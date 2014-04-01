@@ -412,8 +412,9 @@ fixed_t	P_FindHighestFloorSurrounding(sector_t *sec)
   int		i;
   line_t*	check;
   sector_t*	other;
-  fixed_t	floor = -500*FRACUNIT;
+  fixed_t	floor;
 
+  floor = MININT;			// Was -500*FRACUNIT - another well known vanilla bug.
   for (i=0 ;i < sec->linecount ; i++)
   {
     check = sec->lines[i];
@@ -424,10 +425,9 @@ fixed_t	P_FindHighestFloorSurrounding(sector_t *sec)
      && (other->floorheight > floor))
       floor = other->floorheight;
   }
+
   return floor;
 }
-
-
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -501,8 +501,9 @@ fixed_t	P_FindHighestCeilingSurrounding(sector_t* sec)
   int		i;
   line_t*	check;
   sector_t*	other;
-  fixed_t	height = 0;
+  fixed_t	height;
 
+  height = MININT;
   for (i=0 ;i < sec->linecount ; i++)
   {
     check = sec->lines[i];
@@ -513,6 +514,7 @@ fixed_t	P_FindHighestCeilingSurrounding(sector_t* sec)
      && (other->ceilingheight > height))
       height = other->ceilingheight;
   }
+
   return height;
 }
 
