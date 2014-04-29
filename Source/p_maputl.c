@@ -462,35 +462,27 @@ P_BlockLinesIterator
   int			y,
   boolean(*func)(line_t*) )
 {
-    int			offset;
-    short*		list;
-    line_t*		ld;
+  if (x < 0 || y < 0 || x >= bmapwidth || y >= bmapheight)
+    return true;
+  else
+  {
+    int offset = blockmapindex[y * bmapwidth + x];
+    const uint32_t *list;
 
-    if (x<0
-	|| y<0
-	|| x>=bmapwidth
-	|| y>=bmapheight)
+    for (list = &blockmaphead[offset]; *list != (uint32_t)(-1); list++)
     {
-	return true;
+      line_t *ld = &lines[*list];
+
+      if (ld->validcount == validcount)
+	continue; // line has already been checked
+
+      ld->validcount = validcount;
+
+      if (!func(ld))
+	return false;
     }
-
-    offset = y*bmapwidth+x;
-
-    offset = *(blockmap+offset);
-
-    for ( list = blockmaplump+offset ; *list != -1 ; list++)
-    {
-	ld = &lines[*list];
-
-	if (ld->validcount == validcount)
-	    continue;	// line has already been checked
-
-	ld->validcount = validcount;
-
-	if ( !func(ld) )
-	    return false;
-    }
-    return true;	// everything was checked
+    return true; // everything was checked
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1029,7 +1021,7 @@ P_TraverseIntercepts
     }
 #endif
 
-        if ( !func (in) )
+	if ( !func (in) )
 	    return false;	// don't bother going farther
 
 	in->frac = MAXINT;

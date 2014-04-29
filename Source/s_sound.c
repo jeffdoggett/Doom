@@ -25,24 +25,7 @@
 static const char rcsid[] = "$Id: s_sound.c,v 1.6 1997/02/03 22:45:12 b1 Exp $";
 #endif
 
-
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "i_system.h"
-#include "i_sound.h"
-#include "sounds.h"
-#include "s_sound.h"
-
-#include "z_zone.h"
-#include "m_random.h"
-#include "w_wad.h"
-
-#include "doomdef.h"
-#include "p_local.h"
-
-#include "doomstat.h"
+#include "includes.h"
 
 
 // Purpose?

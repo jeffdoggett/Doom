@@ -25,14 +25,7 @@
 static const char rcsid[] = "$Id: p_sight.c,v 1.3 1997/01/28 22:08:28 b1 Exp $";
 #endif
 
-
-#include "doomdef.h"
-
-#include "i_system.h"
-#include "p_local.h"
-
-// State.
-#include "r_state.h"
+#include "includes.h"
 
 //
 // P_CheckSight

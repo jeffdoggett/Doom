@@ -25,15 +25,7 @@
 static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #endif
 
-#include "i_system.h"
-#include "z_zone.h"
-#include "p_local.h"
-#include "m_argv.h"
-#include "m_swap.h"
-
-// State.
-#include "doomstat.h"
-#include "r_state.h"
+#include "includes.h"
 
 // Pads save_p to a 4-byte boundary
 //  so that the load/save works on SGI&Gecko.

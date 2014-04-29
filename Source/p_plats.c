@@ -25,23 +25,7 @@
 static const char rcsid[] = "$Id: p_plats.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #endif
 
-
-#include "i_system.h"
-#include "z_zone.h"
-#include "m_random.h"
-
-#include "doomdef.h"
-#include "p_local.h"
-
-#include "s_sound.h"
-#include "p_inter.h"
-// State.
-#include "doomstat.h"
-#include "r_state.h"
-
-// Data.
-#include "sounds.h"
-
+#include "includes.h"
 
 plat_t*		activeplats[MAXPLATS];
 extern boolean	gamekeydown[NUMKEYS];

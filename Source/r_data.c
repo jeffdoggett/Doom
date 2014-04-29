@@ -28,35 +28,12 @@
 static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #endif
 
-#include <stdlib.h>
-#include <ctype.h>
+#include "includes.h"
 #if defined(LINUX) || defined(HAVE_ALLOCA)
 #include  <alloca.h>
 #else
 extern void * alloca (unsigned int);
 #endif
-
-#include "i_system.h"
-#include "z_zone.h"
-
-#include "m_swap.h"
-
-#include "w_wad.h"
-
-#include "doomdef.h"
-#include "r_local.h"
-#include "p_local.h"
-
-#include "doomstat.h"
-#include "r_sky.h"
-
-#ifdef __riscos
-#include "acorn.h"
-#endif
-
-#include "r_data.h"
-#include "m_argv.h"
-
 
 
 int		numflats;
