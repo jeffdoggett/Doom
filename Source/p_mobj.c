@@ -246,7 +246,8 @@ void P_XYMovement (mobj_t* mo)
 	    || mo->momy > FRACUNIT/4
 	    || mo->momy < -FRACUNIT/4)
 	{
-	    if (mo->floorz > mo->subsector->sector->floorheight)
+//	    if (mo->floorz > mo->subsector->sector->floorheight)
+	    if (mo->z > mo->subsector->sector->floorheight)
 		return;
 	}
     }
