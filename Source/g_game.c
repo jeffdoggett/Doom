@@ -104,7 +104,6 @@ extern clusterdefs_t * finale_clusterdefs;
 
 /* -------------------------------------------------------------------------------------------- */
 
-#define SAVEGAMESIZE	((SCREENHEIGHT*SCREENWIDTH*3)-0x2E00)
 #define SAVESTRINGSIZE	24
 
 
@@ -174,8 +173,6 @@ boolean		precache = true;	// if true, load all graphics at start
 wbstartstruct_t	wminfo;			// parms for world map / intermission
 
 static short	consistancy[MAXPLAYERS][BACKUPTICS];
-
-static byte*	savebuffer;
 
 unsigned int	secretexit;
 extern char*	pagename;
@@ -1753,17 +1750,18 @@ void G_DoLoadGame (void)
 {
   int		i;
   int		a,b,c;
-  unsigned int length;
+  unsigned int	length;
   skill_t	l_skill;
   int		l_episode;
   int		l_map;
-  byte *	save_p;
-  char	vcheck[VERSIONSIZE];
+  byte*		loadbuffer;
+  byte*		save_p;
+  char		vcheck[VERSIONSIZE];
 
   gameaction = ga_nothing;
 
-  length = M_ReadFile (savename, &savebuffer);
-  save_p = savebuffer + SAVESTRINGSIZE;
+  length = M_ReadFile (savename, &loadbuffer);
+  save_p = loadbuffer + SAVESTRINGSIZE;
 
   // skip the description field
   memset (vcheck,0,sizeof(vcheck));
@@ -1799,7 +1797,7 @@ void G_DoLoadGame (void)
       I_Error ("Bad savegame");
 
   // done
-  Z_Free (savebuffer);
+  Z_Free (loadbuffer);
 
   if (setsizeneeded)
       R_ExecuteSetViewSize ();
@@ -1842,23 +1840,47 @@ void G_GetSaveGameName (char * name, int i)
 }
 
 /* ----------------------------------------------------------------------- */
+/*
+   A quick and dirty function to get an approximate
+   size of buffer required for the save game.
+*/
+
+static unsigned int G_GetSaveBufferSize (void)
+{
+  unsigned int	length;
+  thinker_t*	th;
+
+  length = 512;				// Overheads.
+  length += numsectors * 14;		// 14 bytes per sector
+  length += numlines * 26;		// 26 bytes for a two sided line
+
+  for (th = thinker_head ; th != NULL ; th=th->next)
+  {
+    length += 200;			// Just a guess!
+  }
+
+  return (length);
+}
+
+/* ----------------------------------------------------------------------- */
 
 void G_DoSaveGame (void)
 {
-  char	name[100];
-  char	name2[VERSIONSIZE];
-  char*	description;
-  int		length;
   int		i;
-  byte *	save_p;
+  unsigned int	length;
+  unsigned int	savebuffersize;
+  byte*		save_p;
+  byte*		savebuffer;
+  char		name [100];
+  char		name2 [VERSIONSIZE];
 
   G_GetSaveGameName (name, savegameslot);
 
-  description = savedescription;
+  savebuffersize = G_GetSaveBufferSize ();
 
-  save_p = savebuffer = screens[1]+0x4000;
+  save_p = savebuffer = Z_Malloc (savebuffersize, PU_STATIC, NULL);
 
-  memcpy (save_p, description, SAVESTRINGSIZE);
+  memcpy (save_p, savedescription, SAVESTRINGSIZE);
   save_p += SAVESTRINGSIZE;
   memset (name2,0,sizeof(name2));
   sprintf (name2,"version %i",SAVE_GAME_VERSION);
@@ -1890,8 +1912,10 @@ void G_DoSaveGame (void)
   }
 
   length = save_p - savebuffer;
-  if (length > SAVEGAMESIZE)
-      I_Error ("Savegame buffer overrun (%u > %u)", length, SAVEGAMESIZE);
+  if (length > savebuffersize)
+    I_Error ("Savegame buffer overrun (%u > %u)", length, savebuffersize);
+
+  // printf ("Writing %X bytes (buffer = %X)\n", length, savebuffersize);
 
   if (M_WriteFile (name, savebuffer, length) == false)
     players[consoleplayer].message = "SAVE FAILED!!";
@@ -1900,6 +1924,8 @@ void G_DoSaveGame (void)
 
   gameaction = ga_nothing;
   savedescription[0] = 0;
+
+  Z_Free (savebuffer);
 
   // draw the pattern into the back screen
   R_FillBackScreen ();
