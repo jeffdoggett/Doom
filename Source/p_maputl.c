@@ -290,7 +290,7 @@ void P_LineOpening (line_t* linedef)
     sector_t*	front;
     sector_t*	back;
 
-    if (linedef->sidenum[1] == -1)
+    if (linedef->sidenum[1] == (dushort_t) -1)
     {
 	// single sided line
 	openrange = 0;

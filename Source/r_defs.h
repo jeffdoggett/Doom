@@ -220,7 +220,7 @@ typedef struct line_s
 
     // Visual appearance: SideDefs.
     //  sidenum[1] will be -1 if one sided
-    dshort_t	sidenum[2];
+    dushort_t	sidenum[2];
 
     // Neat. Another bounding box, for the extent
     //  of the LineDef.
@@ -257,8 +257,8 @@ typedef struct line_s
 typedef struct subsector_s
 {
     sector_t*	sector;
-    dshort_t	numlines;
-    dshort_t	firstline;
+    dushort_t	numlines;
+    dushort_t	firstline;
 
 } subsector_t;
 
@@ -315,7 +315,7 @@ typedef struct
     fixed_t	bbox[2][4];
 
     // If NF_SUBSECTOR its a subsector.
-    dushort_t	children[2];
+    unsigned int children[2];
 
 } node_t;
 

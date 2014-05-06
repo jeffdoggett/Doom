@@ -441,7 +441,7 @@ byte * P_ArchiveWorld (byte * save_p)
     p_save_16 (li->tag);
     for (j=0 ; j<2 ; j++)
     {
-      if (li->sidenum[j] == -1)
+      if (li->sidenum[j] == (dushort_t) -1)
 	continue;
 
       si = &sides[li->sidenum[j]];
@@ -497,7 +497,7 @@ byte * P_UnArchiveWorld (byte * save_p)
     li->tag = p_load_16(save_p); save_p += 2;
     for (j=0 ; j<2 ; j++)
     {
-      if (li->sidenum[j] == -1)
+      if (li->sidenum[j] == (dushort_t) -1)
 	  continue;
       si = &sides[li->sidenum[j]];
       si->textureoffset = p_load_16(save_p) << FRACBITS; save_p += 2;

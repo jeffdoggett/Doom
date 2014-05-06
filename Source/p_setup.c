@@ -45,25 +45,25 @@ extern void P_Init_SpecHit (void);
 // MAP related Lookup tables.
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
 //
-int		numvertexes;
+unsigned int	numvertexes;
 vertex_t*	vertexes;
 
-int		numsegs;
+unsigned int	numsegs;
 seg_t*		segs;
 
-int		numsectors;
+unsigned int	numsectors;
 sector_t*	sectors;
 
-int		numsubsectors;
+unsigned int	numsubsectors;
 subsector_t*	subsectors;
 
-int		numnodes;
+unsigned int	numnodes;
 node_t*		nodes;
 
-int		numlines;
+unsigned int	numlines;
 line_t*		lines;
 
-int		numsides;
+unsigned int	numsides;
 side_t*		sides;
 
 
@@ -156,8 +156,8 @@ void P_LoadSegs (int lump)
     mapseg_t*		ml;
     seg_t*		li;
     line_t*		ldef;
-    int			linedef;
-    int			side;
+    unsigned int	linedef;
+    unsigned int	side;
     byte*		vertchanged;
 
 #ifdef PADDED_STRUCTS
@@ -178,11 +178,22 @@ void P_LoadSegs (int lump)
     li = segs;
     for (i=0 ; i<numsegs ; i++, li++)
     {
+	unsigned int v;
 	int	ptp_angle;
 	int	delta_angle;
 
-	li->v1 = &vertexes[SHORT(ml->v1)];
-	li->v2 = &vertexes[SHORT(ml->v2)];
+	v = USHORT(ml->v1);
+	if (v >= numvertexes)
+	  I_Error ("P_LoadSegs: invalid vertex %u", v);
+
+	li->v1 = &vertexes[v];
+
+	v = USHORT(ml->v2);
+	if (v >= numvertexes)
+	  I_Error ("P_LoadSegs: invalid vertex %u", v);
+
+	li->v2 = &vertexes[v];
+
 	li->angle = (SHORT(ml->angle))<<16;
 
 	/* firelines fix -- taken from Boom source */
@@ -219,10 +230,10 @@ void P_LoadSegs (int lump)
 
 
 	li->offset = (SHORT(ml->offset))<<16;
-	linedef = SHORT(ml->linedef);
+	linedef = USHORT(ml->linedef);
 	ldef = &lines[linedef];
 	li->linedef = ldef;
-	side = SHORT(ml->side);
+	side = USHORT(ml->side);
 	li->sidedef = &sides[ldef->sidenum[side]];
 	li->frontsector = sides[ldef->sidenum[side]].sector;
 	if (ldef-> flags & ML_TWOSIDED)
@@ -260,8 +271,8 @@ void P_LoadSubsectors (int lump)
 
     for (i=0 ; i<numsubsectors ; i++, ss++, ms++)
     {
-	ss->numlines = SHORT(ms->numsegs);
-	ss->firstline = SHORT(ms->firstseg);
+	ss->numlines = USHORT(ms->numsegs);
+	ss->firstline = USHORT(ms->firstseg);
     }
 
     Z_Free (data);
@@ -333,6 +344,7 @@ void P_LoadNodes (int lump)
     int		i;
     int		j;
     int		k;
+    unsigned int children;
     mapnode_t*	mn;
     node_t*	no;
 
@@ -351,9 +363,29 @@ void P_LoadNodes (int lump)
 	no->dy = SHORT(mn->dy)<<FRACBITS;
 	for (j=0 ; j<2 ; j++)
 	{
-	    no->children[j] = SHORT(mn->children[j]);
-	    for (k=0 ; k<4 ; k++)
-		no->bbox[j][k] = SHORT(mn->bbox[j][k])<<FRACBITS;
+	  children = USHORT(mn->children[j]);
+	  // e6y: support for extended nodes
+	  if (children == 0xFFFF)
+	  {
+	      children = (unsigned int) -1;
+	  }
+#if NF_SUBSECTOR!=0x8000
+	  else if (children & 0x8000)
+	  {
+	      // Convert to extended type
+	      children &= ~0x8000;
+
+	      // haleyjd 11/06/10: check for invalid subsector reference
+	      if (children >= numsubsectors)
+		  children = 0;
+
+	      children |= NF_SUBSECTOR;
+	  }
+#endif
+	  no->children[j] = children;
+
+	  for (k=0 ; k<4 ; k++)
+	       no->bbox[j][k] = SHORT(mn->bbox[j][k])<<FRACBITS;
 	}
     }
 
@@ -461,8 +493,9 @@ static unsigned int P_LoadThings (int lump)
 //
 void P_LoadLineDefs (int lump)
 {
-    byte*		data;
     int			i;
+    unsigned short	sidenum;
+    byte*		data;
     maplinedef_t*	mld;
     line_t*		ld;
     vertex_t*		v1;
@@ -481,11 +514,11 @@ void P_LoadLineDefs (int lump)
     ld = lines;
     for (i=0 ; i<numlines ; i++, ld++)
     {
-	ld->flags = SHORT(mld->flags);
-	ld->special = SHORT(mld->special);
-	ld->tag = SHORT(mld->tag);
-	v1 = ld->v1 = &vertexes[SHORT(mld->v1)];
-	v2 = ld->v2 = &vertexes[SHORT(mld->v2)];
+	ld->flags = USHORT(mld->flags);
+	ld->special = USHORT(mld->special);
+	ld->tag = USHORT(mld->tag);
+	v1 = ld->v1 = &vertexes[USHORT(mld->v1)];
+	v2 = ld->v2 = &vertexes[USHORT(mld->v2)];
 	ld->dx = v2->x - v1->x;
 	ld->dy = v2->y - v1->y;
 
@@ -523,22 +556,34 @@ void P_LoadLineDefs (int lump)
 	    ld->bbox[BOXTOP] = v1->y;
 	}
 
-        // calculate sound origin of line to be its midpoint
-        ld->soundorg.x = (ld->bbox[BOXLEFT] + ld->bbox[BOXRIGHT] ) / 2;
-        ld->soundorg.y = (ld->bbox[BOXTOP] + ld->bbox[BOXBOTTOM]) / 2;
+	// calculate sound origin of line to be its midpoint
+	ld->soundorg.x = (ld->bbox[BOXLEFT] + ld->bbox[BOXRIGHT] ) / 2;
+	ld->soundorg.y = (ld->bbox[BOXTOP] + ld->bbox[BOXBOTTOM]) / 2;
 
-	ld->sidenum[0] = SHORT(mld->sidenum[0]);
-	ld->sidenum[1] = SHORT(mld->sidenum[1]);
-
-	if (ld->sidenum[0] != -1)
-	    ld->frontsector = sides[ld->sidenum[0]].sector;
+	sidenum = USHORT(mld->sidenum[0]);
+	if (sidenum == 0xFFFF)
+	{
+	  ld->sidenum[0] = (dushort_t) -1;
+	  ld->frontsector = 0;
+	}
 	else
-	    ld->frontsector = 0;
+	{
+	  ld->sidenum[0] = sidenum;
+	  ld->frontsector = sides[sidenum].sector;
+	}
 
-	if (ld->sidenum[1] != -1)
-	    ld->backsector = sides[ld->sidenum[1]].sector;
+	sidenum = USHORT(mld->sidenum[1]);
+	if (sidenum == 0xFFFF)
+	{
+	  ld->sidenum[1] = (dushort_t) -1;
+	  ld->backsector = 0;
+	}
 	else
-	    ld->backsector = 0;
+	{
+	  ld->sidenum[1] = sidenum;
+	  ld->backsector = sides[sidenum].sector;
+	}
+
 #ifdef PADDED_STRUCTS
 	mld = (maplinedef_t *) ((byte *) mld + 14);
 #else
@@ -624,10 +669,10 @@ void P_LoadBlockMap (int lump)
   // because Doom originally considered the offsets as always signed.
   // [WDJ] They are unsigned in Unofficial Doom Spec.
 
-  blockmaphead[0] = SHORT(wadblockmaplump[0]) & 0xFFFF;	// map orgin_x
-  blockmaphead[1] = SHORT(wadblockmaplump[1]) & 0xFFFF;	// map orgin_y
-  blockmaphead[2] = SHORT(wadblockmaplump[2]) & 0xFFFF;	// number columns (x size)
-  blockmaphead[3] = SHORT(wadblockmaplump[3]) & 0xFFFF;	// number rows (y size)
+  blockmaphead[0] = USHORT(wadblockmaplump[0]);	// map orgin_x
+  blockmaphead[1] = USHORT(wadblockmaplump[1]);	// map orgin_y
+  blockmaphead[2] = USHORT(wadblockmaplump[2]);	// number columns (x size)
+  blockmaphead[3] = USHORT(wadblockmaplump[3]);	// number rows (y size)
 
   bmaporgx = blockmaphead[0] << FRACBITS;
   bmaporgy = blockmaphead[1] << FRACBITS;
@@ -650,7 +695,7 @@ void P_LoadBlockMap (int lump)
   // read blockmap index array
   for (i = 4; i < firstlist; i++)		// for all entries in wad offset index
   {
-    uint32_t bme = SHORT(wadblockmaplump[i]) & 0xFFFF;	// offset
+    uint32_t bme = USHORT(wadblockmaplump[i]);	// offset
 
 						// upon overflow, the bme will wrap to low values
     if (bme < firstlist				// too small to be valid
@@ -672,12 +717,12 @@ void P_LoadBlockMap (int lump)
        && wadblockmaplump[bmec] == 0		// valid start list
        && bmec - blockmaphead[i - 1] < 1000)	// reasonably close sequentially
       {
-        bme = bmec;
+	bme = bmec;
       }
     }
 
     if (bme > lastlist)
-        I_Error("Blockmap offset[%i]= %i, exceeds bounds.\n", i, bme);
+	I_Error("Blockmap offset[%i]= %i, exceeds bounds.\n", i, bme);
     if (bme < firstlist
      || wadblockmaplump[bme] != 0) // not start list
       I_Error("Bad blockmap offset[%i]= %i.\n", i, bme);
@@ -689,7 +734,7 @@ void P_LoadBlockMap (int lump)
   {
     // killough 3/1/98
     // keep -1 (0xffff), but other values are unsigned
-    uint16_t bme = SHORT(wadblockmaplump[i]);
+    uint16_t bme = USHORT(wadblockmaplump[i]);
 
     blockmaphead[i] = (bme == 0xffff ? (uint32_t)(-1) : (uint32_t)bme);
   }
@@ -703,124 +748,224 @@ void P_LoadBlockMap (int lump)
 
 
 //
-/* In case something went wrong with the memory-requirements... */
-static int P_TryGroupLines(int total)
+// P_GroupLines
+// Builds sector line lists and subsector sector numbers.
+// Finds block bounding boxes for sectors.
+//
+// killough 5/3/98: reformatted, cleaned up
+// cph 18/8/99: rewritten to avoid O(numlines * numsectors) section
+// It makes things more complicated, but saves seconds on big levels
+// figgi 09/18/00 -- adapted for gl-nodes
+
+// cph - convenient sub-function
+static void P_AddLineToSector (line_t *li, sector_t *sector)
 {
-    line_t**		linebuffer;
-    line_t**            linebase;
-    sector_t*		sector;
-    fixed_t		bbox[4];
-    int			block;
-    int                 i, j;
-    line_t*             li;
+    fixed_t *bbox = (void *)sector->blockbox;
 
-    /* build line tables for each sector        */
-    linebase = Z_Malloc (total*sizeof(line_t*), PU_LEVEL, 0);
-    linebuffer = linebase;
-
-    sector = sectors;
-    for (i=0 ; i<numsectors ; i++, sector++)
-    {
-	M_ClearBox (bbox);
-	sector->lines = linebuffer;
-	li = lines;
-	for (j=0 ; j<numlines ; j++, li++)
-	{
-	    if ((li->frontsector == sector) || ((li->backsector == sector) && (li->backsector != li->frontsector)))
-	    {
-		if (linebuffer < linebase + total) *linebuffer = li;
-		linebuffer++;
-		M_AddToBox (bbox, li->v1->x, li->v1->y);
-		M_AddToBox (bbox, li->v2->x, li->v2->y);
-	    }
-	}
-	if (linebuffer - sector->lines != sector->linecount)
-	{
-	    fprintf(stderr, "P_GroupLines: miscounted by %d\n", (linebuffer - sector->lines) - sector->linecount);
-	    sector->linecount = linebuffer - sector->lines;
-	}
-	/* set the degenmobj_t to the middle of the bounding box*/
-	sector->soundorg.x = (bbox[BOXRIGHT]+bbox[BOXLEFT])/2;
-	sector->soundorg.y = (bbox[BOXTOP]+bbox[BOXBOTTOM])/2;
-
-	/* adjust bounding box to map blocks*/
-	block = (bbox[BOXTOP]-bmaporgy+MAXRADIUS)>>MAPBLOCKSHIFT;
-	block = block >= bmapheight ? bmapheight-1 : block;
-	sector->blockbox[BOXTOP]=block;
-
-	block = (bbox[BOXBOTTOM]-bmaporgy-MAXRADIUS)>>MAPBLOCKSHIFT;
-	block = block < 0 ? 0 : block;
-	sector->blockbox[BOXBOTTOM]=block;
-
-	block = (bbox[BOXRIGHT]-bmaporgx+MAXRADIUS)>>MAPBLOCKSHIFT;
-	block = block >= bmapwidth ? bmapwidth-1 : block;
-	sector->blockbox[BOXRIGHT]=block;
-
-	block = (bbox[BOXLEFT]-bmaporgx-MAXRADIUS)>>MAPBLOCKSHIFT;
-	block = block < 0 ? 0 : block;
-	sector->blockbox[BOXLEFT]=block;
-    }
-
-    if (linebuffer > linebase + total)
-    {
-	Z_Free(linebase);
-	return (linebuffer - linebase);
-    }
-    return 0;
+    sector->lines[sector->linecount++] = li;
+    M_AddToBox (bbox, li->v1->x, li->v1->y);
+    M_AddToBox (bbox, li->v2->x, li->v2->y);
 }
-
-/* P_GroupLines*/
-/* Builds sector line lists and subsector sector numbers.*/
-/* Finds block bounding boxes for sectors.*/
 
 static void P_GroupLines (void)
 {
-    int                 i;
-    int                 total;
-    line_t*             li;
-    subsector_t*        ss;
-    seg_t*              seg;
+    register line_t *li;
+    register sector_t *sector;
+    int i, j, total = numlines;
 
-    /* look up sector number for each subsector*/
-    ss = subsectors;
-    for (i=0 ; i<numsubsectors ; i++, ss++)
+    // figgi
+    for (i = 0; i < numsubsectors; i++)
     {
-	seg = &segs[ss->firstline];
-	ss->sector = seg->sidedef->sector;
+	seg_t *seg = &segs[subsectors[i].firstline];
+
+	subsectors[i].sector = NULL;
+	for (j = 0; j < subsectors[i].numlines; j++)
+	{
+	    if (seg->sidedef)
+	    {
+		subsectors[i].sector = seg->sidedef->sector;
+		break;
+	    }
+	    seg++;
+	}
+	if (subsectors[i].sector == NULL)
+	    I_Error ("P_GroupLines: Subsector a part of no sector!");
     }
 
-    /* count number of lines in each sector*/
-    li = lines;
-    total = 0;
-    for (i=0 ; i<numlines ; i++, li++)
+    // count number of lines in each sector
+    for (i = 0, li = lines; i < numlines; i++, li++)
     {
-//	if (li->frontsector != NULL)		// Removed By JAD as it causes off-by-one errors
-	{					// in HR2 map 32.
-	    /* This copied from Doom retro */
-	    if (!li->frontsector && li->backsector)
-	    {
-		// swap front and backsectors if a one-sided linedef
-		// does not have a front sector
-		li->frontsector = li->backsector;
-		li->backsector = NULL;
-	    }
+	if (!li->frontsector && li->backsector)
+	{
+	    // swap front and backsectors if a one-sided linedef
+	    // does not have a front sector.
+	    // HR2 map 32.
+	    li->frontsector = li->backsector;
+	    li->backsector = NULL;
+	    // printf ("P_GroupLines: No front sector\n");
+	}
 
-	    if (li->frontsector)		// And moved to here.
-	    {
-		li->frontsector->linecount++;
-		total++;
-	    }
-
-	    if (li->backsector && li->backsector != li->frontsector)
-	    {
-		li->backsector->linecount++;
-		total++;
-	    }
+	li->frontsector->linecount++;
+	if (li->backsector && li->backsector != li->frontsector)
+	{
+	    li->backsector->linecount++;
+	    total++;
 	}
     }
 
-    while (total != 0) total = P_TryGroupLines(total);
+    // allocate line tables for each sector
+    {
+	line_t **linebuffer = Z_Malloc (total * sizeof(line_t *), PU_LEVEL, 0);
+
+	// e6y: REJECT overrun emulation code
+	// moved to P_LoadReject
+	for (i = 0, sector = sectors; i < numsectors; i++, sector++)
+	{
+	    sector->lines = linebuffer;
+	    linebuffer += sector->linecount;
+	    sector->linecount = 0;
+	    M_ClearBox(sector->blockbox);
+	}
+    }
+
+    // Enter those lines
+    for (i = 0, li = lines; i < numlines; i++, li++)
+    {
+	P_AddLineToSector (li, li->frontsector);
+	if (li->backsector && li->backsector != li->frontsector)
+	    P_AddLineToSector (li, li->backsector);
+    }
+
+    for (i = 0, sector = sectors; i < numsectors; i++, sector++)
+    {
+	fixed_t *bbox = (void*)sector->blockbox; // cph - For convenience, so
+	int block; // I can use the old code unchanged
+
+	//e6y: fix sound origin for large levels
+	sector->soundorg.x = bbox[BOXRIGHT] / 2 + bbox[BOXLEFT] / 2;
+	sector->soundorg.y = bbox[BOXTOP] / 2 + bbox[BOXBOTTOM] / 2;
+
+	// adjust bounding box to map blocks
+	block = (bbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = (block >= bmapheight ? bmapheight - 1 : block);
+	sector->blockbox[BOXTOP] = block;
+
+	block = (bbox[BOXBOTTOM] - bmaporgy - MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = (block < 0 ? 0 : block);
+	sector->blockbox[BOXBOTTOM] = block;
+
+	block = (bbox[BOXRIGHT] - bmaporgx + MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = (block >= bmapwidth ? bmapwidth - 1 : block);
+	sector->blockbox[BOXRIGHT] = block;
+
+	block = (bbox[BOXLEFT] - bmaporgx - MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = (block < 0 ? 0 : block);
+	sector->blockbox[BOXLEFT] = block;
+    }
 }
+
+//
+// killough 10/98
+//
+// Remove slime trails.
+//
+// Slime trails are inherent to Doom's coordinate system -- i.e. there is
+// nothing that a node builder can do to prevent slime trails ALL of the time,
+// because it's a product of the integer coodinate system, and just because
+// two lines pass through exact integer coordinates, doesn't necessarily mean
+// that they will intersect at integer coordinates. Thus we must allow for
+// fractional coordinates if we are to be able to split segs with node lines,
+// as a node builder must do when creating a BSP tree.
+//
+// A wad file does not allow fractional coordinates, so node builders are out
+// of luck except that they can try to limit the number of splits (they might
+// also be able to detect the degree of roundoff error and try to avoid splits
+// with a high degree of roundoff error). But we can use fractional coordinates
+// here, inside the engine. It's like the difference between square inches and
+// square miles, in terms of granularity.
+//
+// For each vertex of every seg, check to see whether it's also a vertex of
+// the linedef associated with the seg (i.e, it's an endpoint). If it's not
+// an endpoint, and it wasn't already moved, move the vertex towards the
+// linedef by projecting it using the law of cosines. Formula:
+//
+// 2 2 2 2
+// dx x0 + dy x1 + dx dy (y0 - y1) dy y0 + dx y1 + dx dy (x0 - x1)
+// {---------------------------------, ---------------------------------}
+// 2 2 2 2
+// dx + dy dx + dy
+//
+// (x0,y0) is the vertex being moved, and (x1,y1)-(x1+dx,y1+dy) is the
+// reference linedef.
+//
+// Segs corresponding to orthogonal linedefs (exactly vertical or horizontal
+// linedefs), which comprise at least half of all linedefs in most wads, don't
+// need to be considered, because they almost never contribute to slime trails
+// (because then any roundoff error is parallel to the linedef, which doesn't
+// cause slime). Skipping simple orthogonal lines lets the code finish quicker.
+//
+// Please note: This section of code is not interchangable with TeamTNT's
+// code which attempts to fix the same problem.
+//
+// Firelines (TM) is a Rezistered Trademark of MBF Productions
+//
+
+static void P_RemoveSlimeTrails (void)		// killough 10/98
+{
+  int i;
+  byte *hit;					// Hitlist for vertices
+
+  hit = (byte *) calloc (1, numvertexes);
+  if (hit)
+  {
+    for (i = 0; i < numsegs; i++)		// Go through each seg
+    {
+      const line_t *l = segs[i].linedef;	// The parent linedef
+
+      if (l->dx && l->dy)			// We can ignore orthogonal lines
+      {
+	vertex_t *v = segs[i].v1;
+
+	do
+	  if (!hit [v - vertexes])		// If we haven't processed vertex
+	  {
+	    hit [v - vertexes] = 1;		// Mark this vertex as processed
+
+	    if (v != l->v1 && v != l->v2)	// Exclude endpoints of linedefs
+	    {
+#if 0
+	      // Project the vertex back onto the parent linedef
+	      int64_t dx2 = (l->dx >> FRACBITS) * (l->dx >> FRACBITS);
+	      int64_t dy2 = (l->dy >> FRACBITS) * (l->dy >> FRACBITS);
+	      int64_t dxy = (l->dx >> FRACBITS) * (l->dy >> FRACBITS);
+	      int64_t s = dx2 + dy2;
+	      int x0 = v->x, y0 = v->y, x1 = l->v1->x, y1 = l->v1->y;
+
+	      v->x = (int)((dx2 * x0 + dy2 * x1 + dxy * (y0 - y1)) / s);
+	      v->y = (int)((dy2 * y0 + dx2 * y1 + dxy * (x0 - x1)) / s);
+#else
+	      // The Norcroft ARM compiler threw
+	      // "Warning: Lower precision in wider context" for the above....
+	      // JAD 6/5/14
+	      int32_t dx2 = (l->dx >> FRACBITS) * (l->dx >> FRACBITS);
+	      int32_t dy2 = (l->dy >> FRACBITS) * (l->dy >> FRACBITS);
+	      int32_t dxy = (l->dx >> FRACBITS) * (l->dy >> FRACBITS);
+	      int64_t s = (int64_t) dx2 + (int64_t) dy2;
+	      int x0 = v->x, y0 = v->y, x1 = l->v1->x, y1 = l->v1->y;
+
+	      v->x = (int)(((int64_t)dx2 * (int64_t)x0 + (int64_t)dy2 * (int64_t)x1 + (int64_t)dxy * (int64_t)(y0 - y1)) / s);
+	      v->y = (int)(((int64_t)dy2 * (int64_t)y0 + (int64_t)dx2 * (int64_t)y1 + (int64_t)dxy * (int64_t)(x0 - x1)) / s);
+#endif
+//	      printf ("%X,%X\n", v->x, v->y);
+	    }
+	  } // Obsfucated C contest entry: :)
+	while ((v != segs[i].v2) && ((v = segs[i].v2) != NULL));
+      }
+    }
+    free(hit);
+  }
+}
+
 
 
 
@@ -895,6 +1040,7 @@ P_SetupLevel
     rejectmatrix = W_CacheLumpNum (lumpnum+ML_REJECT,PU_LEVEL);
     rejectmatrixsize = W_LumpLength (lumpnum+ML_REJECT);
     P_GroupLines ();
+    P_RemoveSlimeTrails ();
 
     bodyqueslot = 0;
     deathmatch_p = deathmatchstarts;

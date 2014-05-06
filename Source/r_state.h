@@ -72,28 +72,28 @@ extern int		numtextures;
 //
 // Lookup tables for map data.
 //
-extern int		numsprites;
+extern unsigned int	numsprites;
 extern spritedef_t*	sprites;
 
-extern int		numvertexes;
+extern unsigned int	numvertexes;
 extern vertex_t*	vertexes;
 
-extern int		numsegs;
+extern unsigned int	numsegs;
 extern seg_t*		segs;
 
-extern int		numsectors;
+extern unsigned int	numsectors;
 extern sector_t*	sectors;
 
-extern int		numsubsectors;
+extern unsigned int	numsubsectors;
 extern subsector_t*	subsectors;
 
-extern int		numnodes;
+extern unsigned int	numnodes;
 extern node_t*		nodes;
 
-extern int		numlines;
+extern unsigned int	numlines;
 extern line_t*		lines;
 
-extern int		numsides;
+extern unsigned int	numsides;
 extern side_t*		sides;
 
 
