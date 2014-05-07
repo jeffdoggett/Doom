@@ -41,6 +41,7 @@ extern void P_Init_Intercepts (void);
 extern void P_Init_SpecHit (void);
 
 
+//-----------------------------------------------------------------------------
 //
 // MAP related Lookup tables.
 // Store VERTEXES, LINEDEFS, SIDEDEFS, etc.
@@ -67,6 +68,7 @@ unsigned int	numsides;
 side_t*		sides;
 
 
+//-----------------------------------------------------------------------------
 // BLOCKMAP
 // Created from axis aligned bounding box
 // of the map, a rectangular array of
@@ -87,6 +89,7 @@ fixed_t		bmaporgy;
 mobj_t**	blocklinks;
 
 
+//-----------------------------------------------------------------------------
 // REJECT
 // For fast sight rejection.
 // Speeds up enemy AI by skipping detailed
@@ -106,9 +109,7 @@ mapthing_t*	deathmatch_p;
 mapthing_t	playerstarts[MAXPLAYERS];
 
 
-
-
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadVertexes
 //
@@ -144,113 +145,119 @@ void P_LoadVertexes (int lump)
     Z_Free (data);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadSegs
 //
 void P_LoadSegs (int lump)
 {
-    byte*		data;
-    int			i;
-    mapseg_t*		ml;
-    seg_t*		li;
-    line_t*		ldef;
-    unsigned int	linedef;
-    unsigned int	side;
-    byte*		vertchanged;
+  byte*		data;
+  int			i;
+  mapseg_t*		ml;
+  seg_t*		li;
+  line_t*		ldef;
+  unsigned int	linedef;
+  unsigned int	side;
+//  byte*		vertchanged;
 
 #ifdef PADDED_STRUCTS
-    numsegs = W_LumpLength (lump) / 12;
+  numsegs = W_LumpLength (lump) / 12;
 #else
-    numsegs = W_LumpLength (lump) / sizeof(mapseg_t);
+  numsegs = W_LumpLength (lump) / sizeof(mapseg_t);
 #endif
-    segs = Z_Malloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
-    memset (segs, 0, numsegs*sizeof(seg_t));
-    data = W_CacheLumpNum (lump,PU_STATIC);
+  segs = Z_Malloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
+  memset (segs, 0, numsegs*sizeof(seg_t));
+  data = W_CacheLumpNum (lump,PU_STATIC);
 
-    i = (numvertexes+7)>>3;
-    vertchanged = (byte *) alloca (i);
-    if (vertchanged)
-	memset(vertchanged, 0, i);
+#if 0
+  i = (numvertexes+7)>>3;
+  vertchanged = (byte *) alloca (i);
+  if (vertchanged)
+      memset(vertchanged, 0, i);
+#endif
 
-    ml = (mapseg_t *)data;
-    li = segs;
-    for (i=0 ; i<numsegs ; i++, li++)
+  ml = (mapseg_t *)data;
+  li = segs;
+  for (i=0 ; i<numsegs ; i++, li++)
+  {
+    unsigned int v;
+
+    v = USHORT(ml->v1);
+    if (v >= numvertexes)
+      I_Error ("P_LoadSegs: invalid vertex %u", v);
+
+    li->v1 = &vertexes[v];
+
+    v = USHORT(ml->v2);
+    if (v >= numvertexes)
+      I_Error ("P_LoadSegs: invalid vertex %u", v);
+
+    li->v2 = &vertexes[v];
+
+    li->angle = (SHORT(ml->angle))<<16;
+
+#if 0
     {
-	unsigned int v;
-	int	ptp_angle;
-	int	delta_angle;
+      // Now done later in P_RemoveSlimeTrails
+      int	ptp_angle;
+      int	delta_angle;
 
-	v = USHORT(ml->v1);
-	if (v >= numvertexes)
-	  I_Error ("P_LoadSegs: invalid vertex %u", v);
+      /* firelines fix -- taken from Boom source */
+      ptp_angle = R_PointToAngle2(li->v1->x,li->v1->y,li->v2->x,li->v2->y);
+      delta_angle = (abs(ptp_angle-li->angle)>>ANGLETOFINESHIFT)*360/8192;
 
-	li->v1 = &vertexes[v];
+      if ((delta_angle != 0) && (vertchanged != NULL))
+      {
+	int dis, dx, dy, vnum1, vnum2;
 
-	v = USHORT(ml->v2);
-	if (v >= numvertexes)
-	  I_Error ("P_LoadSegs: invalid vertex %u", v);
-
-	li->v2 = &vertexes[v];
-
-	li->angle = (SHORT(ml->angle))<<16;
-
-	/* firelines fix -- taken from Boom source */
-	ptp_angle = R_PointToAngle2(li->v1->x,li->v1->y,li->v2->x,li->v2->y);
-	delta_angle = (abs(ptp_angle-li->angle)>>ANGLETOFINESHIFT)*360/8192;
-
-	if ((delta_angle != 0) && (vertchanged != NULL))
+	dx = (li->v1->x - li->v2->x)>>FRACBITS;
+	dy = (li->v1->y - li->v2->y)>>FRACBITS;
+	dx = dx * dx;
+	dy = dy * dy;
+	dx = dx + dy;
+	dis = ((int) sqrt(dx))<<FRACBITS;
+	dx = finecosine[li->angle>>ANGLETOFINESHIFT];
+	dy = finesine[li->angle>>ANGLETOFINESHIFT];
+	vnum1 = li->v1 - vertexes;
+	vnum2 = li->v2 - vertexes;
+	if ((vnum2 > vnum1) && ((vertchanged[vnum2>>3] & (1 << (vnum2&7))) == 0))
 	{
-	    int dis, dx, dy, vnum1, vnum2;
-
-	    dx = (li->v1->x - li->v2->x)>>FRACBITS;
-	    dy = (li->v1->y - li->v2->y)>>FRACBITS;
-	    dx = dx * dx;
-	    dy = dy * dy;
-	    dx = dx + dy;
-	    dis = ((int) sqrt(dx))<<FRACBITS;
-	    dx = finecosine[li->angle>>ANGLETOFINESHIFT];
-	    dy = finesine[li->angle>>ANGLETOFINESHIFT];
-	    vnum1 = li->v1 - vertexes;
-	    vnum2 = li->v2 - vertexes;
-	    if ((vnum2 > vnum1) && ((vertchanged[vnum2>>3] & (1 << (vnum2&7))) == 0))
-	    {
-		li->v2->x = li->v1->x + FixedMul(dis,dx);
-		li->v2->y = li->v1->y + FixedMul(dis,dy);
-		vertchanged[vnum2>>3] |= 1 << (vnum2&7);
-	    }
-	    else if ((vertchanged[vnum1>>3] & (1 << (vnum1&7))) == 0)
-	    {
-		li->v1->x = li->v2->x - FixedMul(dis,dx);
-		li->v1->y = li->v2->y - FixedMul(dis,dy);
-		vertchanged[vnum1>>3] |= 1 << (vnum1&7);
-	    }
+	    li->v2->x = li->v1->x + FixedMul(dis,dx);
+	    li->v2->y = li->v1->y + FixedMul(dis,dy);
+	    vertchanged[vnum2>>3] |= 1 << (vnum2&7);
 	}
-
-
-	li->offset = (SHORT(ml->offset))<<16;
-	linedef = USHORT(ml->linedef);
-	ldef = &lines[linedef];
-	li->linedef = ldef;
-	side = USHORT(ml->side);
-	li->sidedef = &sides[ldef->sidenum[side]];
-	li->frontsector = sides[ldef->sidenum[side]].sector;
-	if (ldef-> flags & ML_TWOSIDED)
-	    li->backsector = sides[ldef->sidenum[side^1]].sector;
-	else
-	    li->backsector = 0;
-#ifdef PADDED_STRUCTS
-	ml = (mapseg_t *) ((byte *) ml + 12);
-#else
-	ml++;
-#endif
+	else if ((vertchanged[vnum1>>3] & (1 << (vnum1&7))) == 0)
+	{
+	    li->v1->x = li->v2->x - FixedMul(dis,dx);
+	    li->v1->y = li->v2->y - FixedMul(dis,dy);
+	    vertchanged[vnum1>>3] |= 1 << (vnum1&7);
+	}
+      }
     }
+#endif
 
-    Z_Free (data);
+    li->offset = (SHORT(ml->offset))<<16;
+    linedef = USHORT(ml->linedef);
+    ldef = &lines[linedef];
+    li->linedef = ldef;
+    side = USHORT(ml->side);
+    li->sidedef = &sides[ldef->sidenum[side]];
+    li->frontsector = sides[ldef->sidenum[side]].sector;
+    if (ldef-> flags & ML_TWOSIDED)
+	li->backsector = sides[ldef->sidenum[side^1]].sector;
+    else
+	li->backsector = 0;
+#ifdef PADDED_STRUCTS
+    ml = (mapseg_t *) ((byte *) ml + 12);
+#else
+    ml++;
+#endif
+  }
+
+  Z_Free (data);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadSubsectors
 //
@@ -278,8 +285,7 @@ void P_LoadSubsectors (int lump)
     Z_Free (data);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadSectors
 //
@@ -334,7 +340,7 @@ void P_LoadSectors (int lump)
     Z_Free (data);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadNodes
 //
@@ -392,7 +398,7 @@ void P_LoadNodes (int lump)
     Z_Free (data);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadThings
 //
@@ -486,7 +492,7 @@ static unsigned int P_LoadThings (int lump)
     return (nomonsterbits);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadLineDefs
 // Also counts secret lines for intermissions.
@@ -595,7 +601,7 @@ void P_LoadLineDefs (int lump)
     Z_Free (data);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadSideDefs
 //
@@ -636,7 +642,7 @@ void P_LoadSideDefs (int lump)
     Z_Free (data);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_LoadBlockMap
 //
@@ -746,7 +752,7 @@ void P_LoadBlockMap (int lump)
 }
 
 
-
+//-----------------------------------------------------------------------------
 //
 // P_GroupLines
 // Builds sector line lists and subsector sector numbers.
@@ -864,6 +870,7 @@ static void P_GroupLines (void)
     }
 }
 
+//-----------------------------------------------------------------------------
 //
 // killough 10/98
 //
@@ -966,10 +973,7 @@ static void P_RemoveSlimeTrails (void)		// killough 10/98
   }
 }
 
-
-
-
-
+//-----------------------------------------------------------------------------
 //
 // P_SetupLevel
 //
@@ -1078,6 +1082,8 @@ P_SetupLevel
 						// actioned when they die.
 }
 
+//-----------------------------------------------------------------------------
+
 #ifndef PADDED_STRUCTS
 static void P_Check_Structs (void)
 {
@@ -1091,6 +1097,8 @@ static void P_Check_Structs (void)
     }
 }
 #endif
+
+//-----------------------------------------------------------------------------
 //
 // P_Init
 //
@@ -1106,5 +1114,4 @@ void P_Init (void)
   P_Init_SpecHit ();
 }
 
-
-
+//-----------------------------------------------------------------------------
