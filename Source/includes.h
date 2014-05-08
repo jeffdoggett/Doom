@@ -14,7 +14,7 @@
 #endif
 #ifdef __riscos
 #include "acorn.h"
-#include "stdint.h"
+#include <stdint.h>
 #endif
 
 
