@@ -425,7 +425,8 @@ static const char * const dehack_codeptrs [] =
 
 static const char * const dehack_codeptr_frames [] =
 {
-  "NULL", "Light0", "WeaponReady", "Lower", "Raise",
+  "NULL",
+  "Light0", "WeaponReady", "Lower", "Raise",
   "Punch", "ReFire", "FirePistol", "Light1",
   "FireShotgun", "Light2", "FireShotgun2", "CheckReload",
   "OpenShotgun2", "LoadShotgun2", "CloseShotgun2", "FireCGun",
@@ -449,7 +450,8 @@ static const char * const dehack_codeptr_frames [] =
 
 static const actionf_t action_ptrs[] =
 {
-  {NULL}, {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
+  {NULL},
+  {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
   {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
   {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
   {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
@@ -468,6 +470,32 @@ static const actionf_t action_ptrs[] =
   {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
 };
 
+/* We cannot replace a A_* function that takes a mobj pointer */
+/* with one that takes a player_t pointer as *bad* things happen. */
+/* Harmony.wad wants to use A_CloseShotgun2 in place of A_BFGSpray */
+/* which crashes doom. */
+
+static const unsigned char action_player_type[] =
+{
+  255,
+  1, 1, 1, 1,	// {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
+  1, 1, 1, 1,	// {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
+  1, 1, 1, 1,	// {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
+  1, 1, 1, 1,	// {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
+  1, 1, 1, 1,	// {A_GunFlash}, {A_FireMissile}, {A_Saw}, {A_FirePlasma},
+  1, 1, 0, 0, 0,// {A_BFGsound}, {A_FireBFG}, {A_BFGSpray}, {A_Explode}, {A_Pain},
+  0, 0, 0, 0, 0,// {A_PlayerScream}, {A_Fall}, {A_XScream}, {A_Look}, {A_Chase},
+  0, 0, 0, 0, 0,// {A_FaceTarget}, {A_PosAttack}, {A_Scream}, {A_SPosAttack}, {A_VileChase},
+  0, 0, 0, 0, 0,// {A_VileStart}, {A_VileTarget}, {A_VileAttack}, {A_StartFire}, {A_Fire},
+  0, 0, 0, 0, 0,// {A_FireCrackle}, {A_Tracer}, {A_SkelWhoosh}, {A_SkelFist}, {A_SkelMissile},
+  0, 0, 0, 0,	// {A_FatRaise}, {A_FatAttack1}, {A_FatAttack2}, {A_FatAttack3},
+  0, 0, 0, 0,	// {A_BossDeath}, {A_CPosAttack}, {A_CPosRefire}, {A_TroopAttack},
+  0, 0, 0, 0,	// {A_SargAttack}, {A_HeadAttack}, {A_BruisAttack}, {A_SkullAttack},
+  0, 0, 0, 0,	// {A_Metal}, {A_SpidRefire}, {A_BabyMetal}, {A_BspiAttack},
+  0, 0, 0, 0, 0,// {A_Hoof}, {A_CyberAttack}, {A_PainAttack}, {A_PainDie}, {A_KeenDie},
+  0, 0, 0, 0,	// {A_BrainPain}, {A_BrainScream}, {A_BrainDie}, {A_BrainAwake},
+  0, 0, 0, 0	// {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
+};
 
 /* These tables are in the same order as the declarations of the messages */
 
@@ -1660,6 +1688,21 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
 
 /* ---------------------------------------------------------------------------- */
 
+static unsigned int get_action_function_num (actionf_v aname)
+{
+  unsigned int p;
+  
+  p = 0;
+  do
+  {
+    if (action_ptrs [p].acv == aname)
+      return (p);
+  } while (++p < ARRAY_SIZE (action_ptrs));
+
+  return (0);
+}
+
+/* ---------------------------------------------------------------------------- */
 /* pointer [number] (frame [record]) = frame [value] */
 
 /* The pointer number is the n'th frame discounting the NULL pointers */
@@ -1667,7 +1710,7 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
 static void dh_write_to_pointer (unsigned int number, unsigned int record, unsigned int value, unsigned int line_no)
 {
   int counter;
-  int p;
+  int p,q;
 
   if ((value < NUMSTATES) && (record < NUMSTATES))
   {
@@ -1680,16 +1723,30 @@ static void dh_write_to_pointer (unsigned int number, unsigned int record, unsig
       if (states_ptr_copy[p].acv) counter++;
     } while (counter < (int) number);
 
-    if (p == record)
+    if (p != record)
     {
-      states[record].action.acv = states_ptr_copy[value].acv;
-      // printf ("patched pointer - copied from frame %d to %d\n", value, record);
+      fprintf (stderr, "Pointer value (%u) and frame value (%u) don't agree at line %d\n", value, record, line_no-1);
+      // fprintf (stderr, "counter = %d, p = %d, number = %d, record = %d, value = %d\n",
+      // counter, p, number,record, value);
     }
     else
     {
-      fprintf (stderr, "Pointer value and frame value don't agree at line %d\n", line_no-1);
-      // fprintf (stderr, "counter = %d, p = %d, number = %d, record = %d, value = %d\n",
-      // counter, p, number,record, value);
+      p = get_action_function_num (states_ptr_copy[record].acv);
+      q = get_action_function_num (states_ptr_copy[value].acv);
+
+      if (action_player_type [p] != action_player_type [q])
+      {
+	fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
+		dehack_codeptr_frames [p], dehack_codeptr_frames [q], line_no-1);
+      }
+      else
+      {
+	states[record].action.acv = states_ptr_copy[value].acv;
+#if 0
+	printf ("Pointer copied from frame %d to %d (A_%s -> A_%s)\n",
+		value, record, dehack_codeptr_frames [p], dehack_codeptr_frames [q]);
+#endif
+      }
     }
   }
 }
@@ -3365,8 +3422,19 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      counter1 = dh_search_str_tab_a (dehack_codeptr_frames, string1);
 	      if (counter1 != -1)
 	      {
-		states[counter2].action.acv = action_ptrs[counter1].acv;
-		// printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
+		unsigned int p;
+		p = get_action_function_num (states[counter2].action.acv);
+
+		if (action_player_type [p] != action_player_type [counter1])
+		{
+		  fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
+			dehack_codeptr_frames [p], dehack_codeptr_frames [counter1], dh_line_number-1);
+		}
+		else
+		{
+		  states[counter2].action.acv = action_ptrs[counter1].acv;
+		  // printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
+		}
 	      }
 	    }
 	    break;
