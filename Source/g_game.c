@@ -924,8 +924,8 @@ void G_DoLoadLevel (void)
       G_InitPlayer (i);
   } while (++i < MAXPLAYERS);
 
-  BOOMSTATEMENT(sector_list = NULL;)
-  BOOMSTATEMENT(headsecnode = NULL;)
+  sector_list = NULL;
+  headsecnode = NULL;
 
   P_SetupLevel (gameepisode, gamemap, 0, gameskill);
   displayplayer = consoleplayer;		// view the guy you are playing

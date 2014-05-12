@@ -28,6 +28,7 @@ static const char rcsid[] = "$Id: p_mobj.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "includes.h"
 
 extern void G_PlayerReborn (int player);
+extern void P_DelSeclist (msecnode_t *node);
 
 /* -------------------------------------------------------------------------------------------- */
 /*
@@ -48,7 +49,7 @@ int P_GetMobjSpeed (mobj_t* mobj)
     {
       case MT_BRUISERSHOT:
 	speed = (speed * 3) / 4;	// 20 -> 15
-        break;
+	break;
 
       case MT_HEADSHOT:
       case MT_TROOPSHOT:
@@ -98,6 +99,9 @@ P_SetMobjState
     mobj->tics = tics;
     mobj->sprite = st->sprite;
     mobj->frame = (int) st->frame;
+
+    // NULL head of sector list
+    mobj->touching_sectorlist = NULL;
 
     // Modified handling.
     // Call action functions when the state is set
@@ -659,6 +663,13 @@ void P_RemoveMobj (mobj_t* mobj)
 
     // unlink from sector and block lists
     P_UnsetThingPosition (mobj);
+
+    // Delete all nodes on the current sector_list
+    if (sector_list)
+    {
+	P_DelSeclist(sector_list);
+	sector_list = NULL;
+    }
 
     // stop any playing sound
     S_StopSound (mobj);

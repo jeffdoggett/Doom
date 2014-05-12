@@ -30,6 +30,8 @@ static const char rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $"
 
 #include "includes.h"
 
+extern void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y);
+
 //-----------------------------------------------------------------------------
 //
 // P_AproxDistance
@@ -348,6 +350,21 @@ void P_UnsetThingPosition (mobj_t* thing)
 	    thing->sprev->snext = thing->snext;
 	else
 	    thing->subsector->sector->thinglist = thing->snext;
+
+	// phares 3/14/98
+	//
+	// Save the sector list pointed to by touching_sectorlist.
+	// In P_SetThingPosition, we'll keep any nodes that represent
+	// sectors the Thing still touches. We'll add new ones then, and
+	// delete any nodes for sectors the Thing has vacated. Then we'll
+	// put it back into touching_sectorlist. It's done this way to
+	// avoid a lot of deleting/creating for nodes, when most of the
+	// time you just get back what you deleted anyway.
+	//
+	// If this Thing is being removed entirely, then the calling
+	// routine will clear out the nodes in sector_list.
+	sector_list = thing->touching_sectorlist;
+	thing->touching_sectorlist = NULL; // to be restored by P_SetThingPosition
     }
 
     if ( ! (thing->flags & MF_NOBLOCKMAP) )
@@ -406,6 +423,23 @@ P_SetThingPosition (mobj_t* thing)
 	    sec->thinglist->sprev = thing;
 
 	sec->thinglist = thing;
+
+
+	// phares 3/16/98
+	//
+	// If sector_list isn't NULL, it has a collection of sector
+	// nodes that were just removed from this Thing.
+
+	// Collect the sectors the object will live in by looking at
+	// the existing sector_list and adding new nodes and deleting
+	// obsolete ones.
+
+	// When a node is deleted, its sector links (the links starting
+	// at sector_t->touching_thinglist) are broken. When a node is
+	// added, new sector links are created.
+	P_CreateSecNodeList(thing, thing->x, thing->y);
+	thing->touching_sectorlist = sector_list; // Attach to Thing's mobj_t
+	sector_list = NULL; // clear for next time
     }
 
 

@@ -128,12 +128,13 @@ typedef	struct
 
     int			linecount;
     struct line_s**	lines;	// [linecount] size
+    struct msecnode_s*	touching_thinglist;
 
     dushort_t	oldspecial;
     void*	floordata;
     void*	ceilingdata;
     void*	lightingdata;
-#if 1
+
     fixed_t	floor_xoffs;
     fixed_t	floor_yoffs;
     fixed_t	ceiling_xoffs;
@@ -141,23 +142,7 @@ typedef	struct
     int		heightsec;
     int		floorlightsec;
     int		ceilinglightsec;
-#endif
-#ifdef BOOM
-    struct msecnode_s *touching_thinglist;
-    int		nexttag;
-    int		firsttag;
-    int		stairlock;
-    int		prevsec;
-    int		nextsec;
-    int		bottommap;
-    int		midmap;
-    int		topmap;
-#else
-    /* thinker_t for reversable actions*/
-    //void*	specialdata;
-#endif
 } sector_t;
-
 
 
 
@@ -263,16 +248,35 @@ typedef struct subsector_s
 } subsector_t;
 
 
+// phares 3/14/98
+//
+// Sector list node showing all sectors an object appears in.
+//
+// There are two threads that flow through these nodes. The first thread
+// starts at touching_thinglist in a sector_t and flows through the m_snext
+// links to find all mobjs that are entirely or partially in the sector.
+// The second thread starts at touching_sectorlist in an mobj_t and flows
+// through the m_tnext links to find all sectors a thing touches. This is
+// useful when applying friction or push effects to sectors. These effects
+// can be done as thinkers that act upon all objects touching their sectors.
+// As an mobj moves through the world, these nodes are created and
+// destroyed, with the links changed appropriately.
+//
+// For the links, NULL means top or end of list.
+
 typedef struct msecnode_s
 {
-    sector_t*		m_sector;
-    struct mobj_s*	m_thing;
-    struct msecnode_s*	m_tprev;
-    struct msecnode_s*	m_tnext;
-    struct msecnode_s*	m_sprev;
-    struct msecnode_s*	m_snext;
-    boolean		visited;
+  sector_t		*m_sector;	// a sector containing this object
+  struct mobj_s		*m_thing;	// this object
+  struct msecnode_s	*m_tprev;	// prev msecnode_t for this thing
+  struct msecnode_s	*m_tnext;	// next msecnode_t for this thing
+  struct msecnode_s	*m_sprev;	// prev msecnode_t for this sector
+  struct msecnode_s	*m_snext;	// next msecnode_t for this sector
+  boolean		visited;	// killough 4/4/98, 4/7/98: used in search algorithms
 } msecnode_t;
+
+extern msecnode_t *sector_list;		// phares 3/16/98
+extern msecnode_t *headsecnode;
 
 
 //

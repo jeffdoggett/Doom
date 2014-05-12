@@ -317,7 +317,7 @@ void P_LoadSectors (int lump)
 	ss->special = SHORT(ms->special);
 	ss->tag = SHORT(ms->tag);
 	ss->thinglist = NULL;
-//	ss->touching_thinglist = NULL;
+	ss->touching_thinglist = NULL;  // phares 3/14/98
 //	ss->nextsec = -1;
 //	ss->prevsec = -1;
 	ss->floor_xoffs = 0;
