@@ -1330,6 +1330,7 @@ static void IdentifyVersion (void)
   reqd_pwad = 0;
 
   p = M_CheckParm ("-file");
+  if (p)
   {
     q = M_CheckParm ("-file_dir");
     while (++p < myargc && myargv[p][0] != '-')
