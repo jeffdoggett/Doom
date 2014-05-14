@@ -167,7 +167,7 @@ static void R_GenerateComposite (int texnum)
 
     block = Z_Malloc (texturecompositesize[texnum],
 		      PU_STATIC,
-		      &texturecomposite[texnum]);
+		      (void **)&texturecomposite[texnum]);
 
     if ((marks = (byte*)malloc(texture->width * texture->height)) == NULL)
         I_Error("R_GenerateComposite: couldn't alloc marks");

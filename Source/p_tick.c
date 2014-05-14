@@ -84,6 +84,9 @@ void P_RemoveThinker (thinker_t* thinker)
 {
   // FIXME: NOP.
   thinker->function.aci = -1;
+#ifdef USE_BOOM_P_ChangeSector
+  thinker->removedelay = 100;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -103,13 +106,23 @@ static void P_RunThinkers (void)
   {
     if (currentthinker->function.aci == -1)
     {
-      /* time to remove it*/
-      if ((*prevptr = currentthinker->next) == NULL)	// Released the last block?
+#ifdef USE_BOOM_P_ChangeSector
+      if (--currentthinker->removedelay != 0)
       {
-	thinker_tail = lastthinker;
-	// printf ("Last thinker %X %X\n", prevptr, lastthinker);
+	lastthinker = currentthinker;
+	prevptr = &currentthinker -> next;
       }
-      Z_Free (currentthinker);
+      else
+#endif
+      {
+	/* time to remove it*/
+	if ((*prevptr = currentthinker->next) == NULL)	// Released the last block?
+	{
+	  thinker_tail = lastthinker;
+	  // printf ("Last thinker %X %X\n", prevptr, lastthinker);
+	}
+        Z_Free (currentthinker);
+      }
     }
     else
     {

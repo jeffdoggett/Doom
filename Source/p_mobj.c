@@ -28,7 +28,11 @@ static const char rcsid[] = "$Id: p_mobj.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "includes.h"
 
 extern void G_PlayerReborn (int player);
+
+#ifdef USE_BOOM_P_ChangeSector
 extern void P_DelSeclist (msecnode_t *node);
+extern msecnode_t *P_DelSecnode (msecnode_t *node);
+#endif
 
 /* -------------------------------------------------------------------------------------------- */
 /*
@@ -100,8 +104,10 @@ P_SetMobjState
     mobj->sprite = st->sprite;
     mobj->frame = (int) st->frame;
 
+#ifdef USE_BOOM_P_ChangeSector
     // NULL head of sector list
     mobj->touching_sectorlist = NULL;
+#endif
 
     // Modified handling.
     // Call action functions when the state is set
@@ -661,15 +667,38 @@ void P_RemoveMobj (mobj_t* mobj)
 	    iquetail = (iquetail+1)&(ITEMQUESIZE-1);
     }
 
+
     // unlink from sector and block lists
     P_UnsetThingPosition (mobj);
 
+#ifdef USE_BOOM_P_ChangeSector
     // Delete all nodes on the current sector_list
     if (sector_list)
     {
 	P_DelSeclist(sector_list);
 	sector_list = NULL;
     }
+
+    {
+      msecnode_t *n;
+      sector_t *sector;
+
+      sector = mobj->subsector->sector;
+      if (sector)
+      {
+	for (n = sector->touching_thinglist; n; n = n->m_snext)	// go through list
+	{
+	  if (n->m_thing == mobj)
+	  {
+	    // printf ("Thing %X is in sector %X\n", mobj, sector);
+	    n->m_thing = NULL;
+	    P_DelSecnode (n);
+	    break;
+	  }
+	}
+      }
+    }
+#endif
 
     // stop any playing sound
     S_StopSound (mobj);

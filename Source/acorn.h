@@ -17,7 +17,6 @@
 
 
 
-unsigned int ROS_ramsize (void);
 void set_riscos_filetype (const char * file, unsigned int type);
 
 int access(const char * filename, int mode);

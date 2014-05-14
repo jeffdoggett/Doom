@@ -284,8 +284,11 @@ typedef struct mobj_s
     // Thing being chased/attacked for tracers.
     struct mobj_s*	tracer;
 
+#ifdef USE_BOOM_P_ChangeSector
+
     // a linked list of sectors where this object appears
     struct msecnode_s   *touching_sectorlist;   // phares 3/14/98
+#endif
 
 } mobj_t;
 

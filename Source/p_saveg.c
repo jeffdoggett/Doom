@@ -838,7 +838,7 @@ static byte * P_UnArchiveCeiling (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVEL, NULL);
+  ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -911,7 +911,7 @@ static byte * P_UnArchiveDoor (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  door = Z_Malloc (sizeof(*door), PU_LEVEL, NULL);
+  door = Z_Malloc (sizeof(*door), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -989,7 +989,7 @@ static byte * P_UnArchiveFloor (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  floor = Z_Malloc (sizeof(*floor), PU_LEVEL, NULL);
+  floor = Z_Malloc (sizeof(*floor), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1060,7 +1060,7 @@ static byte * P_UnArchivePlat (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  plat = Z_Malloc (sizeof(*plat), PU_LEVEL, NULL);
+  plat = Z_Malloc (sizeof(*plat), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1130,7 +1130,7 @@ static byte * P_UnArchiveLightFlash (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  flash = Z_Malloc (sizeof(*flash), PU_LEVEL, NULL);
+  flash = Z_Malloc (sizeof(*flash), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1194,7 +1194,7 @@ static byte * P_UnArchiveStrobeFlash (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  strobe = Z_Malloc (sizeof(*strobe), PU_LEVEL, NULL);
+  strobe = Z_Malloc (sizeof(*strobe), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1256,7 +1256,7 @@ static byte * P_UnArchiveGlow (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  glow = Z_Malloc (sizeof(*glow), PU_LEVEL, NULL);
+  glow = Z_Malloc (sizeof(*glow), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1321,7 +1321,7 @@ static byte * P_UnArchiveScroll (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  scroll = Z_Malloc (sizeof(*scroll), PU_LEVEL, NULL);
+  scroll = Z_Malloc (sizeof(*scroll), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1387,7 +1387,7 @@ static byte * P_UnArchiveElevator (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  elevator = Z_Malloc (sizeof(*elevator), PU_LEVEL, NULL);
+  elevator = Z_Malloc (sizeof(*elevator), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 
@@ -1450,7 +1450,7 @@ static byte * P_UnArchiveFireFlicker (byte * save_p)
   unsigned int * save_32_p;
 
   PADSAVEP();
-  flick = Z_Malloc (sizeof(*flick), PU_LEVEL, NULL);
+  flick = Z_Malloc (sizeof(*flick), PU_LEVSPEC, NULL);
 
   save_32_p = (unsigned int *) save_p;
 

@@ -56,6 +56,9 @@ typedef struct thinker_s
 {
     struct thinker_s*	next;
     actionf_t		function;
+#ifdef USE_BOOM_P_ChangeSector
+    unsigned int	removedelay;
+#endif
 } thinker_t;
 
 #endif

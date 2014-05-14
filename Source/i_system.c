@@ -52,10 +52,6 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 
 
-
-int	mb_used = 32;
-
-
 void
 I_Tactile
 ( int	on,
@@ -71,30 +67,6 @@ ticcmd_t*	I_BaseTiccmd(void)
 {
     return &emptycmd;
 }
-
-#if 0
-int  I_GetHeapSize (void)
-{
-    return mb_used*1024*1024;
-}
-#endif
-
-byte* I_ZoneBase (unsigned int* size)
-{
-  unsigned int amount;
-  byte * base;
-
-  amount = mb_used*1024*1024;
-
-  do
-  {
-    base = (byte *) malloc (amount);
-  } while ((base == 0) && (amount >>= 1));
-
-  *size = amount;
-  return (base);
-}
-
 
 
 //

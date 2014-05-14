@@ -62,10 +62,6 @@ boolean		Monsters_Infight = false;
 extern void P_ExplodeMissile (mobj_t* mo);
 extern boolean	gamekeydown[NUMKEYS];
 
-// Temporary holder for thing_sectorlist threads
-msecnode_t *sector_list;			// phares 3/16/98
-
-
 void P_Init_SpecHit (void)
 {
   spechit_max = 32;
@@ -1475,6 +1471,41 @@ boolean PIT_ChangeSector (mobj_t*	thing)
 }
 
 
+#ifndef USE_BOOM_P_ChangeSector
+//
+// P_ChangeSector
+//
+
+boolean
+P_ChangeSector
+( sector_t*	sector,
+  boolean	crunch )
+{
+    int	x;
+    int	y;
+
+    nofit = false;
+    crushchange = crunch;
+
+    // re-check heights for all things near the moving sector
+    for (x=sector->blockbox[BOXLEFT] ; x<= sector->blockbox[BOXRIGHT] ; x++)
+	for (y=sector->blockbox[BOXBOTTOM];y<= sector->blockbox[BOXTOP] ; y++)
+	    P_BlockThingsIterator (x, y, PIT_ChangeSector);
+
+
+    crushchange = false;
+    return nofit;
+}
+
+#else
+
+// JAD: I couldn't get this to work.
+// 1) When mobj's are deleted the reference stays in the msecnode_t
+//    arrays, and then the function below uses stale free'd data.
+//    There are bodges added below and in the ticker functon to
+//    try to overcome this.
+// 2) There are performance issues with terrible juddering when sectors
+//    are raising/lowering with an object on top.
 
 //
 // P_ChangeSector
@@ -1485,6 +1516,7 @@ boolean PIT_ChangeSector (mobj_t*	thing)
 //
 boolean P_ChangeSector (sector_t *sector, boolean crunch)
 {
+    mobj_t* mobj;
     msecnode_t *n;
 
     nofit = false;
@@ -1507,12 +1539,16 @@ boolean P_ChangeSector (sector_t *sector, boolean crunch)
 	    if (!n->visited)					// unprocessed thing found
 	    {
 		n->visited = true;				// mark thing as processed
-		if (!(n->m_thing->flags & MF_NOBLOCKMAP))	// jff 4/7/98 don't do these
-		    PIT_ChangeSector(n->m_thing);		// process it
+		mobj = n->m_thing;
+		if ((mobj)
+		 && (mobj->thinker.function.aci != -1)
+		 && (!(mobj->flags & MF_NOBLOCKMAP)))		// jff 4/7/98 don't do these
+		    PIT_ChangeSector(mobj);			// process it
 		break;						// exit and start over
 	    }
     while (n);		// repeat from scratch until all things left are marked valid
 
+    crushchange = false;
     return nofit;
 }
 
@@ -1521,17 +1557,25 @@ boolean P_ChangeSector (sector_t *sector, boolean crunch)
 // Maintain a freelist of msecnode_t's to reduce memory allocs and frees.
 msecnode_t *headsecnode;
 
+// Temporary holder for thing_sectorlist threads
+msecnode_t *sector_list;			// phares 3/16/98
+
+
 // P_GetSecnode() retrieves a node from the freelist. The calling routine
 // should make sure it sets all fields properly.
 //
-// killough 11/98: reformatted
+
 static msecnode_t *P_GetSecnode(void)
 {
-    msecnode_t *node;
+  msecnode_t *node;
 
-    return (headsecnode ?
-	node = headsecnode, headsecnode = node->m_snext, node :
-	Z_Malloc(sizeof *node, PU_LEVEL, NULL));
+  node = headsecnode;
+  if (node == NULL)
+    node = Z_Malloc (sizeof *node, PU_LEVMAP, NULL);
+  else
+    headsecnode = node->m_snext;
+
+  return (node);
 }
 
 // P_PutSecnode() returns a node to the freelist.
@@ -1587,7 +1631,7 @@ static msecnode_t *P_AddSecnode(sector_t *s, mobj_t *thing, msecnode_t *nextnode
 // on the linked list, or NULL.
 //
 // killough 11/98: reformatted
-static msecnode_t *P_DelSecnode(msecnode_t *node)
+msecnode_t *P_DelSecnode (msecnode_t *node)
 {
   if (node)
   {
@@ -1727,3 +1771,4 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 	    node = node->m_tnext;
 }
 
+#endif

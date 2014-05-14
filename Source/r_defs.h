@@ -128,7 +128,10 @@ typedef	struct
 
     int			linecount;
     struct line_s**	lines;	// [linecount] size
+
+#ifdef USE_BOOM_P_ChangeSector
     struct msecnode_s*	touching_thinglist;
+#endif
 
     dushort_t	oldspecial;
     void*	floordata;
@@ -247,6 +250,7 @@ typedef struct subsector_s
 
 } subsector_t;
 
+#ifdef USE_BOOM_P_ChangeSector
 
 // phares 3/14/98
 //
@@ -278,6 +282,7 @@ typedef struct msecnode_s
 extern msecnode_t *sector_list;		// phares 3/16/98
 extern msecnode_t *headsecnode;
 
+#endif
 
 //
 // The LineSeg.

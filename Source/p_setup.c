@@ -317,7 +317,9 @@ void P_LoadSectors (int lump)
 	ss->special = SHORT(ms->special);
 	ss->tag = SHORT(ms->tag);
 	ss->thinglist = NULL;
+#ifdef USE_BOOM_P_ChangeSector
 	ss->touching_thinglist = NULL;  // phares 3/14/98
+#endif
 //	ss->nextsec = -1;
 //	ss->prevsec = -1;
 	ss->floor_xoffs = 0;
@@ -1015,6 +1017,9 @@ P_SetupLevel
 #endif
 	Z_FreeTags (PU_LEVEL, PU_PURGELEVEL-1);
 
+#ifdef USE_BOOM_P_ChangeSector
+    headsecnode = NULL;
+#endif
 
     // UNUSED W_Profile ();
     P_InitThinkers ();

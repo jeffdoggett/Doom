@@ -924,14 +924,14 @@ void G_DoLoadLevel (void)
       G_InitPlayer (i);
   } while (++i < MAXPLAYERS);
 
+#ifdef USE_BOOM_P_ChangeSector
   sector_list = NULL;
-  headsecnode = NULL;
+#endif
 
   P_SetupLevel (gameepisode, gamemap, 0, gameskill);
   displayplayer = consoleplayer;		// view the guy you are playing
   starttime = I_GetTime ();
   gameaction = ga_nothing;
-  Z_CheckHeap ();
 
   // clear cmd building stuff
   memset (gamekeydown, 0, sizeof(gamekeydown));

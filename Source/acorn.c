@@ -81,19 +81,6 @@ int access (const char * filename, int mode)
 
 /* ---------------------------------------------------------------------------- */
 
-unsigned int ROS_ramsize (void)
-{
-  _kernel_swi_regs regs;
-
-  _kernel_swi (OS_ReadMemMapInfo, &regs, &regs);
-
-  // R0 = Page size in bytes
-  // R1 = Number of pages
-  return (regs.r[0] * regs.r[1]);
-}
-
-/* --------------------------------------------------------------------------------- */
-
 void set_riscos_filetype (const char * file, unsigned int type)
 {
   _kernel_osfile_block osfile;

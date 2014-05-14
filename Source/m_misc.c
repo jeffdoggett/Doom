@@ -168,8 +168,6 @@ extern int	showMessages;
 // machine-independent sound params
 extern int	numChannels;
 
-extern int	mb_used;
-
 // UNIX hack, to be removed.
 #ifdef NORMALUNIX
 #ifdef SNDSERV
@@ -213,7 +211,6 @@ default_t	defaults[] =
   {"key_use",&key_use, (char *) ' '},
   {"key_strafe",&key_strafe, (char *) KEY_RALT},
   {"key_speed",&key_speed, (char *) KEY_RSHIFT},
-  {"mb_used", &mb_used, (char *) 32},
 
 // UNIX hack, to be removed.
 #ifdef NORMALUNIX
@@ -404,23 +401,6 @@ void M_LoadDefaults (void)
   numdefaults = sizeof(defaults)/sizeof(defaults[0]);
   for (i=0 ; i<numdefaults ; i++)
       *defaults[i].location = (pint) defaults[i].defaultvalue;
-
-#ifdef __riscos
-  i = ROS_ramsize ();
-  mb_used = 32;
-  if (i < 32*1024*1024)
-  {
-    mb_used = 8;
-    if (i < 0xC00000)	// Less than 12MB ?
-    {
-      mb_used = 4;
-      if (i < 0x800000) // less than 8MB ?
-      {
-	mb_used = 2;
-      }
-    }
-  }
-#endif
 
   defaultfile = get_doomrc_filename (buffer);
 
