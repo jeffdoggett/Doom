@@ -1541,10 +1541,12 @@ boolean P_ChangeSector (sector_t *sector, boolean crunch)
 		n->visited = true;				// mark thing as processed
 		mobj = n->m_thing;
 		if ((mobj)
-		 && (mobj->thinker.function.aci != -1)
+		 && (mobj->thinker.function.acp1 == (actionf_p1) P_MobjThinker)
 		 && (!(mobj->flags & MF_NOBLOCKMAP)))		// jff 4/7/98 don't do these
-		    PIT_ChangeSector(mobj);			// process it
-		break;						// exit and start over
+		{
+		  PIT_ChangeSector(mobj);			// process it
+		  break;					// exit and start over
+		}
 	    }
     while (n);		// repeat from scratch until all things left are marked valid
 
