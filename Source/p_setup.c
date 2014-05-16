@@ -152,10 +152,10 @@ void P_LoadVertexes (int lump)
 void P_LoadSegs (int lump)
 {
   byte*		data;
-  int			i;
-  mapseg_t*		ml;
-  seg_t*		li;
-  line_t*		ldef;
+  int		i;
+  mapseg_t*	ml;
+  seg_t*	li;
+  line_t*	ldef;
   unsigned int	linedef;
   unsigned int	side;
 //  byte*		vertchanged;
@@ -238,9 +238,19 @@ void P_LoadSegs (int lump)
 
     li->offset = (SHORT(ml->offset))<<16;
     linedef = USHORT(ml->linedef);
+    if (linedef >= numlines)
+    {
+      printf ("P_LoadSegs: linedef = %u/%u\n", linedef, linedef);
+      linedef = 0;
+    }
     ldef = &lines[linedef];
     li->linedef = ldef;
     side = USHORT(ml->side);
+    if (side > 1)
+    {
+      printf ("P_LoadSegs: side = %u\n", side);
+      side = 0;
+    }
     li->sidedef = &sides[ldef->sidenum[side]];
     li->frontsector = sides[ldef->sidenum[side]].sector;
     if (ldef-> flags & ML_TWOSIDED)
@@ -576,6 +586,11 @@ void P_LoadLineDefs (int lump)
 	}
 	else
 	{
+	  if (sidenum >= numsides)
+	  {
+	    printf ("P_LoadLineDefs: Front sidenum = %u\n", sidenum);
+	    sidenum = 0;
+	  }
 	  ld->sidenum[0] = sidenum;
 	  ld->frontsector = sides[sidenum].sector;
 	}
@@ -585,9 +600,15 @@ void P_LoadLineDefs (int lump)
 	{
 	  ld->sidenum[1] = (dushort_t) -1;
 	  ld->backsector = 0;
+	  ld->flags &= ~ML_TWOSIDED;		// Just in case (e.g. nova.wad map 32)
 	}
 	else
 	{
+	  if (sidenum >= numsides)
+	  {
+	    printf ("P_LoadLineDefs: Back sidenum = %u\n", sidenum);
+	    sidenum = 0;
+	  }
 	  ld->sidenum[1] = sidenum;
 	  ld->backsector = sides[sidenum].sector;
 	}
@@ -810,6 +831,7 @@ static void P_GroupLines (void)
 	    // HR2 map 32.
 	    li->frontsector = li->backsector;
 	    li->backsector = NULL;
+	    li->flags &= ~ML_TWOSIDED;		// Just in case
 	    // printf ("P_GroupLines: No front sector\n");
 	}
 
