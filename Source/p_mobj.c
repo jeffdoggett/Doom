@@ -104,11 +104,6 @@ P_SetMobjState
     mobj->sprite = st->sprite;
     mobj->frame = (int) st->frame;
 
-#ifdef USE_BOOM_P_ChangeSector
-    // NULL head of sector list
-    mobj->touching_sectorlist = NULL;
-#endif
-
     // Modified handling.
     // Call action functions when the state is set
     if (st->action.acp1)
@@ -677,26 +672,6 @@ void P_RemoveMobj (mobj_t* mobj)
     {
 	P_DelSeclist(sector_list);
 	sector_list = NULL;
-    }
-
-    {
-      msecnode_t *n;
-      sector_t *sector;
-
-      sector = mobj->subsector->sector;
-      if (sector)
-      {
-	for (n = sector->touching_thinglist; n; n = n->m_snext)	// go through list
-	{
-	  if (n->m_thing == mobj)
-	  {
-	    // printf ("Thing %X is in sector %X\n", mobj, sector);
-	    n->m_thing = NULL;
-	    P_DelSecnode (n);
-	    break;
-	  }
-	}
-      }
     }
 #endif
 

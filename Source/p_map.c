@@ -1498,16 +1498,6 @@ P_ChangeSector
 }
 
 #else
-
-// JAD: I couldn't get this to work.
-// 1) When mobj's are deleted the reference stays in the msecnode_t
-//    arrays, and then the function below uses stale free'd data.
-//    There are bodges added below and in the ticker functon to
-//    try to overcome this.
-// 2) There are performance issues with terrible juddering when sectors
-//    are raising/lowering with an object on top.
-
-//
 // P_ChangeSector
 // jff 3/19/98 added to just check monsters on the periphery
 // of a moving sector instead of all in bounding box of the
@@ -1541,7 +1531,6 @@ boolean P_ChangeSector (sector_t *sector, boolean crunch)
 		n->visited = true;				// mark thing as processed
 		mobj = n->m_thing;
 		if ((mobj)
-		 && (mobj->thinker.function.acp1 == (actionf_p1) P_MobjThinker)
 		 && (!(mobj->flags & MF_NOBLOCKMAP)))		// jff 4/7/98 don't do these
 		{
 		  PIT_ChangeSector(mobj);			// process it

@@ -27,7 +27,7 @@
 #include <string.h>
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
-// #define USE_BOOM_P_ChangeSector
+#define USE_BOOM_P_ChangeSector
 
 //
 // Global parameters/defines.
