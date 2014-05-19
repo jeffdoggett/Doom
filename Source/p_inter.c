@@ -1195,6 +1195,7 @@ P_DamageMobj
   player_t*	player;
   fixed_t	thrust;
   int		temp;
+  int		damagecount;
 
   if (gamecompletedtimer)
     return;
@@ -1293,10 +1294,14 @@ P_DamageMobj
 	  player->health = 0;
 
       player->attacker = source;
-      player->damagecount += damage;	// add damage after armour / invuln
+      damagecount = player->damagecount + damage; // add damage after armour / invuln
 
-      if (player->damagecount > 100)
-	  player->damagecount = 100;	// teleport stomp does 10k points...
+      if ((damage > 0) && (damagecount < 2))	// damagecount gets decremented before
+	damagecount = 2;			// being used so needs to be at least 2.
+      if (damagecount > 100)
+	damagecount = 100;			// teleport stomp does 10k points...
+
+      player->damagecount = damagecount;
 
       temp = damage < 100 ? damage : 100;
 
