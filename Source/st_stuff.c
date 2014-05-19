@@ -835,7 +835,7 @@ int ST_calcPainOffset(void)
 // the precedence of expressions is:
 //  dead > evil grin > turned head > straight ahead
 //
-void ST_updateFaceWidget(void)
+static void ST_updateFaceWidget(void)
 {
     int		i;
     angle_t	badguyangle;
@@ -944,7 +944,8 @@ void ST_updateFaceWidget(void)
 	// getting hurt because of your own damn stupidity
 	if (plyr->damagecount)
 	{
-	    if (plyr->health - st_oldhealth > ST_MUCHPAIN)
+	    // if (plyr->health - st_oldhealth > ST_MUCHPAIN) /* Correct the "Ouch face" bug.
+	    if (st_oldhealth - plyr->health > ST_MUCHPAIN)
 	    {
 		priority = 7;
 		st_facecount = ST_TURNCOUNT;
@@ -1008,7 +1009,7 @@ void ST_updateFaceWidget(void)
 
 }
 
-void ST_updateWidgets(void)
+static void ST_updateWidgets(void)
 {
     static int	largeammo = 1994; // means "n/a"
     int		i;
