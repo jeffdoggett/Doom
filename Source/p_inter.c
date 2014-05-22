@@ -1222,6 +1222,9 @@ P_DamageMobj
     damage = target->health;
   }
 
+  if (damage == 0)		// It's possible for the /2 above to
+    return;			// yeild zero if there was only 1% damage
+				// but we'll do the test down here to be safe.
 
   // Some close combat weapons should not
   // inflict thrust and push the victim out of reach,
