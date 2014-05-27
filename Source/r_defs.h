@@ -145,6 +145,8 @@ typedef	struct
     int		heightsec;
     int		floorlightsec;
     int		ceilinglightsec;
+    int		firsttag;
+    int		nexttag;
 } sector_t;
 
 
@@ -224,6 +226,8 @@ typedef struct line_s
 
     // if == validcount, already checked
     int		validcount;
+    int		firsttag;
+    int		nexttag;
 
     // thinker_t for reversable actions
 //  void*	specialdata;

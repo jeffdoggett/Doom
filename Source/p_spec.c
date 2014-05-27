@@ -75,7 +75,6 @@ typedef struct
 static void P_SpawnScrollers(void);
 //static void P_SpawnFriction(void);
 //static void P_SpawnPushers(void);
-//static void P_InitTagLists(void);
 
 //
 // P_InitPicAnims
@@ -570,34 +569,68 @@ fixed_t P_FindNextLowestCeiling(const sector_t *sec, int currentheight)
   return height;
 }
 
-
 /* ---------------------------------------------------------------------------- */
 //
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
-int
-P_FindSectorFromLineTag
-( line_t*	line,
-  int		start )
+// Find the next sector with the same tag as a linedef.
+// Rewritten by Lee Killough to use chained hashing to improve speed
+int P_FindSectorFromLineTag(const line_t *line, int start)
 {
-  sector_t * ptr;
+  int tag;
 
-  if (line -> tag)
-  {
-    start++;
-    if (start < numsectors)
-    {
-      ptr = &sectors [start];
-      do
-      {
-	if (ptr -> tag == line -> tag)
-	  return (start);
-	ptr++;
-      } while (++start < numsectors);
-    }
+  if ((tag = line->tag) == 0)
+    return (-1);
+
+  start = (start >= 0 ? sectors[start].nexttag :
+    sectors[(unsigned)tag % (unsigned)numsectors].firsttag);
+  while (start >= 0 && sectors[start].tag != tag)
+    start = sectors[start].nexttag;
+  return start;
+}
+
+/* ---------------------------------------------------------------------------- */
+// killough 4/16/98: Same thing, only for linedefs
+
+int P_FindLineFromTag(int tag, int start)
+{
+  if (tag == 0)
+    return (-1);
+
+  start = (start >= 0 ? lines[start].nexttag :
+    lines[(unsigned)tag % (unsigned)numlines].firsttag);
+  while (start >= 0 && lines[start].tag != tag)
+    start = lines[start].nexttag;
+  return start;
+}
+
+/* ---------------------------------------------------------------------------- */
+// Hash the sector tags across the sectors and linedefs.
+
+static void P_InitTagLists(void)
+{
+  register int i;
+
+  for (i = numsectors; --i >= 0;) // Initially make all slots empty.
+    sectors[i].firsttag = -1;
+  for (i = numsectors; --i >= 0;) // Proceed from last to first sector
+  { // so that lower sectors appear first
+    int j = (unsigned)sectors[i].tag % (unsigned)numsectors; // Hash func
+
+    sectors[i].nexttag = sectors[j].firsttag; // Prepend sector to chain
+    sectors[j].firsttag = i;
   }
 
-  return -1;
+  // killough 4/17/98: same thing, only for linedefs
+  for (i = numlines; --i >= 0;) // Initially make all slots empty.
+    lines[i].firsttag = -1;
+  for (i = numlines; --i >= 0;) // Proceed from last to first linedef
+  { // so that lower linedefs appear first
+    int j = (unsigned)lines[i].tag % (unsigned)numlines; // Hash func
+
+    lines[i].nexttag = lines[j].firsttag; // Prepend linedef to chain
+    lines[j].firsttag = i;
+  }
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1770,7 +1803,7 @@ P_ShootSpecialLine
       switch(line->special)
       {
 	case 46:
-        case 0x8B00+47:
+	case 0x8B00+47:
 	  // OPEN DOOR IMPACT
 	  break;
 
@@ -1920,7 +1953,7 @@ void P_PlayerInSpecialSector (player_t* player)
       if (player->health <= 10)
       {
 	G_ExitLevel();
-        sector->special &= ~31;
+	sector->special &= ~31;
       }
       break;
 
@@ -2156,7 +2189,7 @@ void P_SpawnSpecials (void)
     }
   }
 
-  //P_InitTagLists();
+  P_InitTagLists();
 
   //if (!compatibility && !demo_compatibility)
   {
@@ -2289,31 +2322,6 @@ sector_t *P_FindModelCeilingSector (fixed_t ceilingdestheight,int secnum)
     }
   }
   return NULL;
-}
-
-/* ---------------------------------------------------------------------------- */
-
-int P_FindLineFromTag(int tag, int start)
-{
-  // BOOMTRACEOUT("P_FindLineFromTag")
-  line_t * ptr;
-
-  if (tag)
-  {
-    start++;
-    if (start < numlines)
-    {
-      ptr = &lines [start];
-      do
-      {
-	if (ptr -> tag == tag)
-	  return (start);
-	ptr++;
-      } while (++start < numlines);
-    }
-  }
-
-  return -1;
 }
 
 /* ---------------------------------------------------------------------------- */
