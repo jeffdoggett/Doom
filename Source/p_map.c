@@ -55,7 +55,7 @@ line_t*		blockline;     // killough 8/11/98: blocking linedef
 
 // 1/11/98 killough: removed limit on special lines crossed
 line_t	**	spechit;
-static int 	spechit_max;
+static int	spechit_max;
 int		numspechit;
 
 boolean		Monsters_Infight = false;
@@ -375,6 +375,27 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    P_TouchSpecialThing (thing, tmthing);
 	}
 	return (boolean)!solid;
+    }
+
+    // see if it went over / under
+    if (tmthing->z >= thing->z + thing->height)
+    {
+	if (!(thing->flags & MF_SPECIAL))
+	{
+	    tmfloorz = thing->z + thing->height;
+	    thing->ceilingz = tmthing->z;
+	    return true;	// overhead
+	}
+    }
+
+    if (tmthing->z + tmthing->height < thing->z)
+    {
+	if (!(thing->flags & MF_SPECIAL))
+	{
+	    tmceilingz = thing->z;
+	    thing->floorz = tmthing->z + tmthing->height;
+	    return true;	// underneath
+	}
     }
 
     return (boolean)!(thing->flags & MF_SOLID);
