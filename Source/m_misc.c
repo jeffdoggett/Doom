@@ -236,7 +236,7 @@ default_t	defaults[] =
   {"joyb_use",&joybuse, (char *) 3},
   {"joyb_speed",&joybspeed, (char *) 2},
 
-  {"screenblocks",&screenblocks, (char *) 9},
+  {"screenblocks",&screenblocks, (char *) 10},
   {"detaillevel",&detailLevel, (char *) 0},
   {"stbar_scale",&stbar_scale, (char *) 1},
   {"weaponscale",&weaponscale, (char *) 1},
