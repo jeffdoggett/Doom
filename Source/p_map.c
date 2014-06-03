@@ -30,11 +30,11 @@ static const char rcsid[] = "$Id: p_map.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 #include "includes.h"
 
 
-fixed_t		tmbbox[4];
-mobj_t*		tmthing;
-int		tmflags;
-fixed_t		tmx;
-fixed_t		tmy;
+static fixed_t	tmbbox[4];
+static mobj_t*	tmthing;
+static int	tmflags;
+static fixed_t	tmx;
+static fixed_t	tmy;
 
 
 // If "floatok" true, move would be ok
@@ -1736,7 +1736,10 @@ static boolean PIT_GetSectors(line_t *ld)
 void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 {
     int xl, xh, yl, yh, bx, by;
-    msecnode_t *node;
+    msecnode_t*	node;
+    mobj_t*	saved_tmthing;
+    fixed_t	saved_tmx;
+    fixed_t	saved_tmy;
 
     // First, clear out the existing m_thing fields. As each node is
     // added or verified as needed, m_thing will be set properly. When
@@ -1744,6 +1747,10 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
     // represent the sectors the Thing has vacated.
     for (node = sector_list; node; node = node->m_tnext)
 	node->m_thing = NULL;
+
+    saved_tmthing = tmthing;	// Save the current tmthing before
+    saved_tmx = tmx;		// we clobber it.
+    saved_tmy = tmy;
 
     tmthing = thing;
     tmflags = thing->flags;
@@ -1781,6 +1788,19 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 	}
 	else
 	    node = node->m_tnext;
+
+    // Restore tmthing....
+
+    tmx = saved_tmx;
+    tmy = saved_tmy;
+    if ((tmthing = saved_tmthing) != NULL)
+    {
+      tmflags = tmthing->flags;
+      tmbbox[BOXTOP] = tmy + tmthing->radius;
+      tmbbox[BOXBOTTOM] = tmy - tmthing->radius;
+      tmbbox[BOXRIGHT] = tmx + tmthing->radius;
+      tmbbox[BOXLEFT] = tmx - tmthing->radius;
+    }
 }
 
 #endif
