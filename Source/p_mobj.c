@@ -31,7 +31,6 @@ extern void G_PlayerReborn (int player);
 
 #ifdef USE_BOOM_P_ChangeSector
 extern void P_DelSeclist (msecnode_t *node);
-extern msecnode_t *P_DelSecnode (msecnode_t *node);
 #endif
 
 /* -------------------------------------------------------------------------------------------- */

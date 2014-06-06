@@ -1643,7 +1643,7 @@ static msecnode_t *P_AddSecnode(sector_t *s, mobj_t *thing, msecnode_t *nextnode
 // on the linked list, or NULL.
 //
 // killough 11/98: reformatted
-msecnode_t *P_DelSecnode (msecnode_t *node)
+static msecnode_t *P_DelSecnode (msecnode_t *node)
 {
   if (node)
   {
