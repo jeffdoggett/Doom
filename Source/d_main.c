@@ -1955,7 +1955,8 @@ void D_DoomMain (void)
     case registered:
     case retail:
     case commercial:
-      if (W_CheckNumForName ("FREEDOOM") == -1)
+//    if (W_CheckNumForName ("FREEDOOM") == -1)		// Not needed anymore as freedoom
+//							// now sets this up in DEHACKED
 	printf (dmain_messages [D_COMMERCIAL]);
       break;
 

@@ -2852,6 +2852,15 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     return (HU_access_mapname_E (253, counter1));
   }
 
+  if (strncasecmp (ttext, "STARTUP", 7) == 0)
+  {
+    counter1 = atoi (ttext+7) + (D_PUBLIC-1);
+    if (counter1 <= D_DO_NOT_DIST)
+      return (&dmain_messages [counter1]);
+    else
+      return (NULL);
+  }
+
   if (strcasecmp (ttext, "GGSAVED") == 0)
   {
     return (&save_game_messages[GG_GGSAVED]);
