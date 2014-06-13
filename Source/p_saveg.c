@@ -36,6 +36,7 @@ static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
    machine with the opposite endian-ness (e.g. HP-UX PA-RISC -> ARM)
 */
 static boolean wrong_endian;
+extern int numflats;
 
 //-----------------------------------------------------------------------------
 #if 0
@@ -969,7 +970,8 @@ static byte * P_ArchiveFloor (byte * save_p, floormove_t* floor)
   p_save_32 (0);					// SPARE!!!
   p_save_32 (0);					// SPARE!!!
   p_save_32 (thinker);
-  p_save_32 ((unsigned int) floor -> type);
+//p_save_32 ((unsigned int) floor -> type);
+  p_save_32 (0);					// SPARE!!!
   p_save_32 ((unsigned int) floor -> crush);
   p_save_32 (floor -> sector - sectors);
   p_save_32 (floor -> direction);
@@ -996,7 +998,8 @@ static byte * P_UnArchiveFloor (byte * save_p)
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   thinker = p_load_32 (save_32_p); save_32_p++;
-  floor -> type = (floor_e) p_load_32 (save_32_p); save_32_p++;
+//floor -> type = (floor_e) p_load_32 (save_32_p); save_32_p++;
+  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   floor -> crush = (boolean) p_load_32 (save_32_p); save_32_p++;
   floor -> sector = P_GetSectorPtr (save_32_p); save_32_p++;
   floor -> sector->floordata = floor;
@@ -1005,6 +1008,12 @@ static byte * P_UnArchiveFloor (byte * save_p)
   floor -> newtexture = p_load_32 (save_32_p); save_32_p++;
   floor -> floordestheight = p_load_32 (save_32_p); save_32_p++;
   floor -> speed = p_load_32 (save_32_p); save_32_p++;
+
+  if (floor -> newtexture >= numflats)			// Old games did not always save this!
+  {
+    floor -> newtexture = floor -> sector -> floorpic;	// so bodge it.
+    floor -> newspecial = floor -> sector -> special;
+  }
 
   if (thinker)
     P_AddThinker (&floor->thinker, (actionf_p1)T_MoveFloor);

@@ -219,8 +219,11 @@ T_MovePlane
 void T_MoveFloor(floormove_t* floor)
 {
   result_e	res;
+  sector_t *	sec;
 
-  res = T_MovePlane(floor->sector,
+  sec = floor->sector;
+
+  res = T_MovePlane(sec,
 		    floor->speed,
 		    floor->floordestheight,
 		    floor->crush,0,floor->direction);
@@ -229,20 +232,21 @@ void T_MoveFloor(floormove_t* floor)
   if (res != pastdest)
   {
     if (!(leveltime&7))
-      S_StartSound((mobj_t *)&floor->sector->soundorg, sfx_stnmov);
+      S_StartSound((mobj_t *)&sec->soundorg, sfx_stnmov);
   }
   else
   {
-    floor->sector->floordata = NULL;
+    sec->floordata = NULL;
 #ifdef SHOW_FLOOR_TEX_CHANGE
     printf ("Floor spec %d -> %d, pic %d -> %d\n",
-	      floor->sector->special, floor->newspecial,
-	      floor->sector->floorpic, floor->newtexture);
+	      sec->special, floor->newspecial,
+	      sec->floorpic, floor->newtexture);
 #endif
-    floor->sector->special = floor->newspecial;
-    floor->sector->floorpic = floor->newtexture;
+    sec->special = floor->newspecial;			// We have aready set these to the
+    sec->floorpic = floor->newtexture;			// correct special/texture so we can
+							// just write them always.
     P_RemoveThinker(&floor->thinker);
-    S_StartSound((mobj_t *)&floor->sector->soundorg, sfx_pstop);
+    S_StartSound((mobj_t *)&sec->soundorg, sfx_pstop);
   }
 }
 
@@ -322,13 +326,13 @@ static floormove_t* get_floor_block (sector_t* sec)
 
   sec->floordata = floor;
   floor->sector = sec;
-  floor->newtexture = sec->floorpic;
-  floor->newspecial = sec->special;
+  floor->newtexture = sec->floorpic;	// Copy current texture/special so that we
+  floor->newspecial = sec->special;	// can just copy back later without checking.
   floor->direction = 1;
   floor->speed = FLOORSPEED;
   floor->floordestheight = sec->floorheight;
   floor->crush = false;
-  floor->type = buildStair;
+//floor->type = buildStair;
   return (floor);
 }
 
@@ -351,7 +355,6 @@ EV_DoFloor
   floormove_t*	floor;
 
   rtn = 0;
-
 
   // If the line has no tag then operate the associated sector.
   if (line -> tag == 0)
@@ -384,7 +387,7 @@ EV_DoFloor
     // new floor thinker
     rtn = 1;
     floor = get_floor_block (sec);
-    floor->type = floortype;
+//  floor->type = floortype;
 
     switch(floortype)
     {
@@ -731,6 +734,8 @@ EV_BuildStairs
   int		secnum;
   sector_t*	sec;
 
+  rtn = 0;
+
   // If the line has no tag then operate the associated sector.
   if (line -> tag == 0)
   {
@@ -743,16 +748,16 @@ EV_BuildStairs
     if (secnum == -1)
     {
       line->special = 0;	// Yet another badly built wad!!
-      return (0);
+      return (rtn);
     }
   }
 
   do
   {
     sec = &sectors [secnum];
-    if (make_stairs (sec, buildtype, false) == true)
+    if (make_stairs (sec, buildtype, false) == true)	// Can we do it?
     {
-      (void) make_stairs (sec, buildtype, true);
+      (void) make_stairs (sec, buildtype, true);	// Yes.
       rtn = 1;
     }
   } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
@@ -819,7 +824,7 @@ int EV_DoDonut(line_t*	line)
 
       //	Spawn rising slime
       floor = get_floor_block (s2);
-      floor->type = donutRaise;
+//    floor->type = donutRaise;
       floor->speed = FLOORSPEED / 2;
       floor->newtexture = s3->floorpic;
       floor->newspecial = 0;
@@ -827,7 +832,7 @@ int EV_DoDonut(line_t*	line)
 
       //	Spawn lowering donut-hole
       floor = get_floor_block (s1);
-      floor->type = lowerFloor;
+//    floor->type = lowerFloor;
       floor->direction = -1;
       floor->speed = FLOORSPEED / 2;
       floor->floordestheight = s3->floorheight;

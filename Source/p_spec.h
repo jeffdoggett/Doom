@@ -1054,8 +1054,7 @@ typedef enum
     lowerFloor24,
     lowerFloor32Turbo,
     raiseFloor32Turbo,
-    raiseToCeiling,
-    buildStair //BRAD:http://doom.wikia.com/wiki/Stairs_create_unknown_sector_types
+    raiseToCeiling
 } floor_e;
 
 
@@ -1086,7 +1085,7 @@ typedef enum
 typedef struct
 {
     thinker_t	thinker;
-    floor_e	type;
+//  floor_e	type;			// No longer required
     boolean	crush;
     sector_t*	sector;
     int		direction;
