@@ -378,27 +378,34 @@ boolean PIT_CheckThing (mobj_t* thing)
     }
 
     // see if it went over / under
-    if (tmthing->z >= thing->z + thing->height)
+    if (tmthing->flags & MF_SOLID)
     {
-	if (!(thing->flags & MF_SPECIAL))
+	if (tmthing->z >= thing->z + thing->height)
 	{
-	    tmfloorz = thing->z + thing->height;
-	    thing->ceilingz = tmthing->z;
-	    return true;	// overhead
+	    if (!(thing->flags & MF_SPECIAL))
+	    {
+		tmfloorz = thing->z + thing->height;
+		thing->ceilingz = tmthing->z;
+		return (true);	// overhead
+	    }
+	}
+	if (tmthing->z + tmthing->height < thing->z)
+	{
+	    if (!(thing->flags & MF_SPECIAL))
+	    {
+		tmceilingz = thing->z;
+		thing->floorz = tmthing->z + tmthing->height;
+		return (true);	// underneath
+	    }
 	}
     }
 
-    if (tmthing->z + tmthing->height < thing->z)
-    {
-	if (!(thing->flags & MF_SPECIAL))
-	{
-	    tmceilingz = thing->z;
-	    thing->floorz = tmthing->z + tmthing->height;
-	    return true;	// underneath
-	}
-    }
-
-    return (boolean)!(thing->flags & MF_SOLID);
+    // killough 3/16/98: Allow non-solid moving objects to move through solid
+    // ones, by allowing the moving thing (tmthing) to move if it's non-solid,
+    // despite another solid thing being in the way.
+    // killough 4/11/98: Treat no-clipping things as not blocking
+    return (boolean)!((thing->flags & MF_SOLID) && !(thing->flags & MF_NOCLIP)
+		&& (tmthing->flags & MF_SOLID));
 }
 
 
