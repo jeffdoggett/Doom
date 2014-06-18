@@ -378,28 +378,23 @@ boolean PIT_CheckThing (mobj_t* thing)
     }
 
     // see if it went over / under
-//  if (tmthing->flags & MF_SOLID)
-    if (tmthing->player)		// Only allow the player...
+    if ((tmthing->player || (tmthing->flags & MF_FLOAT))
+     && (tmthing->z >= thing->z + thing->height))
     {
-	if (tmthing->z >= thing->z + thing->height)
-	{
-	    if (!(thing->flags & MF_SPECIAL))
-	    {
-		tmfloorz = thing->z + thing->height;
-		thing->ceilingz = tmthing->z;
-		return (true);	// overhead
-	    }
-	}
-	if (tmthing->z + tmthing->height < thing->z)
-	{
-	    if (!(thing->flags & MF_SPECIAL))
-	    {
-		tmceilingz = thing->z;
-		thing->floorz = tmthing->z + tmthing->height;
-		return (true);	// underneath
-	    }
-	}
+        // over
+        tmfloorz = thing->z + thing->height;
+        thing->ceilingz = tmthing->z;
+        return (true);
     }
+
+    if (tmthing->z + tmthing->height <= thing->z)
+    {
+        // underneath
+        tmceilingz = thing->z;
+        thing->floorz = tmthing->z + tmthing->height;
+        return (true);
+    }
+
 
     // killough 3/16/98: Allow non-solid moving objects to move through solid
     // ones, by allowing the moving thing (tmthing) to move if it's non-solid,
