@@ -2972,7 +2972,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	27*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3140,7 +3140,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	30*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3168,7 +3168,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	27*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3196,7 +3196,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	31*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3224,7 +3224,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	31*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3252,7 +3252,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	27*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3280,7 +3280,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	31*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
@@ -3308,7 +3308,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	S_NULL, 						// xdeathstate
 	sfx_None,						// deathsound
 	0,							// speed
-	27*FRACUNIT,						// radius
+	20*FRACUNIT,						// radius
 	20*FRACUNIT,						// pickupradius
 	16*FRACUNIT,						// height
 	100,							// mass
