@@ -1536,9 +1536,10 @@ static byte * P_UnArchiveButton (byte * save_p)
 //
 byte * P_ArchiveSpecials (byte * save_p)
 {
-  int		i;
   int		done_one;
   thinker_t*	th;
+  plat_t *	plat;
+  ceiling_t *	ceiling;
 
   // save off the current thinkers
   for (th = thinker_head ; th != NULL ; th=th->next)
@@ -1546,24 +1547,27 @@ byte * P_ArchiveSpecials (byte * save_p)
     if (th->function.acv == (actionf_v)NULL)
     {
       done_one = 0;
-      for (i = 0; i < MAXCEILINGS;i++)
+      
+      for (ceiling = activeceilingshead ; ceiling != NULL ; ceiling=ceiling->next)
       {
-	if (activeceilings[i] == (ceiling_t *)th)
+	if (ceiling == (ceiling_t *)th)
 	{
 	  save_p = P_ArchiveCeiling (save_p, (ceiling_t *) th);
 	  done_one = 1;
 	  break;
 	}
       }
-      for (i = 0;i < MAXPLATS;i++)
+
+      for (plat = activeplatshead ; plat != NULL ; plat=plat->next)
       {
-	if (activeplats[i] == (plat_t*) th)
+	if (plat == (plat_t*) th)
 	{
 	  save_p = P_ArchivePlat (save_p, (plat_t*) th);
 	  done_one = 1;
 	  break;
 	}
       }
+
       if (done_one)
 	continue;
     }

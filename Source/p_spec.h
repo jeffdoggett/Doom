@@ -36,7 +36,6 @@
 
 #define CEILSPEED		FRACUNIT
 #define CEILWAIT		150
-#define MAXCEILINGS		30
 
 /* p_doors */
 
@@ -47,7 +46,6 @@
 
 #define PLATWAIT		3
 #define PLATSPEED		FRACUNIT
-#define MAXPLATS		30
 
 
 /* p_lights */
@@ -760,9 +758,11 @@ typedef enum
 
 
 
-typedef struct
+typedef struct plat_s
 {
     thinker_t	thinker;
+    struct plat_s* next;
+    struct plat_s* prev;
     sector_t*	sector;
     fixed_t	speed;
     fixed_t	low;
@@ -782,7 +782,7 @@ typedef struct
 
 
 
-extern plat_t*	activeplats[MAXPLATS];
+extern plat_t*	activeplatshead;
 
 void    T_PlatRaise(plat_t*	plat);
 
@@ -971,9 +971,11 @@ typedef enum
 
 
 
-typedef struct
+typedef struct ceiling_s
 {
     thinker_t	thinker;
+    struct ceiling_s* next;
+    struct ceiling_s* prev;
     ceiling_e	type;
     sector_t*	sector;
     fixed_t	bottomheight;
@@ -999,7 +1001,7 @@ typedef struct
 } ceiling_t;
 
 
-extern ceiling_t*	activeceilings[MAXCEILINGS];
+extern ceiling_t*	activeceilingshead;
 
 int
 EV_DoCeiling

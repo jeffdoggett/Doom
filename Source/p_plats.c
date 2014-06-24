@@ -27,7 +27,7 @@ static const char rcsid[] = "$Id: p_plats.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 
 #include "includes.h"
 
-plat_t*		activeplats[MAXPLATS];
+plat_t*		activeplatshead;
 extern boolean	gamekeydown[NUMKEYS];
 
 
@@ -380,39 +380,19 @@ EV_DoPlat
 static int P_ActivateInStasis (int tag)
 {
   int rc;
-  unsigned int qty;
-  plat_t** ptr_1;
-  plat_t* ptr_2;
+  plat_t * plat;
 
   rc = 0;
-  ptr_1 = activeplats;
-  qty = MAXPLATS;
-  do
+  for (plat = activeplatshead ; plat != NULL ; plat=plat->next)
   {
-    ptr_2 = *ptr_1++;
-    if ((ptr_2 != NULL)
-     && (ptr_2 -> tag == tag)
-     && (ptr_2 -> status == in_stasis))
+    if ((plat -> tag == tag)
+     && (plat -> status == in_stasis))
     {
-      ptr_2 -> status = ptr_2 -> oldstatus;
-      ptr_2 -> thinker.function.acp1 = (actionf_p1) T_PlatRaise;
+      plat -> status = plat -> oldstatus;
+      plat -> thinker.function.acp1 = (actionf_p1) T_PlatRaise;
       rc = 1;
     }
-  } while (--qty);
-
-#if 0
-  int	i;
-
-  for (i = 0;i < MAXPLATS;i++)
-      if (activeplats[i]
-	  && (activeplats[i])->tag == tag
-	  && (activeplats[i])->status == in_stasis)
-      {
-	  (activeplats[i])->status = (activeplats[i])->oldstatus;
-	  (activeplats[i])->thinker.function.acp1
-	    = (actionf_p1) T_PlatRaise;
-      }
-#endif
+  }
 
   return (rc);
 }
@@ -421,108 +401,55 @@ static int P_ActivateInStasis (int tag)
 
 void EV_StopPlat (line_t* line)
 {
-  unsigned int qty;
-  plat_t** ptr_1;
-  plat_t* ptr_2;
+  plat_t * plat;
 
-  ptr_1 = activeplats;
-  qty = MAXPLATS;
-  do
+  for (plat = activeplatshead ; plat != NULL ; plat=plat->next)
   {
-    ptr_2 = *ptr_1++;
-    if ((ptr_2 != NULL)
-     && (ptr_2 -> tag == line->tag)
-     && (ptr_2 -> status != in_stasis))
+    if ((plat -> tag == line->tag)
+     && (plat -> status != in_stasis))
     {
-      ptr_2 -> oldstatus = ptr_2 -> status;
-      ptr_2 -> status = in_stasis;
-      ptr_2 -> thinker.function.acv = (actionf_v) NULL;
+      plat -> oldstatus = plat -> status;
+      plat -> status = in_stasis;
+      plat -> thinker.function.acv = (actionf_v) NULL;
     }
-  } while (--qty);
-
-#if 0
-  int	j;
-
-  for (j = 0;j < MAXPLATS;j++)
-      if (activeplats[j]
-	  && ((activeplats[j])->status != in_stasis)
-	  && ((activeplats[j])->tag == line->tag))
-      {
-	  (activeplats[j])->oldstatus = (activeplats[j])->status;
-	  (activeplats[j])->status = in_stasis;
-	  (activeplats[j])->thinker.function.acv = (actionf_v)NULL;
-      }
-#endif
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void P_AddActivePlat(plat_t* plat)
 {
-  unsigned int qty;
-  plat_t** ptr_1;
-  plat_t* ptr_2;
+  plat_t *next;
 
-  ptr_1 = activeplats;
-  qty = MAXPLATS;
-  do
-  {
-    ptr_2 = *ptr_1++;
-    if (ptr_2 == NULL)
-    {
-      ptr_1 [-1] = plat;
-      return;
-    }
-  } while (--qty);
+  next = activeplatshead;
+  if (next)
+    next -> prev = plat;
 
-#if 0
-  int	i;
-
-  for (i = 0;i < MAXPLATS;i++)
-      if (activeplats[i] == NULL)
-      {
-	  activeplats[i] = plat;
-	  return;
-      }
-#endif
-  I_Error ("P_AddActivePlat: no more plats!");
+  activeplatshead = plat;
+  plat -> next = next;
+  plat -> prev = NULL;
 }
 
 //-----------------------------------------------------------------------------
 
 void P_RemoveActivePlat(plat_t* plat)
 {
-  unsigned int qty;
-  plat_t** ptr_1;
-  plat_t* ptr_2;
+  plat_t *next;
+  plat_t *prev;
 
-  ptr_1 = activeplats;
-  qty = MAXPLATS;
-  do
-  {
-    ptr_2 = *ptr_1++;
-    if (ptr_2 == plat)
-    {
-      plat -> sector->floordata = NULL;
-      P_RemoveThinker(&plat->thinker);
-      ptr_1 [-1] = NULL;
-      return;
-    }
-  } while (--qty);
+  next = plat -> next;
+  prev = plat -> prev;
 
-#if 0
-  int	i;
-  for (i = 0;i < MAXPLATS;i++)
-      if (plat == activeplats[i])
-      {
-	  (activeplats[i])->sector->floordata = NULL;
-	  P_RemoveThinker(&(activeplats[i])->thinker);
-	  activeplats[i] = NULL;
+  if (next)
+    next -> prev = prev;
 
-	  return;
-      }
-  I_Error ("P_RemoveActivePlat: can't find plat!");
-#endif
+  if (prev == NULL)
+    activeplatshead = next;
+  else
+    prev -> next = next;
+
+  plat->sector->floordata = NULL;
+  P_RemoveThinker (&plat->thinker);
 }
 
 //-----------------------------------------------------------------------------

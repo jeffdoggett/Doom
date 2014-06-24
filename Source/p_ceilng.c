@@ -35,7 +35,7 @@ static int P_ActivateInStasisCeiling (line_t* line);
 //
 
 
-ceiling_t* activeceilings[MAXCEILINGS];
+ceiling_t* activeceilingshead;
 
 
 //-----------------------------------------------------------------------------
@@ -413,20 +413,15 @@ EV_DoCeiling
 //
 void P_AddActiveCeiling (ceiling_t* c)
 {
-  int qty;
-  ceiling_t** ptr_1;
+  ceiling_t *next;
 
-  qty = MAXCEILINGS;
-  ptr_1 = activeceilings;
+  next = activeceilingshead;
+  if (next)
+    next -> prev = c;
 
-  do
-  {
-    if (*ptr_1++ == NULL)
-    {
-      ptr_1 [-1] = c;
-      break;
-    }
-  } while (--qty);
+  activeceilingshead = c;
+  c -> next = next;
+  c -> prev = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -435,38 +430,22 @@ void P_AddActiveCeiling (ceiling_t* c)
 //
 void P_RemoveActiveCeiling (ceiling_t* c)
 {
-  int qty;
-  ceiling_t** ptr_1;
-  ceiling_t* ptr_2;
+  ceiling_t *next;
+  ceiling_t *prev;
 
-  qty = MAXCEILINGS;
-  ptr_1 = activeceilings;
+  next = c -> next;
+  prev = c -> prev;
 
-  do
-  {
-    ptr_2 = *ptr_1++;
-    if (ptr_2 == c)
-    {
-      ptr_2 -> sector->ceilingdata = NULL;
-      P_RemoveThinker (&ptr_2->thinker);
-      ptr_1 [-1] = NULL;
-      break;
-    }
-  } while (--qty);
+  if (next)
+    next -> prev = prev;
 
+  if (prev == NULL)
+    activeceilingshead = next;
+  else
+    prev -> next = next;
 
-#if 0
-  for (i = 0;i < MAXCEILINGS;i++)
-  {
-    if (activeceilings[i] == c)
-    {
-      activeceilings[i]->sector->ceilingdata = NULL;
-      P_RemoveThinker (&activeceilings[i]->thinker);
-      activeceilings[i] = NULL;
-      break;
-    }
-  }
-#endif
+  c->sector->ceilingdata = NULL;
+  P_RemoveThinker (&c->thinker);
 }
 
 //-----------------------------------------------------------------------------
@@ -475,42 +454,22 @@ void P_RemoveActiveCeiling (ceiling_t* c)
 //
 static int P_ActivateInStasisCeiling (line_t* line)
 {
-  int qty;
   int rtn;
-  ceiling_t** ptr_1;
-  ceiling_t* ptr_2;
+  ceiling_t * ceiling;
 
   rtn = 0;
-  qty = MAXCEILINGS;
-  ptr_1 = activeceilings;
-
-  do
+  for (ceiling = activeceilingshead ; ceiling != NULL ; ceiling=ceiling->next)
   {
-    ptr_2 = *ptr_1++;
-    if ((ptr_2 != NULL)
-     && (ptr_2 -> tag == line->tag)
-     && (ptr_2 -> thinker.function.acp1 == (actionf_p1)NULL))
+    if ((ceiling -> tag == line->tag)
+     && (ceiling -> thinker.function.acp1 == (actionf_p1)NULL))
     {
-      // ptr_2 -> direction = ptr_2 -> olddirection;
-      ptr_2 -> thinker.function.acp1 = (actionf_p1)T_MoveCeiling;
+      // ceiling -> direction = ptr_2 -> olddirection;
+      ceiling -> thinker.function.acp1 = (actionf_p1)T_MoveCeiling;
       rtn = 1;
     }
-  } while (--qty);
-
-#if 0
-  for (i = 0;i < MAXCEILINGS;i++)
-  {
-    if (activeceilings[i]
-     && (activeceilings[i]->tag == line->tag)
-     && (activeceilings[i]->direction == 0))
-    {
-      activeceilings[i]->direction = activeceilings[i]->olddirection;
-      activeceilings[i]->thinker.function.acp1
-	= (actionf_p1)T_MoveCeiling;
-    }
   }
-#endif
-  return rtn;
+
+  return (rtn);
 }
 
 //-----------------------------------------------------------------------------
@@ -520,46 +479,23 @@ static int P_ActivateInStasisCeiling (line_t* line)
 //
 int EV_CeilingCrushStop (line_t *line)
 {
-  int qty;
   int rtn;
-
-  ceiling_t** ptr_1;
-  ceiling_t* ptr_2;
+  ceiling_t * ceiling;
 
   rtn = 0;
-  qty = MAXCEILINGS;
-  ptr_1 = activeceilings;
-
-  do
+  for (ceiling = activeceilingshead ; ceiling != NULL ; ceiling=ceiling->next)
   {
-    ptr_2 = *ptr_1++;
-    if ((ptr_2 != NULL)
-     && (ptr_2 -> tag == line->tag)
-     && (ptr_2 -> thinker.function.acp1 != (actionf_p1)NULL))
+    if ((ceiling -> tag == line->tag)
+     && (ceiling -> thinker.function.acp1 != (actionf_p1)NULL))
     {
-      // ptr_2 -> olddirection = ptr_2 -> direction;
-      ptr_2 -> thinker.function.acp1 = (actionf_p1)NULL;
-      // ptr_2 -> direction = 0;		// in-stasis
-      rtn = 1;
-    }
-  } while (--qty);
-
-
-#if 0
-  for (i = 0;i < MAXCEILINGS;i++)
-  {
-    if (activeceilings[i]
-     && (activeceilings[i]->tag == line->tag)
-     && (activeceilings[i]->direction != 0))
-    {
-      activeceilings[i]->olddirection = activeceilings[i]->direction;
-      activeceilings[i]->thinker.function.acv = (actionf_v)NULL;
-      activeceilings[i]->direction = 0;		// in-stasis
+      // ceiling -> olddirection = ptr_2 -> direction;
+      ceiling -> thinker.function.acp1 = (actionf_p1)NULL;
+      // ceiling -> direction = 0;		// in-stasis
       rtn = 1;
     }
   }
-#endif
-  return rtn;
+
+  return (rtn);
 }
 
 //-----------------------------------------------------------------------------
