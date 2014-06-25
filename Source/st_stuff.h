@@ -40,6 +40,7 @@
 
 // Called by main loop.
 boolean ST_Responder (event_t* ev);
+void ST_AutoMapEvent (int am_message);
 
 // Called by main loop.
 void ST_Ticker (void);

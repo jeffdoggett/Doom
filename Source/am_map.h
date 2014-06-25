@@ -23,9 +23,8 @@
 #define __AMMAP_H__
 
 // Used by ST StatusBar stuff.
-#define AM_MSGHEADER (('a'<<24)+('m'<<16))
-#define AM_MSGENTERED (AM_MSGHEADER | ('e'<<8))
-#define AM_MSGEXITED (AM_MSGHEADER | ('x'<<8))
+#define AM_MSGENTERED	1
+#define AM_MSGEXITED	0
 
 void AM_LoadColours (int palette_lump);
 

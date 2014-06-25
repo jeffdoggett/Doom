@@ -705,7 +705,6 @@ static void AM_changeWindowLoc(void)
 static void AM_initVariables(void)
 {
     int pnum;
-    static event_t st_notify = { ev_keyup, AM_MSGENTERED };
 
     automapactive = true;
     fb = screens[0];
@@ -744,7 +743,7 @@ static void AM_initVariables(void)
     old_m_h = m_h;
 
     // inform the status bar of the change
-    ST_Responder(&st_notify);
+    ST_AutoMapEvent (AM_MSGENTERED);
 }
 
 //
@@ -810,11 +809,9 @@ void AM_LevelInit(void)
 //
 void AM_Stop (void)
 {
-    static event_t st_notify = { (evtype_t)0, ev_keyup, AM_MSGEXITED };
-
     AM_unloadPics();
     automapactive = false;
-    ST_Responder(&st_notify);
+    ST_AutoMapEvent (AM_MSGEXITED);
     stopped = true;
 }
 

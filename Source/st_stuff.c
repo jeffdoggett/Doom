@@ -534,26 +534,8 @@ ST_Responder (event_t* ev)
 {
   int		i;
 
-  // Filter automap on/off.
-  if (ev->type == ev_keyup
-      && ((ev->data1 & 0xffff0000) == AM_MSGHEADER))
-  {
-    switch(ev->data1)
-    {
-      case AM_MSGENTERED:
-	st_gamestate = AutomapState;
-	st_firsttime = true;
-	break;
-
-      case AM_MSGEXITED:
-	//	fprintf(stderr, "AM exited\n");
-	st_gamestate = FirstPersonState;
-	break;
-    }
-  }
-
   // if a user keypress...
-  else if (ev->type == ev_keydown)
+  if (ev->type == ev_keydown)
   {
     if (!netgame)
     {
@@ -810,7 +792,25 @@ ST_Responder (event_t* ev)
   return false;
 }
 
+/* ---------------------------------------------------------------------------- */
 
+void ST_AutoMapEvent (int am_message)
+{
+  switch (am_message)
+  {
+    case AM_MSGENTERED:
+      st_gamestate = AutomapState;
+      st_firsttime = true;
+      break;
+
+    case AM_MSGEXITED:
+      //	fprintf(stderr, "AM exited\n");
+      st_gamestate = FirstPersonState;
+      break;
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
 
 int ST_calcPainOffset(void)
 {
@@ -828,7 +828,7 @@ int ST_calcPainOffset(void)
     return lastcalc;
 }
 
-
+/* ---------------------------------------------------------------------------- */
 //
 // This is a not-very-pretty routine which handles
 //  the face states and their timing.
@@ -1009,6 +1009,8 @@ static void ST_updateFaceWidget(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 static void ST_updateWidgets(void)
 {
     static int	largeammo = 1994; // means "n/a"
@@ -1073,6 +1075,8 @@ static void ST_updateWidgets(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_Ticker (void)
 {
 
@@ -1082,6 +1086,8 @@ void ST_Ticker (void)
     st_oldhealth = plyr->health;
 
 }
+
+/* ---------------------------------------------------------------------------- */
 
 static int st_palette = 0;
 
@@ -1139,6 +1145,8 @@ void ST_doPaletteStuff(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_drawWidgets(boolean refresh)
 {
     int		i;
@@ -1174,6 +1182,8 @@ void ST_drawWidgets(boolean refresh)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_doRefresh(void)
 {
 
@@ -1187,11 +1197,15 @@ void ST_doRefresh(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_diffDraw(void)
 {
     // update all widgets
     ST_drawWidgets(false);
 }
+
+/* ---------------------------------------------------------------------------- */
 
 void ST_Drawer (boolean fullscreen, boolean refresh)
 {
@@ -1208,6 +1222,8 @@ void ST_Drawer (boolean fullscreen, boolean refresh)
     else ST_diffDraw();
 
 }
+
+/* ---------------------------------------------------------------------------- */
 
 void ST_loadGraphics(void)
 {
@@ -1286,12 +1302,16 @@ void ST_loadGraphics(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_loadData(void)
 {
     lu_palette = W_GetNumForName ("PLAYPAL");
     ST_loadGraphics();
     AM_LoadColours (lu_palette);
 }
+
+/* ---------------------------------------------------------------------------- */
 
 void ST_unloadGraphics(void)
 {
@@ -1330,10 +1350,14 @@ void ST_unloadGraphics(void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_unloadData(void)
 {
     ST_unloadGraphics();
 }
+
+/* ---------------------------------------------------------------------------- */
 
 static void ST_initData(void)
 {
@@ -1366,7 +1390,7 @@ static void ST_initData(void)
 
 }
 
-
+/* ---------------------------------------------------------------------------- */
 
 void ST_createWidgets(void)
 {
@@ -1530,6 +1554,8 @@ void ST_createWidgets(void)
   }
 }
 
+/* ---------------------------------------------------------------------------- */
+
 static boolean	st_stopped = true;
 
 
@@ -1545,6 +1571,8 @@ void ST_Start (void)
 
 }
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_Stop (void)
 {
     if (st_stopped)
@@ -1554,6 +1582,8 @@ void ST_Stop (void)
 
     st_stopped = true;
 }
+
+/* ---------------------------------------------------------------------------- */
 
 void ST_Init (void)
 {
@@ -1569,3 +1599,5 @@ void ST_Init (void)
     screens[4] = (byte *) Z_Malloc(SCREENWIDTH*64, PU_STATIC, 0);
 #endif
 }
+
+/* ---------------------------------------------------------------------------- */
