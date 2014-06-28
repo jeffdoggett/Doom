@@ -34,12 +34,12 @@ extern void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y);
 
 //-----------------------------------------------------------------------------
 //
-// P_AproxDistance
+// P_ApproxDistance
 // Gives an estimation of distance (not exact)
 //
 
 fixed_t
-P_AproxDistance
+P_ApproxDistance
 ( fixed_t	dx,
   fixed_t	dy )
 {

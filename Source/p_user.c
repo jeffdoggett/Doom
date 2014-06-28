@@ -140,36 +140,38 @@ void P_CalcHeight (player_t* player)
 //
 void P_MovePlayer (player_t* player)
 {
-  int j;  /* ARM compiler fails to sign extend char to int! */
-  ticcmd_t * cmd;
+  int j;	/* ARM compiler fails to sign extend char to int! */
+  ticcmd_t *	cmd;
+  mobj_t   *	mo;
 
+  mo = player->mo;
   cmd = &player->cmd;
 
-  player->mo->angle += (cmd->angleturn<<16);
+  mo->angle += (cmd->angleturn<<16);
 
   // Do not let the player control movement
   //  if not onground.
-  onground = (boolean) (player->mo->z <= player->mo->floorz);
+  onground = (boolean) (mo->z <= mo->floorz || (mo->flags2 & MF2_ONMOBJ));
 
   if (onground)
   {
     if ((j = cmd->forwardmove) != 0)
     {
       if (j > 0x7F) j |= ~0xFF;
-      P_Thrust (player, player->mo->angle, j*2048);
+      P_Thrust (player, mo->angle, j*2048);
     }
 
     if ((j = cmd->sidemove) != 0)
     {
       if (j > 0x7F) j |= ~0xFF;
-      P_Thrust (player, player->mo->angle-ANG90, j*2048);
+      P_Thrust (player, mo->angle-ANG90, j*2048);
     }
   }
 
   if ( (cmd->forwardmove || cmd->sidemove)
-   && player->mo->state == &states[S_PLAY] )
+   && mo->state == &states[S_PLAY] )
   {
-    P_SetMobjState (player->mo, S_PLAY_RUN1);
+    P_SetMobjState (mo, S_PLAY_RUN1);
   }
 }
 

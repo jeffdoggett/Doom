@@ -203,7 +203,7 @@ boolean P_CheckMeleeRange (mobj_t*	actor)
     return false;
 
   pl = actor->target;
-  dist = P_AproxDistance (pl->x-actor->x, pl->y-actor->y);
+  dist = P_ApproxDistance (pl->x-actor->x, pl->y-actor->y);
 
   if (dist >= MELEERANGE-20*FRACUNIT+pl->info->radius)
     return false;
@@ -240,7 +240,7 @@ boolean P_CheckMissileRange (mobj_t* actor)
 	return false;	// do not attack yet
 
     // OPTIMIZE: get this from a global checksight
-    dist = P_AproxDistance ( actor->x-actor->target->x,
+    dist = P_ApproxDistance ( actor->x-actor->target->x,
 			     actor->y-actor->target->y) - 64*FRACUNIT;
 
     if (!actor->info->meleestate)
@@ -554,7 +554,7 @@ P_LookForPlayers
 	}
 
 	player = &players[actor->lastlook];
-	dist = P_AproxDistance (player->mo->x - actor->x, player->mo->y - actor->y);
+	dist = P_ApproxDistance (player->mo->x - actor->x, player->mo->y - actor->y);
 
 	// [BH] monsters won't see partially invisible player unless too close
 	if ((player->powers[pw_invisibility]) && (dist > MELEERANGE * 2))
@@ -576,7 +576,7 @@ P_LookForPlayers
 
 	    if (an > ANG90 && an < ANG270)
 	    {
-//		dist = P_AproxDistance (player->mo->x - actor->x, player->mo->y - actor->y);
+//		dist = P_ApproxDistance (player->mo->x - actor->x, player->mo->y - actor->y);
 		// if real close, react anyway
 		if (dist > MELEERANGE)
 		    continue;	// behind back
@@ -1108,7 +1108,7 @@ void A_Tracer (mobj_t* actor)
     actor->momy = FixedMul (actor->info->speed, finesine[exact]);
 
     // change slope
-    dist = P_AproxDistance (dest->x - actor->x,
+    dist = P_ApproxDistance (dest->x - actor->x,
 			    dest->y - actor->y);
 
     dist = dist / actor->info->speed;
@@ -1507,7 +1507,7 @@ void A_SkullAttack (mobj_t* actor)
     an = actor->angle >> ANGLETOFINESHIFT;
     actor->momx = FixedMul (SKULLSPEED, finecosine[an]);
     actor->momy = FixedMul (SKULLSPEED, finesine[an]);
-    dist = P_AproxDistance (dest->x - actor->x, dest->y - actor->y);
+    dist = P_ApproxDistance (dest->x - actor->x, dest->y - actor->y);
     dist = dist / SKULLSPEED;
 
     if (dist < 1)

@@ -203,6 +203,11 @@ typedef enum
     MF_BOUNCES		= 0x10000000
 } mobjflag_t;
 
+typedef enum
+{
+  MF2_PASSMOBJ		= 1,
+  MF2_ONMOBJ		= 2
+} mobjflag2_t;
 
 // Map Object definition.
 typedef struct mobj_s
@@ -253,6 +258,7 @@ typedef struct mobj_s
     int			tics;	// state tic counter
     state_t*		state;
     int			flags;
+    int			flags2;
     int			health;
 
     // Movement direction, movement generation (zig-zagging).

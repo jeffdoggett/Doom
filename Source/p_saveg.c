@@ -577,9 +577,7 @@ static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
   p_save_32 (mobj->health);
   p_save_32 (mobj->movedir);
   p_save_32 (mobj->movecount);
-
-  p_save_32 (0);					// SPARE!!!
-
+  p_save_32 (mobj->flags2);
   p_save_32 (mobj->reactiontime);
   p_save_32 (mobj->threshold);
 
@@ -662,9 +660,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
 
   mobj->movedir = p_load_32 (save_32_p); save_32_p++;
   mobj->movecount = p_load_32 (save_32_p); save_32_p++;
-
-  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
-
+  mobj->flags2 = p_load_32 (save_32_p); save_32_p++;
   mobj->reactiontime = p_load_32 (save_32_p); save_32_p++;
   mobj->threshold = p_load_32 (save_32_p); save_32_p++;
 
@@ -1547,7 +1543,7 @@ byte * P_ArchiveSpecials (byte * save_p)
     if (th->function.acv == (actionf_v)NULL)
     {
       done_one = 0;
-      
+
       for (ceiling = activeceilingshead ; ceiling != NULL ; ceiling=ceiling->next)
       {
 	if (ceiling == (ceiling_t *)th)

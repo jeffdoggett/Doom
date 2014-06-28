@@ -236,7 +236,8 @@ void P_XYMovement (mobj_t* mo)
     }
 
     if ((flags & (MF_MISSILE | MF_SKULLFLY) )	// no friction for missiles ever
-     || (mo->z > mo->floorz))			// no friction when airborne
+     || ((mo->z > mo->floorz)			// no friction when airborne
+      && !(mo->flags2 & MF2_ONMOBJ)))
     {
 	return;
     }
@@ -330,7 +331,7 @@ void P_ZMovement (mobj_t* mo)
 	if ( !(mo->flags & MF_SKULLFLY)
 	     && !(mo->flags & MF_INFLOAT) )
 	{
-	    dist = P_AproxDistance (mo->x - mo->target->x,
+	    dist = P_ApproxDistance (mo->x - mo->target->x,
 				    mo->y - mo->target->y);
 
 	    delta =(mo->target->z + (mo->height>>1)) - mo->z;
@@ -424,6 +425,15 @@ void P_ZMovement (mobj_t* mo)
 	  }
 	}
     }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+static void PlayerLandedOnThing (mobj_t *mo, mobj_t *onmobj)
+{
+    mo->player->deltaviewheight = mo->momz >> 3;
+    if (mo->momz < -23 * FRACUNIT)
+	P_NoiseAlert (mo, mo);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -521,7 +531,41 @@ void P_MobjThinker (mobj_t* mobj)
     if ( (mobj->z != mobj->floorz)
 	 || mobj->momz )
     {
-	P_ZMovement (mobj);
+	if (mobj->flags2 & MF2_PASSMOBJ)
+	{
+	    mobj_t *onmo;
+
+	    onmo = P_CheckOnmobj(mobj);
+	    if (onmo == NULL)
+	    {
+		P_ZMovement(mobj);
+		if (mobj->player && (mobj->flags2 & MF2_ONMOBJ))
+		    mobj->flags2 &= ~MF2_ONMOBJ;
+	    }
+	    else
+	    {
+		if (mobj->player)
+		{
+		    if (mobj->momz < -GRAVITY * 8)
+			PlayerLandedOnThing(mobj, onmo);
+		    if (onmo->z + onmo->height - mobj->z <= 24 * FRACUNIT)
+		    {
+			mobj->player->viewheight -= onmo->z + onmo->height - mobj->z;
+			mobj->player->deltaviewheight = (VIEWHEIGHT - mobj->player->viewheight) >> 3;
+			mobj->z = onmo->z + onmo->height;
+			mobj->flags2 |= MF2_ONMOBJ;
+			mobj->momz = 0;
+		    }
+		    else
+			// hit the bottom of the blocking mobj
+			mobj->momz = 0;
+		}
+	    }
+	}
+	else
+	{
+	   P_ZMovement (mobj);
+	}
 
 	// FIXME: decent NOP/NULL/Nil function pointer please.
 	if (mobj->thinker.function.aci == -1)
@@ -591,7 +635,8 @@ P_SpawnMobj
     mobj->y = y;
     mobj->radius = info->radius;
     mobj->height = info->height;
-    mobj->flags = info->flags;
+    mobj->flags  = info->flags;
+    mobj->flags2 = info->flags2;
     mobj->health = info->spawnhealth;
 
     if (gameskill != sk_nightmare)
@@ -1052,7 +1097,7 @@ P_SpawnMissile
     th->momx = FixedMul (th->info->speed, finecosine[an]);
     th->momy = FixedMul (th->info->speed, finesine[an]);
 
-    dist = P_AproxDistance (dest->x - source->x, dest->y - source->y);
+    dist = P_ApproxDistance (dest->x - source->x, dest->y - source->y);
     dist = dist / th->info->speed;
 
     if (dist < 1)

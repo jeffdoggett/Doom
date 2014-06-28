@@ -155,7 +155,7 @@ typedef struct
 
 typedef boolean (*traverser_t) (intercept_t *in);
 
-fixed_t P_AproxDistance (fixed_t dx, fixed_t dy);
+fixed_t P_ApproxDistance (fixed_t dx, fixed_t dy);
 int 	P_PointOnLineSide (fixed_t x, fixed_t y, line_t* line);
 int 	P_PointOnDivlineSide (fixed_t x, fixed_t y, divline_t* line);
 void 	P_MakeDivline (line_t* li, divline_t* dl);
@@ -206,6 +206,8 @@ extern	line_t*		ceilingline;
 extern	line_t*		blockline;
 
 boolean P_CheckPosition (mobj_t *thing, fixed_t x, fixed_t y);
+mobj_t *P_CheckOnmobj (mobj_t *thing);
+void	P_FakeZMovement (mobj_t *mo);
 boolean P_TryMove (mobj_t* thing, fixed_t x, fixed_t y);
 boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y);
 void	P_SlideMove (mobj_t* mo);
