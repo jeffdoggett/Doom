@@ -35,6 +35,7 @@ static mobj_t*	tmthing;
 static int	tmflags;
 static fixed_t	tmx;
 static fixed_t	tmy;
+static fixed_t	tmz;
 
 
 // If "floatok" true, move would be ok
@@ -108,6 +109,11 @@ boolean PIT_StompThing (mobj_t* thing)
 	return false;
     }
 
+    if (tmz > thing->z + thing->height)
+        return true; // overhead
+    if (tmz + tmthing->height < thing->z)
+        return true; // underneath
+
     P_DamageMobj (thing, tmthing, tmthing, (thing->health+thing->info->spawnhealth)*2);
 
     return true;
@@ -117,11 +123,7 @@ boolean PIT_StompThing (mobj_t* thing)
 //
 // P_TeleportMove
 //
-boolean
-P_TeleportMove
-( mobj_t*	thing,
-  fixed_t	x,
-  fixed_t	y )
+boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z)
 {
     int		xl;
     int		xh;
@@ -138,6 +140,7 @@ P_TeleportMove
 
     tmx = x;
     tmy = y;
+    tmz = z;
 
     tmbbox[BOXTOP] = y + tmthing->radius;
     tmbbox[BOXBOTTOM] = y - tmthing->radius;
@@ -271,6 +274,8 @@ boolean PIT_CheckLine (line_t* ld)
 //
 boolean PIT_CheckThing (mobj_t* thing)
 {
+    fixed_t	newdist;
+    fixed_t	olddist;
     fixed_t	blockdist;
     boolean	solid;
     int		damage;
@@ -392,6 +397,19 @@ boolean PIT_CheckThing (mobj_t* thing)
 	}
 	return (boolean)!solid;
     }
+
+    // check if things are stuck and allow move if it makes them further apart
+
+    if ((tmx == tmthing->x) && (tmy == tmthing->y))
+	return true;
+
+    newdist = P_ApproxDistance(thing->x - tmx, thing->y - tmy);
+    olddist = P_ApproxDistance(thing->x - tmthing->x, thing->y - tmthing->y);
+
+    if ((newdist > olddist)
+     && (!((tmthing->z >= thing->z + thing->height)
+      || (tmthing->z + tmthing->height <= thing->z))))
+	return true;
 
     // killough 3/16/98: Allow non-solid moving objects to move through solid
     // ones, by allowing the moving thing (tmthing) to move if it's non-solid,
@@ -603,49 +621,47 @@ void P_FakeZMovement (mobj_t *mo)
 {
     // adjust height
     mo->z += mo->momz;
-    if (mo->flags & MF_FLOAT && mo->target)
+
+    if ((mo->flags & MF_FLOAT) && mo->target)
     {
 	// float down towards target if too close
 	if (!(mo->flags & MF_SKULLFLY) && !(mo->flags & MF_INFLOAT))
 	{
-	    int dist = P_ApproxDistance(mo->x - mo->target->x, mo->y - mo->target->y);
-	    int delta = (mo->target->z + (mo->height >> 1)) - mo->z;
+	    fixed_t delta = (mo->target->z + (mo->height >> 1) - mo->z) * 3;
 
-	    if (delta < 0 && dist < -(delta * 3))
-		mo->z -= FLOATSPEED;
-	    else if (delta > 0 && dist < (delta * 3))
-		mo->z += FLOATSPEED;
-	}
+	    if (P_ApproxDistance(mo->x - mo->target->x, mo->y - mo->target->y) < ABS(delta))
+		mo->z += (delta < 0 ? -FLOATSPEED : FLOATSPEED);
+        }
     }
 
     // clip movement
     if (mo->z <= mo->floorz)
     {
-	// Hit the floor
-	mo->z = mo->floorz;
-	if (mo->momz < 0)
-	    mo->momz = 0;
+	// hit the floor
 	if (mo->flags & MF_SKULLFLY)
-	    // The skull slammed into something
-	    mo->momz = -mo->momz;
+            mo->momz = -mo->momz; // the skull slammed into something
+
+	if (mo->momz < 0)
+            mo->momz = 0;
+	mo->z = mo->floorz;
     }
     else if (!(mo->flags & MF_NOGRAVITY))
     {
-	if (mo->momz == 0)
-	    mo->momz = -GRAVITY * 2;
-	else
-	    mo->momz -= GRAVITY;
+	if (!mo->momz)
+            mo->momz = -GRAVITY;
+	mo->momz -= GRAVITY;
     }
 
     if (mo->z + mo->height > mo->ceilingz)
     {
 	// hit the ceiling
 	if (mo->momz > 0)
-	    mo->momz = 0;
-	mo->z = mo->ceilingz - mo->height;
+            mo->momz = 0;
+
 	if (mo->flags & MF_SKULLFLY)
-	    // the skull slammed into something
-	    mo->momz = -mo->momz;
+            mo->momz = -mo->momz; // the skull slammed into something
+
+	mo->z = mo->ceilingz - mo->height;
     }
 }
 

@@ -199,10 +199,10 @@ boolean P_CheckMeleeRange (mobj_t*	actor)
   mobj_t*	pl;
   fixed_t	dist;
 
-  if (!actor->target)
+  pl = actor->target;
+  if (pl == NULL)
     return false;
 
-  pl = actor->target;
   dist = P_ApproxDistance (pl->x-actor->x, pl->y-actor->y);
 
   if (dist >= MELEERANGE-20*FRACUNIT+pl->info->radius)
@@ -2199,8 +2199,6 @@ static mobj_t* A_NextBrainTarget (void)
 
 void A_BrainSpit (mobj_t*	mo)
 {
-  int		dx;
-  int		dy;
   int		dist;
   mobj_t*	targ;
   mobj_t*	newmobj;
@@ -2222,11 +2220,9 @@ void A_BrainSpit (mobj_t*	mo)
     // spawn brain missile
     newmobj = P_SpawnMissile (mo, targ, MT_SPAWNSHOT);
     newmobj->target = targ;
-    dx = (targ->x - (mo->x+mo->momx)) >> FRACBITS;
-    dy = (targ->y - (mo->y+mo->momy)) >> FRACBITS;
-    dist = (dx * dx) + (dy * dy);
+    dist = P_ApproxDistance (targ->x - (mo->x + mo->momx), targ->y - (mo->y + mo->momy));
 
-    // Use the reactiontime to hold the distance (squared)
+    // Use the reactiontime to hold the distance
     // from the target after the next move.
 
     newmobj->reactiontime = dist;
@@ -2242,17 +2238,13 @@ void A_SpawnFly (mobj_t* mo)
   mobj_t*	fog;
   mobj_t*	targ;
   int		r;
-  int		dx;
-  int		dy;
   int		dist;
   mobjtype_t	type;
 
   targ = mo->target;
   if (targ)
   {
-    dx = (targ->x - (mo->x+mo->momx)) >> FRACBITS;
-    dy = (targ->y - (mo->y+mo->momy)) >> FRACBITS;
-    dist = (dx * dx) + (dy * dy);
+    dist = P_ApproxDistance (targ->x - (mo->x + mo->momx), targ->y - (mo->y + mo->momy));
     // Will the next move put the cube closer to
     // the target point than it is now?
     if ((unsigned) dist < (unsigned) mo->reactiontime)
@@ -2299,7 +2291,7 @@ void A_SpawnFly (mobj_t* mo)
 
       if ((P_LookForPlayers (newmobj, true) == 0)
        || (P_SetMobjState (newmobj, (statenum_t) newmobj->info->seestate)))
-	P_TeleportMove (newmobj, newmobj->x, newmobj->y); // telefrag anything in this spot
+	P_TeleportMove (newmobj, newmobj->x, newmobj->y, newmobj->z); // telefrag anything in this spot
 
       // [BH] increase totalkills
       totalkills++;

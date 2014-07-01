@@ -2014,6 +2014,11 @@ void P_PlayerInSpecialSector (player_t* player)
   {
   }
 #endif
+#if 0
+  if (sector->special & 0x200)		// Wind/current/pushers/pullers are enabled for this sector
+  {					// Nova Map 27 has this bit set
+  }
+#endif
 
   if (sector->special & 0xFE00)		// Anything else
   {
