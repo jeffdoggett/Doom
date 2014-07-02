@@ -575,17 +575,34 @@ fixed_t P_FindNextLowestCeiling(const sector_t *sec, int currentheight)
 //
 // Find the next sector with the same tag as a linedef.
 // Rewritten by Lee Killough to use chained hashing to improve speed
-int P_FindSectorFromLineTag(const line_t *line, int start)
+
+int P_FindSectorFromLineTag (line_t *line, int start)
 {
   int tag;
+  sector_t* sec;
+
+  // If the line has no tag then operate the associated sector.
+  // Required in Freedoom II Level 30 (Keyed doors near start).
 
   if ((tag = line->tag) == 0)
+  {
+    if (start != -1)			// Only if it is the first time here
+      return (-1);
+
+    if ((line ->flags & ML_TWOSIDED)
+     && ((sec = sides[ line->sidenum[0^1]] .sector) != NULL))
+      return (sec-sectors);
+
+    line->special = 0;			// Yet another badly built wad!!
     return (-1);
+  }
 
   start = (start >= 0 ? sectors[start].nexttag :
     sectors[(unsigned)tag % (unsigned)numsectors].firsttag);
+
   while (start >= 0 && sectors[start].tag != tag)
     start = sectors[start].nexttag;
+
   return start;
 }
 
@@ -599,8 +616,10 @@ int P_FindLineFromTag(int tag, int start)
 
   start = (start >= 0 ? lines[start].nexttag :
     lines[(unsigned)tag % (unsigned)numlines].firsttag);
+
   while (start >= 0 && lines[start].tag != tag)
     start = lines[start].nexttag;
+
   return start;
 }
 

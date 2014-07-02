@@ -394,23 +394,9 @@ EV_DoDoorR
   sector_t*	sec;
   vldoor_t*	door;
 
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (0);
-    }
-  }
-
   rtn = 0;
-  do
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors[secnum];
 #if 0
@@ -562,7 +548,7 @@ EV_DoDoorR
 	}
 	break;
     }
-  } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
+  }
   return rtn;
 }
 
@@ -578,7 +564,6 @@ EV_VerticalDoor
   player_t*	player;
   sector_t*	sec;
   vldoor_t*	door;
-  int		side;
 
   //	Check for locks
   player = thing->player;
@@ -604,10 +589,14 @@ EV_VerticalDoor
       break;
   }
 
-  // if the sector has an active thinker, use it
-  side = 0;	// only front sides can be used
-  sec = sides[ line->sidenum[side^1]] .sector;
+  if (((line ->flags & ML_TWOSIDED) == 0)
+   || ((sec = sides[ line->sidenum[0^1]] .sector) == NULL))
+  {
+    line->special = 0;			// Yet another badly built wad!!
+    return;
+  }
 
+  // if the sector has an active thinker, use it
   door = sec->ceilingdata;
   if (door)
   {

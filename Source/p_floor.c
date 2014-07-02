@@ -355,24 +355,8 @@ EV_DoFloor
   floormove_t*	floor;
 
   rtn = 0;
-
-  // If the line has no tag then operate the associated sector.
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (rtn);
-    }
-  }
-
-  do
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors[secnum];
 
@@ -606,7 +590,7 @@ EV_DoFloor
 	}
 	break;
     }
-  } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
+  }
   return (rtn);
 }
 
@@ -735,24 +719,8 @@ EV_BuildStairs
   sector_t*	sec;
 
   rtn = 0;
-
-  // If the line has no tag then operate the associated sector.
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (rtn);
-    }
-  }
-
-  do
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors [secnum];
     if (make_stairs (sec, buildtype, false) == true)	// Can we do it?
@@ -760,7 +728,7 @@ EV_BuildStairs
       (void) make_stairs (sec, buildtype, true);	// Yes.
       rtn = 1;
     }
-  } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
+  }
 
   return (rtn);
 }
@@ -781,24 +749,8 @@ int EV_DoDonut(line_t*	line)
   floormove_t*	floor;
 
   rtn = 0;
-
-  // If the line has no tag then operate the associated sector.
-  if (line -> tag == 0)
-  {
-    s1 = sides[ line->sidenum[0^1]] .sector;
-    secnum = s1-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (rtn);
-    }
-  }
-
-  do
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     s1 = &sectors[secnum];
 
@@ -840,7 +792,7 @@ int EV_DoDonut(line_t*	line)
       rtn = 1;
       break;
     }
-  } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
+  }
   return rtn;
 }
 
@@ -855,29 +807,11 @@ int EV_DoChange
   sector_t*	sec;
   sector_t*	secm;
 
-  //BOOMTRACEOUT("EV_DoChange")
-
-  // If the line has no tag then operate the associated sector.
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (0);
-    }
-  }
-
   rtn = 0;
-
-  do
-  /* change all sectors with the same tag as the linedef */
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
+    /* change all sectors with the same tag as the linedef */
     sec = &sectors[secnum];
 
     rtn = 1;
@@ -902,7 +836,7 @@ int EV_DoChange
       default:
 	break;
     }
-  } while ((secnum = P_FindSectorFromLineTag((line_t*)line,secnum)) >= 0);
+  }
   return rtn;
 }
 
@@ -917,28 +851,11 @@ int EV_DoElevator
   sector_t*	sec;
   elevator_t*	elevator;
 
-  //BOOMTRACEOUT("EV_DoElevator")
-
-  // If the line has no tag then operate the associated sector.
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (0);
-    }
-  }
-
   rtn = 0;
-  do
-  /* act on all sectors with the same tag as the triggering linedef */
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
+    /* act on all sectors with the same tag as the triggering linedef */
     sec = &sectors[secnum];
 
     /* If either floor or ceiling is already activated, skip it */
@@ -985,8 +902,7 @@ int EV_DoElevator
     }
 
     elevator->ceilingdestheight = elevator->floordestheight + sec->ceilingheight - sec->floorheight;
-
-  } while ((secnum = P_FindSectorFromLineTag((line_t*)line,secnum)) >= 0);
+  }
   return rtn;
 }
 

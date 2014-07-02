@@ -588,7 +588,7 @@ fixed_t P_FindHighestCeilingSurrounding(sector_t* sec);
 
 int
 P_FindSectorFromLineTag
-( const line_t*	line,
+( line_t*	line,
   int		start );
 
 int

@@ -162,24 +162,8 @@ EV_DoPlat
   }
 #endif
 
-  // If the line has no tag then operate the associated sector.
-  // Required in Freedoom II Level 30.
-  if (line -> tag == 0)
-  {
-    sec = sides[ line->sidenum[0^1]] .sector;
-    secnum = sec-sectors;
-  }
-  else
-  {
-    secnum = P_FindSectorFromLineTag(line,-1);
-    if (secnum == -1)
-    {
-      line->special = 0;	// Yet another badly built wad!!
-      return (0);
-    }
-  }
-
-  do
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors[secnum];
 
@@ -371,7 +355,7 @@ EV_DoPlat
 	}
     }
     P_AddActivePlat(plat);
-  } while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0);
+  }
   return rtn;
 }
 
