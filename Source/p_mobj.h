@@ -206,7 +206,8 @@ typedef enum
 typedef enum
 {
   MF2_PASSMOBJ		= 1,
-  MF2_ONMOBJ		= 2
+  MF2_ONMOBJ		= 2,
+  MF2_MASSACRE		= 0x10000000
 } mobjflag2_t;
 
 // Map Object definition.

@@ -1595,10 +1595,13 @@ void A_PainAttack (mobj_t* actor)
 
 void A_PainDie (mobj_t* actor)
 {
-    A_Fall (actor);
+  A_Fall (actor);
+  if ((actor->flags2 & MF2_MASSACRE) == 0)
+  {
     A_PainShootSkull (actor, actor->angle+ANG90);
     A_PainShootSkull (actor, actor->angle+ANG180);
     A_PainShootSkull (actor, actor->angle+ANG270);
+  }
 }
 
 

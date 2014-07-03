@@ -1021,6 +1021,7 @@ P_KillMobj
   int		flags;
   int		special;
   fixed_t	height;
+  fixed_t	dropheight;
   char *	msg;
   mobj_t*	mo;
   item_to_drop_t * p;
@@ -1046,17 +1047,32 @@ P_KillMobj
   {
     if (p -> just_died == target->type)
     {
-#if 1
-      /* Spawn the new object off the floor so */
-      /* that it looks like it is falling. JAD 23/07/12. */
-      mo = P_SpawnMobj (target -> x, target -> y, target -> z + (height>>1), p -> mt_spawn);
-#else
-      mo = P_SpawnMobj (target -> x, target -> y, ONFLOORZ, p -> mt_spawn);
-#endif
+      if (mobjinfo [p -> mt_spawn].flags & MF_COUNTKILL)
+      {
+	dropheight = ONFLOORZ;
+      }
+      else
+      {
+	/* Spawn the new object off the floor so */
+	/* that it looks like it is falling. JAD 23/07/12. */
+	dropheight = target -> z + (height>>1);
+      }
+
+      mo = P_SpawnMobj (target -> x, target -> y, dropheight, p -> mt_spawn);
+
       mo->flags |= MF_DROPPED;	// special versions of items
-      if (mo->flags & MF_COUNTKILL)
-	mo->z = mo->floorz;
       flags |= mo->flags;
+
+      /* If we are in massacre mode then immediately kill the new */
+      /* monster. Done this way so that Hitler without his armour in */
+      /* the Wolfenstein original.wad will be killed and end the level. */
+
+      if ((mo->flags & MF_COUNTKILL)
+       && (target->flags2 & MF2_MASSACRE))
+      {
+        mo->flags2 |= MF2_MASSACRE;		// Infinite recursion hell here!!
+	P_DamageMobj (mo, NULL, NULL, mo -> health);
+      }
     }
     p++;
   } while (p -> just_died != -1);
@@ -1367,8 +1383,12 @@ void P_Massacre (void)
     if (th->function.acp1 == (actionf_p1)P_MobjThinker)
     {
       mobj = (mobj_t *) th;
-      if (mobj->player == 0)
+      if ((mobj->player == 0)
+       && (mobj->flags & MF_SHOOTABLE))
+      {
+	mobj->flags2 |= MF2_MASSACRE;
 	P_DamageMobj (mobj, NULL, NULL, mobj -> health);
+      }
     }
   }
 }
