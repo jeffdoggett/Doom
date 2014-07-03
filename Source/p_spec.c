@@ -579,6 +579,7 @@ fixed_t P_FindNextLowestCeiling(const sector_t *sec, int currentheight)
 int P_FindSectorFromLineTag (line_t *line, int start)
 {
   int tag;
+  int secnum;
   sector_t* sec;
 
   // If the line has no tag then operate the associated sector.
@@ -586,24 +587,24 @@ int P_FindSectorFromLineTag (line_t *line, int start)
 
   if ((tag = line->tag) == 0)
   {
-    if (start != -1)			// Only if it is the first time here
-      return (-1);
+    if (start == -1)			// Only if it is the first time here
+    {
+      if ((line ->flags & ML_TWOSIDED)
+       && ((sec = sides[ line->sidenum[0^1]] .sector) != NULL))
+	return (sec-sectors);
 
-    if ((line ->flags & ML_TWOSIDED)
-     && ((sec = sides[ line->sidenum[0^1]] .sector) != NULL))
-      return (sec-sectors);
-
-    line->special = 0;			// Yet another badly built wad!!
+      line->special = 0;		// Yet another badly built wad!!
+    }
     return (-1);
   }
 
-  start = (start >= 0 ? sectors[start].nexttag :
+  secnum = (start >= 0 ? sectors[start].nexttag :
     sectors[(unsigned)tag % (unsigned)numsectors].firsttag);
 
-  while (start >= 0 && sectors[start].tag != tag)
-    start = sectors[start].nexttag;
+  while (secnum >= 0 && sectors[secnum].tag != tag)
+    secnum = sectors[secnum].nexttag;
 
-  return start;
+  return secnum;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -611,16 +612,18 @@ int P_FindSectorFromLineTag (line_t *line, int start)
 
 int P_FindLineFromTag(int tag, int start)
 {
+  int linenum;
+
   if (tag == 0)
     return (-1);
 
-  start = (start >= 0 ? lines[start].nexttag :
+  linenum = (start >= 0 ? lines[start].nexttag :
     lines[(unsigned)tag % (unsigned)numlines].firsttag);
 
-  while (start >= 0 && lines[start].tag != tag)
-    start = lines[start].nexttag;
+  while (linenum >= 0 && lines[linenum].tag != tag)
+    linenum = lines[linenum].nexttag;
 
-  return start;
+  return linenum;
 }
 
 /* ---------------------------------------------------------------------------- */
