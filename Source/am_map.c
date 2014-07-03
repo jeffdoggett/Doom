@@ -1467,7 +1467,7 @@ static boolean moving_sector (sector_t * sector)
 
 /* We treat a door as closed if the ceiling is near to the floor. */
 /* (Fragport.wad level 13 has a Blue key door that is one pixel */
-/* above the floor) */
+/* above the floor and Nova.wad level 28 has some bars way above the floor) */
 
 static boolean door_closed (line_t* line)
 {
@@ -1480,7 +1480,7 @@ static boolean door_closed (line_t* line)
   ceilingheight = sector->ceilingheight;
 
   if ((floorheight <= ceilingheight)
-   && ((ceilingheight - floorheight) < (20<<FRACBITS)))
+   && ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
     return (true);
 
   sector = line->frontsector;
@@ -1488,7 +1488,7 @@ static boolean door_closed (line_t* line)
   ceilingheight = sector->ceilingheight;
 
   if ((floorheight <= ceilingheight)
-   && ((ceilingheight - floorheight) < (20<<FRACBITS)))
+   && ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
     return (true);
 
   return (false);
