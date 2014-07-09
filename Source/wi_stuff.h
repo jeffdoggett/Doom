@@ -45,6 +45,7 @@ void WI_Drawer (void);
 
 // Setup for an intermission screen.
 void WI_Start(wbstartstruct_t*	 wbstartstruct);
+int WI_checkForAccelerate (void);
 
 #endif
 //-----------------------------------------------------------------------------

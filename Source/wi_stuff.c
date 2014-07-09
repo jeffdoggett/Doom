@@ -1705,10 +1705,13 @@ static void WI_drawStats(void)
 
 /* ---------------------------------------------------------------------------- */
 
-static void WI_checkForAccelerate(void)
+int WI_checkForAccelerate (void)
 {
     int   i;
+    int   rc;
     player_t  *player;
+
+    rc = 0;
 
     // check for button presses to skip delays
     for (i=0, player = players ; i<MAXPLAYERS ; i++, player++)
@@ -1718,7 +1721,7 @@ static void WI_checkForAccelerate(void)
 	    if (player->cmd.buttons & BT_ATTACK)
 	    {
 		if (!player->attackdown)
-		    acceleratestage = 1;
+		    rc = 1;
 		player->attackdown = true;
 	    }
 	    else
@@ -1726,13 +1729,15 @@ static void WI_checkForAccelerate(void)
 	    if (player->cmd.buttons & BT_USE)
 	    {
 		if (!player->usedown)
-		    acceleratestage = 1;
+		    rc = 1;
 		player->usedown = true;
 	    }
 	    else
 		player->usedown = false;
 	}
     }
+
+  return (rc);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1752,7 +1757,8 @@ void WI_Ticker(void)
 	  S_ChangeMusic(mus_inter, true);
     }
 
-    WI_checkForAccelerate();
+    if (WI_checkForAccelerate())
+      acceleratestage = 1;
 
     switch (state)
     {

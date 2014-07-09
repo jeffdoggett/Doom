@@ -406,7 +406,7 @@ boolean F_Responder (event_t *event)
 //
 void F_Ticker (void)
 {
-    int		i;
+    int		fc;
     map_dests_t * map_ptr;
 
     // check for skipping
@@ -414,12 +414,16 @@ void F_Ticker (void)
       && ( finalecount > 50) )
     {
       // go on to the next level
-      for (i=0 ; i<MAXPLAYERS ; i++)
-	if (players[i].cmd.buttons)
-	  break;
 
-      if (i < MAXPLAYERS)
+      if (WI_checkForAccelerate ())
       {
+	fc = strlen (finaletext)*TEXTSPEED + TEXTWAIT;
+	if (finalecount < fc)
+	{
+	  finalecount = fc;
+	  return;
+	}
+
 	if (nextfinaletext)
 	{
 	  finaletext = nextfinaletext;
