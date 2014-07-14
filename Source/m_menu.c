@@ -270,7 +270,8 @@ void M_ChangeMessages(int choice);
 void M_ChangeSensitivity(int choice);
 void M_SfxVol(int choice);
 void M_MusicVol(int choice);
-void M_ChangeDetail(int choice);
+static void M_ChangeDetail(int choice);
+static void M_ChangeGraphicDetail(int choice);
 void M_SizeDisplay(int choice);
 void M_StartGame(int choice);
 void M_Sound(int choice);
@@ -438,7 +439,7 @@ static menuitem_t OptionsMenu[]=
 {
     {1,"M_ENDGAM",	M_EndGame,'e'},
     {1,"M_MESSG",	M_ChangeMessages,'m'},
-    {1,"M_DETAIL",	M_ChangeDetail,'g'},
+    {1,"M_DETAIL",	M_ChangeGraphicDetail,'g'},
     {2,"M_SCRNSZ",	M_SizeDisplay,'s'},
     {-1,"",0},
     {2,"M_MSENS",	M_ChangeSensitivity,'m'},
@@ -1127,19 +1128,23 @@ char	msgNames[2][9]		= {"M_MSGOFF","M_MSGON"};
 
 void M_DrawOptions(void)
 {
-    V_DrawPatchScaled (108,15,0,W_CacheLumpName("M_OPTTTL",PU_CACHE));
+  patch_t*	patch;
 
-    V_DrawPatchScaled (OptionsDef.x + 175,OptionsDef.y+LINEHEIGHT*detail,0,
-		       W_CacheLumpName(detailNames[detailLevel],PU_CACHE));
+  V_DrawPatchScaled (108,15,0,W_CacheLumpName("M_OPTTTL",PU_CACHE));
 
-    V_DrawPatchScaled (OptionsDef.x + 120,OptionsDef.y+LINEHEIGHT*messages,0,
-		       W_CacheLumpName(msgNames[showMessages],PU_CACHE));
+  patch = W_CacheLumpName (OptionsMenu[1].name,PU_CACHE);
+  V_DrawPatchScaled (OptionsDef.x + SHORT(patch->width) + 2,OptionsDef.y+LINEHEIGHT*messages,0,
+			W_CacheLumpName(msgNames[showMessages],PU_CACHE));
 
-    M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(mousesens+1),
-		 10,mouseSensitivity);
+  patch = W_CacheLumpName (OptionsMenu[2].name,PU_CACHE);
+  V_DrawPatchScaled (OptionsDef.x + SHORT(patch->width) + 2,OptionsDef.y+LINEHEIGHT*detail,0,
+			W_CacheLumpName(detailNames[detailLevel],PU_CACHE));
 
-    M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(scrnsize+1),
-		 9,screenSize);
+  M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(mousesens+1),
+			10,mouseSensitivity);
+
+  M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(scrnsize+1),
+			9,screenSize);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1324,26 +1329,13 @@ void M_ChangeSensitivity(int choice)
 
 /* ----------------------------------------------------------------------- */
 
-void M_ChangeDetail(int choice)
+static void M_ChangeDetail (int choice)
 {
   unsigned int flags;
 
     choice = 0;
     // detailLevel = 1 - detailLevel;
-    detailLevel = 0;
-
-#if 0
-    // FIXME - does not work. Remove anyway?
-    fprintf( stderr, "M_ChangeDetail: low detail mode n.a.\n");
-    return;
-
-    /*R_SetViewSize (screenblocks, detailLevel);
-
-    if (!detailLevel)
-	players[consoleplayer].message = menu_messages [MM_DETAILHI];
-    else
-	players[consoleplayer].message = menu_messages [MM_DETAILLO];*/
-#endif
+    // detailLevel = 0;
 
     flags = 3;				// Work out what is visible.
 
@@ -1390,7 +1382,17 @@ void M_ChangeDetail(int choice)
     }
 
     if (flags)
-      R_SetViewSize (screenblocks, detailLevel);
+      R_SetViewSize (screenblocks, 0 /*detailLevel*/);
+}
+
+/* ----------------------------------------------------------------------- */
+
+static void M_ChangeGraphicDetail (int choice)
+{
+  choice = 0;
+  detailLevel = 1 - detailLevel;
+
+  R_SetViewSize (screenblocks, 0 /*detailLevel*/);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1416,7 +1418,7 @@ void M_SizeDisplay(int choice)
     }
 
 
-    R_SetViewSize (screenblocks, detailLevel);
+    R_SetViewSize (screenblocks, 0 /*detailLevel*/);
 }
 
 /* ----------------------------------------------------------------------- */

@@ -783,7 +783,7 @@ void R_ExecuteSetViewSize (void)
 //
 // R_Init
 //
-extern int	detailLevel;
+//extern int	detailLevel;		// Not currently used
 extern int	screenblocks;
 
 
@@ -800,7 +800,7 @@ void R_Init (void)
     // viewwidth / viewheight / detailLevel are set by the defaults
     // printf ("\nR_InitTables");
 
-    R_SetViewSize (screenblocks, detailLevel);
+    R_SetViewSize (screenblocks, 0 /* detailLevel */);
     R_InitPlanes ();
     // printf ("\nR_InitPlanes");
     R_InitLightTables ();
