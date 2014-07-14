@@ -159,7 +159,6 @@ void D_DoomLoop (void);
 void D_CheckNetGame (void);
 void D_ProcessEvents (void);
 void G_BuildTiccmd (ticcmd_t* cmd);
-void G_InitItemDropList (void);
 void D_DoAdvanceDemo (void);
 
 
@@ -1898,7 +1897,6 @@ void D_DoomMain (void)
 
   // printf ("Z_Init: Init zone memory allocation daemon. \n");
   Z_Init ();
-  G_InitItemDropList ();
 
   //printf ("W_Init: Init WADfiles.\n");
   printf ("Using Wadfiles:\n");

@@ -516,44 +516,27 @@ static map_starts_t start_doom2_tab [] =
 
 /* -------------------------------------------------------------------------------------------- */
 
-typedef struct
+static item_to_drop_t item_4 =
 {
-  mobjtype_t	 just_died;
-  mobjtype_t	 mt_spawn;
-} item_drops_t;
-
-item_drops_t item_drop_list [] =
-{
-  {MT_WOLFSS,	MT_CLIP},
-  {MT_POSSESSED, MT_CLIP},
-  {MT_SHOTGUY, MT_SHOTGUN},
-  {MT_CHAINGUY, MT_CHAINGUN}
+  MT_CHAINGUY, MT_CHAINGUN, NULL
 };
 
-item_to_drop_t * item_drop_head;
-
-void G_InitItemDropList (void)
+static item_to_drop_t item_3 =
 {
-  int count;
-  item_drops_t * src;
-  item_to_drop_t * dest;
+  MT_SHOTGUY, MT_SHOTGUN, &item_4
+};
 
-  item_drop_head = NULL;
-  count = ARRAY_SIZE (item_drop_list);
-  src = item_drop_list;
-  do
-  {
-    dest = malloc (sizeof (item_to_drop_t));
-    if (dest)
-    {
-      dest -> next = item_drop_head;
-      item_drop_head = dest;
-      dest -> just_died = src -> just_died;
-      dest -> mt_spawn = src -> mt_spawn;
-    }
-    src++;
-  } while (--count);
-}
+static item_to_drop_t item_2 =
+{
+  MT_POSSESSED, MT_CLIP, &item_3
+};
+
+static item_to_drop_t item_1 =
+{
+  MT_WOLFSS, MT_CLIP, &item_2
+};
+
+item_to_drop_t * item_drop_head = &item_1;
 
 /* -------------------------------------------------------------------------------------------- */
 
