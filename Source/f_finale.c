@@ -417,7 +417,7 @@ void F_Ticker (void)
 
       if (WI_checkForAccelerate ())
       {
-	fc = strlen (finaletext)*TEXTSPEED + TEXTWAIT;
+	fc = strlen (finaletext)*TEXTSPEED;
 	if (finalecount < fc)
 	{
 	  finalecount = fc;
