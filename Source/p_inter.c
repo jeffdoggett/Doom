@@ -27,7 +27,7 @@ static const char rcsid[] = "$Id: p_inter.c,v 1.4 1997/02/03 22:45:11 b1 Exp $";
 #endif
 
 #include "includes.h"
-extern item_to_drop_t item_drop_table [];
+extern item_to_drop_t * item_drop_head;
 extern castinfo_t castorder[];
 extern char* player_names[];
 extern unsigned char player_genders[];
@@ -1041,9 +1041,8 @@ P_KillMobj
   // This determines the kind of object(s) spawned
   // during the death frame of a thing.
 
-  p = &item_drop_table [0];
-
-  do
+  p = item_drop_head;
+  while (p)
   {
     if (p -> just_died == target->type)
     {
@@ -1074,8 +1073,8 @@ P_KillMobj
 	P_DamageMobj (mo, NULL, NULL, mo -> health);
       }
     }
-    p++;
-  } while (p -> just_died != -1);
+    p = p -> next;
+  }
 
 
 

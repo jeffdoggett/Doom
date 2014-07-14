@@ -64,10 +64,11 @@ typedef struct
   unsigned char  start_map;
 } map_starts_t;
 
-typedef struct
+typedef struct item_to_drop_s
 {
   mobjtype_t	 just_died;
   mobjtype_t	 mt_spawn;
+  struct item_to_drop_s * next;
 } item_to_drop_t;
 
 extern boolean par_changed;

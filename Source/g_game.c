@@ -516,35 +516,44 @@ static map_starts_t start_doom2_tab [] =
 
 /* -------------------------------------------------------------------------------------------- */
 
-item_to_drop_t item_drop_table [] =
+typedef struct
+{
+  mobjtype_t	 just_died;
+  mobjtype_t	 mt_spawn;
+} item_drops_t;
+
+item_drops_t item_drop_list [] =
 {
   {MT_WOLFSS,	MT_CLIP},
   {MT_POSSESSED, MT_CLIP},
   {MT_SHOTGUY, MT_SHOTGUN},
-  {MT_CHAINGUY, MT_CHAINGUN},
-  {(mobjtype_t) -2,(mobjtype_t) -1}, 	// Spare slots - gets filled in by .msq reader
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -2,(mobjtype_t) -1},
-  {(mobjtype_t) -1,(mobjtype_t) -1}
+  {MT_CHAINGUY, MT_CHAINGUN}
 };
+
+item_to_drop_t * item_drop_head;
+
+void G_InitItemDropList (void)
+{
+  int count;
+  item_drops_t * src;
+  item_to_drop_t * dest;
+
+  item_drop_head = NULL;
+  count = ARRAY_SIZE (item_drop_list);
+  src = item_drop_list;
+  do
+  {
+    dest = malloc (sizeof (item_to_drop_t));
+    if (dest)
+    {
+      dest -> next = item_drop_head;
+      item_drop_head = dest;
+      dest -> just_died = src -> just_died;
+      dest -> mt_spawn = src -> mt_spawn;
+    }
+    src++;
+  } while (--count);
+}
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -2657,31 +2666,39 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 		j = 0;
 	      pos++;
 	    } while (j);
+
 	    if (a_line [pos] == '-')
-	      j = i;
-	    else
-	      j = -2;
-
-
-    	    drop_info_p = &item_drop_table [0];
-
-    	    while (((drop_info_p -> just_died) >= 0)
-		&& ((drop_info_p -> just_died) != j))
-    	    {
-      	      drop_info_p++;
-	    }
-
-	    switch (drop_info_p -> just_died)
 	    {
-	      case -2: /* Use a spare slot */
-		drop_info_p -> just_died = (mobjtype_t) i;
-		break;
-
-	      case -1:
-  		fprintf (stderr, "Entity drop table full at line %d of file %s\n",
-	    		line_number, filename);
-		drop_info_p = 0;
-		break;
+    	      drop_info_p = item_drop_head;
+	      while (drop_info_p)
+	      {
+		if (drop_info_p -> just_died == i)
+		  break;
+		drop_info_p = drop_info_p -> next;
+	      }
+	    }
+	    else
+	    {
+    	      drop_info_p = item_drop_head;
+	      while (drop_info_p)
+	      {
+		if (drop_info_p -> just_died == (mobjtype_t) -2)
+		{
+		  drop_info_p -> just_died = (mobjtype_t) i;
+		  break;
+		}
+		drop_info_p = drop_info_p -> next;
+	      }
+	      if (drop_info_p == NULL)
+	      {
+		drop_info_p = malloc (sizeof (item_to_drop_t));
+		if (drop_info_p)
+		{
+		  drop_info_p -> next = item_drop_head;
+		  item_drop_head = drop_info_p;
+		  drop_info_p -> just_died = (mobjtype_t) i;
+		}
+	      }
 	    }
 	  }
 	  break;
@@ -2885,10 +2902,9 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
     i++;
   } while (i < ARRAY_SIZE(next_level_tab_2));
 
-
-  drop_info_p = &item_drop_table [0];
-
-  while ((drop_info_p -> just_died) != -1)
+  printf ("item_drop_head = %X\n", item_drop_head);
+  drop_info_p = item_drop_head;
+  while (drop_info_p)
   {
     if ((drop_info_p -> just_died) == -2)
     {
@@ -2899,7 +2915,7 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
       printf ("DMT_%s:MT_%s\n",	cast_mtconv [drop_info_p -> just_died],
       				cast_mtconv [drop_info_p -> mt_spawn]);
     }
-    drop_info_p++;
+    drop_info_p = drop_info_p -> next;
   }
 #endif
 }
