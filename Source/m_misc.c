@@ -130,6 +130,7 @@ unsigned int M_ReadFile (char const*name, byte**buffer)
 // DEFAULTS
 //
 int		usemouse;
+int		novert;
 int		usejoystick;
 
 extern int	key_right;
@@ -148,6 +149,7 @@ extern int	key_speed;
 extern int	mousebfire;
 extern int	mousebstrafe;
 extern int	mousebforward;
+
 
 extern int	joybfire;
 extern int	joybstrafe;
@@ -229,6 +231,8 @@ default_t	defaults[] =
   {"mouseb_fire",&mousebfire, (char *) 0},
   {"mouseb_strafe",&mousebstrafe, (char *) 1},
   {"mouseb_forward",&mousebforward, (char *) 2},
+  {"novert",&novert, (char *) 0},
+
 
   {"use_joystick",&usejoystick, (char *) 0},
   {"joyb_fire",&joybfire, (char *) 0},

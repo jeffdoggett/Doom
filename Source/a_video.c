@@ -17,6 +17,7 @@
 #include "acorn.h"
 
 extern boolean	menuactive;
+extern int 	novert;
 
 #define OS_Word			 0x07
 #define OS_Mouse		 0x1C
@@ -549,6 +550,9 @@ static void poll_kbd_menu_mode (void)
 
   _kernel_swi (OS_Mouse, &regs, &regs);
 
+  if (novert)
+    regs.r[1] = lastmousey;
+
   if ((regs.r[0] != lastmousex)
    || (regs.r[1] != lastmousey)
    || (regs.r[2] != lastmousebut))
@@ -716,6 +720,9 @@ static void poll_kbd (void)
   /* See whether the mouse has moved */
 
   _kernel_swi (OS_Mouse, &regs, &regs);
+
+  if (novert)
+    regs.r[1] = lastmousey;
 
   if ((regs.r[0] != lastmousex)
    || (regs.r[1] != lastmousey)

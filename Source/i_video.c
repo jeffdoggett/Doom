@@ -101,6 +101,8 @@ static int	lastmousey = 0;
 static boolean	mousemoved = false;
 static boolean	shmFinished;
 
+extern int	novert;
+
 /***************************************************************************/
 //
 //  Translates the key currently in X_event
@@ -193,7 +195,7 @@ void I_StartFrame (void)
 
 void I_GetEvent(void)
 {
-
+    int dy;
     event_t event;
 
     // put event-grabbing stuff in here
@@ -243,19 +245,23 @@ void I_GetEvent(void)
 	break;
       case MotionNotify:
 	event.type = ev_mouse;
+	if (novert)
+	  dy = lastmousey;
+	else
+	  dy = X_event.xmotion.y;
 	event.data1 =
 	    (X_event.xmotion.state & Button1Mask)
 	    | (X_event.xmotion.state & Button2Mask ? 2 : 0)
 	    | (X_event.xmotion.state & Button3Mask ? 4 : 0);
 	event.data2 = (X_event.xmotion.x - lastmousex) << 2;
-	event.data3 = (lastmousey - X_event.xmotion.y) << 2;
+	event.data3 = (lastmousey - dy) << 2;
 
 	if (event.data2 || event.data3)
 	{
 	    lastmousex = X_event.xmotion.x;
-	    lastmousey = X_event.xmotion.y;
+	    lastmousey = dy;
 	    if (X_event.xmotion.x != X_width/2 &&
-		X_event.xmotion.y != X_height/2)
+		dy != X_height/2)
 	    {
 		D_PostEvent(&event);
 		// fprintf(stderr, "m");
