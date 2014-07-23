@@ -35,7 +35,26 @@ static const char rcsid[] = "$Id: p_pspr.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 unsigned int bfg_cells = 40;
 
 extern int setblocks;
+int	weaponrecoil;
 
+extern void P_Thrust (player_t*	player, angle_t	angle, fixed_t move);
+
+//-----------------------------------------------------------------------------
+
+static const int recoil[] = // phares
+{
+  10,	// wp_fist
+  10,	// wp_pistol
+  30,	// wp_shotgun
+  10,	// wp_chaingun
+  100,	// wp_missile
+  20,	// wp_plasma
+  100,	// wp_bfg
+  0,	// wp_chainsaw
+  80	// wp_supershotgun
+};
+
+//-----------------------------------------------------------------------------
 /* This was this:
 #define WEAPONBOTTOM		128*FRACUNIT
 #define WEAPONTOP		32*FRACUNIT
@@ -112,6 +131,7 @@ fixed_t weapon_top (void)
 
 #define weapon_bottom() (weapon_top()+(96*FRACUNIT))
 
+//-----------------------------------------------------------------------------
 //
 // P_SetPsprite
 //
@@ -161,8 +181,7 @@ P_SetPsprite
     // an initial state of 0 could cycle through
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_CalcSwing
 //
@@ -187,8 +206,7 @@ void P_CalcSwing (player_t*	player)
     swingy = -FixedMul ( swingx, finesine[angle]);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_BringUpWeapon
 // Starts bringing the pending weapon up
@@ -213,6 +231,7 @@ void P_BringUpWeapon (player_t* player)
     P_SetPsprite (player, ps_weapon, newstate);
 }
 
+//-----------------------------------------------------------------------------
 //
 // P_CheckAmmo
 // Returns true if there is enough ammo to shoot.
@@ -299,7 +318,7 @@ boolean P_CheckAmmo (player_t* player)
     return false;
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_FireWeapon.
 //
@@ -316,8 +335,7 @@ void P_FireWeapon (player_t* player)
     P_NoiseAlert (player->mo, player->mo);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_DropWeapon
 // Player died, so put the weapon away.
@@ -329,8 +347,7 @@ void P_DropWeapon (player_t* player)
 		  (statenum_t) weaponinfo[player->readyweapon].downstate);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_WeaponReady
 // The player can fire the weapon
@@ -393,8 +410,7 @@ A_WeaponReady
     psp->sy = weapon_top () + FixedMul (player->bob, finesine[angle]);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_ReFire
 // The player can re-fire the weapon
@@ -421,6 +437,7 @@ void A_ReFire
     }
 }
 
+//-----------------------------------------------------------------------------
 
 void
 A_CheckReload
@@ -434,8 +451,7 @@ A_CheckReload
 #endif
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_Lower
 // Lowers current weapon,
@@ -478,7 +494,7 @@ A_Lower
     P_BringUpWeapon (player);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_Raise
 //
@@ -506,8 +522,23 @@ A_Raise
     P_SetPsprite (player, ps_weapon, newstate);
 }
 
+//-----------------------------------------------------------------------------
+// Weapons now recoil, amount depending on the weapon. // phares
+// // |
+// The P_SetPsprite call in each of the weapon firing routines // V
+// was moved here so the recoil could be synced with the
+// muzzle flash, rather than the pressing of the trigger.
+// The BFG delay caused this to be necessary.
 
+static void A_FireSomething (player_t* player, int adder)
+{
+  P_SetPsprite (player, ps_flash, weaponinfo[player->readyweapon].flashstate + adder);
 
+  if (weaponrecoil)
+    P_Thrust (player, ANG180 + player->mo->angle, 2048 * recoil[player->readyweapon]);
+}
+
+//-----------------------------------------------------------------------------
 //
 // A_GunFlash
 //
@@ -517,11 +548,10 @@ A_GunFlash
   pspdef_t*	psp )
 {
     P_SetMobjState (player->mo, S_PLAY_ATK2);
-    P_SetPsprite (player,ps_flash,(statenum_t)weaponinfo[player->readyweapon].flashstate);
+    A_FireSomething (player, 0);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // WEAPON ATTACKS
 //
@@ -562,7 +592,7 @@ A_Punch
     }
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_Saw
 //
@@ -612,8 +642,7 @@ A_Saw
     player->mo->flags |= MF_JUSTATTACKED;
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_FireMissile
 //
@@ -626,7 +655,7 @@ A_FireMissile
     P_SpawnPlayerMissile (player->mo, MT_ROCKET);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_FireBFG
 //
@@ -639,8 +668,7 @@ A_FireBFG
     P_SpawnPlayerMissile (player->mo, MT_BFG);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_FirePlasma
 //
@@ -650,16 +678,11 @@ A_FirePlasma
   pspdef_t*	psp )
 {
     player->ammo[weaponinfo[player->readyweapon].ammo]--;
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  (statenum_t) (weaponinfo[player->readyweapon].flashstate+(P_Random ()&1)));
-
+    A_FireSomething (player, (P_Random ()&1));
     P_SpawnPlayerMissile (player->mo, MT_PLASMA);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_BulletSlope
 // Sets a slope so a near miss is at aproximately
@@ -688,7 +711,7 @@ void P_BulletSlope (mobj_t*	mo)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // P_GunShot
 //
@@ -712,7 +735,7 @@ P_GunShot
     P_LineAttack (mo, angle, MISSILERANGE, bulletslope, damage);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_FirePistol
 //
@@ -725,16 +748,12 @@ A_FirePistol
 
     P_SetMobjState (player->mo, S_PLAY_ATK2);
     player->ammo[weaponinfo[player->readyweapon].ammo]--;
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  (statenum_t) weaponinfo[player->readyweapon].flashstate);
-
+    A_FireSomething (player, 0);
     P_BulletSlope (player->mo);
     P_GunShot (player->mo, (boolean) (!player->refire));
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_FireShotgun
 //
@@ -747,21 +766,15 @@ A_FireShotgun
 
     S_StartSound (player->mo, sfx_shotgn);
     P_SetMobjState (player->mo, S_PLAY_ATK2);
-
     player->ammo[weaponinfo[player->readyweapon].ammo]--;
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  (statenum_t) weaponinfo[player->readyweapon].flashstate);
-
+    A_FireSomething (player, 0);
     P_BulletSlope (player->mo);
 
     for (i=0 ; i<7 ; i++)
 	P_GunShot (player->mo, false);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // A_FireShotgun2
 //
@@ -777,13 +790,8 @@ A_FireShotgun2
 
     S_StartSound (player->mo, sfx_dshtgn);
     P_SetMobjState (player->mo, S_PLAY_ATK2);
-
     player->ammo[weaponinfo[player->readyweapon].ammo]-=2;
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  (statenum_t) weaponinfo[player->readyweapon].flashstate);
-
+    A_FireSomething (player, 0);
     P_BulletSlope (player->mo);
 
     for (i=0 ; i<20 ; i++)
@@ -801,7 +809,7 @@ A_FireShotgun2
     }
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_FireCGun
 //
@@ -816,20 +824,12 @@ A_FireCGun
     S_StartSound (player->mo, sfx_pistol);
     P_SetMobjState (player->mo, S_PLAY_ATK2);
     player->ammo[weaponinfo[player->readyweapon].ammo]--;
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  (statenum_t) (weaponinfo[player->readyweapon].flashstate
-		  + psp->state
-		  - &states[S_CHAIN1]));
-
+    A_FireSomething (player, psp->state - &states[S_CHAIN1]);
     P_BulletSlope (player->mo);
-
     P_GunShot (player->mo, (boolean)(!player->refire));
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // ?
 //
@@ -848,7 +848,7 @@ void A_Light2 (player_t *player, pspdef_t *psp)
     player->extralight = 2;
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_BFGSpray
 // Spawn a BFG explosion on every monster in view
@@ -885,7 +885,7 @@ void A_BFGSpray (mobj_t* mo)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // A_BFGsound
 //
@@ -897,8 +897,7 @@ A_BFGsound
     S_StartSound (player->mo, sfx_bfg);
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // P_SetupPsprites
 // Called at start of level for each player.
@@ -916,9 +915,7 @@ void P_SetupPsprites (player_t* player)
     P_BringUpWeapon (player);
 }
 
-
-
-
+//-----------------------------------------------------------------------------
 //
 // P_MovePsprites
 // Called every tic by player thinking routine.
@@ -951,4 +948,4 @@ void P_MovePsprites (player_t* player)
     player->psprites[ps_flash].sy = player->psprites[ps_weapon].sy;
 }
 
-
+//-----------------------------------------------------------------------------

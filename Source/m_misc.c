@@ -159,6 +159,8 @@ extern int	joybspeed;
 extern int	viewwidth;
 extern int	viewheight;
 
+extern int	weaponrecoil;
+
 extern int	mouseSensitivity;
 extern int	showMessages;
 
@@ -244,6 +246,8 @@ default_t	defaults[] =
   {"detaillevel",&detailLevel, (char *) 0},
   {"stbar_scale",&stbar_scale, (char *) 1},
   {"weaponscale",&weaponscale, (char *) 1},
+
+  {"weaponrecoil",&weaponrecoil, (char *) 0},
 
   {"snd_channels",&numChannels, (char *) 3},
   {"play_music",&snd_AllowMusic, (char *) 1},
