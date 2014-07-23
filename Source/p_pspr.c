@@ -37,7 +37,7 @@ unsigned int bfg_cells = 40;
 extern int setblocks;
 int	weaponrecoil;
 
-extern void P_Thrust (player_t*	player, angle_t	angle, fixed_t move);
+extern void P_Thrust (player_t* player, angle_t angle, fixed_t move);
 
 //-----------------------------------------------------------------------------
 
@@ -532,10 +532,13 @@ A_Raise
 
 static void A_FireSomething (player_t* player, int adder)
 {
-  P_SetPsprite (player, ps_flash, weaponinfo[player->readyweapon].flashstate + adder);
+  fixed_t move;
 
-  if (weaponrecoil)
-    P_Thrust (player, ANG180 + player->mo->angle, 2048 * recoil[player->readyweapon]);
+  P_SetPsprite (player, ps_flash, (statenum_t) (weaponinfo[player->readyweapon].flashstate + adder));
+
+  if ((weaponrecoil)
+   && ((move = recoil [player->readyweapon]) != 0))
+    P_Thrust (player, ANG180 + player->mo->angle, 2048 * move);
 }
 
 //-----------------------------------------------------------------------------
