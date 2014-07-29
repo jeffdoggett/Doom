@@ -1252,6 +1252,16 @@ void G_PlayerFinishLevel (int player)
   p->fixedcolormap = 0;			// cancel ir gogles
   p->damagecount = 0;			// no palette changes
   p->bonuscount = 0;
+
+  /*
+  If the player has a chainsaw and a berserk power-up, and ends a level
+  with their fists selected, they start the next level with their fists.
+  This shouldn't happen, because the berserk power-up has been removed and
+  they have the chainsaw.
+  */
+  if ((p->readyweapon == wp_fist)
+   && (p->weaponowned[wp_chainsaw]))
+    p->readyweapon = wp_chainsaw;
 }
 
 
