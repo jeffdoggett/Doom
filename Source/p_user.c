@@ -309,8 +309,9 @@ void P_PlayerThink (player_t* player)
     }
 
 
-    if (player->weaponowned[newweapon]
-     && newweapon != player->readyweapon)
+    if ((player->weaponowned[newweapon])
+     && (newweapon != player->readyweapon)
+     && (newweapon != player->pendingweapon))	// Added so that the sound (getpow) only gets played once.
     {
       // Do not go to plasma or BFG in shareware,
       //  even if cheated.
@@ -319,6 +320,9 @@ void P_PlayerThink (player_t* player)
        || (gamemode != shareware) )
       {
 	player->pendingweapon = newweapon;
+	if ((newweapon == wp_fist)
+	 && (player->powers[pw_strength]))
+	  S_StartSound (NULL, sfx_getpow);
       }
     }
   }
