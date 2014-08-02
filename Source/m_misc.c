@@ -145,6 +145,7 @@ extern int	key_fire;
 extern int	key_use;
 extern int	key_strafe;
 extern int	key_speed;
+extern int	always_run;
 
 extern int	mousebfire;
 extern int	mousebstrafe;
@@ -241,6 +242,8 @@ default_t	defaults[] =
   {"joyb_strafe",&joybstrafe, (char *) 1},
   {"joyb_use",&joybuse, (char *) 3},
   {"joyb_speed",&joybspeed, (char *) 2},
+
+  {"always_run",&always_run, (char *) 0},
 
   {"screenblocks",&screenblocks, (char *) 10},
   {"detaillevel",&detailLevel, (char *) 0},
