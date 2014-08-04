@@ -78,14 +78,26 @@ void P_CalcHeight (player_t* player)
   // OPTIMIZE: tablify angle
   // Note: a LUT allows for effects
   //  like a ramp with low health.
-  player->bob =
+
+  if ((player->mo->flags & MF_SLIDE)	// No bob if we are riding a conveyor
+   && (player->cmd.forwardmove == 0)
+   && (player->cmd.sidemove == 0))
+  {
+    bob = 0;
+  }
+  else
+  {
+    bob =
 	FixedMul (player->mo->momx, player->mo->momx)
 	+ FixedMul (player->mo->momy,player->mo->momy);
 
-  player->bob >>= 2;
+    bob >>= 2;
 
-  if (player->bob>MAXBOB)
-    player->bob = MAXBOB;
+    if (bob > MAXBOB)
+      bob = MAXBOB;
+  }
+
+  player->bob = bob;
 
   if ((player->cheats & CF_NOMOMENTUM) || !onground)
   {
