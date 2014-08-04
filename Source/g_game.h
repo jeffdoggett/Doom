@@ -127,6 +127,7 @@ void G_parse_map_seq_wad_file (char * wadfile, boolean do_it);
 const char * leafname (const char * path);
 void dirname (char * dest, const char * path);
 void scan_dir (char * dirname, char * filename, boolean do_it);
+void G_Patch_Map (void);
 
 #endif
 //-----------------------------------------------------------------------------

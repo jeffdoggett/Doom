@@ -1072,6 +1072,8 @@ P_SetupLevel
     rejectmatrixsize = W_LumpLength (lumpnum+ML_REJECT);
     P_GroupLines ();
     P_RemoveSlimeTrails ();
+    G_Patch_Map ();
+
 
     bodyqueslot = 0;
     deathmatch_p = deathmatchstarts;

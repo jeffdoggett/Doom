@@ -248,7 +248,17 @@ int		bodyqueslot;
 
 void*		statcopy;				// for statistics driver
 
+/* -------------------------------------------------------------------------------------------- */
 
+typedef struct map_patch_s
+{
+  struct map_patch_s * next;
+  char patch [4];
+} map_patch_t;
+
+static map_patch_t * map_patches_head = NULL;
+
+/* -------------------------------------------------------------------------------------------- */
 /* Look up tables of level destinations */
 
 const char sky_1 [] = "SKY1";
@@ -2697,12 +2707,26 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	  }
 	  break;
 
+	  case 'P':
+	  case 'p':
+	    if (strncasecmp (a_line, "PATCH ", 6) == 0)
+	    {
+	      map_patch_t * ptr;
+
+	      ptr = malloc (sizeof (map_patch_t) + strlen (a_line));
+	      if (ptr)
+	      {
+	        ptr -> next = map_patches_head;
+	        map_patches_head = ptr;
+	        strcpy (ptr -> patch, a_line+6);
+	      }
+	      break;
+	    }
+
 	  case 'H':
 	  case 'h':
 	  case 'T':
 	  case 't':
-	  case 'P':
-	  case 'p':
 	    if (dh_instr (a_line, "HUSTR_"))
 	      G_process_hustr_line (a_line);
       }
@@ -3152,6 +3176,136 @@ void G_parse_map_seq_wad_file (char * wadname, boolean do_it)
       }
     }
     fclose (fin);
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+/*
+  Read patches from the .msq file.
+
+  Examples:
+    Patch E1M5 Sector 14 Tag=12
+    Patch Map01 Line 1555 Special=10
+    Patch Map01 GenDoors Tag=0
+*/
+
+void G_Patch_Map (void)
+{
+  unsigned int pos;
+  unsigned int index;
+  unsigned int patch;
+  map_patch_t * ptr;
+  char * pp;
+  char * pq;
+  line_t * line;
+  sector_t * sector;
+
+  ptr = map_patches_head;
+  if (ptr)
+  {
+    do
+    {
+      pp = ptr -> patch;
+
+      if (gamemode == commercial)
+      {
+	if (strncasecmp (pp, "map", 3))
+	  continue;
+	if (atoi (pp+3) != gamemap)
+	  continue;
+	pp += 5;
+      }
+      else
+      {
+        if ((pp [0] != 'E')
+         || (pp [2] != 'M')
+         || (pp [4] != ' ')
+         || ((pp [1] - '0') != gameepisode)
+         || ((pp [3] - '0') != gamemap))
+	  continue;
+	pp += 4;
+      }
+
+      pos = dh_inchar (pp, '=');
+      if (pos == 0)
+	continue;
+
+      pq = pp + pos;
+      while (*pq == ' ') pq++;
+      patch = atoi (pq);
+      while (*pp == ' ') pp++;
+      if (strncasecmp (pp, "LINE ",5) == 0)
+      {
+	pp += 5;
+	index = atoi (pp);
+	if (index < numlines)
+	{
+	  while (*pp && (*pp != ' ')) pp++;
+	  while (*pp == ' ') pp++;
+	  line = &lines [index];
+	  if (strncasecmp (pp, "TAG", 3) == 0)
+	  {
+//	    printf ("Line %u Tag set to %u\n", index, patch);
+	    line -> tag = patch;
+	  }
+	  else if (strncasecmp (pp, "FLAGS", 5) == 0)
+	  {
+	    line -> flags = patch;
+	  }
+	  else if (strncasecmp (pp, "SPECIAL", 7) == 0)
+	  {
+	    line -> special = patch;
+	  }
+	}
+      }
+
+      if (strncasecmp (pp, "SECTOR ", 7) == 0)
+      {
+	pp += 7;
+	index = atoi (pp);
+	if (index < numsectors)
+	{
+	  while (*pp && (*pp != ' ')) pp++;
+	  while (*pp == ' ') pp++;
+	  sector = &sector [index];
+	  if (strncasecmp (pp, "TAG", 3) == 0)
+	  {
+	    sector -> tag = patch;
+	  }
+	  else if (strncasecmp (pp, "SPECIAL", 7) == 0)
+	  {
+	    sector -> special = patch;
+	  }
+	}
+      }
+
+      if (strncasecmp (pp, "GENDOORS ",9) == 0)
+      {
+	while (*pp && (*pp != ' ')) pp++;
+	while (*pp == ' ') pp++;
+        index = 0;
+        line = &lines [0];
+        do
+        {
+          if ((line -> special >= GenLockedBase)
+           && (line -> special < GenCeilingBase))
+          {
+	    if (strncasecmp (pp, "TAG", 3) == 0)
+	    {
+//	      printf ("Line %u Tag set to %u from %u\n", index, patch, line->tag);
+	      line -> tag = patch;
+	    }
+	    else if (strncasecmp (pp, "SPECIAL", 7) == 0)
+	    {
+	      line -> special = patch;
+	    }
+          }
+          line++;
+        } while (++index < numlines);
+      }
+
+
+    } while ((ptr = ptr -> next) != NULL);
   }
 }
 
