@@ -873,6 +873,7 @@ static byte * P_UnArchiveCeiling (byte * save_p)
 
 static byte * P_ArchiveDoor (byte * save_p, vldoor_t* door)
 {
+  unsigned int linenum;
   unsigned int thinker;
   unsigned int * save_32_p;
 
@@ -882,12 +883,15 @@ static byte * P_ArchiveDoor (byte * save_p, vldoor_t* door)
   save_32_p = (unsigned int *) save_p;
 
   thinker = 0;
-
   if (door->thinker.function.acp1)
     thinker = 1;
 
+  linenum = 0;
+  if (door->line)
+    linenum = (door->line - lines) + 1;
+
   p_save_32 (0);					// SPARE!!!
-  p_save_32 (0);					// SPARE!!!
+  p_save_32 (linenum);
   p_save_32 (thinker);
   p_save_32 ((unsigned int) door->type);
   p_save_32 (door->sector - sectors);
@@ -904,6 +908,7 @@ static byte * P_ArchiveDoor (byte * save_p, vldoor_t* door)
 static byte * P_UnArchiveDoor (byte * save_p)
 {
   vldoor_t* door;
+  unsigned int linenum;
   unsigned int thinker;
   unsigned int * save_32_p;
 
@@ -913,7 +918,7 @@ static byte * P_UnArchiveDoor (byte * save_p)
   save_32_p = (unsigned int *) save_p;
 
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
-  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
+  linenum = p_load_32 (save_32_p); save_32_p++;
   thinker = p_load_32 (save_32_p); save_32_p++;
   door -> type = (vldoor_e) p_load_32 (save_32_p); save_32_p++;
   door -> sector = P_GetSectorPtr (save_32_p); save_32_p++;
@@ -923,6 +928,11 @@ static byte * P_UnArchiveDoor (byte * save_p)
   door -> direction = p_load_32 (save_32_p); save_32_p++;
   door -> topwait = p_load_32 (save_32_p); save_32_p++;
   door -> topcountdown = p_load_32 (save_32_p); save_32_p++;
+
+  if ((linenum == 0) || (linenum >= numlines))
+    door -> line = NULL;
+  else
+    door -> line = &lines [linenum-1];
 
   if (thinker)
     P_AddThinker (&door->thinker, (actionf_p1)T_VerticalDoor);

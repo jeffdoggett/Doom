@@ -113,6 +113,8 @@ static void T_Makedoorsound (vldoor_t* door)
 void T_VerticalDoor (vldoor_t* door)
 {
     result_e	res;
+    line_t* 	line;
+    line_t 	linecopy;
 
     switch(door->direction)
     {
@@ -166,6 +168,13 @@ void T_VerticalDoor (vldoor_t* door)
 			  false,1,door->direction);
 	if (res == pastdest)
 	{
+	    if ((line = door->line) != NULL)
+	    {
+	      linecopy.tag = line->tag;
+	      linecopy.special = 0;
+	      EV_TurnTagLightsOff (&linecopy);
+	    }
+
 	    switch(door->type)
 	    {
 	      case blazeRaise:
@@ -220,13 +229,20 @@ void T_VerticalDoor (vldoor_t* door)
 
 	if (res == pastdest)
 	{
+	    if ((line = door->line) != NULL)
+	    {
+	      linecopy.tag = line->tag;
+	      linecopy.special = 0;
+	      EV_LightTurnOn (&linecopy, 0);
+	    }
+
 	    switch(door->type)
 	    {
 	      case blazeRaise:
 	      case normal:
 		if (netgame || (!gamekeydown['`'])) 	// Stay open cheat
 		{
-		  door->direction = 0; 		// wait at top
+		  door->direction = 0;			// wait at top
 		  door->topcountdown = door->topwait;
 		  break;
 		}
@@ -438,6 +454,7 @@ EV_DoDoorR
     door->topwait = VDOORWAIT;
     door->speed = VDOORSPEED;
     door->direction = 1;
+    door->line = NULL;
 
     switch(type)
     {
@@ -478,6 +495,9 @@ EV_DoDoorR
 	if ((type >= GenLockedBase)			// And GenDoorBase
 	 && (type < 0x4000))
 	{
+	  if (line -> tag)
+	    door->line = line;
+
 	  switch (genshift(type,DoorSpeed,DoorSpeedShift))
 	  {
 	    case 0: door->speed = VDOORSPEED/2; break;
@@ -630,6 +650,7 @@ EV_VerticalDoor
   door->direction = 1;
   door->speed = VDOORSPEED;
   door->topwait = VDOORWAIT;
+  door->line = NULL;
 
   switch(line->special)
   {
@@ -687,6 +708,7 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
     door->type = normal;
     door->speed = VDOORSPEED;
     door->topcountdown = 30 * 35;
+    door->line = NULL;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -715,9 +737,8 @@ P_SpawnDoorRaiseIn5Mins
     door->topheight -= 4*FRACUNIT;
     door->topwait = VDOORWAIT;
     door->topcountdown = 5 * 60 * 35;
+    door->line = NULL;
 }
-
-
 
 /* ---------------------------------------------------------------------------- */
 // UNUSED
