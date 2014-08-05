@@ -570,51 +570,6 @@ fixed_t P_FindNextLowestCeiling(const sector_t *sec, int currentheight)
 }
 
 /* ---------------------------------------------------------------------------- */
-/*
-   The Boom enhancements use non zero tags on door operations to adjust
-   the lighting levels as the door opens/closes.
-*/
-#if 0
-static unsigned char NZTags [] =
-{
-  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,	// 0 - 63
-  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,	// 64 - 127
-  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,	// 128 - 191
-  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF	// 192 - 255
-};
-#endif
-static int P_GetTag (line_t *line)
-{
-  int tag;
-  int spec;
-
-  tag = line -> tag;
-  if (tag)
-  {
-    spec = line -> special;
-    if ((spec >= GenLockedBase)
-     && (spec < GenCeilingBase))
-    {
-      tag = 0;
-    }
-#if 0
-    else if (spec < (sizeof (NZTags) * 8))
-    {
-      int mask;
-      int index;
-
-      index = spec >> 3;
-      mask = 1 << (spec & 7);
-      if ((NZTags [index] & mask) == 0)
-	tag = 0;
-    }
-#endif
-  }
-
-  return (tag);
-}
-
-/* ---------------------------------------------------------------------------- */
 //
 // RETURN NEXT SECTOR # THAT LINE TAG REFERS TO
 //
@@ -630,8 +585,7 @@ int P_FindSectorFromLineTag (line_t *line, int start)
   // If the line has no tag then operate the associated sector.
   // Required in Freedoom II Level 30 (Keyed doors near start).
 
-  tag = P_GetTag (line);
-  if (tag == 0)
+  if ((tag = line->tag) == 0)
   {
     if (start == -1)			// Only if it is the first time here
     {

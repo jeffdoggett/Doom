@@ -1676,7 +1676,7 @@ boolean P_BoomSpecialLine (mobj_t* thing, line_t* line, int side, triggered_e tr
   }
   else if (special >= GenDoorBase)
   {
-    rc = (boolean) EV_DoDoorR (line, (vldoor_e) special, thing);
+    rc = (boolean) EV_DoGenDoor (line, (vldoor_e) special, thing);
   }
   else if (special >= GenLockedBase)
   {
@@ -1822,7 +1822,7 @@ boolean P_BoomSpecialLine (mobj_t* thing, line_t* line, int side, triggered_e tr
 #ifdef SHOW_BOOM_SPECIAL
     printf ("Key = %u (%s)\n", key, door_messages [key]);
 #endif
-    rc = (boolean) EV_DoLockedDoor (line, key, (vldoor_e) special, thing);
+    rc = (boolean) EV_DoGenLockedDoor (line, key, (vldoor_e) special, thing);
   }
   else if (special >= GenLiftBase)
   {

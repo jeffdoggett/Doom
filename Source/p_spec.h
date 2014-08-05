@@ -498,12 +498,6 @@ int EV_DoGenStairs
 int EV_DoGenCrusher
 ( const line_t* line );
 
-int EV_DoGenDoor
-( const line_t* line );
-
-int EV_DoGenLockedDoor
-( const line_t* line );
-
 int EV_DoChange
 ( line_t* line,
   change_e changetype );
@@ -855,6 +849,18 @@ int
 EV_DoLockedDoor
 ( line_t*	line,
   int		keynum,
+  vldoor_e	type,
+  mobj_t*	thing );
+
+int EV_DoGenLockedDoor
+( line_t*	line,
+  int		keynum,
+  vldoor_e	type,
+  mobj_t*	thing );
+
+int
+EV_DoGenDoor
+( line_t*	line,
   vldoor_e	type,
   mobj_t*	thing );
 

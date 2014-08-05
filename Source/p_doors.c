@@ -114,7 +114,6 @@ void T_VerticalDoor (vldoor_t* door)
 {
     result_e	res;
     line_t* 	line;
-    line_t 	linecopy;
 
     switch(door->direction)
     {
@@ -169,11 +168,7 @@ void T_VerticalDoor (vldoor_t* door)
 	if (res == pastdest)
 	{
 	    if ((line = door->line) != NULL)
-	    {
-	      linecopy.tag = line->tag;
-	      linecopy.special = 0;
-	      EV_TurnTagLightsOff (&linecopy);
-	    }
+	      EV_TurnTagLightsOff (line);
 
 	    switch(door->type)
 	    {
@@ -231,9 +226,7 @@ void T_VerticalDoor (vldoor_t* door)
 	{
 	    if ((line = door->line) != NULL)
 	    {
-	      linecopy.tag = line->tag;
-	      linecopy.special = 0;
-	      EV_LightTurnOn (&linecopy, 0);
+	      EV_LightTurnOn (line, 0);
 	    }
 
 	    switch(door->type)
@@ -393,6 +386,27 @@ EV_DoDoor
 }
 
 /* ---------------------------------------------------------------------------- */
+/*
+  Init a floor movement structure to some safe defaults.
+*/
+
+static vldoor_t* get_door_block (sector_t* sec)
+{
+  vldoor_t*	door;
+
+  door = Z_Malloc (sizeof(*door), PU_LEVSPEC, 0);
+  P_AddThinker (&door->thinker, (actionf_p1) T_VerticalDoor);
+  sec->ceilingdata = door;
+
+  door->sector = sec;
+  door->topwait = VDOORWAIT;
+  door->speed = VDOORSPEED;
+  door->direction = 1;
+  door->line = NULL;
+  return (door);
+}
+
+//-----------------------------------------------------------------------------
 /* Returns:
 	0 = No doors opened
 	1 = Opened at least 1 door
@@ -405,7 +419,6 @@ EV_DoDoorR
   mobj_t*	thing )
 {
   int		secnum,rtn;
-  int		door_type;
   int		newheight;
   sector_t*	sec;
   vldoor_t*	door;
@@ -445,16 +458,8 @@ EV_DoDoorR
 
     // new door thinker
     rtn = 1;
-    door = Z_Malloc (sizeof(*door), PU_LEVSPEC, 0);
-    P_AddThinker (&door->thinker, (actionf_p1) T_VerticalDoor);
-    sec->ceilingdata = door;
-
-    door->sector = sec;
+    door = get_door_block (sec);
     door->type = type;
-    door->topwait = VDOORWAIT;
-    door->speed = VDOORSPEED;
-    door->direction = 1;
-    door->line = NULL;
 
     switch(type)
     {
@@ -490,86 +495,136 @@ EV_DoDoorR
 	}
 	door->topheight = newheight;
 	break;
-
-      default:
-	if ((type >= GenLockedBase)			// And GenDoorBase
-	 && (type < 0x4000))
-	{
-	  if (line -> tag)
-	    door->line = line;
-
-	  switch (genshift(type,DoorSpeed,DoorSpeedShift))
-	  {
-	    case 0: door->speed = VDOORSPEED/2; break;
-	    case 1: door->speed = VDOORSPEED; break;
-	    case 2: door->speed = VDOORSPEED * 2; break;
-	    default:door->speed = VDOORSPEED * 4;
-	  }
-
-	  if (type >= GenDoorBase)
-	  {
-	    switch ((type >> DoorDelayShift) & 3)
-	    {
-	      case 0: door->topwait = 35 * 1; break;	// 1 sec
-	      case 1: door->topwait = 35 * 4; break;	// 4 sec
-	      case 2: door->topwait = 35 * 9; break;	// 9 sec
-	      default:door->topwait = 35 * 30; break;	// 30 sec
-	    }
-	    door_type = genshift(type,DoorKind,DoorKindShift);
-	  }
-	  else
-	  {
-	    door_type = genshift(type,LockedKind,LockedKindShift);// Locked doors only do OWC & OSO
-	  }
-
-	  switch (door_type)
-	  {
-	    case OdCDoor:				// OWC
-	      door->type = normal;
-	      // door->direction = 1;
-	      newheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
-	      if (newheight > sec->ceilingheight)	// Returns current height if none found...
-	      {
-		newheight -= 4*FRACUNIT;
-		if (newheight > sec->ceilingheight)	// Is door going to move?
-		  T_Makedoorsound (door);
-	      }
-	      door->topheight = newheight;
-	      break;
-
-	    case ODoor:					// OSO
-	      door->type = normalOpen;
-	      // door->direction = 1;
-	      newheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
-	      if (newheight > sec->ceilingheight)	// Returns current height if none found...
-	      {
-		newheight -= 4*FRACUNIT;
-		if (newheight > sec->ceilingheight)	// Is door going to move?
-		  T_Makedoorsound (door);
-	      }
-	      door->topheight = newheight;
-	      break;
-
-	    case CdODoor:				// CWO
-	      door->type = closeThenOpen;
-	      door->topheight = sec->ceilingheight;
-	      door->direction = -1;
-	      T_Makedoorsound (door);
-	      break;
-
-	    default: /* CDoor */			// CSC
-	      door->type = normalClose;
-	      newheight = P_FindLowestCeilingSurrounding(sec);
-	      door->topheight = newheight - 4*FRACUNIT;
-	      door->direction = -1;
-	      T_Makedoorsound (door);
-	      break;
-	  }
-	}
-	break;
     }
   }
   return rtn;
+}
+
+//-----------------------------------------------------------------------------
+//
+// EV_DoLockedDoor
+// Move a locked door up/down
+//
+
+int
+EV_DoGenLockedDoor
+( line_t*	line,
+  int		keynum,
+  vldoor_e	type,
+  mobj_t*	thing )
+{
+  int rc;
+
+  rc = EV_Check_Lock (thing->player, keynum);
+  if (rc)
+    rc = EV_DoGenDoor (line,type,thing);
+
+  return (rc);
+}
+
+/* ---------------------------------------------------------------------------- */
+/* Returns:
+	0 = No doors opened
+	1 = Opened at least 1 door
+*/
+
+int
+EV_DoGenDoor
+( line_t*	line,
+  vldoor_e	type,
+  mobj_t*	thing )
+{
+  int		rtn;
+  int		door_type;
+  int		newheight;
+  sector_t*	sec;
+  vldoor_t*	door;
+
+  rtn = 0;
+
+  if (((line ->flags & ML_TWOSIDED) == 0)
+   || ((sec = sides[ line->sidenum[0^1]] .sector) == NULL))
+  {
+    line->special = 0;			// Yet another badly built wad!!
+    return (rtn);
+  }
+
+  // new door thinker
+  rtn = 1;
+  door = get_door_block (sec);
+  door->type = type;
+
+  if (line -> tag)
+    door->line = line;
+
+  switch (genshift(type,DoorSpeed,DoorSpeedShift))
+  {
+    case 0: door->speed = VDOORSPEED/2; break;
+    case 1: door->speed = VDOORSPEED; break;
+    case 2: door->speed = VDOORSPEED * 2; break;
+    default:door->speed = VDOORSPEED * 4;
+  }
+
+  if (type >= GenDoorBase)
+  {
+    switch ((type >> DoorDelayShift) & 3)
+    {
+      case 0: door->topwait = 35 * 1; break;	// 1 sec
+      case 1: door->topwait = 35 * 4; break;	// 4 sec
+      case 2: door->topwait = 35 * 9; break;	// 9 sec
+      default:door->topwait = 35 * 30; break;	// 30 sec
+    }
+    door_type = genshift(type,DoorKind,DoorKindShift);
+  }
+  else
+  {
+    door_type = genshift(type,LockedKind,LockedKindShift);// Locked doors only do OWC & OSO
+  }
+
+  switch (door_type)
+  {
+    case OdCDoor:				// OWC
+      door->type = normal;
+      // door->direction = 1;
+      newheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
+      if (newheight > sec->ceilingheight)	// Returns current height if none found...
+      {
+	newheight -= 4*FRACUNIT;
+	if (newheight > sec->ceilingheight)	// Is door going to move?
+	  T_Makedoorsound (door);
+      }
+      door->topheight = newheight;
+      break;
+
+    case ODoor:					// OSO
+      door->type = normalOpen;
+      // door->direction = 1;
+      newheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
+      if (newheight > sec->ceilingheight)	// Returns current height if none found...
+      {
+	newheight -= 4*FRACUNIT;
+	if (newheight > sec->ceilingheight)	// Is door going to move?
+	  T_Makedoorsound (door);
+      }
+      door->topheight = newheight;
+      break;
+
+    case CdODoor:				// CWO
+      door->type = closeThenOpen;
+      door->topheight = sec->ceilingheight;
+      door->direction = -1;
+      T_Makedoorsound (door);
+      break;
+
+    default: /* CDoor */			// CSC
+      door->type = normalClose;
+      newheight = P_FindLowestCeilingSurrounding(sec);
+      door->topheight = newheight - 4*FRACUNIT;
+      door->direction = -1;
+      T_Makedoorsound (door);
+      break;
+  }
+  return (rtn);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -643,14 +698,7 @@ EV_VerticalDoor
   }
 
   // new door thinker
-  door = Z_Malloc (sizeof(*door), PU_LEVSPEC, 0);
-  P_AddThinker (&door->thinker, (actionf_p1) T_VerticalDoor);
-  sec->ceilingdata = door;
-  door->sector = sec;
-  door->direction = 1;
-  door->speed = VDOORSPEED;
-  door->topwait = VDOORWAIT;
-  door->line = NULL;
+  door = get_door_block (sec);
 
   switch(line->special)
   {
@@ -682,8 +730,7 @@ EV_VerticalDoor
   }
 
   // find the top and bottom of the movement range
-  door->topheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
-  door->topheight -= 4*FRACUNIT;
+  door->topheight = P_FindNextHighestCeiling (sec, sec->ceilingheight) - (4*FRACUNIT);
   T_Makedoorsound (door);
 }
 
@@ -696,17 +743,10 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
 {
     vldoor_t*	door;
 
-    door = Z_Malloc ( sizeof(*door), PU_LEVSPEC, 0);
-
-    P_AddThinker (&door->thinker, (actionf_p1)T_VerticalDoor);
-
-    sec->ceilingdata = door;
     sec->special &= ~31;
-
-    door->sector = sec;
+    door = get_door_block (sec);
     door->direction = 0;
     door->type = normal;
-    door->speed = VDOORSPEED;
     door->topcountdown = 30 * 35;
     door->line = NULL;
 }
@@ -722,22 +762,12 @@ P_SpawnDoorRaiseIn5Mins
 {
     vldoor_t*	door;
 
-    door = Z_Malloc ( sizeof(*door), PU_LEVSPEC, 0);
-
-    P_AddThinker (&door->thinker, (actionf_p1)T_VerticalDoor);
-
-    sec->ceilingdata = door;
     sec->special &= ~31;
-
-    door->sector = sec;
+    door = get_door_block (sec);
     door->direction = 2;
     door->type = raiseIn5Mins;
-    door->speed = VDOORSPEED;
-    door->topheight = P_FindNextHighestCeiling (sec, sec->ceilingheight);
-    door->topheight -= 4*FRACUNIT;
-    door->topwait = VDOORWAIT;
+    door->topheight = P_FindNextHighestCeiling (sec, sec->ceilingheight) - (4*FRACUNIT);
     door->topcountdown = 5 * 60 * 35;
-    door->line = NULL;
 }
 
 /* ---------------------------------------------------------------------------- */
