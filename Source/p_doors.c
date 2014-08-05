@@ -225,9 +225,7 @@ void T_VerticalDoor (vldoor_t* door)
 	if (res == pastdest)
 	{
 	    if ((line = door->line) != NULL)
-	    {
 	      EV_LightTurnOn (line, 0);
-	    }
 
 	    switch(door->type)
 	    {
@@ -387,7 +385,7 @@ EV_DoDoor
 
 /* ---------------------------------------------------------------------------- */
 /*
-  Init a floor movement structure to some safe defaults.
+  Init a door movement structure to some safe defaults.
 */
 
 static vldoor_t* get_door_block (sector_t* sec)
@@ -549,8 +547,39 @@ EV_DoGenDoor
     return (rtn);
   }
 
-  // new door thinker
+
+  door = sec->ceilingdata;
+  if (door)
+  {
+    if (door->thinker.function.acp1 == (actionf_p1) T_VerticalDoor)
+    {
+      rtn = 1;
+
+      if (type >= GenDoorBase)
+	door_type = genshift(type,DoorKind,DoorKindShift);
+      else
+	door_type = genshift(type,LockedKind,LockedKindShift);// Locked doors only do OWC & OSO
+
+      switch (door_type)
+      {
+	case OdCDoor:				// OWC
+	  if (door->direction == -1)
+	  {
+	    door->direction = 1;		// go back up
+	  }
+	  else if ((thing)&&(thing->player))	// JDC: bad guys never close doors
+	  {
+	    door->direction = -1;		// start going down immediately
+	  }
+	  break;
+      }
+    }
+    return (rtn);
+  }
+
   rtn = 1;
+
+  // new door thinker
   door = get_door_block (sec);
   door->type = type;
 
@@ -748,7 +777,6 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
     door->direction = 0;
     door->type = normal;
     door->topcountdown = 30 * 35;
-    door->line = NULL;
 }
 
 /* ---------------------------------------------------------------------------- */
