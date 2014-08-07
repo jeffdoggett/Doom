@@ -133,6 +133,69 @@ static sector_t * P_GetSectorPtr (unsigned int * save_32_p)
 
 //-----------------------------------------------------------------------------
 
+static uint32_t P_ThinkerToIndex (thinker_t* thinker)
+{
+  uint32_t i;
+  thinker_t* th;
+
+  if (thinker)
+  {
+    for (th = thinker_head, i = 1 ; th != NULL ; th=th->next, i++)
+    {
+      if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+      {
+	if (th == thinker)
+	  return (i);
+      }
+    }
+  }
+
+  return (0);
+}
+
+//-----------------------------------------------------------------------------
+
+static thinker_t* P_IndexToThinker (uint32_t index)
+{
+  uint32_t i;
+  thinker_t* th;
+
+  if (index)
+  {
+    for (th = thinker_head, i = 1 ; th != NULL ; th=th->next, i++)
+    {
+      if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+      {
+	if (i == index)
+	  return (th);
+      }
+    }
+  }
+
+  return (NULL);
+}
+
+//-----------------------------------------------------------------------------
+
+void P_RestoreTargets (void)
+{
+  uint32_t i;
+  mobj_t* mo;
+  thinker_t* th;
+
+  for (th = thinker_head, i = 1 ; th != NULL ; th=th->next, i++)
+  {
+    if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+    {
+      mo = (mobj_t*) th;
+      mo->target = (mobj_t*) P_IndexToThinker((uintptr_t) mo->target);
+      mo->tracer = (mobj_t*) P_IndexToThinker((uintptr_t) mo->tracer);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 static byte * P_ArchivePlayer (byte * save_p, player_t * ply)
 {
   unsigned int i;
@@ -568,16 +631,14 @@ static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
   p_save_32 (mobj->momz);
   p_save_32 (mobj->validcount);
   p_save_32 (mobj->type);
-
-  p_save_32 (0);					// SPARE!!!
-
+  p_save_32 (mobj->flags2);
   p_save_32 (mobj->tics);
   p_save_32 (mobj->state - states);
   p_save_32 (mobj->flags);
   p_save_32 (mobj->health);
   p_save_32 (mobj->movedir);
   p_save_32 (mobj->movecount);
-  p_save_32 (mobj->flags2);
+  p_save_32 (P_ThinkerToIndex ((thinker_t *) mobj->target));
   p_save_32 (mobj->reactiontime);
   p_save_32 (mobj->threshold);
 
@@ -596,7 +657,7 @@ static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
   p_save_16 (0);					// SPARE!!!
   save_32_p = (unsigned int *) put;
 
-  p_save_32 (0);					// SPARE!!!
+  p_save_32 (P_ThinkerToIndex ((thinker_t *) mobj->tracer));
 
   // printf ("P_ArchiveMobj %u %u\n", sizeof (mobj_t), (byte *) save_32_p - save_p);
   return ((byte *) save_32_p);
@@ -649,18 +710,15 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->momz = p_load_32 (save_32_p); save_32_p++;
   mobj->validcount = p_load_32 (save_32_p); save_32_p++;
   mobj->type = (mobjtype_t) p_load_32 (save_32_p); save_32_p++;
-
-  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
-
+  mobj->flags2 = p_load_32 (save_32_p); save_32_p++;
   mobj->tics = p_load_32 (save_32_p); save_32_p++;
   t32 = p_load_32 (save_32_p); save_32_p++;
   mobj->state = &states[t32];
   mobj->flags = p_load_32 (save_32_p); save_32_p++;
   mobj->health = p_load_32 (save_32_p); save_32_p++;
-
   mobj->movedir = p_load_32 (save_32_p); save_32_p++;
   mobj->movecount = p_load_32 (save_32_p); save_32_p++;
-  mobj->flags2 = p_load_32 (save_32_p); save_32_p++;
+  mobj->target = (mobj_t*) p_load_32 (save_32_p); save_32_p++;
   mobj->reactiontime = p_load_32 (save_32_p); save_32_p++;
   mobj->threshold = p_load_32 (save_32_p); save_32_p++;
 
@@ -683,7 +741,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   /* p_load_16 (save_p); */ save_p += 2;
   save_32_p = (unsigned int *) save_p;
 
-  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
+  mobj->tracer = (mobj_t*) p_load_32 (save_32_p); save_32_p++;
 
   P_SetThingPosition (mobj);
   mobj->info = &mobjinfo[mobj->type];

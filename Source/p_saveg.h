@@ -39,6 +39,7 @@ byte * P_ArchiveThinkers (byte * save_p);
 byte * P_UnArchiveThinkers (byte * save_p);
 byte * P_ArchiveSpecials (byte * save_p);
 byte * P_UnArchiveSpecials (byte * save_p);
+void P_RestoreTargets (void);
 
 #endif
 //-----------------------------------------------------------------------------

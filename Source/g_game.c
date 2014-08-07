@@ -1805,6 +1805,7 @@ void G_DoLoadGame (void)
   save_p = P_UnArchiveThinkers (save_p);
   save_p = P_UnArchiveSpecials (save_p);
   BOOMSTATEMENT(save_p = P_UnArchiveMap(save_p);)
+  P_RestoreTargets ();
 
   if (*save_p != 0x1d)
       I_Error ("Bad savegame");
