@@ -65,6 +65,8 @@ static mobj_t*	onmobj;
 extern void P_ExplodeMissile (mobj_t* mo);
 extern boolean	gamekeydown[NUMKEYS];
 
+static boolean	telefrag;
+
 void P_Init_SpecHit (void)
 {
   spechit_max = 32;
@@ -82,7 +84,6 @@ void P_Init_SpecHit (void)
 //
 boolean PIT_StompThing (mobj_t* thing)
 {
-    map_dests_t * mapd_ptr;
     fixed_t	blockdist;
 
     if (!(thing->flags & MF_SHOOTABLE) )
@@ -104,8 +105,8 @@ boolean PIT_StompThing (mobj_t* thing)
     // monsters don't stomp things except on boss level (30)
     if (!tmthing->player) // && gamemap != 30)
     {
-      mapd_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
-      if (mapd_ptr -> allow_monster_telefrags == 0)
+      if ((telefrag == false)
+       && (G_Access_MapInfoTab (gameepisode, gamemap) -> allow_monster_telefrags == 0))
 	return false;
     }
 
@@ -123,7 +124,7 @@ boolean PIT_StompThing (mobj_t* thing)
 //
 // P_TeleportMove
 //
-boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z)
+boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean boss)
 {
     int		xl;
     int		xh;
@@ -131,8 +132,9 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z)
     int		yh;
     int		bx;
     int		by;
-
     subsector_t*	newsubsec;
+
+    telefrag = (boolean) (thing->player || boss);
 
     // kill anything occupying the position
     tmthing = thing;

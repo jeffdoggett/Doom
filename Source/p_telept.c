@@ -64,7 +64,7 @@ EV_Teleport (line_t* line, int side, mobj_t* thing)
       oldy = thing->y;
       oldz = thing->z;
 
-      if (P_TeleportMove (thing, m->x, m->y, m->z))
+      if (P_TeleportMove (thing, m->x, m->y, m->z, false))
       {
 	thing->z = thing->floorz;  //fixme: not needed?
 	if (thing->player)
@@ -147,7 +147,7 @@ int EV_SilentTeleport (const line_t *line, int side, mobj_t *thing)
       player = thing->player;
 
       /* Attempt to teleport, aborting if blocked */
-      if (P_TeleportMove(thing, m->x, m->y, m->z))
+      if (P_TeleportMove(thing, m->x, m->y, m->z, false))
       {
 	/* Rotate thing according to difference in angles */
 	thing->angle += angle;
@@ -278,7 +278,7 @@ int EV_SilentLineTeleport (const line_t *line, int side, mobj_t *thing, boolean 
 	  x += l->dy < 0 != aside ? -1 : 1;
 
       /* Attempt to teleport, aborting if blocked */
-      if (P_TeleportMove(thing, x, y, z))
+      if (P_TeleportMove(thing, x, y, z, false))
       {
 	/* Adjust z position to be same height above ground as before. */
 	/* Ground level at the exit is measured as the higher of the */

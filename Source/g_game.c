@@ -432,7 +432,7 @@ static map_dests_t next_level_tab_2 [] =
   { 255, 28, 255, 31, 0, 0, 0, 0, 0, 0, 330/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 27
   { 255, 29, 255, 31, 0, 0, 0, 0, 0, 0, 420/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 28
   { 255, 30, 255, 31, 0, 0, 0, 0, 0, 0, 300/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 29
-  { 255,  0, 255,  0, 0, 0, 4, 0, 0, 1, 180/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 30
+  { 255,  0, 255,  0, 0, 0, 4, 0, 0, 0, 180/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 30
   { 255, 16, 255, 32, 1, 0, 0, 0, 0, 0, 120/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 31
   { 255, 16, 255, 16, 2, 0, 0, 0, 0, 0,  30/5, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 32
   { 255, 34, 255, 34, 0, 0, 0, 0, 0, 0,   0, 60, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2 },	// Map 33
