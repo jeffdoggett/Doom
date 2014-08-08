@@ -179,11 +179,10 @@ static thinker_t* P_IndexToThinker (uint32_t index)
 
 void P_RestoreTargets (void)
 {
-  uint32_t i;
   mobj_t* mo;
   thinker_t* th;
 
-  for (th = thinker_head, i = 1 ; th != NULL ; th=th->next, i++)
+  for (th = thinker_head; th != NULL ; th=th->next)
   {
     if (th->function.acp1 == (actionf_p1) P_MobjThinker)
     {
