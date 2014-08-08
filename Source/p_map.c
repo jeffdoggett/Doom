@@ -110,10 +110,13 @@ boolean PIT_StompThing (mobj_t* thing)
 	return false;
     }
 
-    if (tmz > thing->z + thing->height)
+    if (tmthing->flags2 & MF2_PASSMOBJ)
+    {
+      if (tmz > thing->z + thing->height)
         return true; // overhead
-    if (tmz + tmthing->height < thing->z)
+      if (tmz + tmthing->height < thing->z)
         return true; // underneath
+    }
 
     P_DamageMobj (thing, tmthing, tmthing, (thing->health+thing->info->spawnhealth)*2);
 
