@@ -179,16 +179,27 @@ static thinker_t* P_IndexToThinker (uint32_t index)
 
 void P_RestoreTargets (void)
 {
+  int norestore;
   mobj_t* mo;
   thinker_t* th;
+
+  norestore = M_CheckParm ("-norestoretargets");
 
   for (th = thinker_head; th != NULL ; th=th->next)
   {
     if (th->function.acp1 == (actionf_p1) P_MobjThinker)
     {
       mo = (mobj_t*) th;
-      mo->target = (mobj_t*) P_IndexToThinker((uintptr_t) mo->target);
-      mo->tracer = (mobj_t*) P_IndexToThinker((uintptr_t) mo->tracer);
+      if (norestore)
+      {
+	mo->target = NULL;
+	mo->tracer = NULL;
+      }
+      else
+      {
+	mo->target = (mobj_t*) P_IndexToThinker((uintptr_t) mo->target);
+	mo->tracer = (mobj_t*) P_IndexToThinker((uintptr_t) mo->tracer);
+      }
     }
   }
 }
@@ -717,7 +728,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->health = p_load_32 (save_32_p); save_32_p++;
   mobj->movedir = p_load_32 (save_32_p); save_32_p++;
   mobj->movecount = p_load_32 (save_32_p); save_32_p++;
-  mobj->target = (mobj_t*) p_load_32 (save_32_p); save_32_p++;
+  mobj->target = (mobj_t*) ((pint) p_load_32 (save_32_p)); save_32_p++;
   mobj->reactiontime = p_load_32 (save_32_p); save_32_p++;
   mobj->threshold = p_load_32 (save_32_p); save_32_p++;
 
@@ -740,7 +751,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   /* p_load_16 (save_p); */ save_p += 2;
   save_32_p = (unsigned int *) save_p;
 
-  mobj->tracer = (mobj_t*) p_load_32 (save_32_p); save_32_p++;
+  mobj->tracer = (mobj_t*) ((pint) p_load_32 (save_32_p)); save_32_p++;
 
   P_SetThingPosition (mobj);
   mobj->info = &mobjinfo[mobj->type];
