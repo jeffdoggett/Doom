@@ -1965,7 +1965,7 @@ static const unsigned char wilv_char_7F [] =
 
 /* ---------------------------------------------------------------------------- */
 
-static const unsigned char * const red_charset [] =
+static const unsigned char * red_charset [] =
 {
   red_char_21, red_char_22, red_char_23, red_char_24,
   red_char_25, red_char_26, red_char_27, red_char_28,
@@ -2410,5 +2410,153 @@ static void save_patch (patch_t * patch, int ascii)
 }
 
 #endif
+
+/* -------------------------------------------------------------------------------------------- */
+
+void V_LoadFonts (void)
+{
+  int lump;
+  unsigned int first;
+  unsigned int last;
+  unsigned int length;
+  unsigned int char_height;
+  unsigned int char_width;
+  unsigned int palette_size;
+  unsigned int constant_width;
+  unsigned int char_num;
+  unsigned int run_length;
+  unsigned int the_char;
+  unsigned int count;
+  unsigned int bytes_req;
+  unsigned char c0,c1,c2;
+  unsigned char * fontlump;
+  unsigned char * ptr;
+  unsigned char * red_char;
+  unsigned char * palette;
+  unsigned char * colnum;
+  unsigned char char_widths [256];
+  unsigned char colours [256];
+
+  lump = W_CheckNumForName ("DBIGFONT");
+  if (lump != -1)
+  {
+    length = W_LumpLength (lump);
+    if (length)
+    {
+      ptr = fontlump = W_CacheLumpNum (lump, PU_STATIC);
+      if ((ptr [0] == 'F')
+       && (ptr [1] == 'O')
+       && (ptr [2] == 'N')
+       && (ptr [3] == '2'))
+      {
+	char_height = ptr [4] | (ptr [5] << 8);
+	first = ptr [6];			// First ascii character
+	last  = ptr [7];			// and the last
+
+	memset (char_widths, 0, sizeof (char_widths));
+	constant_width = ptr [8];
+	palette_size = ptr [10];
+	ptr += 11;
+	if (*ptr++ & 1)
+	{
+	  ptr += 2;
+	}
+
+	if (constant_width)
+	{
+	  char_width = ptr [0] | (ptr [1] << 8);
+	  memset (char_widths + first, char_width, (last - first) + 1);
+	  ptr += 2;
+	}
+	else
+	{
+	  char_num = first;
+	  do
+	  {
+	    char_widths [char_num] = ptr [0] | (ptr [1] << 8);
+	    ptr += 2;
+	  } while (++char_num <= last);
+	}
+
+
+	/* Read palette info */
+        palette = W_CacheLumpName ("PLAYPAL", PU_CACHE);
+        colnum = colours;
+        *colnum++ = 0;
+        ptr += 3;			// Miss out 1st one which is the transparent colour
+	do
+	{
+	  c0 = *ptr++;
+	  c1 = *ptr++;
+	  c2 = *ptr++;
+	  *colnum++ = AM_load_colour (c0, c1, c2, palette);
+	} while (--palette_size);
+
+
+//	ptr += (palette_size + 1) * 3;
+
+	/* And finally the RLE encoded info */
+	char_num = first;
+	do
+	{
+	  if (char_widths [char_num])
+	  {
+	    bytes_req = char_widths [char_num] * char_height;
+
+	    red_char = malloc (bytes_req + 3);
+	    if (red_char)
+	    {
+	      if ((char_num >= 0x21)
+	       && (char_num <= 0x7F))
+	      {
+		red_charset [char_num-0x21] = red_char;
+		if ((char_num >= 'A')
+		 && (char_num <= 'Z'))
+		  red_charset [char_num-0x01] = red_char;
+	      }
+
+	      *red_char++ = char_widths [char_num];
+	      *red_char++ = char_height;
+	      *red_char++ = 0;
+
+//	      printf ("%X size %u x %u (%u)\n", char_num, char_widths [char_num], char_height, bytes_req);
+	      do
+	      {
+		run_length = *ptr++;
+		if (run_length < 0x80)
+		{
+		  run_length++;
+		  /* Use the next n bytes */
+		  // memcpy (red_char, ptr, run_length);
+		  count = 0;
+		  do
+		  {
+		    red_char [count] = colours [ptr [count]];
+		  } while (++count < run_length);
+		  ptr += run_length;
+		}
+		else
+		{
+		  run_length = 257 - run_length;
+		  the_char = *ptr++;
+		  /* Use this byte n times */
+		  memset (red_char, colours [the_char], run_length);
+		}
+
+		red_char += run_length;
+
+//		printf ("Run length = %u, char = %X, left = %d\n", run_length, the_char, bytes_req-run_length);
+
+		bytes_req -= run_length;
+	      } while (bytes_req);
+	    }
+	  }
+	} while (++char_num <= last);
+//	printf ("Bytes used = %X\n", ptr - fontlump);
+      }
+      Z_Free (fontlump);
+    }
+  }
+}
 
 /* -------------------------------------------------------------------------------------------- */

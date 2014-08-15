@@ -26,6 +26,7 @@
 #define AM_MSGENTERED	1
 #define AM_MSGEXITED	0
 
+unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char c2, unsigned char * palette);
 void AM_LoadColours (int palette_lump);
 
 // Called by main loop.

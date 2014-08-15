@@ -2013,6 +2013,7 @@ void D_DoomMain (void)
   HU_Init ();
   // printf ("ST_Init: Init status bar.\n");
   ST_Init ();
+  V_LoadFonts ();
   I_InitGraphics ();
 
 

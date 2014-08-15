@@ -481,7 +481,7 @@ static void show_colour (const char * name, unsigned int num, unsigned char * pa
    Find the best match in the palette table for this colour
 */
 
-static unsigned char load_colour (unsigned char c0, unsigned char c1, unsigned char c2, unsigned char * palette)
+unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char c2, unsigned char * palette)
 {
   unsigned char colnum;
   unsigned char rc;
@@ -543,7 +543,7 @@ void AM_LoadColours (int palette_lump)
     c0 = *colsptr++;
     c1 = *colsptr++;
     c2 = *colsptr++;
-    *colnum++ = load_colour (c0, c1, c2, palette);
+    *colnum++ = AM_load_colour (c0, c1, c2, palette);
   } while (--count);
 }
 
