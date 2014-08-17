@@ -2484,6 +2484,7 @@ void V_LoadFonts (void)
         colnum = colours;
         *colnum++ = 0;
         ptr += 3;			// Miss out 1st one which is the transparent colour
+        if (palette_size)
 	do
 	{
 	  c0 = *ptr++;
@@ -2495,7 +2496,10 @@ void V_LoadFonts (void)
 
 //	ptr += (palette_size + 1) * 3;
 
-	/* And finally the RLE encoded info */
+	/* And finally the RLE encoded info. */
+	/* 1st byte =	0-127	= use next 1-128 data bytes */
+	/*		128-255	= use next byte 2-132 times (where 255 = 2) */
+
 	char_num = first;
 	do
 	{
