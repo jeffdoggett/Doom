@@ -2428,6 +2428,7 @@ void V_LoadFonts (void)
   unsigned int the_char;
   unsigned int count;
   unsigned int bytes_req;
+  unsigned int colour_number;
   unsigned char c0,c1,c2;
   unsigned char * fontlump;
   unsigned char * ptr;
@@ -2484,15 +2485,37 @@ void V_LoadFonts (void)
         colnum = colours;
         *colnum++ = 0;
         ptr += 3;			// Miss out 1st one which is the transparent colour
+	colour_number = 1;
         if (palette_size)
+	{
+	  do
+	  {
+	    c0 = *ptr++;
+	    c1 = *ptr++;
+	    c2 = *ptr++;
+	    *colnum++ = AM_load_colour (c0, c1, c2, palette);
+	    colour_number++;
+	  } while (--palette_size);
+	}
+
+	if (colour_number < sizeof (colours))	// Did we fill the whole table?
+	{
+	  do					// No - fill the rest.
+	  {
+	    *colnum++ = colour_number;
+	  } while (++colour_number < sizeof (colours));
+	}
+
+#if 0
+
+	colour_number = 0;			// A bit of debug!
+        colnum = colours;
 	do
 	{
-	  c0 = *ptr++;
-	  c1 = *ptr++;
-	  c2 = *ptr++;
-	  *colnum++ = AM_load_colour (c0, c1, c2, palette);
-	} while (--palette_size);
-
+	  printf ("Colour table number %u = %u\n", colour_number, *colnum++);
+	} while (++colour_number < sizeof (colours));
+	
+#endif
 
 //	ptr += (palette_size + 1) * 3;
 

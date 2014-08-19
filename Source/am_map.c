@@ -499,7 +499,7 @@ unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char 
     d1 = c1 - *palette++;
     d2 = c2 - *palette++;
     diff = (d0 * d0) + (d1 * d1) + (d2 * d2);
-    if (diff < best)
+    if (diff <= best)		// Use <= to find highest numbered....
     {
       best = diff;
       rc = colnum;
