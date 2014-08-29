@@ -73,6 +73,15 @@ typedef struct
   int		speed;
 } animdef_t;
 
+typedef struct animdef2_s
+{
+  boolean	istexture;	// if false, it is a flat
+  char		endname[9];
+  char		startname[9];
+  int		speed;
+  struct animdef2_s * next;
+} animdef2_t;
+
 static void P_SpawnScrollers(void);
 //static void P_SpawnFriction(void);
 //static void P_SpawnPushers(void);
@@ -118,30 +127,45 @@ static animdef_t animdefs[] =
   {true,	"BFALL4",	"BFALL1",	8},
   {true,	"SFALL4",	"SFALL1",	8},
   {true,	"WFALL4",	"WFALL1",	8},
-  {true,	"DBRAIN4",	"DBRAIN1",	8},
-
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1},
-  {(boolean)-1}
+  {true,	"DBRAIN4",	"DBRAIN1",	8}
 };
 
 static anim_t*	animhead;
+
+/* ---------------------------------------------------------------------------- */
+/*
+   See if we've already seen this animdef.
+*/
+
+static animdef_t * find_existing_anim (animdef2_t * lumps, const char * name_1, const char * name_2)
+{
+  int count;
+  animdef_t * an_ptr;
+  animdef2_t * an2_ptr;
+
+  /* Look first in the fixed array */
+
+  count = ARRAY_SIZE (animdefs);
+  an_ptr = animdefs;
+  do
+  {
+    if ((strcasecmp (an_ptr -> endname, name_1) == 0)
+     || (strcasecmp (an_ptr -> startname, name_2) == 0))
+      return (an_ptr);
+    an_ptr++;
+  } while (--count);
+
+  /* Not there, see if in the new linked list. */
+
+  for (an2_ptr = lumps; an2_ptr != NULL; an2_ptr = an2_ptr -> next)
+  {
+    if ((strcasecmp (an2_ptr -> endname, name_1) == 0)
+     || (strcasecmp (an2_ptr -> startname, name_2) == 0))
+      return ((animdef_t *) an2_ptr);
+  }
+
+  return (NULL);
+}
 
 /* ---------------------------------------------------------------------------- */
 /*
@@ -153,127 +177,174 @@ static anim_t*	animhead;
   Bytes 19-22: speed
 */
 
-static void Read_ANIMATED_Lump (void)
+static animdef2_t * Read_ANIMATED_Lump (void)
 {
   int i;
   int lump;
   int size;
-  int pos;
-  char * ptr;
-  int istexture;
   int speed;
+  int istexture;
+  char * lump_ptr;
+  char * ptr;
   animdef_t * an_ptr;
+  animdef2_t * lumphead;
+  animdef2_t * thisanim;
+  animdef2_t ** lastanim;
   char name_1 [10];
   char name_2 [10];
 
+  lumphead = NULL;
+  lastanim = &lumphead;
 
   lump = -1;
   while ((lump = W_NextLumpNumForName ("ANIMATED", lump)) != -1)
   {
-    ptr = W_CacheLumpNum (lump, PU_STATIC);
+    ptr = lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
     size = W_LumpLength (lump);
-    pos = 0;
     do
     {
-      istexture = ptr [pos++];
+      istexture = *ptr++;
       i = 0;
       do
       {
-	name_1 [i++] = ptr [pos++];
+	name_1 [i++] = *ptr++;
       } while (i < 9);
       i = 0;
       do
       {
-	name_2 [i++] = ptr [pos++];
+	name_2 [i++] = *ptr++;
       } while (i < 9);
 
-      speed = ptr [pos++];
-      speed |= (ptr [pos++] << 8);
-      speed |= (ptr [pos++] << 16);
-      speed |= (ptr [pos++] << 24);
+      speed = *ptr++;
+      speed |= (*ptr++ << 8);
+      speed |= (*ptr++ << 16);
+      speed |= (*ptr++ << 24);
 
       if ((name_1 [0]) && (name_2 [0]))
       {
-	i = 0;
-	an_ptr = animdefs;
-	do
-	{
-	  if ((an_ptr -> istexture == -1)		// Empty slot?
-	   || (strcasecmp (an_ptr -> endname, name_1) == 0)
-	   || (strcasecmp (an_ptr -> startname, name_2) == 0))
-	  {
-//	    printf ("Anim %d %d: %s %s %d %d\n", i, an_ptr -> istexture, name_1, name_2, istexture, speed);
-	    an_ptr -> istexture = (boolean) istexture;
-	    strcpy (an_ptr -> endname, name_1);
-	    strcpy (an_ptr -> startname, name_2);
-	    an_ptr -> speed = speed;
-	    break;
-	  }
-	  an_ptr++;
-	  if (++i >= (ARRAY_SIZE (animdefs) - 1))
-	  {
-	    printf ("Too many animated textures\n");
-	    break;
-	  }
-	} while (1);
+	/* See whether this anim is a duplicate of an existing one. */
+	/* If it is, then just overwrite it, otherwise create a new */
+	/* entity in the temporary linked list. */
+        an_ptr = find_existing_anim (lumphead, name_1, name_2);
+        if (an_ptr == NULL)
+        {
+          thisanim = malloc (sizeof (animdef2_t));
+          if (thisanim == NULL)
+            break;
+
+	  *lastanim = thisanim;
+	  lastanim = &thisanim -> next;
+	  *lastanim = NULL;
+
+          an_ptr = (animdef_t *) thisanim;
+        }
+
+//	printf ("Anim %d %d: %s %s %d %d\n", i, an_ptr -> istexture, name_1, name_2, istexture, speed);
+	an_ptr -> istexture = (boolean) istexture;
+	strcpy (an_ptr -> endname, name_1);
+	strcpy (an_ptr -> startname, name_2);
+	an_ptr -> speed = speed;
       }
 
       size -= 23;
     } while (size >= 23);
 
-    Z_Free (ptr);
+    Z_Free (lump_ptr);
   }
+
+  return (lumphead);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static anim_t* read_anim (animdef_t * an_ptr)
+{
+  int   bp;
+  int   pn;
+  anim_t* thisanim;
+
+  if (an_ptr -> istexture)
+  {
+    bp = R_CheckTextureNumForName (an_ptr -> startname);
+    pn = R_CheckTextureNumForName (an_ptr -> endname);
+  }
+  else
+  {
+    bp = R_CheckFlatNumForName (an_ptr -> startname);
+    pn = R_CheckFlatNumForName (an_ptr -> endname);
+  }
+
+  thisanim = NULL;
+
+  if ((bp != -1) && (pn != -1))
+  {
+    thisanim = malloc (sizeof (anim_t));
+    if (thisanim)
+    {
+      thisanim->basepic = bp;
+      thisanim->picnum = pn;
+      thisanim->istexture = an_ptr -> istexture;
+      thisanim->numpics = thisanim->picnum - thisanim->basepic + 1;
+
+      if (thisanim->numpics < 2)
+	I_Error ("P_InitPicAnims: bad cycle from %s to %s",
+		  an_ptr -> startname,
+		  an_ptr -> endname);
+
+      thisanim->speed = an_ptr -> speed;
+    }
+  }
+
+  return (thisanim);
 }
 
 /* ---------------------------------------------------------------------------- */
 
 void P_InitPicAnims (void)
 {
-  int	i;
-  int   bp;
-  int   pn;
+  int   count;
   anim_t** prevanim;
   anim_t* thisanim;
+  animdef_t * animdef;
+  animdef2_t * lumphead;
+  animdef2_t * next;
 
-  Read_ANIMATED_Lump ();
+  /* Read the ANIMATED lump from the WAD file. */
+  /* Any duplicates will overwrite the existing entries. */
+  /* Unique animations will be placed in a temporary */
+  /* linked list, which we'll free later as it's read. */
+  lumphead = Read_ANIMATED_Lump ();
 
   //	Init animation
   prevanim = &animhead;
+  count = ARRAY_SIZE (animdefs);
+  animdef = animdefs;
 
-  for (i=0 ; animdefs[i].istexture != -1 ; i++)
+  do
   {
-    if (animdefs[i].istexture)
+    thisanim = read_anim (animdef);
+    if (thisanim)
     {
-      bp = R_CheckTextureNumForName (animdefs[i].startname);
-      pn = R_CheckTextureNumForName (animdefs[i].endname);
-    }
-    else
-    {
-      bp = R_CheckFlatNumForName (animdefs[i].startname);
-      pn = R_CheckFlatNumForName (animdefs[i].endname);
-    }
-
-    if ((bp != -1) && (pn != -1))
-    {
-      thisanim = malloc (sizeof (anim_t));
-      if (thisanim == NULL)
-	break;
-
-      thisanim->basepic = bp;
-      thisanim->picnum = pn;
-      thisanim->istexture = animdefs[i].istexture;
-      thisanim->numpics = thisanim->picnum - thisanim->basepic + 1;
-
-      if (thisanim->numpics < 2)
-	I_Error ("P_InitPicAnims: bad cycle from %s to %s",
-		  animdefs[i].startname,
-		  animdefs[i].endname);
-
-      thisanim->speed = animdefs[i].speed;
-
       *prevanim = thisanim;
       prevanim = &thisanim -> next;
     }
+    animdef++;
+  } while (--count);
+
+  if (lumphead)				// Have we any extra ones?
+  {
+    do
+    {
+      thisanim = read_anim ((animdef_t*) lumphead);
+      if (thisanim)
+      {
+        *prevanim = thisanim;
+        prevanim = &thisanim -> next;
+      }
+      next = lumphead -> next;
+      free (lumphead);
+      lumphead = next;
+    } while (lumphead);
   }
 
   *prevanim = NULL;
