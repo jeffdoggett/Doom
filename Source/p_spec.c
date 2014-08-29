@@ -52,8 +52,9 @@ typedef enum
 // Animating textures and planes
 // There is another anim_t used in wi_stuff, unrelated.
 //
-typedef struct
+typedef struct anim_s
 {
+  struct anim_s* next;
   boolean	istexture;
   int		picnum;
   int		basepic;
@@ -140,10 +141,7 @@ static animdef_t animdefs[] =
   {(boolean)-1}
 };
 
-#define MAXANIMS (ARRAY_SIZE(animdefs)-1)
-
-static anim_t	anims[MAXANIMS];
-static anim_t*	lastanim;
+static anim_t*	animhead;
 
 /* ---------------------------------------------------------------------------- */
 /*
@@ -232,45 +230,53 @@ static void Read_ANIMATED_Lump (void)
 void P_InitPicAnims (void)
 {
   int	i;
-  int sn;
+  int   bp;
+  int   pn;
+  anim_t** prevanim;
+  anim_t* thisanim;
 
   Read_ANIMATED_Lump ();
 
   //	Init animation
-  lastanim = anims;
+  prevanim = &animhead;
+
   for (i=0 ; animdefs[i].istexture != -1 ; i++)
   {
     if (animdefs[i].istexture)
     {
-      sn = R_CheckTextureNumForName(animdefs[i].startname);
-      // different episode ?
-      if (sn == -1)
-	  continue;
-
-      lastanim->basepic = sn;
-      lastanim->picnum = R_TextureNumForName (animdefs[i].endname);
+      bp = R_CheckTextureNumForName (animdefs[i].startname);
+      pn = R_CheckTextureNumForName (animdefs[i].endname);
     }
     else
     {
-      sn = W_CheckNumForName(animdefs[i].startname);
-      if (sn == -1)
-	  continue;
-
-      lastanim->basepic = R_FlatNumForName (animdefs[i].startname);
-      lastanim->picnum = R_FlatNumForName (animdefs[i].endname);
+      bp = R_CheckFlatNumForName (animdefs[i].startname);
+      pn = R_CheckFlatNumForName (animdefs[i].endname);
     }
 
-    lastanim->istexture = animdefs[i].istexture;
-    lastanim->numpics = lastanim->picnum - lastanim->basepic + 1;
+    if ((bp != -1) && (pn != -1))
+    {
+      thisanim = malloc (sizeof (anim_t));
+      if (thisanim == NULL)
+	break;
 
-    if (lastanim->numpics < 2)
-      I_Error ("P_InitPicAnims: bad cycle from %s to %s",
-		animdefs[i].startname,
-		animdefs[i].endname);
+      thisanim->basepic = bp;
+      thisanim->picnum = pn;
+      thisanim->istexture = animdefs[i].istexture;
+      thisanim->numpics = thisanim->picnum - thisanim->basepic + 1;
 
-    lastanim->speed = animdefs[i].speed;
-    lastanim++;
+      if (thisanim->numpics < 2)
+	I_Error ("P_InitPicAnims: bad cycle from %s to %s",
+		  animdefs[i].startname,
+		  animdefs[i].endname);
+
+      thisanim->speed = animdefs[i].speed;
+
+      *prevanim = thisanim;
+      prevanim = &thisanim -> next;
+    }
   }
+
+  *prevanim = NULL;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2074,7 +2080,8 @@ void P_UpdateSpecials (void)
   }
 
   //	ANIMATE FLATS AND TEXTURES GLOBALLY
-  for (anim = anims ; anim < lastanim ; anim++)
+
+  for (anim = animhead; anim != NULL ; anim = anim->next)
   {
     for (i=anim->basepic ; i<anim->basepic+anim->numpics ; i++)
     {
