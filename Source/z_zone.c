@@ -206,11 +206,16 @@ void Z_FreeTags (uint32_t lowtag, uint32_t hightag)
 
 void Z_ChangeTag (void *ptr, uint32_t tag)
 {
-  memblock_t *block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+  memblock_t *block;
 
   // proff - added sanity check, this can happen when an empty lump is locked
   if (!ptr)
       return;
+
+  block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+  if (block->zoneid != ZONEID)
+    I_Error ("Z_ChangeTag: Attempt to change invalid memory");
+
   // proff - do nothing if tag doesn't differ
   if (tag == block->tag)
       return;
