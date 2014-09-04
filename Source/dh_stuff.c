@@ -1691,7 +1691,7 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
 static unsigned int get_action_function_num (actionf_v aname)
 {
   unsigned int p;
-  
+
   p = 0;
   do
   {
@@ -4031,11 +4031,10 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   } while (*ptr);
 
   if (*ptr == '\"')
-  {
     ptr++;
-    l = dh_inchar (ptr, '"');
-    if (l) ptr[l-1] = 0;
-  }
+
+  l = dh_inchar (ptr, '"');
+  if (l) ptr[l-1] = 0;
 
   newtext = NULL;
 
@@ -4066,7 +4065,12 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
     }
   }
 
-  if (newtext)
+  if (newtext == NULL)
+  {
+    if (M_CheckParm ("-showunknown"))
+      fprintf (stderr,"DeHackEd:Failed to lookup text %s\n", ptr);
+  }
+  else
   {
     if (finale_clusterdefs == 0)
     {
@@ -4535,6 +4539,10 @@ void Parse_Mapinfo (char * ptr, char * top)
       {
 	ptr = set_enter_exit_text (ptr+j+5, 0, intertext, episode, map);
       }
+      else if (i && (ptr[i] == '$'))
+      {
+	ptr = set_enter_exit_text (ptr+i+1, 0, intertext, episode, map);
+      }
       else
       {
 	if (i == 0)
@@ -4579,6 +4587,10 @@ void Parse_Mapinfo (char * ptr, char * top)
       if ((j) && (j < i))
       {
 	ptr = set_enter_exit_text (ptr+j+5, 1, intertext, episode, map);
+      }
+      else if (i && (ptr[i] == '$'))
+      {
+	ptr = set_enter_exit_text (ptr+i+1, 1, intertext, episode, map);
       }
       else
       {
