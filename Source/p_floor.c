@@ -614,10 +614,12 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
   fixed_t	stairsize;
   floormove_t*	floor;
 
-  if (sec -> floordata)
-    return (false);
-
-  if (doit)
+  if (doit == false)
+  {
+    if (sec -> floordata)
+      return (false);
+  }
+  else
   {
     switch ((((int)buildtype) >> StairStepShift) & 3)
     {
@@ -648,12 +650,15 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
     height = sec->floorheight + stairsize;
 
     // new floor thinker
-    floor = get_floor_block (sec);
-    floor->direction = direction;
-    floor->speed = speed;
-    floor->floordestheight = height;
-    if (floor->floordestheight > sec->ceilingheight)
-      floor->floordestheight = sec->ceilingheight;
+    if (sec -> floordata == NULL)
+    {
+      floor = get_floor_block (sec);
+      floor->direction = direction;
+      floor->speed = speed;
+      floor->floordestheight = height;
+      if (floor->floordestheight > sec->ceilingheight)
+	floor->floordestheight = sec->ceilingheight;
+    }
     height += stairsize;
   }
 
@@ -681,12 +686,28 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
        && (tsec->floorpic != texture))
 	continue;
 
-      if (tsec->floordata)
-	return (false);
+      /* All this complexity is to cope with TNT map 30. */
+      /* We need to recreate the buggy behavior of 1.9 */
+      /* while preventing re-triggerable stairs from */
+      /* being actioned again whilst they're still moving. */
 
-      sec = tsec;
-      if (doit)
+      if (doit == false)
       {
+	if (tsec->floordata)
+	  return (false);
+
+	sec = tsec;
+      }
+      else
+      {
+	if (tsec->floordata)
+	{
+	  height += stairsize;
+	  continue;
+	}
+
+	sec = tsec;
+
 	// new floor thinker
 	floor = get_floor_block (sec);
 	floor->direction = direction;
@@ -699,7 +720,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
       ok = 1;
       break;
     }
-  } while(ok);
+  } while (ok);
 
   return (true);
 }
@@ -723,7 +744,8 @@ EV_BuildStairs
   while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors [secnum];
-    if (make_stairs (sec, buildtype, false) == true)	// Can we do it?
+    if (((buildtype & 1) == 0)
+     || (make_stairs (sec, buildtype, false) == true))	// Can we do it?
     {
       (void) make_stairs (sec, buildtype, true);	// Yes.
       rtn = 1;
