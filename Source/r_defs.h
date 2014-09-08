@@ -147,6 +147,7 @@ typedef	struct
     int		ceilinglightsec;
     int		firsttag;
     int		nexttag;
+    int		stairlock;
 } sector_t;
 
 

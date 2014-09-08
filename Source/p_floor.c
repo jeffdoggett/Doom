@@ -608,11 +608,14 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
   int		height;
   int		texture;
   int		direction;
+  int		stairlock;
   line_t*	sline;
   sector_t*	tsec;
   fixed_t	speed;
   fixed_t	stairsize;
   floormove_t*	floor;
+
+  stairlock = sec -> stairlock + 1;	// Magic number
 
   if (doit == false)
   {
@@ -662,7 +665,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
     height += stairsize;
   }
 
-
+  sec -> stairlock = stairlock;
   texture = sec->floorpic;
 
   // Find next sector to raise
@@ -693,6 +696,9 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
 
       if (doit == false)
       {
+	if (tsec -> stairlock == stairlock)
+	  continue;
+
 	if (tsec->floordata)
 	  return (false);
 
@@ -700,8 +706,8 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
       }
       else
       {
-	if (tsec->floordata)
-	{
+	if (tsec -> stairlock == stairlock)	// floordata will be non zero here as
+	{					// well if the stairlock matches.
 	  height += stairsize;
 	  continue;
 	}
@@ -717,6 +723,8 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
 	  floor->floordestheight = sec->ceilingheight;
 	height += stairsize;
       }
+
+      sec -> stairlock = stairlock;
       ok = 1;
       break;
     }
@@ -744,8 +752,7 @@ EV_BuildStairs
   while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors [secnum];
-    if (((buildtype & 1) == 0)
-     || (make_stairs (sec, buildtype, false) == true))	// Can we do it?
+    if (make_stairs (sec, buildtype, false) == true)	// Can we do it?
     {
       (void) make_stairs (sec, buildtype, true);	// Yes.
       rtn = 1;
