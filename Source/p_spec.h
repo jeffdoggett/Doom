@@ -710,7 +710,7 @@ P_ChangeSwitchTexture
   int		useAgain );
 
 void P_InitSwitchList(void);
-
+void P_PatchSwitchList (const char * patchline);
 
 //
 // P_PLATS

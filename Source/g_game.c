@@ -2712,14 +2712,21 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	  case 'p':
 	    if (strncasecmp (a_line, "PATCH ", 6) == 0)
 	    {
-	      map_patch_t * ptr;
-
-	      ptr = malloc (sizeof (map_patch_t) + strlen (a_line));
-	      if (ptr)
+	      if (strncasecmp (a_line+6, "SWITCHES ", 9) == 0)
 	      {
-	        ptr -> next = map_patches_head;
-	        map_patches_head = ptr;
-	        strcpy (ptr -> patch, a_line+6);
+		P_PatchSwitchList (a_line + 15);
+	      }
+	      else
+	      {
+		map_patch_t * ptr;
+
+		ptr = malloc (sizeof (map_patch_t) + strlen (a_line));
+		if (ptr)
+		{
+		  ptr -> next = map_patches_head;
+		  map_patches_head = ptr;
+		  strcpy (ptr -> patch, a_line+6);
+		}
 	      }
 	      break;
 	    }

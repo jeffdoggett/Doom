@@ -88,8 +88,16 @@ void P_InitSwitchList (void)
   } while (++i < numtextures);
 
   *prev_switch = NULL;
-
   Read_SWITCHES_Lump ();
+
+#if 0
+  i = 0;
+  for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
+  {
+    i++;
+    printf ("Switch %u: %u,%u\n", i,this_switch->textures[0],this_switch->textures[1]);
+  }
+#endif
 }
 
 /* ----------------------------------------------------------------------- */
@@ -106,6 +114,8 @@ static switchlist_t * find_duplicate_switch (int lump1, int lump2)
     prev_switch = &this_switch -> next;
 
     if ((this_switch -> textures [0] == lump1)
+     || (this_switch -> textures [0] == lump2)
+     || (this_switch -> textures [1] == lump1)
      || (this_switch -> textures [1] == lump2))
       return (this_switch);
   }
@@ -124,6 +134,28 @@ static switchlist_t * find_duplicate_switch (int lump1, int lump2)
 }
 
 /* ----------------------------------------------------------------------- */
+
+static void add_switch_pair (const char * name_1, const char * name_2)
+{
+  int slump1,slump2;
+  switchlist_t*	this_switch;
+
+  if (((slump1 = R_CheckTextureNumForName (name_1)) != -1)
+   && ((slump2 = R_CheckTextureNumForName (name_2)) != -1))
+  {
+    /* Have we already done this one? */
+    // printf ("Checking switches %s and %s\n", name_1, name_2);
+
+    this_switch = find_duplicate_switch (slump1, slump2);
+    if (this_switch)
+    {
+      this_switch -> textures [0] = slump1;
+      this_switch -> textures [1] = slump2;
+    }
+  }
+}
+
+/* ----------------------------------------------------------------------- */
 /*
    Read the switches lump.
    Each Entry is 20 bytes.
@@ -132,11 +164,10 @@ static switchlist_t * find_duplicate_switch (int lump1, int lump2)
 static void Read_SWITCHES_Lump (void)
 {
   int i;
-  int lump,slump1,slump2;
+  int lump;
   int size;
   int pos;
   char * ptr;
-  switchlist_t*	this_switch;
   char name_1 [10];
   char name_2 [10];
 
@@ -162,26 +193,62 @@ static void Read_SWITCHES_Lump (void)
       pos += 2;				// Not interested in the episode number
 
       if ((name_1 [0]) && (name_2 [0]))
-      {
-	if (((slump1 = R_CheckTextureNumForName (name_1)) != -1)
-	 && ((slump2 = R_CheckTextureNumForName (name_2)) != -1))
-	{
-	  /* Have we already done this one? */
-	  // printf ("Checking switches %s and %s\n", name_1, name_2);
+	add_switch_pair (name_1, name_2);
 
-	  this_switch = find_duplicate_switch (slump1, slump2);
-	  if (this_switch)
-	  {
-	    this_switch -> textures [0] = slump1;
-	    this_switch -> textures [1] = slump2;
-	  }
-	}
-      }
       size -= 20;
     } while (size >= 20);
 
     Z_Free (ptr);
   }
+}
+
+/* ----------------------------------------------------------------------- */
+/*
+   Patch a switch
+   Line looks like:
+   SW1MS1 SW2MS1
+*/
+
+void P_PatchSwitchList (const char * patchline)
+{
+  int i;
+  char cc;
+  char name_1 [10];
+  char name_2 [10];
+
+  i = 0;
+  do
+  {
+    cc = *patchline++;
+    if ((cc <= ' ') || (i > 8)) cc = 0;
+    name_1 [i++] = cc;
+  } while (cc);
+
+  while (((cc = *patchline) != 0) && (cc <= ' '))
+    patchline++;
+
+  i = 0;
+  do
+  {
+    cc = *patchline++;
+    if ((cc <= ' ') || (i > 8)) cc = 0;
+    name_2 [i++] = cc;
+  } while (cc);
+
+  if ((name_1 [0]) && (name_2 [0]))
+    add_switch_pair (name_1, name_2);
+
+#if 0
+  {
+    switchlist_t * this_switch;
+    i = 0;
+    for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
+    {
+      i++;
+      printf ("Switch %u: %u,%u\n", i,this_switch->textures[0],this_switch->textures[1]);
+    }
+  }
+#endif
 }
 
 /* ----------------------------------------------------------------------- */
