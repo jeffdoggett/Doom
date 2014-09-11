@@ -29,67 +29,18 @@ static const char rcsid[] = "$Id: p_switch.c,v 1.3 1997/01/28 22:08:29 b1 Exp $"
 
 #include "includes.h"
 
-static unsigned int Read_SWITCHES_Lump (unsigned int count);
+static void Read_SWITCHES_Lump (void);
 
 /* ----------------------------------------------------------------------- */
-#if 0
-//
-// CHANGE THE TEXTURE OF A WALL SWITCH TO ITS OPPOSITE
-//
-switchlist_t alphSwitchList[] =
+
+typedef struct switchlist_s
 {
-    // Doom shareware episode 1 switches
-    {"SW1BRCOM",	"SW2BRCOM",	1},
-    {"SW1BRN1",	"SW2BRN1",	1},
-    {"SW1BRN2",	"SW2BRN2",	1},
-    {"SW1BRNGN",	"SW2BRNGN",	1},
-    {"SW1BROWN",	"SW2BROWN",	1},
-    {"SW1COMM",	"SW2COMM",	1},
-    {"SW1COMP",	"SW2COMP",	1},
-    {"SW1DIRT",	"SW2DIRT",	1},
-    {"SW1EXIT",	"SW2EXIT",	1},
-    {"SW1GRAY",	"SW2GRAY",	1},
-    {"SW1GRAY1",	"SW2GRAY1",	1},
-    {"SW1METAL",	"SW2METAL",	1},
-    {"SW1PIPE",	"SW2PIPE",	1},
-    {"SW1SLAD",	"SW2SLAD",	1},
-    {"SW1STARG",	"SW2STARG",	1},
-    {"SW1STON1",	"SW2STON1",	1},
-    {"SW1STON2",	"SW2STON2",	1},
-    {"SW1STONE",	"SW2STONE",	1},
-    {"SW1STRTN",	"SW2STRTN",	1},
+  struct switchlist_s * next;
+  int			textures [2];
+} switchlist_t;
 
-    // Doom registered episodes 2&3 switches
-    {"SW1BLUE",	"SW2BLUE",	2},
-    {"SW1CMT",		"SW2CMT",	2},
-    {"SW1GARG",	"SW2GARG",	2},
-    {"SW1GSTON",	"SW2GSTON",	2},
-    {"SW1HOT",		"SW2HOT",	2},
-    {"SW1LION",	"SW2LION",	2},
-    {"SW1SATYR",	"SW2SATYR",	2},
-    {"SW1SKIN",	"SW2SKIN",	2},
-    {"SW1VINE",	"SW2VINE",	2},
-    {"SW1WOOD",	"SW2WOOD",	2},
+static switchlist_t * switchhead;
 
-    // Doom II switches
-    {"SW1PANEL",	"SW2PANEL",	3},
-    {"SW1ROCK",	"SW2ROCK",	3},
-    {"SW1MET2",	"SW2MET2",	3},
-    {"SW1WDMET",	"SW2WDMET",	3},
-    {"SW1BRIK",	"SW2BRIK",	3},
-    {"SW1MOD1",	"SW2MOD1",	3},
-    {"SW1ZIM",		"SW2ZIM",	3},
-    {"SW1STON6",	"SW2STON6",	3},
-    {"SW1TEK",		"SW2TEK",	3},
-    {"SW1MARB",	"SW2MARB",	3},
-    {"SW1SKULL",	"SW2SKULL",	3},
-
-    {"\0",		"\0",		0}
-};
-#endif
-/* ----------------------------------------------------------------------- */
-
-int		switchlist[(MAXSWITCHES*2) + 1];
 extern texture_t** textures;
 extern int	numtextures;
 
@@ -103,19 +54,16 @@ extern int	numtextures;
 void P_InitSwitchList (void)
 {
   int	 	i,j;
-  unsigned int	count;
-  int *		ptr_B;
   texture_t**	ptr_1;
   texture_t*	ptr_2;
-  char sw2name [9];
+  switchlist_t*	this_switch;
+  switchlist_t**prev_switch;
+  char		sw2name [9];
 
   sw2name [8] = 0;
-
+  prev_switch = &switchhead;
   i = 0;
-  count = 0;
-  // numswitches = 0;
   ptr_1 = textures;
-  ptr_B = switchlist;
 
   do
   {
@@ -127,40 +75,68 @@ void P_InitSwitchList (void)
       j = R_CheckTextureNumForName (sw2name);
       if (j != -1)
       {
-	if (count < MAXSWITCHES)
+	this_switch = malloc (sizeof (switchlist_t));
+	if (this_switch)
 	{
-	  *ptr_B++ = i;
-	  *ptr_B++ = j;
-	  // numswitches++;
+	  *prev_switch = this_switch;
+	  prev_switch = &this_switch -> next;
+	  this_switch -> textures [0] = i;
+	  this_switch -> textures [1] = j;
 	}
-	count++;
       }
     }
   } while (++i < numtextures);
 
-  *ptr_B = -1;
+  *prev_switch = NULL;
 
-  count = Read_SWITCHES_Lump (count);
+  Read_SWITCHES_Lump ();
+}
 
-  if ((M_CheckParm ("-showswitchcount"))
-   || (count > MAXSWITCHES))
-    printf ("Found %u switch pairs of %u\n", count, MAXSWITCHES);
+/* ----------------------------------------------------------------------- */
+
+static switchlist_t * find_duplicate_switch (int lump1, int lump2)
+{
+  switchlist_t*	this_switch;
+  switchlist_t**prev_switch;
+
+  prev_switch = &switchhead;
+
+  for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
+  {
+    prev_switch = &this_switch -> next;
+
+    if ((this_switch -> textures [0] == lump1)
+     || (this_switch -> textures [1] == lump2))
+      return (this_switch);
+  }
+
+  /* No duplicate - reserve a new one while */
+  /* we know where the end of the list is. */
+
+  this_switch = malloc (sizeof (switchlist_t));
+  if (this_switch)
+  {
+    *prev_switch = this_switch;
+    this_switch -> next = NULL;
+  }
+
+  return (this_switch);
 }
 
 /* ----------------------------------------------------------------------- */
 /*
    Read the switches lump.
    Each Entry is 20 bytes.
-
 */
 
-static unsigned int Read_SWITCHES_Lump (unsigned int count)
+static void Read_SWITCHES_Lump (void)
 {
-  int i,j;
+  int i;
   int lump,slump1,slump2;
   int size;
   int pos;
   char * ptr;
+  switchlist_t*	this_switch;
   char name_1 [10];
   char name_2 [10];
 
@@ -176,12 +152,12 @@ static unsigned int Read_SWITCHES_Lump (unsigned int count)
       i = 0;
       do
       {
-        name_1 [i++] = ptr [pos++];
+	name_1 [i++] = ptr [pos++];
       } while (i < 9);
       i = 0;
       do
       {
-        name_2 [i++] = ptr [pos++];
+	name_2 [i++] = ptr [pos++];
       } while (i < 9);
       pos += 2;				// Not interested in the episode number
 
@@ -192,30 +168,13 @@ static unsigned int Read_SWITCHES_Lump (unsigned int count)
 	{
 	  /* Have we already done this one? */
 	  // printf ("Checking switches %s and %s\n", name_1, name_2);
-	  i = 0;
-	  do
+
+	  this_switch = find_duplicate_switch (slump1, slump2);
+	  if (this_switch)
 	  {
-	    j = switchlist[i];
-	    if (j == -1)
-	    {
-	      if (count < MAXSWITCHES)
-	      {
-		switchlist [i++] = slump1;
-		switchlist [i++] = slump2;
-		switchlist [i++] = -1;
-		// numswitches++;
-	      }
-	      count++;
-	      break;
-	    }
-	    if ((slump1 == j)
-	     || (slump2 == j))
-	    {
-	      switchlist [i] = slump1;
-	      switchlist [i ^ 1] = slump2;
-	      break;
-	    }
-	  } while (++i);
+	    this_switch -> textures [0] = slump1;
+	    this_switch -> textures [1] = slump2;
+	  }
 	}
       }
       size -= 20;
@@ -223,56 +182,7 @@ static unsigned int Read_SWITCHES_Lump (unsigned int count)
 
     Z_Free (ptr);
   }
-
-  return (count);
 }
-
-/* ----------------------------------------------------------------------- */
-
-#if 0
-void P_InitSwitchList(void)
-{
-    int		i;
-    int		index;
-    int		episode;
-
-    episode = 1;
-
-    if (gamemode == registered)
-	episode = 2;
-    else
-	if ( gamemode == commercial )
-	    episode = 3;
-
-    for (index = 0,i = 0;i < MAXSWITCHES;i++)
-    {
-	if (!alphSwitchList[i].episode)
-	{
-	    numswitches = index/2;
-	    switchlist[index] = -1;
-	    break;
-	}
-
-	if (alphSwitchList[i].episode <= episode)
-	{
-#if 0	// UNUSED - debug?
-	    int		value;
-
-	    if (R_CheckTextureNumForName(alphSwitchList[i].name1) < 0)
-	    {
-		I_Error("Can't find switch texture '%s'!",
-			alphSwitchList[i].name1);
-		continue;
-	    }
-
-	    value = R_TextureNumForName(alphSwitchList[i].name1);
-#endif
-	    switchlist[index++] = R_TextureNumForName(alphSwitchList[i].name1);
-	    switchlist[index++] = R_TextureNumForName(alphSwitchList[i].name2);
-	}
-    }
-}
-#endif
 
 /* ----------------------------------------------------------------------- */
 
@@ -345,6 +255,7 @@ P_ChangeSwitchTexture
   int	  swtex;
   side_t * side;
   mobj_t * soundorg;
+  switchlist_t*	this_switch;
 
   side = &sides[line->sidenum[0]];
   texTop = side -> toptexture;
@@ -363,39 +274,42 @@ P_ChangeSwitchTexture
   if (!useAgain)
     line->special = 0;
 
-  i = 0;
-  do
+
+  for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
   {
-    swtex = switchlist[i];
-    if (swtex == texTop)
+    i = 0;
+    do
     {
-      soundorg = (mobj_t *)&line->soundorg;
-      S_StartSound (soundorg,sound);
-      if (useAgain)
-	P_StartButton (line,top,swtex,BUTTONTIME);
-      side -> toptexture = switchlist[i^1];
-      break;
-    }
-    else if (swtex == texMid)
-    {
-      soundorg = (mobj_t *)&line->soundorg;
-      S_StartSound(soundorg,sound);
-      if (useAgain)
-	P_StartButton (line, middle,swtex,BUTTONTIME);
-      side -> midtexture = switchlist[i^1];
-      break;
-    }
-    else if (swtex == texBot)
-    {
-      soundorg = (mobj_t *)&line->soundorg;
-      S_StartSound (soundorg,sound);
-      if (useAgain)
-	P_StartButton(line, bottom,swtex,BUTTONTIME);
-      side -> bottomtexture = switchlist[i^1];
-      break;
-    }
-    i++;
-  } while (swtex != -1);
+      swtex = this_switch->textures[i];
+      if (swtex == texTop)
+      {
+	soundorg = (mobj_t *)&line->soundorg;
+	S_StartSound (soundorg,sound);
+	if (useAgain)
+	  P_StartButton (line,top,swtex,BUTTONTIME);
+	side -> toptexture = this_switch->textures[i^1];
+	return;
+      }
+      else if (swtex == texMid)
+      {
+	soundorg = (mobj_t *)&line->soundorg;
+	S_StartSound(soundorg,sound);
+	if (useAgain)
+	  P_StartButton (line, middle,swtex,BUTTONTIME);
+	side -> midtexture = this_switch->textures[i^1];
+	return;
+      }
+      else if (swtex == texBot)
+      {
+	soundorg = (mobj_t *)&line->soundorg;
+	S_StartSound (soundorg,sound);
+	if (useAgain)
+	  P_StartButton(line, bottom,swtex,BUTTONTIME);
+	side -> bottomtexture = this_switch->textures[i^1];
+	return;
+      }
+    } while (++i < 2);
+  }
 }
 
 /* ----------------------------------------------------------------------- */

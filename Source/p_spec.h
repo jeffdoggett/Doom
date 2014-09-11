@@ -676,12 +676,6 @@ void    P_SpawnGlowingLight(sector_t* sector);
 //
 // P_SWITCH
 //
-typedef struct
-{
-    char	name1[9];
-    char	name2[9];
-    short	episode;
-} switchlist_t;
 
 
 typedef enum
@@ -705,9 +699,6 @@ typedef struct
 
 extern void P_StartButton (line_t* line, bwhere_e w, int texture, int time);
 extern void T_Button (button_t* button);
-
- // max # of wall switches in a level
-#define MAXSWITCHES		100
 
  // 1 second, in ticks.
 #define BUTTONTIME      35
