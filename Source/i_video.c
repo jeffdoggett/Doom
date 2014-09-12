@@ -707,7 +707,17 @@ void I_SetPalette (byte* palette)
       red <<= 16;
       green <<= 8;
 #endif
-      palette_table [colour] = red | green | blue;
+
+      c = red | green | blue;
+
+#ifdef __BIG_ENDIAN__
+      if (image->byte_order != MSBFirst)
+	c = SwapLONG (c);	// ((c & 0x00FF00) | (c >> 16) | (c << 16)) << 8;
+#else
+      if (image->byte_order != LSBFirst)
+	c = SwapLONG (c);	// ((c & 0x00FF00) | (c >> 16) | (c << 16)) << 8;
+#endif
+      palette_table [colour] = c;
     } while (++colour < 256);
   }
 }
@@ -1042,6 +1052,9 @@ void I_InitGraphics (void)
 
   // check for command-line display name
   pnum = M_CheckParm ("-disp");
+  if (pnum == 0)
+    pnum = M_CheckParm ("-display");
+
   if (pnum)
     displayname = myargv[pnum+1];
   else

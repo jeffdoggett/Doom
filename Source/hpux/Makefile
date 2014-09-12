@@ -9,6 +9,7 @@ CC=  cc  # gcc or g++
 CFLAGS= -Ae -O -I/usr/include/X11R5 -DNORMALUNIX -D__BIG_ENDIAN__ -DMAXSCREENHEIGHT=480 -DMAXSCREENWIDTH=640 -DMORELIGHTLEVELS -DHAVE_ALLOCA
 LDFLAGS=-L/usr/lib/X11R5
 LIBS=-lXext -lX11 -lm
+VPATH=..
 
 HDRS=		am_map.h dh_stuff.h doomdata.h doomdef.h doomstat.h doomtype.h dstrings.h d_englsh.h \
 		d_event.h d_french.h d_items.h d_main.h d_net.h d_player.h d_textur.h d_think.h d_ticcmd.h \

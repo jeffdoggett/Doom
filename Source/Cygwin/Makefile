@@ -10,6 +10,7 @@
 #CC=x86_64-pc-cygwin-gcc
 CC=gcc
 ASM=
+VPATH=..
 
 CFLAGS=-g -DMAXSCREENHEIGHT=480 -DMAXSCREENWIDTH=640 -DMORELIGHTLEVELS -DPADDED_STRUCTS -DNORMALUNIX -DHAVE_ALLOCA -D_64_BIT_PTRS
 #-DUSE_INTS_FOR_SHORTS
@@ -44,11 +45,13 @@ all:		/usr/local/lib/Doom/xdoom
 		#upx $@
 		@echo Finished OK
 
-.SUFFIXES: .o .c
-.c.o:;		$(CC) $(CFLAGS) -c -o $@ $*.c
+#.SUFFIXES: .o .c
+#.c.o:;		$(CC) $(CFLAGS) -c -o $@ $*.c
+%.o:	%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-.SUFFIXES: .o .s
-.s.o:;		$(ASM) $(AFLAGS) -o $@ $*.s
+#.SUFFIXES: .o .s
+#.s.o:;		$(ASM) $(AFLAGS) -o $@ $*.s
 
 
 $(OBJS):	$(HDRS)
