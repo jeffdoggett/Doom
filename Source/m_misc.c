@@ -248,6 +248,7 @@ default_t	defaults[] =
   {"screenblocks",&screenblocks, (char *) 10},
   {"detaillevel",&detailLevel, (char *) 0},
   {"stbar_scale",&stbar_scale, (char *) 1},
+  {"hutext_scale",&hutext_scale, (char *) 1},
   {"weaponscale",&weaponscale, (char *) 1},
 
   {"weaponrecoil",&weaponrecoil, (char *) 0},

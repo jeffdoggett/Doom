@@ -400,7 +400,10 @@ static int	st_randomnumber;
 
 int		weaponscale;
 int		stbar_scale = 1;
+int		hutext_scale = 1;
+
 fixed_t		sbarscale = 1 << FRACBITS;
+fixed_t		hutextscale = 1 << FRACBITS;
 
 unsigned int God_Mode_Health = 100;
 unsigned int IDFA_Armour = 200;
@@ -1590,6 +1593,10 @@ void ST_Init (void)
     sbarscale = 1 << FRACBITS;
     if (stbar_scale > 1)
       sbarscale = (FRACUNIT*SCREENWIDTH)/320;
+
+    hutextscale = 1 << FRACBITS;
+    if (hutext_scale > 1)
+      hutextscale = (FRACUNIT*SCREENWIDTH)/320;
 
     ST_loadData();
 #if 0

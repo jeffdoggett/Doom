@@ -81,7 +81,9 @@ boolean ST_Responder(event_t* ev);
 
 extern int weaponscale;
 extern int stbar_scale;
+extern int hutext_scale;
 extern fixed_t sbarscale;
+extern fixed_t hutextscale;
 
 #endif
 //-----------------------------------------------------------------------------

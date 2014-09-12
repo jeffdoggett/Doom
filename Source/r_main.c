@@ -617,17 +617,14 @@ void R_InitLightTables (void)
 //  because it might be in the middle of a refresh.
 // The change will take effect next refresh.
 //
-boolean		setsizeneeded;
+int		setsizeneeded;
 int		setblocks;
 int		setdetail;
 
 
-void
-R_SetViewSize
-( int		blocks,
-  int		detail )
+void R_SetViewSize (int flag, int blocks, int detail)
 {
-    setsizeneeded = true;
+    setsizeneeded = flag;
     setblocks = blocks;
     setdetail = detail;
 }
@@ -646,13 +643,16 @@ void R_ExecuteSetViewSize (void)
     int		level;
     int		startmap;
 
-    if (setsizeneeded == true)
+    if (setsizeneeded)
     {
       sbarscale = 1 << FRACBITS;
       if (stbar_scale > 1)
         sbarscale = (FRACUNIT*SCREENWIDTH)/320;
 
-      setsizeneeded = false;
+      hutextscale = 1 << FRACBITS;
+      if (hutext_scale > 1)
+        hutextscale = (FRACUNIT*SCREENWIDTH)/320;
+
       ST_createWidgets ();
       HU_createWidgets (1);
       if (automapactive)
@@ -776,6 +776,11 @@ void R_ExecuteSetViewSize (void)
 	    scalelight[i][j] = colormaps + level*256;
 	}
     }
+
+    if (setsizeneeded > 1)
+      players[consoleplayer].message = HU_printf ("Scale: Bar %u, Weapon %u, Text %u", stbar_scale, weaponscale, hutext_scale);
+
+    setsizeneeded = 0;
 }
 
 
@@ -800,7 +805,7 @@ void R_Init (void)
     // viewwidth / viewheight / detailLevel are set by the defaults
     // printf ("\nR_InitTables");
 
-    R_SetViewSize (screenblocks, 0 /* detailLevel */);
+    R_SetViewSize (1, screenblocks, 0 /* detailLevel */);
     R_InitPlanes ();
     // printf ("\nR_InitPlanes");
     R_InitLightTables ();

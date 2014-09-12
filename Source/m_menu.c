@@ -1333,56 +1333,82 @@ static void M_ChangeDetail (int choice)
 {
   unsigned int flags;
 
-    choice = 0;
-    // detailLevel = 1 - detailLevel;
-    // detailLevel = 0;
+  choice = 0;
+  // detailLevel = 1 - detailLevel;
+  // detailLevel = 0;
 
-    flags = 3;				// Work out what is visible.
+  flags = 7;				// Work out what is visible.
 
-    if ((SCREENWIDTH <= 320)
-     || (setblocks == 11))		// If cannot see or scale the status bar
-      flags &= ~1;
+  if (SCREENWIDTH <= 320)
+    flags &= ~5;
 
-    if (automapactive)			// If cannot see the weapon
-      flags &= ~2;
+  if (automapactive)			// If cannot see the weapon
+    flags &= ~2;
+  else if (setblocks == 11)		// If cannot see or scale the status bar
+    flags &= ~1;
 
-    switch (flags)
-    {
-      case 0x03:
-	switch ((weaponscale << 4) | stbar_scale)
-	{
-	  case 0x11:
-	    stbar_scale = 2;
-	    break;
-	  case 0x12:
-	    weaponscale = 2;
-	    break;
-	  case 0x22:
-	    stbar_scale = 1;
-	    break;
-	  default:	// 0x21
-	    weaponscale = 1;
-	    stbar_scale = 1;	// just in case!
-	}
-	break;
+  // Ok, this is a terrible way to do it....
 
-      case 0x02:
-	if (weaponscale == 1)
-	  weaponscale = 2;
-	else
-	  weaponscale = 1;
-	break;
+  switch (flags)
+  {
+    case 0x07:
+      if (stbar_scale > 1) choice |= 1;
+      if (weaponscale > 1) choice |= 2;
+      if (hutext_scale > 1) choice |= 4;
+      choice++;
+      if (choice & 1) stbar_scale = 2; else stbar_scale = 1;
+      if (choice & 2) weaponscale = 2; else weaponscale = 1;
+      if (choice & 4) hutext_scale = 2; else hutext_scale = 1;
+      break;
 
-      case 0x01:
-	if (stbar_scale == 1)
-	  stbar_scale = 2;
-	else
-	  stbar_scale = 1;
-	break;
-    }
+    case 0x06:
+      if (weaponscale > 1) choice |= 1;
+      if (hutext_scale > 1) choice |= 2;
+      choice++;
+      if (choice & 1) weaponscale = 2; else weaponscale = 1;
+      if (choice & 2) hutext_scale = 2; else hutext_scale = 1;
+      break;
 
-    if (flags)
-      R_SetViewSize (screenblocks, 0 /*detailLevel*/);
+    case 0x05:
+      if (stbar_scale > 1) choice |= 1;
+      if (hutext_scale > 1) choice |= 2;
+      choice++;
+      if (choice & 1) stbar_scale = 2; else stbar_scale = 1;
+      if (choice & 2) hutext_scale = 2; else hutext_scale = 1;
+      break;
+
+    case 0x04:
+      if (hutext_scale == 1)
+	hutext_scale = 2;
+      else
+	hutext_scale = 1;
+      break;
+
+    case 0x03:
+      if (stbar_scale > 1) choice |= 1;
+      if (weaponscale > 1) choice |= 2;
+      choice++;
+      if (choice & 1) stbar_scale = 2; else stbar_scale = 1;
+      if (choice & 2) weaponscale = 2; else weaponscale = 1;
+      break;
+
+    case 0x02:
+      if (weaponscale == 1)
+	weaponscale = 2;
+      else
+	weaponscale = 1;
+      break;
+
+    case 0x01:
+      if (stbar_scale == 1)
+	stbar_scale = 2;
+      else
+	stbar_scale = 1;
+      break;
+  }
+
+  if (flags)
+    R_SetViewSize (2, screenblocks, 0 /*detailLevel*/);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1392,7 +1418,7 @@ static void M_ChangeGraphicDetail (int choice)
   choice = 0;
   detailLevel = 1 - detailLevel;
 
-  R_SetViewSize (screenblocks, 0 /*detailLevel*/);
+  R_SetViewSize (1, screenblocks, 0 /*detailLevel*/);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1418,7 +1444,7 @@ void M_SizeDisplay(int choice)
     }
 
 
-    R_SetViewSize (screenblocks, 0 /*detailLevel*/);
+    R_SetViewSize (1, screenblocks, 0 /*detailLevel*/);
 }
 
 /* ----------------------------------------------------------------------- */

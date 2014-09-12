@@ -168,27 +168,27 @@ static void HU_DrawPatchDirect (int x, int y, patch_t * patch)
   int offset;
 
   offset = SHORT(patch->leftoffset);
-  offset = (offset * sbarscale) >> FRACBITS;
+  offset = (offset * hutextscale) >> FRACBITS;
   x -= offset;
 
   if (y)
   {
     if (y < 200)
     {
-      y = (y * sbarscale) >> FRACBITS;
+      y = (y * hutextscale) >> FRACBITS;
     }
     else
     {
-      offset = ((SHORT(patch->height)) * (sbarscale - FRACUNIT)) >> FRACBITS;
+      offset = ((SHORT(patch->height)) * (hutextscale - FRACUNIT)) >> FRACBITS;
       y -= offset;
     }
   }
 
   offset = SHORT(patch->topoffset);
-  offset = (offset * sbarscale) >> FRACBITS;
+  offset = (offset * hutextscale) >> FRACBITS;
   y -= offset;
 
-  V_DrawPatchScaleFlip (x, y, HU_FG, patch, sbarscale, sbarscale, 0);
+  V_DrawPatchScaleFlip (x, y, HU_FG, patch, hutextscale, hutextscale, 0);
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ HUlib_drawTextLine
 	{
 	    w = (SHORT(l->f[c - l->sc]->width)) - HUlib_Kern (c, toupper(l->l[i+1]));
 #ifndef ALWAYS_SMALL_TEXT
-	    w = (w * sbarscale) >> FRACBITS;
+	    w = (w * hutextscale) >> FRACBITS;
 #endif
 	    if (x+w > SCREENWIDTH)
 		break;
