@@ -4102,6 +4102,39 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 
 /* ---------------------------------------------------------------------------- */
 
+static void replace_map_name (const char * ptr, unsigned int episode, unsigned int map)
+{
+  char cc;
+  unsigned int pos;
+  map_dests_t * mdest_ptr;
+  char * newname;
+  char buf1 [12];
+  char buf2 [12];
+
+  pos = 0;
+  do
+  {
+    cc = *ptr++;
+    if (cc <= ' ') cc = 0;
+    buf1 [pos++] = cc;
+  } while (cc);
+
+  G_MapName (buf2, episode, map);
+
+  if (strcasecmp (buf1, buf2))
+  {
+    newname = strdup (buf1);
+    if (newname)
+    {
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      mdest_ptr -> mapname = newname;
+      printf ("Mapname changed to %s\n", newname);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
 void Parse_Mapinfo (char * ptr, char * top)
 {
   char cc;
@@ -4110,6 +4143,7 @@ void Parse_Mapinfo (char * ptr, char * top)
   unsigned int map;
   unsigned int intertext;
   unsigned int doing_episode;
+  char * ptr2;
   char * newtext;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
@@ -4184,7 +4218,9 @@ void Parse_Mapinfo (char * ptr, char * top)
     {
       doing_episode = 0;
       intertext = 0;
-      ptr = read_map_num (&episode, &map, ptr+4);
+      ptr2 = read_map_num (&episode, &map, ptr+4);
+      replace_map_name (ptr+4, episode, map);
+      ptr = ptr2;
       i = dh_inchar (ptr, '"');
       if ((i) && (dh_instr (ptr, "lookup \"HUSTR") == 0))
       {

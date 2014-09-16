@@ -51,6 +51,7 @@ typedef struct
   unsigned char  allow_monster_telefrags;
   unsigned char  par_time_5;			// Par time divided by 5
   unsigned char	 time_sucks;			// Par time for sucks in minutes
+  char *	 mapname;
   char *	 sky;
   char *	 titlepatch;
   char *	 enterpic;
@@ -120,6 +121,7 @@ map_dests_t * G_Access_MapInfoTab (unsigned int episode, unsigned int map);
 map_dests_t * G_Access_MapInfoTab_E (unsigned int episode, unsigned int map);
 map_starts_t * G_Access_MapStartTab (unsigned int episode);
 map_starts_t * G_Access_MapStartTab_E (unsigned int episode);
+void G_MapName (char * name, int episode, int map);
 int G_MapLump (int episode, int map);
 void G_ParseMapSeq (char * filename, FILE * fin, int docheck);
 void G_ReadMapSeq (char * filename);
