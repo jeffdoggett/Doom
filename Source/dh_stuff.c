@@ -3025,7 +3025,6 @@ static unsigned int DH_Parse_language_string (char * a_line)
 
   if (*string1 == '\"')
   {
-    string1++;
     counter1 = strlen (string1);
     do
     {
@@ -3033,6 +3032,7 @@ static unsigned int DH_Parse_language_string (char * a_line)
       string1 [counter1] = 0;
       counter1--;
     } while ((counter1) && (cc != '\"'));
+    string1++;
   }
 
   if (is_all_spaces (string1))
@@ -3041,6 +3041,7 @@ static unsigned int DH_Parse_language_string (char * a_line)
   dest = DH_Find_language_text (first_word, dh_changing_pwad);
   if (dest)
   {
+    // printf ("Replaced (%s) with (%s)\n", first_word,string1);
     replace_text_string (dest, string1);
     return (0);
   }
