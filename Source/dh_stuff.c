@@ -4128,7 +4128,7 @@ static void replace_map_name (const char * ptr, unsigned int episode, unsigned i
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> mapname = newname;
-      printf ("Mapname changed to %s\n", newname);
+      // printf ("Mapname changed to %s\n", newname);
     }
   }
 }
