@@ -3877,7 +3877,7 @@ static void show_map_dests (map_dests_t * map_ptr)
   if (titlepatch == NULL)
     titlepatch = "";
 
-  printf ("%u %2u %u %2u %u %u %u %2u %u %3u '%s' '%s' '%s' '%s' '%s'\n",
+  printf ("%u %2u %u %2u %u %u %u %2u %u %3u '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
 	map_ptr -> normal_exit_to_map,
 	map_ptr -> secret_exit_to_episode,
@@ -3888,6 +3888,7 @@ static void show_map_dests (map_dests_t * map_ptr)
 	map_ptr -> cluster,
 	map_ptr -> allow_monster_telefrags,
 	map_ptr -> par_time_5 * 5,			// Par time divided by 5
+	map_ptr -> mapname,
 	sky, titlepatch,
 	map_ptr -> enterpic,
 	map_ptr -> exitpic,
