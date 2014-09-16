@@ -23,6 +23,7 @@ int access(const char * filename, int mode);
 int mkdir (const char * directory_name, mode_t perms);
 int strcasecmp (const char * s1, const char * s2);
 int strncasecmp (const char * s1, const char * s2, unsigned int max);
+char * strdup (const char * string);
 void usleep (unsigned int time);
 int RiscOs_expand_path (const char * path_name);
 

@@ -184,7 +184,20 @@ int strncasecmp (const char * s1, const char * s2, unsigned int max)
   return (result);
 }
 
-/* --------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------ */
+
+char * strdup (const char * string)
+{
+  char * rc;
+
+  rc = malloc (strlen (string) + 1);
+  if (rc)
+    strcpy (rc, string);
+
+  return (rc);
+}
+
+/* ------------------------------------------------------------------------ */
 
 static void gs_trans (char * dest, const char * source)
 {
