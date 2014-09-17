@@ -119,6 +119,7 @@ extern char * door_messages [];
 extern char * door_messages_orig [];
 
 /* Strings from g_game.c */
+extern const char enterpic_2 [];
 extern char * save_game_messages [];
 extern char * save_game_messages_orig [];
 
@@ -570,28 +571,38 @@ void D_PageTicker (void)
 void D_PageDrawer (const char * page)
 {
   int lump;
+  int attempts;
   patch_t * patch;
 
-  lump = W_CheckNumForName (page);
+  attempts = 3;
 
-  /* FreeDoom daily build has a couple of corrupt patches */
-  /* CREDIT is only 13 bytes and VICTORY2 is only 2538.   */
-
-  if ((lump == -1)
-   || (W_LumpLength (lump) < 4096)
-   || (SHORT((patch = W_CacheLumpNum (lump, PU_CACHE))->width) < 320)
-   || (SHORT(patch->height) < 200))
+  do
   {
-    // printf ("Patch %s is too small\n", page);
-    if (page != finale_backdrops[BG_TITLEPIC])
-      D_PageDrawer (finale_backdrops[BG_TITLEPIC]);
+    lump = W_CheckNumForName (page);
+
+    /* FreeDoom daily build has a couple of corrupt patches */
+    /* CREDIT is only 13 bytes and VICTORY2 is only 2538.   */
+
+    if ((lump != -1)
+     && (W_LumpLength (lump) >= 4096)
+     && (SHORT((patch = W_CacheLumpNum (lump, PU_CACHE))->width) >= 320)
+     && (SHORT(patch->height) >= 200))
+    {
+      V_DrawPatchScaled (0, 0, 0, patch);
+      return;
+    }
+
+    // printf ("Patch %s does not exist or is too small\n", page);
+
+    if (page == finale_backdrops[BG_TITLEPIC])
+      page = enterpic_2;
     else
-      F_DrawBackgroundFlat (NULL);
-  }
-  else
-  {
-    V_DrawPatchScaled (0, 0, 0, patch);
-  }
+      page = finale_backdrops[BG_TITLEPIC];
+
+  } while (--attempts);
+
+  /* Cannot find a usable graphic, give up. */
+  F_DrawBackgroundFlat (NULL);
 }
 
 //-----------------------------------------------------------------------------
