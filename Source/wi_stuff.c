@@ -422,6 +422,7 @@ static void WI_drawLF (void)
 {
     int x;
     int y;
+    unsigned int h;
 
     y = WI_TITLEY;
 
@@ -442,8 +443,8 @@ static void WI_drawLF (void)
     }
     else if (ltext_last)
     {
-      V_drawWILV (y, ltext_last);
-      y += 14;
+      h = V_drawWILV (y, ltext_last);
+      y += (h+1);
     }
 
     // draw "Finished!"

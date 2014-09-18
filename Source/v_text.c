@@ -1995,7 +1995,7 @@ static const unsigned char * red_charset [] =
 
 /* ---------------------------------------------------------------------------- */
 
-static const unsigned char * const wilv_charset [] =
+static const unsigned char * wilv_charset [] =
 {
   wilv_char_21, wilv_char_22, wilv_char_23, wilv_char_24,
   wilv_char_25, wilv_char_26, wilv_char_27, wilv_char_28,
@@ -2263,7 +2263,7 @@ static unsigned int V_drawMenuchar (int x, int y, int i)
 
 /* ---------------------------------------------------------------------------- */
 
-void V_drawMenuText (int x, int y, const char *str)
+unsigned int V_drawMenuText (int x, int y, const char *str)
 {
   unsigned char cc;
   unsigned int j;
@@ -2281,6 +2281,8 @@ void V_drawMenuText (int x, int y, const char *str)
     }
     x += j;
   } while (cc);
+
+  return (red_charset [0][1]);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2332,7 +2334,7 @@ static unsigned int V_drawWILVchar (int x, int y, int i)
 
 /* ---------------------------------------------------------------------------- */
 
-void V_drawWILV (int y, const char *str)
+unsigned int V_drawWILV (int y, const char *str)
 {
   unsigned char cc;
   unsigned int i;
@@ -2366,6 +2368,8 @@ void V_drawWILV (int y, const char *str)
     x += j;
     i++;
   } while (x < 320);
+
+  return (wilv_charset [0][1]);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2413,7 +2417,7 @@ static void save_patch (patch_t * patch, int ascii)
 
 /* -------------------------------------------------------------------------------------------- */
 
-void V_LoadFonts (void)
+static void V_Load_Font (const unsigned char * charset[], const char * lumpname)
 {
   int lump;
   unsigned int first;
@@ -2438,7 +2442,7 @@ void V_LoadFonts (void)
   unsigned char char_widths [256];
   unsigned char colours [256];
 
-  lump = W_CheckNumForName ("DBIGFONT");
+  lump = W_CheckNumForName (lumpname);
   if (lump != -1)
   {
     length = W_LumpLength (lump);
@@ -2536,10 +2540,20 @@ void V_LoadFonts (void)
 	      if ((char_num >= 0x21)
 	       && (char_num <= 0x7F))
 	      {
-		red_charset [char_num-0x21] = red_char;
+		charset [char_num-0x21] = red_char;
+
+		/* If the other case is not present */
+		/* then copy this one across. */
+
 		if ((char_num >= 'A')
-		 && (char_num <= 'Z'))
-		  red_charset [char_num-0x01] = red_char;
+		 && (char_num <= 'Z')
+		 && (char_widths [char_num+0x20] == 0))
+		  charset [char_num-0x01] = red_char;
+
+		if ((char_num >= 'a')
+		 && (char_num <= 'z')
+		 && (char_widths [char_num-0x20] == 0))
+		  charset [char_num-0x41] = red_char;
 	      }
 
 	      *red_char++ = char_widths [char_num];
@@ -2584,6 +2598,14 @@ void V_LoadFonts (void)
       Z_Free (fontlump);
     }
   }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+void V_LoadFonts (void)
+{
+  V_Load_Font (red_charset, "DBIGFONT");
+  V_Load_Font (wilv_charset, "DBIGFONT");
 }
 
 /* -------------------------------------------------------------------------------------------- */
