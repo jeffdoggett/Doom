@@ -119,27 +119,27 @@ static dshort_t* maskedtexturecol;
 //  The code is not perfect across all situations. Some floor wiggle can
 //   still be seen, and some texture strips may be slightly misaligned in
 //   extreme cases. These effects cannot be corrected further, without
-//   increasing the precision of various renderer variables, and, 
+//   increasing the precision of various renderer variables, and,
 //   possibly, creating a noticable performance penalty.
-//   
+//
 
 static int	max_rwscale = 64 * FRACUNIT;
 static int	heightbits = 12;
 static int	heightunit = (1 << 12);
 static int	invhgtbits = 4;
- 
+
 typedef struct
 {
   int clamp;
   int heightbits;
 } scale_values_t;
-	
+
 static const scale_values_t scale_values [] =
 {
   {2048 * FRACUNIT, 12}, {1024 * FRACUNIT, 12},
   {1024 * FRACUNIT, 11}, { 512 * FRACUNIT, 11},
   { 512 * FRACUNIT, 10}, { 256 * FRACUNIT, 10},
-  { 256 * FRACUNIT,  9}, { 128 * FRACUNIT,  9}	
+  { 256 * FRACUNIT,  9}, { 128 * FRACUNIT,  9}
 };
 
 static void R_FixWiggle (sector_t *sector)
@@ -342,7 +342,7 @@ R_RenderMaskedSegRange
 		  t > (int64_t) SCREENHEIGHT << FRACBITS*2)
 		continue;        // skip if the texture is out of screen's range
 
-	      sprtopscreen = (long)(t >> FRACBITS);
+	      sprtopscreen = (fixed_t)(t >> FRACBITS);
 	    }
 
 	    dc_iscale = 0xffffffffu / (unsigned)spryscale;
