@@ -326,22 +326,11 @@ void P_LoadSectors (int lump)
 	ss->lightlevel = SHORT(ms->lightlevel);
 	ss->special = SHORT(ms->special);
 	ss->tag = SHORT(ms->tag);
-	ss->thinglist = NULL;
-#ifdef USE_BOOM_P_ChangeSector
-	ss->touching_thinglist = NULL;  // phares 3/14/98
-#endif
 //	ss->nextsec = -1;
 //	ss->prevsec = -1;
-	ss->floor_xoffs = 0;
-	ss->floor_yoffs = 0;
-	ss->ceiling_xoffs = 0;
-	ss->ceiling_yoffs = 0;
 	ss->heightsec = -1;
 	ss->floorlightsec = -1;
 	ss->ceilinglightsec = -1;
-//	ss->bottommap = 0;
-//	ss->midmap = 0;
-//	ss->topmap = 0;
 #ifdef PADDED_STRUCTS
 	ms = (mapsector_t *) ((byte *) ms + 26);
 #else
