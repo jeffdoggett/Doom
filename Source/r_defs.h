@@ -148,6 +148,8 @@ typedef	struct
     int		firsttag;
     int		nexttag;
     int		stairlock;
+    int		cachedheight;	// [kb] for R_FixWiggle()
+    int		scaleindex;	// [kb] for R_FixWiggle()
 } sector_t;
 
 
