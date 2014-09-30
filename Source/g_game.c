@@ -1395,20 +1395,28 @@ void G_DeathMatchSpawnPlayer (int playernum)
 {
   int i,j;
   int selections;
+  dmstart_t* dmthis;
 
-  selections = deathmatch_p - deathmatchstarts;
-  if (selections < 4)
-      I_Error ("Only %i deathmatch spots, 4 required", selections);
+  selections = 0;
+  for (dmthis = deathmatchstartlist ; dmthis != NULL ; dmthis = dmthis->next)
+    selections++;
 
-  for (j=0 ; j<20 ; j++)
+  for (j=0 ; j<(selections*2) ; j++)
   {
-      i = P_Random() % selections;
-      if (G_CheckSpot (playernum, &deathmatchstarts[i]) )
-      {
-	  deathmatchstarts[i].type = playernum+1;
-	  P_SpawnPlayer (&deathmatchstarts[i]);
-	  return;
-      }
+    i = (selections - 1) - (P_Random() % selections);	// Reverse the linked list here..
+    dmthis = deathmatchstartlist;
+    while (i)
+    {
+      dmthis = dmthis->next;
+      i--;
+    }
+
+    if (G_CheckSpot (playernum, &dmthis->dmstart))
+    {
+      dmthis->dmstart.type = playernum+1;
+      P_SpawnPlayer (&dmthis->dmstart);
+      return;
+    }
   }
 
   // no good spot, so the player will probably get stuck

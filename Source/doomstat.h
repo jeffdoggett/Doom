@@ -226,6 +226,12 @@ extern  gamestate_t     gamestate;
 //  WAD, partly set at startup time.
 
 
+typedef struct dmstart_s
+{
+  mapthing_t	dmstart;
+  struct dmstart_s * next;
+} dmstart_t;
+
 
 extern	int		gametic;
 
@@ -238,9 +244,7 @@ extern  boolean		playeringame[MAXPLAYERS];
 
 
 // Player spawn spots for deathmatch.
-#define MAX_DM_STARTS   10
-extern  mapthing_t      deathmatchstarts[MAX_DM_STARTS];
-extern  mapthing_t*	deathmatch_p;
+extern  dmstart_t*	deathmatchstartlist;
 
 // Player spawn spots.
 extern  mapthing_t      playerstarts[MAXPLAYERS];

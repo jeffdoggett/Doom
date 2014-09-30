@@ -102,10 +102,7 @@ unsigned int	rejectmatrixsize;
 
 
 // Maintain single and multi player starting spots.
-#define MAX_DEATHMATCH_STARTS	10
-
-mapthing_t	deathmatchstarts[MAX_DEATHMATCH_STARTS];
-mapthing_t*	deathmatch_p;
+dmstart_t*	deathmatchstartlist;
 mapthing_t	playerstarts[MAXPLAYERS];
 
 
@@ -1065,7 +1062,7 @@ P_SetupLevel
 
 
     bodyqueslot = 0;
-    deathmatch_p = deathmatchstarts;
+    deathmatchstartlist = NULL;
     nomonsterbits = P_LoadThings (lumpnum+ML_THINGS);
 
     // if deathmatch, randomly spawn the active players

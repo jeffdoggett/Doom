@@ -20,8 +20,8 @@
 
 #include "doomtype.h"
 #include "doomdef.h"
-#include "doomstat.h"
 #include "doomdata.h"
+#include "doomstat.h"
 
 #include "d_event.h"
 

@@ -860,6 +860,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     int			bit;
     mobj_t*		mobj;
     mobjinfo_t*		ptr;
+    dmstart_t*		dmstart;
     fixed_t		x;
     fixed_t		y;
     fixed_t		z;
@@ -868,11 +869,12 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     // count deathmatch start positions
     if (mthing->type == 11)
     {
-	if (deathmatch_p < &deathmatchstarts[10])
-	{
-	    memcpy (deathmatch_p, mthing, sizeof(*mthing));
-	    deathmatch_p++;
-	}
+	dmstart = Z_Malloc (sizeof(dmstart_t),PU_LEVEL,0);
+	memcpy (&dmstart->dmstart, mthing, sizeof(*mthing));
+
+	/* Add to the top of the linked list, will need reversing later... */
+	dmstart -> next = deathmatchstartlist;
+	deathmatchstartlist = dmstart;
 	return (0);
     }
 
