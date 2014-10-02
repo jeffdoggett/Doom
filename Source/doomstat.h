@@ -229,6 +229,7 @@ extern  gamestate_t     gamestate;
 typedef struct dmstart_s
 {
   mapthing_t	dmstart;
+  int		tried;
   struct dmstart_s * next;
 } dmstart_t;
 

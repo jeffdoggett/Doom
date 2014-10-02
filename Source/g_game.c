@@ -1399,9 +1399,13 @@ void G_DeathMatchSpawnPlayer (int playernum)
 
   selections = 0;
   for (dmthis = deathmatchstartlist ; dmthis != NULL ; dmthis = dmthis->next)
+  {
+    dmthis -> tried = 0;
     selections++;
+  }
 
-  for (j=0 ; j<(selections*2) ; j++)
+  j = 0;
+  while (j<selections)
   {
     i = (selections - 1) - (P_Random() % selections);	// Reverse the linked list here..
     dmthis = deathmatchstartlist;
@@ -1411,11 +1415,17 @@ void G_DeathMatchSpawnPlayer (int playernum)
       i--;
     }
 
-    if (G_CheckSpot (playernum, &dmthis->dmstart))
+    if (dmthis -> tried == 0)			// Have we tried this spot yet?
     {
-      dmthis->dmstart.type = playernum+1;
-      P_SpawnPlayer (&dmthis->dmstart);
-      return;
+      dmthis -> tried = 1;			// No.
+      j++;
+
+      if (G_CheckSpot (playernum, &dmthis->dmstart))
+      {
+	dmthis->dmstart.type = playernum+1;
+	P_SpawnPlayer (&dmthis->dmstart);
+	return;
+      }
     }
   }
 
