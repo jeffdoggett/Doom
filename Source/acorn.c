@@ -415,26 +415,33 @@ DIR * opendir (const char * dirname)
 
 struct dirent *readdir (DIR * dir)
 {
-  _kernel_osgbpb_block osgbpb_block;
+//int rc;
+  int next;
   struct dirent * dire;
-  int rc;
+  _kernel_osgbpb_block osgbpb_block;
 
-  dire = (struct dirent *) dir -> dd_buf;
-
-  osgbpb_block.dataptr  = dire -> d_name;
-  osgbpb_block.nbytes   = 1;
-  osgbpb_block.fileptr  = (int) dir -> dd_seek;
-  osgbpb_block.buf_len  = MAXNAMLEN;
-  osgbpb_block.wild_fld = "*";
-
-  rc = _kernel_osgbpb (9, dir -> dd_fd, &osgbpb_block);
-
-  if (osgbpb_block.nbytes)
+  if (dir -> dd_seek != -1)			// From the previous call?
   {
-    dir -> dd_seek = osgbpb_block.fileptr;
-    return (dire);
-  }
+    do
+    {
+      dire = (struct dirent *) dir -> dd_buf;
 
+//    dir -> dd_fd					// R1 Pointer to directory name
+      osgbpb_block.dataptr  = dire -> d_name;		// R2 Pointer to buffer
+      osgbpb_block.nbytes   = 1;			// R3 Number of objects to read
+      osgbpb_block.fileptr  = (int) dir -> dd_seek;	// R4 Where to start, 0 for first
+      osgbpb_block.buf_len  = sizeof (dire -> d_name);	// R5 Length of buffer
+      osgbpb_block.wild_fld = 0;			// R6 Wildcarded name to match (0 = "*")
+
+      /* rc = */ _kernel_osgbpb (9, dir -> dd_fd, &osgbpb_block);
+
+      dir -> dd_seek = (size_t) (next = osgbpb_block.fileptr);
+      if (osgbpb_block.nbytes)
+	return (dire);
+
+      /* Finished when R4 = -1 */
+    } while (next != -1);
+  }  
   return (0);
 }
 
