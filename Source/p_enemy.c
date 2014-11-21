@@ -1775,8 +1775,7 @@ static void A_Scan_death_tables (unsigned int monsterbits)
   bd_ptr = boss_death_table;
   do
   {
-    if ((bd_ptr -> tag != 0)
-     && (bd_ptr -> monsterbits & monsterbits)
+    if ((bd_ptr -> monsterbits & monsterbits)
      && ((bd_ptr -> episode == 0) || (bd_ptr -> episode == epi))
      && ((bd_ptr -> map == 0) || (bd_ptr -> map == gamemap)))
     {
@@ -1791,8 +1790,7 @@ static void A_Scan_death_tables (unsigned int monsterbits)
   if (bd_ptr)
   do
   {
-    if ((bd_ptr -> tag != 0)
-     && (bd_ptr -> monsterbits & monsterbits)
+    if ((bd_ptr -> monsterbits & monsterbits)
      && ((bd_ptr -> episode == 0) || (bd_ptr -> episode == epi))
      && ((bd_ptr -> map == 0) || (bd_ptr -> map == gamemap)))
     {
