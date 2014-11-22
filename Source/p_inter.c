@@ -47,7 +47,7 @@ char * got_messages_orig [] =
   GOTREDSKULL, GOTINVUL, GOTBERSERK, GOTINVIS,
   GOTSUIT, GOTMAP, GOTVISOR, GOTMSPHERE,
   GOTCLIP, GOTCLIPBOX, GOTROCKET, GOTROCKBOX,
-  GOTCELL, GOTCELLBOX, GOTSHELLS, GOTSHELLBOX,
+  GOTCELL, GOTCELLBOX, GOTSHELLS, GOTNSHELLS, GOTSHELLBOX,
   GOTBACKPACK, GOTBFG9000, GOTCHAINGUN, GOTCHAINSAW,
   GOTLAUNCHER, GOTPLASMA, GOTSHOTGUN, GOTSHOTGUN2,
   NULL
@@ -63,7 +63,7 @@ typedef enum
   P_GOTREDSKULL, P_GOTINVUL, P_GOTBERSERK, P_GOTINVIS,
   P_GOTSUIT, P_GOTMAP, P_GOTVISOR, P_GOTMSPHERE,
   P_GOTCLIP, P_GOTCLIPBOX, P_GOTROCKET, P_GOTROCKBOX,
-  P_GOTCELL, P_GOTCELLBOX, P_GOTSHELLS, P_GOTSHELLBOX,
+  P_GOTCELL, P_GOTCELLBOX, P_GOTSHELLS, P_GOTNSHELLS, P_GOTSHELLBOX,
   P_GOTBACKPACK, P_GOTBFG9000, P_GOTCHAINGUN, P_GOTCHAINSAW,
   P_GOTLAUNCHER, P_GOTPLASMA, P_GOTSHOTGUN, P_GOTSHOTGUN2
 } got_kit_texts_t;
@@ -126,51 +126,53 @@ boolean Give_Max_Damage = false;
 // P_GiveAmmo
 // Num is the number of clip loads,
 // not the individual count (0= 1/2 clip).
-// Returns false if the ammo can't be picked up at all
+// Returns qty of ammo given.
 //
 
-static boolean
+static unsigned int
 P_GiveAmmo
 ( player_t*	player,
   ammotype_t	ammo,
   int		num )
 {
   int		oldammo;
+  int		maxammo;
 
   if (ammo == am_noammo)
-      return false;
+      return (0);
 
   if (ammo < 0 || ammo > NUMAMMO)
       I_Error ("P_GiveAmmo: bad type %i", ammo);
-
-  if ( player->ammo[ammo] == player->maxammo[ammo]  )
-      return false;
 
   if (num)
       num *= clipammo[ammo];
   else
       num = (clipammo[ammo]+1)/2;
 
-  if (gameskill == sk_baby
-      || gameskill == sk_nightmare)
+  if ((gameskill == sk_baby)
+      || (gameskill == sk_nightmare))
   {
       // give double ammo in trainer mode,
       // you'll need in nightmare
       num <<= 1;
   }
 
-
   oldammo = player->ammo[ammo];
-  player->ammo[ammo] += num;
+  maxammo = player->maxammo[ammo];
 
-  if (player->ammo[ammo] > player->maxammo[ammo])
-      player->ammo[ammo] = player->maxammo[ammo];
+  if ((oldammo + num) > maxammo)
+    num = maxammo - oldammo;
+
+  if (num < 1)		// Defensive coding here in case the
+    return (0);		// maths above produced a negative number!
+
+  player->ammo[ammo] = oldammo + num;
 
   // If non zero ammo,
   // don't change up weapons,
   // player was lower on purpose.
   if (oldammo)
-      return true;
+      return (num);
 
   // We were down to zero,
   // so select a new weapon.
@@ -215,7 +217,7 @@ P_GiveAmmo
       break;
   }
 
-  return true;
+  return (num);
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +231,7 @@ P_GiveWeapon
   weapontype_t	weapon,
   boolean	dropped )
 {
-  boolean	gaveammo;
+  unsigned int	qtyammogiven;
   boolean	gaveweapon;
 
   if (netgame
@@ -261,12 +263,12 @@ P_GiveWeapon
       // give one clip with a dropped weapon,
       // two clips with a found weapon
       if (dropped)
-	  gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
+	  qtyammogiven = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
       else
-	  gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
+	  qtyammogiven = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
   }
   else
-      gaveammo = false;
+      qtyammogiven = 0;
 
   if (player->weaponowned[weapon])
       gaveweapon = false;
@@ -278,7 +280,7 @@ P_GiveWeapon
 	player->pendingweapon = weapon;
   }
 
-  return (boolean)(gaveweapon || gaveammo);
+  return (boolean)(gaveweapon || qtyammogiven);
 }
 
 //-----------------------------------------------------------------------------
@@ -443,7 +445,8 @@ P_TouchSpecialThing
   int		i;
   fixed_t	delta;
   int		sound;
-  boolean	pickedup;
+  unsigned int	qtyammogiven;
+  char *	msg;
 
   delta = special->z - toucher->z;
 
@@ -692,9 +695,17 @@ P_TouchSpecialThing
       break;
 
     case SPR_SHEL:
-      if (!P_GiveAmmo (player, am_shell,1))
+      if ((qtyammogiven = P_GiveAmmo (player, am_shell,1)) == 0)
 	  return;
-      player->message = got_messages [P_GOTSHELLS];
+
+      /* If we haven't changed the P_GOTSHELLS message then we */
+      /* can use the new one with the correct quantity in. */
+
+      msg = got_messages [P_GOTSHELLS];
+      if (msg == got_messages_orig [P_GOTSHELLS])
+        player->message = HU_printf (got_messages [P_GOTNSHELLS], qtyammogiven);
+      else
+	player->message = msg;
       break;
 
     case SPR_SBOX:
@@ -710,10 +721,10 @@ P_TouchSpecialThing
 	      player->maxammo[i] *= 2;
 	  player->backpack = true;
       }
-      pickedup = false;
+      qtyammogiven = 0;
       for (i=0 ; i<NUMAMMO ; i++)
-	  pickedup = (boolean) (pickedup | P_GiveAmmo (player, (ammotype_t) i, 1));
-      if (pickedup == false)
+	  qtyammogiven += P_GiveAmmo (player, (ammotype_t) i, 1);
+      if (qtyammogiven == 0)
 	return;
       player->message = got_messages [P_GOTBACKPACK];
       break;
