@@ -2882,31 +2882,31 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 	return (&finale_messages[counter1-'0'+e0text]);
 
       case 'C':
-        if ((counter1 >= '1')
-         && (counter1 <= '6'))
-        {
+	if ((counter1 >= '1')
+	 && (counter1 <= '6'))
+	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+c1text]);
-        }
-        break;
+	}
+	break;
 
       case 'P':
-        if ((counter1 >= '1')
-         && (counter1 <= '6'))
-        {
+	if ((counter1 >= '1')
+	 && (counter1 <= '6'))
+	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+p1text]);
-        }
-        break;
+	}
+	break;
 
       case 'T':
-        if ((counter1 >= '1')
-         && (counter1 <= '6'))
-        {
+	if ((counter1 >= '1')
+	 && (counter1 <= '6'))
+	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+t1text]);
-        }
-        break;
+	}
+	break;
     }
   }
 
@@ -3053,7 +3053,7 @@ static unsigned int DH_Parse_language_string (char * a_line)
 
 void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int filetop_pos)
 {
-  char		a_line [1024];
+  char		a_line [2048];
   dhjobs_t	current_job;
   unsigned int	job_params[2];
   unsigned int	params[2];
@@ -3071,7 +3071,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
     current_job = JOB_NULL;
     do
     {
-      dh_fgets_x (a_line, 1020, fin, filetop_pos);
+      dh_fgets_x (a_line, sizeof (a_line) - 4, fin, filetop_pos);
       dh_line_number++;
       if (a_line [0] == '#')
 	continue;
@@ -3450,6 +3450,29 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    break;
 
 	  case JOB_STRINGS:
+	    /* Freedoom has a trailing backslash at the end of the line */
+	    /* to signify that the next line continues. */
+	    do
+	    {
+	      counter1 = strlen (a_line);
+	      if ((counter1 == 0)
+	       || (a_line [counter1 - 1] != '\\'))
+		break;
+
+	      dh_fgets_x (a_line+(counter1-1), (sizeof (a_line) - 4)-counter1, fin, filetop_pos);
+	      dh_line_number++;
+	      if ((a_line [counter1-1] == ' ')
+	       || (a_line [counter1-1] == '\t'))
+	      {
+		counter2 = counter1 - 1;
+		do
+		{
+		  counter2++;
+		} while ((a_line [counter2] == ' ')
+		      || (a_line [counter2] == '\t'));
+		strcpy (a_line + (counter1-1), a_line + counter2);
+	      }
+	    } while (1);
 	    counter1 = DH_Parse_language_string (a_line);
 	    break;
 	}
