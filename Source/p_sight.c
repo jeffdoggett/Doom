@@ -30,13 +30,20 @@ static const char rcsid[] = "$Id: p_sight.c,v 1.3 1997/01/28 22:08:28 b1 Exp $";
 //
 // P_CheckSight
 //
-fixed_t		sightzstart;		// eye z of looker
-fixed_t		topslope;
-fixed_t		bottomslope;		// slopes to top and bottom of target
+// killough 4/19/98:
+// Convert LOS info to struct for reentrancy and efficiency of data locality
 
-divline_t	strace;			// from t1 to t2
-fixed_t		t2x;
-fixed_t		t2y;
+typedef struct
+{
+  fixed_t sightzstart, t2x, t2y;   // eye z of looker
+  divline_t strace;                // from t1 to t2
+  fixed_t topslope, bottomslope;   // slopes to top and bottom of target
+//fixed_t bbox[4];
+//fixed_t maxz,minz;               // cph - z optimisations for 2sided lines
+} los_t;
+
+static los_t los; // cph - made static
+
 
 int		sightcounts[2];
 
@@ -169,8 +176,8 @@ boolean P_CrossSubsector (int num)
 
 	v1 = line->v1;
 	v2 = line->v2;
-	s1 = P_DivlineSide (v1->x,v1->y, &strace);
-	s2 = P_DivlineSide (v2->x, v2->y, &strace);
+	s1 = P_DivlineSide (v1->x,v1->y, &los.strace);
+	s2 = P_DivlineSide (v2->x, v2->y, &los.strace);
 
 	// line isn't crossed?
 	if (s1 == s2)
@@ -180,8 +187,8 @@ boolean P_CrossSubsector (int num)
 	divl.y = v1->y;
 	divl.dx = v2->x - v1->x;
 	divl.dy = v2->y - v1->y;
-	s1 = P_DivlineSide (strace.x, strace.y, &divl);
-	s2 = P_DivlineSide (t2x, t2y, &divl);
+	s1 = P_DivlineSide (los.strace.x, los.strace.y, &divl);
+	s2 = P_DivlineSide (los.t2x, los.t2y, &divl);
 
 	// line isn't crossed?
 	if (s1 == s2)
@@ -218,23 +225,23 @@ boolean P_CrossSubsector (int num)
 	if (openbottom >= opentop)
 	    return false;		// stop
 
-	frac = P_InterceptVector2 (&strace, &divl);
+	frac = P_InterceptVector2 (&los.strace, &divl);
 
 	if (front->floorheight != back->floorheight)
 	{
-	    slope = FixedDiv (openbottom - sightzstart , frac);
-	    if (slope > bottomslope)
-		bottomslope = slope;
+	    slope = FixedDiv (openbottom - los.sightzstart , frac);
+	    if (slope > los.bottomslope)
+		los.bottomslope = slope;
 	}
 
 	if (front->ceilingheight != back->ceilingheight)
 	{
-	    slope = FixedDiv (opentop - sightzstart , frac);
-	    if (slope < topslope)
-		topslope = slope;
+	    slope = FixedDiv (opentop - los.sightzstart , frac);
+	    if (slope < los.topslope)
+		los.topslope = slope;
 	}
 
-	if (topslope <= bottomslope)
+	if (los.topslope <= los.bottomslope)
 	    return false;		// stop
     }
     // passed the subsector ok
@@ -248,7 +255,8 @@ boolean P_CrossSubsector (int num)
 // Returns true
 //  if strace crosses the given node successfully.
 //
-boolean P_CrossBSPNode (int bspnum)
+#if 0
+static boolean P_CrossBSPNode (int bspnum)
 {
     node_t*	bsp;
     int		side;
@@ -264,7 +272,7 @@ boolean P_CrossBSPNode (int bspnum)
     bsp = &nodes[bspnum];
 
     // decide which side the start point is on
-    side = P_DivlineSide (strace.x, strace.y, (divline_t *)bsp);
+    side = P_DivlineSide (los.strace.x, los.strace.y, (divline_t *)bsp);
     if (side == 2)
 	side = 0;	// an "on" should cross both sides
 
@@ -273,7 +281,7 @@ boolean P_CrossBSPNode (int bspnum)
 	return false;
 
     // the partition plane is crossed here
-    if (side == P_DivlineSide (t2x, t2y,(divline_t *)bsp))
+    if (side == P_DivlineSide (los.t2x, los.t2y,(divline_t *)bsp))
     {
 	// the line doesn't touch the other side
 	return true;
@@ -283,6 +291,31 @@ boolean P_CrossBSPNode (int bspnum)
     return P_CrossBSPNode (bsp->children[side^1]);
 }
 
+#else
+// killough 4/20/98: rewritten to remove tail recursion, clean up, and optimize
+// cph - Made to use R_PointOnSide instead of P_DivlineSide, since the latter
+//  could return 2 which was ambigous, and the former is
+//  better optimised; also removes two casts :-)
+
+static boolean P_CrossBSPNode (int bspnum)
+{
+  while (!(bspnum & NF_SUBSECTOR))
+  {
+    node_t *bsp = nodes + bspnum;
+    int side,side2;
+    side = R_PointOnSide(los.strace.x, los.strace.y, bsp);
+    side2 = R_PointOnSide(los.t2x, los.t2y, bsp);
+    if (side == side2)
+      bspnum = bsp->children[side];		// doesn't touch the other side
+    else					// the partition plane is crossed here
+      if (!P_CrossBSPNode(bsp->children[side]))
+        return (false);				// cross the starting side
+      else
+        bspnum = bsp->children[side^1];		// cross the ending side
+  }
+  return (P_CrossSubsector(bspnum == -1 ? 0 : bspnum & ~NF_SUBSECTOR));
+}
+#endif
 
 //
 // P_CheckSight
@@ -335,16 +368,16 @@ P_CheckSight
 
     validcount++;
 
-    sightzstart = t1->z + t1->height - (t1->height>>2);
-    topslope = (t2->z+t2->height) - sightzstart;
-    bottomslope = (t2->z) - sightzstart;
+    los.sightzstart = t1->z + t1->height - (t1->height>>2);
+    los.topslope = (t2->z+t2->height) - los.sightzstart;
+    los.bottomslope = (t2->z) - los.sightzstart;
 
-    strace.x = t1->x;
-    strace.y = t1->y;
-    t2x = t2->x;
-    t2y = t2->y;
-    strace.dx = t2->x - t1->x;
-    strace.dy = t2->y - t1->y;
+    los.strace.x = t1->x;
+    los.strace.y = t1->y;
+    los.t2x = t2->x;
+    los.t2y = t2->y;
+    los.strace.dx = t2->x - t1->x;
+    los.strace.dy = t2->y - t1->y;
 
     // the head node is the last node output
     return P_CrossBSPNode (numnodes-1);
