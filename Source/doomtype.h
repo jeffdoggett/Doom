@@ -55,9 +55,8 @@ typedef unsigned char byte;
 #define MINLONG		((long)0x80000000)
 #endif
 
-/* Type to use where the original version used short. Decide on one set */
-/* Doesn't work on HPUX - so for now limit to RiscOS only. */
-#ifdef USE_INTS_FOR_SHORTS
+/* Type to use where the original version used short. */
+#ifndef USE_SHORTS_ONLY
 
 typedef int dshort_t;
 typedef unsigned int dushort_t;
