@@ -1479,16 +1479,16 @@ static boolean door_closed (line_t* line)
   floorheight = sector->floorheight;
   ceilingheight = sector->ceilingheight;
 
-  if ((floorheight <= ceilingheight)
-   && ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
+  if ((floorheight >= ceilingheight)
+   || ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
     return (true);
 
   sector = line->frontsector;
   floorheight = sector->floorheight;
   ceilingheight = sector->ceilingheight;
 
-  if ((floorheight <= ceilingheight)
-   && ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
+  if ((floorheight >= ceilingheight)
+   || ((ceilingheight - floorheight) < mobjinfo [MT_PLAYER].height))
     return (true);
 
   return (false);
