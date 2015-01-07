@@ -843,10 +843,7 @@ static char * HU_GetMapName (char * buf)
   int i;
   char * s;
 
-  if (gamemode == commercial)
-    sprintf (buf, "MAP%02d", gamemap);
-  else
-    sprintf (buf, "E%dM%d", gameepisode, gamemap);
+  G_MapName (buf, gameepisode, gamemap);
 
   /* If we are playing a map in a PWAD and the */
   /* mapname hasn't been changed then don't show */

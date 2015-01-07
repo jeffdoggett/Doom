@@ -4900,6 +4900,7 @@ void Load_Mapinfo (void)
   unsigned int length;
   char * ptr;
   char * top;
+  map_dests_t * mptr;
   char mapname [12];
 
   // DTWID-LE requires both MAPINFO & ZMAPINFO, whereas D2TWID requires only one....
@@ -4921,7 +4922,8 @@ void Load_Mapinfo (void)
   map = 0;
   do
   {
-    sprintf (mapname, "MAP%02u", map);
+    mptr = G_Access_MapInfoTab_E (255, map);
+    sprintf (mapname, mptr -> mapname, map);
     lump = W_CheckNumForName (mapname);
     if (lump != -1)
     {
@@ -4943,7 +4945,8 @@ void Load_Mapinfo (void)
     map = 0;
     do
     {
-      sprintf (mapname, "E%uM%u", episode, map);
+      mptr = G_Access_MapInfoTab_E (episode, map);
+      sprintf (mapname, mptr -> mapname, episode, map);
       lump = W_CheckNumForName (mapname);
       if (lump != -1)
       {
