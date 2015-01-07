@@ -86,6 +86,7 @@ static const unsigned char colour_init_tab [] =
   183,183,183,		// plyr_1
   191,123,75,		// plyr_2
   255,0,0,		// plyr_3
+  0,0,11,		// plyr_invis
   243,115,23,		// monster
   0,0,255,		// ammo
   79,0,0,		// body
@@ -124,6 +125,7 @@ typedef struct
   unsigned char hair;
   unsigned char sngl;
   unsigned char plyr[4];
+  unsigned char plyr_invis;
   unsigned char monster;
   unsigned char ammo;
   unsigned char body;
@@ -139,12 +141,12 @@ typedef struct
 
 static mapcolour_t mapcolour;
 
-
+// #define BUILD_COLOUR_DEFS
 #ifdef BUILD_COLOUR_DEFS
 
 typedef struct
 {
-  char name [10];
+  char name [11];
   unsigned char palette_num;
 } default_doom_colours_t;
 
@@ -175,6 +177,7 @@ static const default_doom_colours_t default_doom_colours [] =
   {"plyr_1", 88},
   {"plyr_2", 64},
   {"plyr_3", 176},
+  {"plyr_invis", 246},
   {"monster", 216},
   {"ammo", 200},
   {"body", 190},
@@ -462,9 +465,9 @@ static boolean stopped = true;
 extern boolean viewactive;
 //extern byte screens[][SCREENWIDTH*SCREENHEIGHT];
 
-int ddt_cheating;
-int d_cheating;
-int k_cheating;
+static int ddt_cheating;
+static int d_cheating;
+static int k_cheating;
 
 /* ---------------------------------------------------------------------- */
 
@@ -1395,7 +1398,7 @@ static void AM_drawGrid(int colour)
 
 // jff 4/3/98 add routine to get colour of generalized keyed door
 
-int AM_DoorColour(int type)
+static int AM_DoorColour(int type)
 {
   if (d_cheating == 0)
   {
@@ -1716,9 +1719,8 @@ AM_drawLineCharacter
 static void AM_drawPlayers(void)
 {
     int	 i;
-    player_t*   p;
-    int	 their_colour = -1;
     int	 colour;
+    player_t*   p;
 
     if (!netgame)
     {
@@ -1733,11 +1735,9 @@ static void AM_drawPlayers(void)
 	return;
     }
 
-    for (i=0;i<MAXPLAYERS;i++)
+    p = &players[0];
+    for (i=0;i<MAXPLAYERS;i++,p++)
     {
-	their_colour++;
-	p = &players[i];
-
 	if ( (deathmatch && !singledemo) && p != plr)
 	    continue;
 
@@ -1745,9 +1745,9 @@ static void AM_drawPlayers(void)
 	    continue;
 
 	if (p->powers[pw_invisibility])
-	    colour = 246;				// *close* to black
+	    colour = mapcolour.plyr_invis;		// *close* to black
 	else
-	    colour = mapcolour.plyr[their_colour];	//jff 1/6/98 use default colour
+	    colour = mapcolour.plyr[i];			//jff 1/6/98 use default colour
 
 	AM_drawLineCharacter
 	    (player_arrow, NUMPLYRLINES, 0, p->mo->angle,
