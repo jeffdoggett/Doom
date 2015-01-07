@@ -4160,6 +4160,77 @@ static void replace_map_name (const char * ptr, unsigned int episode, unsigned i
 
 /* ---------------------------------------------------------------------------- */
 
+static char * replace_titletext (char * ptr, unsigned int episode, unsigned int map)
+{
+  unsigned int j;
+  char * newtext;
+  map_dests_t * mdest_ptr;
+  char buf [12];
+
+  if (*ptr == '=') ptr++;
+  while (*ptr == ' ') ptr++;
+  if (*ptr == '\"') ptr++;
+  j = dh_inchar (ptr, ' ');
+  if (j) ptr [j-1] = 0;
+  j = dh_inchar (ptr, '"');
+  if (j) ptr [j-1] = 0;
+
+  mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+
+  buf [0] = 0;
+
+  if (episode == 255)
+  {
+    if (map) sprintf (buf, mdest_ptr -> titlepatch, map-1);
+  }
+  else
+  {
+    if (episode && map) sprintf (buf, mdest_ptr -> titlepatch, episode-1, map-1);
+  }
+
+  if (strcasecmp (ptr, buf))
+  {
+    newtext = strdup (ptr);
+    if (newtext)
+    {
+      mdest_ptr -> titlepatch = newtext;
+      // printf ("titlepatch %u,%u = '%s'\n", episode, map, mdest_ptr -> titlepatch);
+    }
+  }
+
+  return (ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static char * replace_map_text (char ** dest, char * ptr)
+{
+  unsigned int j;
+  char * newtext;
+
+  if (*ptr == '=') ptr++;
+  while (*ptr == ' ') ptr++;
+  if (*ptr == '\"') ptr++;
+  j = dh_inchar (ptr, ' ');
+  if (j) ptr [j-1] = 0;
+  j = dh_inchar (ptr, '"');
+  if (j) ptr [j-1] = 0;
+
+  if (strcasecmp (ptr, *dest))
+  {
+    newtext = strdup (ptr);
+    if (newtext)
+    {
+      *dest = newtext;
+      // printf ("map text = '%s'\n", ptr);
+    }
+  }
+
+  return (ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 void Parse_Mapinfo (char * ptr, char * top)
 {
   char cc;
@@ -4398,105 +4469,29 @@ void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "titlepatch", 10) == 0)
     {
-      ptr += 11;
-      if (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"') ptr++;
-      j = dh_inchar (ptr, ' ');
-      if (j) ptr [j-1] = 0;
-      j = dh_inchar (ptr, '"');
-      if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> titlepatch = newtext;
-	//printf ("titlepatch %u,%u = '%s'\n", episode, map, mdest_ptr -> titlepatch);
-      }
+      ptr = replace_titletext (ptr+11, episode, map);
     }
     else if (strncasecmp (ptr, "enterpic ", 9) == 0)
     {
       /* Picture used as the backdrop for the 'entering level' screen. */
       /* If starts with a $ then the lump is an 'intermission script' */
-      ptr += 10;
-      if (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"') ptr++;
-      j = dh_inchar (ptr, ' ');
-      if (j) ptr [j-1] = 0;
-      j = dh_inchar (ptr, '"');
-      if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> enterpic = newtext;
-	//printf ("titlepatch %u,%u = '%s'\n", episode, map, mdest_ptr -> titlepatch);
-      }
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      ptr = replace_map_text (&mdest_ptr -> enterpic, ptr+10);
     }
     else if (strncasecmp (ptr, "exitpic ", 8) == 0)
     {
-      ptr += 9;
-      if (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"') ptr++;
-      j = dh_inchar (ptr, ' ');
-      if (j) ptr [j-1] = 0;
-      j = dh_inchar (ptr, '"');
-      if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> exitpic = newtext;
-	//printf ("titlepatch %u,%u = '%s'\n", episode, map, mdest_ptr -> titlepatch);
-      }
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      ptr = replace_map_text (&mdest_ptr -> exitpic, ptr+9);
     }
     else if (strncasecmp (ptr, "bordertexture ", 14) == 0)
     {
-      ptr += 15;
-      if (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"') ptr++;
-      j = dh_inchar (ptr, ' ');
-      if (j) ptr [j-1] = 0;
-      j = dh_inchar (ptr, '"');
-      if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> bordertexture = newtext;
-	//printf ("titlepatch %u,%u = '%s'\n", episode, map, mdest_ptr -> titlepatch);
-      }
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      ptr = replace_map_text (&mdest_ptr -> bordertexture, ptr + 15);
     }
     else if (strncasecmp (ptr, "sky1 ", 5) == 0)
     {
-      ptr += 5;
-      if (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"') ptr++;
-      j = dh_inchar (ptr, ' ');
-      if (j) ptr [j-1] = 0;
-      j = dh_inchar (ptr, '"');
-      if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> sky = newtext;
-	// printf ("sky %u,%u = '%s'\n", episode, map, mdest_ptr -> sky);
-      }
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
     }
     else if (strncasecmp (ptr, "map07special", 12) == 0)
     {
