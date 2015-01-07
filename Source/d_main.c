@@ -1513,7 +1513,8 @@ static void find_language_in_wad (const char * wadname)
 	  catname [p] = fgetc (fin);
 	} while (++p < 8);
 
-	if (strcasecmp(catname, "LANGUAGE") == 0)
+	if ((strcasecmp(catname, "LANGUAGE") == 0)
+	 || (strcasecmp(catname, "GAMEINFO") == 0))
 	{
 	  fseek (fin, (long int) file_pos, SEEK_SET);
 	  DH_parse_language_file_f (wadname, fin, file_pos+file_size);
@@ -1568,6 +1569,51 @@ static void find_dehacked_in_wad (const char * wadname)
     }
     fclose (fin);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+unsigned int D_Startup_msg_number (void)
+{
+  unsigned int p;
+
+  switch (gamemode)
+  {
+    case retail:
+      p = D_ULTIMATE;
+      break;
+
+    case shareware:
+      p = D_SHAREWARE;
+      break;
+
+    case registered:
+      p = D_REGISTERED;
+      break;
+
+    case commercial:
+      switch (gamemission)
+      {
+	case pack_plut:
+	  p = D_PLUTONIA;
+	  break;
+
+	case pack_tnt:
+	  p = D_TNT;
+	  break;
+
+	default:
+	  p = D_HELL_ON_EARTH;
+      }
+      break;
+
+
+    default:
+      p = D_PUBLIC;
+      break;
+  }
+
+  return (p);
 }
 
 //-----------------------------------------------------------------------------
@@ -1724,44 +1770,8 @@ void D_DoomMain (void)
       }
   }
 
-
-  switch ( gamemode )
-  {
-    case retail:
-      p = D_ULTIMATE;
-      break;
-
-    case shareware:
-      p = D_SHAREWARE;
-      break;
-
-    case registered:
-      p = D_REGISTERED;
-      break;
-
-    case commercial:
-      switch (gamemission)
-      {
-	case pack_plut:
-	  p = D_PLUTONIA;
-	  break;
-
-	case pack_tnt:
-	  p = D_TNT;
-	  break;
-
-	default:
-	  p = D_HELL_ON_EARTH;
-      }
-      break;
-
-
-    default:
-      p = D_PUBLIC;
-      break;
-  }
-
   printf ("\n\n");
+  p = D_Startup_msg_number ();
   printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
   printf ("\n\n");
 

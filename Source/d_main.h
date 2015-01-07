@@ -53,6 +53,7 @@ typedef enum
 } main_texts_t;
 
 
+unsigned int D_Startup_msg_number (void);
 
 void D_AddFile (const char *file);
 

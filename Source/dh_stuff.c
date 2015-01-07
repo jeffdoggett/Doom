@@ -2854,11 +2854,17 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
   if (strncasecmp (ttext, "STARTUP", 7) == 0)
   {
-    counter1 = atoi (ttext+7) + (D_PUBLIC-1);
-    if (counter1 <= D_DO_NOT_DIST)
-      return (&dmain_messages [counter1]);
-    else
-      return (NULL);
+    ttext += 7;
+    if (strncasecmp (ttext, "TITLE", 5) == 0)
+      return (&dmain_messages [D_Startup_msg_number ()]);
+    if ((ttext [0] >= '0')
+     && (ttext [0] <= '9'))
+    {
+      counter1 = atoi (ttext) + (D_PUBLIC-1);
+      if (counter1 <= D_DO_NOT_DIST)
+        return (&dmain_messages [counter1]);
+    }
+    return (NULL);
   }
 
   if (strcasecmp (ttext, "GGSAVED") == 0)
