@@ -1617,6 +1617,26 @@ unsigned int D_Startup_msg_number (void)
 }
 
 //-----------------------------------------------------------------------------
+
+void D_LoadCheats (void)
+{
+  nomonsters1 = nomonsters2 = (boolean) M_CheckParm ("-nomonsters");
+  Monsters_Infight = (boolean) M_CheckParm ("-monstersinfight");
+  Give_Max_Damage = (boolean) M_CheckParm ("-maxdamage");
+  nobrainspitcheat = (boolean) M_CheckParm ("-nobrainspit");
+}
+
+/* We clear the cheats when running a demo.... */
+
+void D_ClearCheats (void)
+{
+  nomonsters1 = nomonsters2 = false;
+  Monsters_Infight = false;
+  Give_Max_Damage = false;
+  nobrainspitcheat = false;
+}
+
+//-----------------------------------------------------------------------------
 //
 // D_DoomMain
 //
@@ -1650,8 +1670,8 @@ void D_DoomMain (void)
 
   setbuf (stdout, NULL);
   modifiedgame = false;
+  D_LoadCheats ();
 
-  nomonsters1 = nomonsters2 = (boolean) M_CheckParm ("-nomonsters");
   respawnparm = (boolean) M_CheckParm ("-respawn");
   fastparm = (boolean) M_CheckParm ("-fast");
   devparm = (boolean) M_CheckParm ("-devparm");
@@ -1659,9 +1679,6 @@ void D_DoomMain (void)
     deathmatch = (boolean) 2;
   else if (M_CheckParm ("-deathmatch"))
     deathmatch = (boolean) 1;
-  Monsters_Infight = (boolean) M_CheckParm ("-monstersinfight");
-  Give_Max_Damage = (boolean) M_CheckParm ("-maxdamage");
-  nobrainspitcheat = (boolean) M_CheckParm ("-nobrainspit");
 
 
   // add any files specified on the command line with -file wadfile

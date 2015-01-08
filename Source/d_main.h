@@ -55,6 +55,9 @@ typedef enum
 
 unsigned int D_Startup_msg_number (void);
 
+void D_LoadCheats (void);
+void D_ClearCheats (void);
+
 void D_AddFile (const char *file);
 
 

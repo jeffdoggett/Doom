@@ -1817,6 +1817,7 @@ void G_DoLoadGame (void)
   for (i=0 ; i<MAXPLAYERS ; i++)
       playeringame[i] = (boolean) *save_p++;
 
+  D_LoadCheats ();
   // load a base level
   G_InitNew (l_skill, l_episode, l_map);
 
@@ -2012,6 +2013,7 @@ G_DeferedInitNewLater
 
 void G_DoNewGame (void)
 {
+  D_LoadCheats ();
   demoplayback = false;
   netdemo = false;
   netgame = false;
@@ -2283,6 +2285,7 @@ void G_DoPlayDemo (void)
     demo_p = demobuffer;
   }
 
+  D_ClearCheats ();
 
   p = demo_p;
   i = *p++;			/* Version number of program that made the recording */
