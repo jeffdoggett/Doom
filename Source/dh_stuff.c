@@ -118,7 +118,7 @@ extern int	clipammo[];
 extern unsigned int bfg_cells;
 
 /* Variables from p_map.c */
-extern boolean Monsters_Infight;
+extern boolean Monsters_Infight1;
 
 unsigned int Player_Jump = 0;
 unsigned int Homing_Missiles = 0;
@@ -1954,7 +1954,7 @@ static void write_all_miscs (FILE * fout)
   fprintf (fout, "%s = %d\n", dehack_miscs [17], IDKFA_Armour);
   fprintf (fout, "%s = %d\n", dehack_miscs [19], IDKFA_Armour_Class);
   fprintf (fout, "%s = %d\n", dehack_miscs [21], bfg_cells);
-  if (Monsters_Infight == false)
+  if (Monsters_Infight1 == false)
     c = 202;
   else
     c = 221;
@@ -2043,8 +2043,8 @@ static void dh_write_to_misc (unsigned int number, unsigned int record, unsigned
     case 22:	//	"Monsters Infight"
       switch (value)
       {
-	case 202:Monsters_Infight = false; break;
-	case 221:Monsters_Infight = true; break;
+	case 202:Monsters_Infight1 = false; break;
+	case 221:Monsters_Infight1 = true; break;
       }
       break;
 

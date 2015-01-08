@@ -184,7 +184,7 @@ boolean	singletics = false; // debug flag to cancel adaptiveness
 //extern  int	musicVolume;
 
 extern boolean	inhelpscreens;
-extern boolean	Monsters_Infight;
+extern boolean	Monsters_Infight2;
 extern boolean	Give_Max_Damage;
 extern boolean  nobrainspitcheat;
 extern boolean	dh_changing_pwad;
@@ -1621,7 +1621,7 @@ unsigned int D_Startup_msg_number (void)
 void D_LoadCheats (void)
 {
   nomonsters1 = nomonsters2 = (boolean) M_CheckParm ("-nomonsters");
-  Monsters_Infight = (boolean) M_CheckParm ("-monstersinfight");
+  Monsters_Infight2 = (boolean) M_CheckParm ("-monstersinfight");
   Give_Max_Damage = (boolean) M_CheckParm ("-maxdamage");
   nobrainspitcheat = (boolean) M_CheckParm ("-nobrainspit");
 }
@@ -1631,7 +1631,7 @@ void D_LoadCheats (void)
 void D_ClearCheats (void)
 {
   nomonsters1 = nomonsters2 = false;
-  Monsters_Infight = false;
+  Monsters_Infight2 = false;
   Give_Max_Damage = false;
   nobrainspitcheat = false;
 }

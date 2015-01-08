@@ -59,7 +59,8 @@ line_t	**	spechit;
 static int	spechit_max;
 int		numspechit;
 
-boolean		Monsters_Infight = false;
+boolean		Monsters_Infight1 = false;		// Controlled by Dehacked
+boolean		Monsters_Infight2 = false;		// Controlled by the command line
 static mobj_t*	onmobj;
 
 extern void P_ExplodeMissile (mobj_t* mo);
@@ -369,7 +370,9 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    if (thing == tmthing->target)
 		return true;
 
-	    if ((thing->type != MT_PLAYER) && (Monsters_Infight == false))
+	    if ((thing->type != MT_PLAYER)
+	     && (Monsters_Infight1 == false)
+	     && (Monsters_Infight2 == false))
 	    {
 		// Explode, but do no damage.
 		// Let players missile other players.
