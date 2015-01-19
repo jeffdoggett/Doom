@@ -268,7 +268,7 @@ boolean P_CheckAmmo (player_t* player)
 	    player->pendingweapon = wp_plasma;
 	}
 	else if (player->weaponowned[wp_supershotgun]
-		 && player->ammo[am_shell]>2
+		 && player->ammo[am_shell]>=2
 		 && (gamemode == commercial) )
 	{
 	    player->pendingweapon = wp_supershotgun;
@@ -297,7 +297,7 @@ boolean P_CheckAmmo (player_t* player)
 	    player->pendingweapon = wp_missile;
 	}
 	else if (player->weaponowned[wp_bfg]
-		 && player->ammo[am_cell]>40
+		 && player->ammo[am_cell]>=40
 		 && (gamemode != shareware) )
 	{
 	    player->pendingweapon = wp_bfg;
