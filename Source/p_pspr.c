@@ -297,7 +297,7 @@ boolean P_CheckAmmo (player_t* player)
 	    player->pendingweapon = wp_missile;
 	}
 	else if (player->weaponowned[wp_bfg]
-		 && player->ammo[am_cell]>=40
+		 && player->ammo[am_cell]>=bfg_cells
 		 && (gamemode != shareware) )
 	{
 	    player->pendingweapon = wp_bfg;
