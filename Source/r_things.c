@@ -842,9 +842,7 @@ void R_DrawPlayerSprites (void)
     pspdef_t*	psp;
 
     // get light level
-    lightnum =
-	(viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT)
-	+extralight;
+    lightnum = (viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT)+extralight;
 
     if (lightnum < 0)
 	spritelights = scalelight[0];

@@ -70,6 +70,8 @@ extern int		setsizeneeded;
 #ifndef MORELIGHTLEVELS
 #define LIGHTLEVELS	        16
 #define LIGHTSEGSHIFT	         4
+#define LIGHTBRIGHT		 1
+#define WFLASHBRIGHT		 1
 
 #define MAXLIGHTSCALE		48
 #define LIGHTSCALESHIFT		12
@@ -82,8 +84,10 @@ extern int		setsizeneeded;
 
 #else
 
-#define LIGHTLEVELS		  128
-#define LIGHTSEGSHIFT		    1
+#define LIGHTLEVELS		128
+#define LIGHTSEGSHIFT		  1
+#define LIGHTBRIGHT		  1
+#define WFLASHBRIGHT		  1
 
 #define MAXLIGHTSCALE		0x180
 #define LIGHTSCALESHIFT		   12

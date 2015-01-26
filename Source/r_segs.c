@@ -271,9 +271,9 @@ R_RenderMaskedSegRange
     lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
 
     if (curline->v1->y == curline->v2->y)
-	lightnum--;
+	lightnum -= LIGHTBRIGHT;
     else if (curline->v1->x == curline->v2->x)
-	lightnum++;
+	lightnum += LIGHTBRIGHT;
 
     if (lightnum < 0)
 	walllights = scalelight[0];
@@ -854,9 +854,9 @@ R_StoreWallRange
 	    lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
 
 	    if (curline->v1->y == curline->v2->y)
-		lightnum--;
+		lightnum -= LIGHTBRIGHT;
 	    else if (curline->v1->x == curline->v2->x)
-		lightnum++;
+		lightnum += LIGHTBRIGHT;
 
 	    if (lightnum < 0)
 		walllights = scalelight[0];
