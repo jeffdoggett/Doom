@@ -538,6 +538,68 @@ void R_RenderSegLoop (void)
 
 
 
+static fixed_t R_Calc_rw_distance (fixed_t hyp, fixed_t sineval)
+{
+  fixed_t dx, dy, a, c, ac, rwd_x_offset, rwd_y_offset;
+  fixed_t recentered_v1_x, recentered_v1_y, recentered_v2_x, recentered_v2_y;
+  char scaling_fudge;
+
+
+  // if wall is horizontal or vertical, finding the distance
+  // to it is trivial
+  if (curline->v1->y == curline->v2->y)
+    return (abs(viewy - curline->v1->y));
+
+  if (curline->v1->x == curline->v2->x)
+    return (abs(viewx - curline->v1->x));
+
+  // use old code for short walls and for walls that
+  // arent too oblique-- fixes weird Map09 slime trail
+  // these are pretty arbitrary values though
+  if ((hyp < (1024<<FRACBITS)) && (sineval > 2000))
+    return (FixedMul (hyp, sineval));
+
+
+  // recenter world on player at (0,0)
+  recentered_v1_x = curline->v1->x - viewx;
+  recentered_v1_y = curline->v1->y - viewy;
+  recentered_v2_x = curline->v2->x - viewx;
+  recentered_v2_y = curline->v2->y - viewy;
+
+  // resize world if it's too big so that the FixedMul later
+  // doesn't overflow
+  scaling_fudge = 0;
+  while(abs(recentered_v1_x) >= 128<<FRACBITS ||
+        abs(recentered_v1_y) >= 128<<FRACBITS ||
+        abs(recentered_v2_x) >= 128<<FRACBITS ||
+        abs(recentered_v2_y) >= 128<<FRACBITS)
+  {
+    recentered_v1_x >>= 1;
+    recentered_v1_y >>= 1;
+    recentered_v2_x >>= 1;
+    recentered_v2_y >>= 1;
+    scaling_fudge++;
+  }
+
+  dx = recentered_v2_x - recentered_v1_x;
+  dy = recentered_v2_y - recentered_v1_y;
+
+  // so now we should have a world centered on the player at (0,0)
+  // and the vertices of the line are all within 128 units
+  // we are using an imaginary perpendicular line going from
+  // (0,0) to (-dy, dx) for calculations
+  a = FixedMul (recentered_v1_x,recentered_v2_y) - 
+      FixedMul (recentered_v1_y,recentered_v2_x);
+  c = FixedMul (dx,dx) + FixedMul(dy,dy);
+  if (!c) c=1;	// just in case
+  ac = FixedDiv (a,c);
+
+  //if necessary, inflate coordinates back to real world
+  rwd_x_offset = FixedMul (ac,-dy)<<scaling_fudge;
+  rwd_y_offset = FixedMul (ac, dx)<<scaling_fudge;
+
+  return (R_PointToDist (viewx + rwd_x_offset, viewy + rwd_y_offset));
+}
 
 //
 // R_StoreWallRange
@@ -596,8 +658,11 @@ R_StoreWallRange
     distangle = ANG90 - offsetangle;
     hyp = R_PointToDist (curline->v1->x, curline->v1->y);
     sineval = finesine[distangle>>ANGLETOFINESHIFT];
+#if 1
+    rw_distance = R_Calc_rw_distance (hyp, sineval);
+#else
     rw_distance = FixedMul (hyp, sineval);
-
+#endif
 
     ds_p->x1 = rw_x = start;
     ds_p->x2 = stop;
