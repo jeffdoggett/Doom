@@ -291,6 +291,7 @@ extern msecnode_t *headsecnode;
 
 #endif
 
+#define LONG_LINE_FIX
 //
 // The LineSeg.
 //
@@ -312,6 +313,9 @@ typedef struct
     sector_t*	frontsector;
     sector_t*	backsector;
 
+#ifdef LONG_LINE_FIX
+    fixed_t	length;
+#endif
 } seg_t;
 
 

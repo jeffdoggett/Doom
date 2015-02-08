@@ -984,6 +984,22 @@ static void P_RemoveSlimeTrails (void)		// killough 10/98
 }
 
 //-----------------------------------------------------------------------------
+
+void R_CalcSegsLength (void)
+{
+  int i;
+  seg_t *li;
+
+  for (i=0; i<numsegs; i++)
+  {
+    li = segs+i;
+    fixed_t dx = li->v2->x - li->v1->x;
+    fixed_t dy = li->v2->y - li->v1->y;
+    li->length = (fixed_t)sqrt((double)dx*dx + (double)dy*dy);
+  }
+}
+
+//-----------------------------------------------------------------------------
 //
 // P_SetupLevel
 //
@@ -1059,6 +1075,7 @@ P_SetupLevel
     P_GroupLines ();
     P_RemoveSlimeTrails ();
     G_Patch_Map ();
+    R_CalcSegsLength ();
 
 
     bodyqueslot = 0;
