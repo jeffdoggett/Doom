@@ -873,7 +873,9 @@ void G_DoLoadLevel (void)
   int i;
   map_dests_t * map_info_p;
 
-  M_SetEpiSel (gameepisode);
+  if (!demoplayback)
+    M_SetEpiSel (gameepisode);
+
   map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
 
   // Set the sky map.
@@ -1119,7 +1121,8 @@ void G_Ticker (void)
 	  gameaction = ga_nothing;
 	  break;
 	case ga_victory:
-	  M_SetNextEpiSel (gameepisode);
+	  if (!demoplayback)
+	    M_SetNextEpiSel (gameepisode);
 	  F_StartFinale (1);
 	  break;
 	case ga_worlddone:
@@ -2118,7 +2121,7 @@ G_InitNew
 
   usergame = true;		// will be set false if a demo
   paused = false;
-  demoplayback = false;
+//demoplayback = false;
   automapactive = false;
   viewactive = true;
   gameepisode = episode;
@@ -2336,11 +2339,10 @@ void G_DoPlayDemo (void)
 
   // don't spend a lot of time in loadlevel
   precache = false;
+  demoplayback = true;
   G_InitNew (skill, episode, map);
   precache = true;
-
   usergame = false;
-  demoplayback = true;
 }
 
 /* -------------------------------------------------------------------------------------------- */

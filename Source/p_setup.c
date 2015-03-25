@@ -989,12 +989,14 @@ void R_CalcSegsLength (void)
 {
   int i;
   seg_t *li;
+  fixed_t dx;
+  fixed_t dy;
 
   for (i=0; i<numsegs; i++)
   {
     li = segs+i;
-    fixed_t dx = li->v2->x - li->v1->x;
-    fixed_t dy = li->v2->y - li->v1->y;
+    dx = li->v2->x - li->v1->x;
+    dy = li->v2->y - li->v1->y;
     li->length = (fixed_t)sqrt((double)dx*dx + (double)dy*dy);
   }
 }

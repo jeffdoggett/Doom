@@ -1734,7 +1734,8 @@ static void dh_write_to_pointer (unsigned int number, unsigned int record, unsig
       p = get_action_function_num (states_ptr_copy[record].acv);
       q = get_action_function_num (states_ptr_copy[value].acv);
 
-      if (action_player_type [p] != action_player_type [q])
+      if ((action_player_type [q] != 255)
+       && (action_player_type [p] != action_player_type [q]))
       {
 	fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
 		dehack_codeptr_frames [p], dehack_codeptr_frames [q], line_no-1);
@@ -3441,7 +3442,8 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		unsigned int p;
 		p = get_action_function_num (states[counter2].action.acv);
 
-		if (action_player_type [p] != action_player_type [counter1])
+		if ((action_player_type [counter1] != 255)
+		 && (action_player_type [p] != action_player_type [counter1]))
 		{
 		  fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
 			dehack_codeptr_frames [p], dehack_codeptr_frames [counter1], dh_line_number-1);
@@ -3620,6 +3622,10 @@ void DH_replace_file_extension (char * newname, const char * oldname, char * n_e
 {
   unsigned int p;
   unsigned int q;
+  DIR * dirp;
+  struct dirent *dp;
+  char * leaf;
+  char buffer [200];
 
   p = 0;
   q = -1;
@@ -3646,7 +3652,28 @@ void DH_replace_file_extension (char * newname, const char * oldname, char * n_e
 
   newname [q] = EXTSEPC;
   strcpy (newname+q+1, n_ext);
-  // printf ("filename %s is now %s\n", oldname, newname);
+
+//printf ("filename %s is now %s\n", oldname, newname);
+
+  /* On a case dependent file system we need to get it right! */
+
+  dirname (buffer, newname);
+  dirp = opendir (buffer);
+  if (dirp)
+  {
+    leaf = (char *) leafname (newname);
+    while ((dp = readdir (dirp)) != NULL)
+    {
+      if (strcasecmp (leaf, dp -> d_name) == 0)
+      {
+	sprintf (newname, "%s"DIRSEP"%s", buffer, dp -> d_name);
+	break;
+      }
+    }
+    closedir (dirp);
+  }
+  
+//printf ("filename %s is now %s\n", oldname, newname);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -3657,9 +3684,16 @@ void DH_parse_hacker_wad_file (const char * wadname, boolean do_it)
   char dehname [250];
   FILE * fin;
 
-  /* Change /WAD to /DEH */
-  DH_replace_file_extension (dehname, wadname, "deh");
+  /* Change /WAD to /BEX */
+  DH_replace_file_extension (dehname, wadname, "bex");
   fin = fopen (dehname, "r");
+  if (fin == NULL)
+  {
+    /* Change /WAD to /DEH */
+    DH_replace_file_extension (dehname, wadname, "deh");
+    fin = fopen (dehname, "r");
+  }
+
   if (fin)
   {
     /* On a short name system, it's possible that I've just */
