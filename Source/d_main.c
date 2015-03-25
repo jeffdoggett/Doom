@@ -1638,15 +1638,12 @@ void D_ClearCheats (void)
 }
 
 //-----------------------------------------------------------------------------
-//
-// D_DoomMain
-//
-void D_DoomMain (void)
+
+static void D_SetDebugOut (void)
 {
-  unsigned int	p,q;
+  unsigned int	p;
   char *	f;
   char		file[256];
-  map_starts_t *  map_info_p;
 
   p = M_CheckParm ("-debugfile");
   if (p)
@@ -1664,23 +1661,15 @@ void D_DoomMain (void)
     printf ("debug output to: %s\n",f);
     debugfile = fopen (f,"w");
   }
+}
 
-  init_text_messages ();
-  I_SetScreenSize ();
-  IdentifyVersion ();
+//-----------------------------------------------------------------------------
 
-  setbuf (stdout, NULL);
-  modifiedgame = false;
-  D_LoadCheats ();
-
-  respawnparm = (boolean) M_CheckParm ("-respawn");
-  fastparm = (boolean) M_CheckParm ("-fast");
-  devparm = (boolean) M_CheckParm ("-devparm");
-  if (M_CheckParm ("-altdeath"))
-    deathmatch = (boolean) 2;
-  else if (M_CheckParm ("-deathmatch"))
-    deathmatch = (boolean) 1;
-
+static void D_LoadWads (void)
+{
+  unsigned int	p,q;
+  char *	f;
+  char		file[256];
 
   // add any files specified on the command line with -file wadfile
   // to the wad list
@@ -1736,6 +1725,112 @@ void D_DoomMain (void)
       D_AddFile (f);
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+
+static void D_ShowStartupMessage (void)
+{
+  unsigned int	p,q;
+  char		file[256];
+
+  q = 0;
+  p = 0;
+  do
+  {
+    if (startup_messages [p] && startup_messages[p][0])
+    {
+      unsigned int len;
+      char * p1;
+      char * p2;
+      p1 = file;
+      sprintf (p1, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+      do
+      {
+	p2 = strchr (p1, '\n');
+	if (p2) *p2 = 0;
+	if (*p1 != ' ')
+	{
+	  len = strlen (p1);
+	  if (len < 80)
+	  {
+	    len = (80 - len) / 2;
+	    while (len)
+	    {
+	      putchar (' ');
+	      len--;
+	    }
+	  }
+	}
+        printf ("%s\n", p1);
+	if (p2 == NULL)
+	  break;
+	putchar ('\n');		// Write the LF that we clobbered.
+	p1 = p2 + 1;
+      } while (*p1);
+      q++;
+    }
+  } while (++p < ARRAY_SIZE(startup_messages));
+
+  if (q == 0)
+  {
+    p = D_Startup_msg_number ();
+    printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+  }
+
+  printf ("\n\nScreen resolution is %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
+}
+
+//-----------------------------------------------------------------------------
+
+static void D_LoadGameFile (void)
+{
+  unsigned int	p;
+  char		file[256];
+
+  p = M_CheckParm ("-loadgame");
+  if (p && p < myargc-1)
+  {
+    if ((M_CheckParm("-cdrom") == 0)
+     && (access (myargv[p+1], R_OK) == 0))
+    {
+      strcpy (file, myargv[p+1]);
+    }
+    else
+    {
+      G_GetSaveGameName (file, myargv[p+1][0]);
+    }
+    G_LoadGame (file);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//
+// D_DoomMain
+//
+void D_DoomMain (void)
+{
+  unsigned int	p;
+  map_starts_t *  map_info_p;
+
+  D_SetDebugOut ();
+  init_text_messages ();
+  I_SetScreenSize ();
+  IdentifyVersion ();
+
+  setbuf (stdout, NULL);
+  modifiedgame = false;
+  D_LoadCheats ();
+
+  respawnparm = (boolean) M_CheckParm ("-respawn");
+  fastparm = (boolean) M_CheckParm ("-fast");
+  devparm = (boolean) M_CheckParm ("-devparm");
+  if (M_CheckParm ("-altdeath"))
+    deathmatch = (boolean) 2;
+  else if (M_CheckParm ("-deathmatch"))
+    deathmatch = (boolean) 1;
+
+  D_LoadWads ();
 
   dh_changing_pwad = false;
 
@@ -1789,41 +1884,7 @@ void D_DoomMain (void)
   }
 
   printf ("\n\n");
-
-  q = 0;
-  p = 0;
-  do
-  {
-    if (startup_messages [p] && startup_messages[p][0])
-    {
-      unsigned int len;
-      char buffer [100];
-      sprintf (buffer, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
-      if (buffer [0] != ' ')
-      {
-	len = strlen (buffer);
-	if (len < 80)
-	{
-	  len = (80 - len) / 2;
-	  while (len)
-	  {
-	    putchar (' ');
-	    len--;
-	  }
-	}
-      }
-      printf ("%s\n", buffer);
-      q++;
-    }
-  } while (++p < ARRAY_SIZE(startup_messages));
-
-  if (q == 0)
-  {
-    p = D_Startup_msg_number ();
-    printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
-  }
-
-  printf ("\n\nScreen resolution is %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
+  D_ShowStartupMessage ();
 
   if (devparm)
       printf(dmain_messages[D_D_DEVSTR]);
@@ -2129,21 +2190,7 @@ void D_DoomMain (void)
       return;
   }
 
-  p = M_CheckParm ("-loadgame");
-  if (p && p < myargc-1)
-  {
-    if ((M_CheckParm("-cdrom") == 0)
-     && (access (myargv[p+1], R_OK) == 0))
-    {
-      strcpy (file, myargv[p+1]);
-    }
-    else
-    {
-      G_GetSaveGameName (file, myargv[p+1][0]);
-    }
-    G_LoadGame (file);
-  }
-
+  D_LoadGameFile ();
 
   if ( gameaction != ga_loadgame )
   {
