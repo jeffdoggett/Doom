@@ -30,6 +30,7 @@ extern char * obituary_messages [];
 /* Strings from d_main.c */
 extern char * dmain_messages [];
 extern char * dmain_messages_orig [];
+extern char * startup_messages [];
 
 /* Strings from m_menu.c */
 extern char * menu_messages [];
@@ -2861,9 +2862,9 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     if ((ttext [0] >= '0')
      && (ttext [0] <= '9'))
     {
-      counter1 = atoi (ttext) + (D_PUBLIC-1);
-      if (counter1 <= D_DO_NOT_DIST)
-        return (&dmain_messages [counter1]);
+      counter1 = atoi (ttext);
+      if (counter1 <= 9)
+        return (&startup_messages [counter1]);
     }
     return (NULL);
   }
@@ -3672,7 +3673,7 @@ void DH_replace_file_extension (char * newname, const char * oldname, char * n_e
     }
     closedir (dirp);
   }
-  
+
 //printf ("filename %s is now %s\n", oldname, newname);
 }
 

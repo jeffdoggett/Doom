@@ -90,6 +90,7 @@ char * dmain_messages_orig [] =
 };
 
 char * dmain_messages [ARRAY_SIZE(dmain_messages_orig)];
+char * startup_messages [10];
 
 /* ----------------------------------------------------------- */
 /* Strings from f_finale.c */
@@ -1788,11 +1789,41 @@ void D_DoomMain (void)
   }
 
   printf ("\n\n");
-  p = D_Startup_msg_number ();
-  printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
-  printf ("\n\n");
 
-  printf ("Screen resolution is %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
+  q = 0;
+  p = 0;
+  do
+  {
+    if (startup_messages [p] && startup_messages[p][0])
+    {
+      unsigned int len;
+      char buffer [100];
+      sprintf (buffer, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+      if (buffer [0] != ' ')
+      {
+	len = strlen (buffer);
+	if (len < 80)
+	{
+	  len = (80 - len) / 2;
+	  while (len)
+	  {
+	    putchar (' ');
+	    len--;
+	  }
+	}
+      }
+      printf ("%s\n", buffer);
+      q++;
+    }
+  } while (++p < ARRAY_SIZE(startup_messages));
+
+  if (q == 0)
+  {
+    p = D_Startup_msg_number ();
+    printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+  }
+
+  printf ("\n\nScreen resolution is %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
 
   if (devparm)
       printf(dmain_messages[D_D_DEVSTR]);
