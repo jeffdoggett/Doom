@@ -3619,7 +3619,7 @@ E1TEXT =
 
 /* ---------------------------------------------------------------------------- */
 
-void DH_replace_file_extension (char * newname, const char * oldname, char * n_ext)
+void DH_replace_file_extension (char * newname, const char * oldname, const char * n_ext)
 {
   DIR * dirp;
   struct dirent *dp;
