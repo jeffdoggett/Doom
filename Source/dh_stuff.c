@@ -3621,38 +3621,22 @@ E1TEXT =
 
 void DH_replace_file_extension (char * newname, const char * oldname, char * n_ext)
 {
-  unsigned int p;
-  unsigned int q;
   DIR * dirp;
   struct dirent *dp;
+  char * p;
   char * leaf;
   char buffer [200];
 
-  p = 0;
-  q = -1;
-
-  while (oldname [p])
+  strcpy (newname, oldname);
+  leaf = (char *) leafname (newname);
+  p = strrchr (leaf, EXTSEPC);
+  if (p == NULL)
   {
-    switch (oldname [p])
-    {
-      case EXTSEPC:
-	q = p;
-	break;
-
-      case DIRSEPC:
-#ifndef __riscos
-      case '\\':
-#endif
-	q = -1;
-    }
-    newname [p] = oldname [p];
-    p++;
+    p = leaf + strlen (leaf);
+    *p = EXTSEPC;
   }
 
-  if (q == -1)  q = p;
-
-  newname [q] = EXTSEPC;
-  strcpy (newname+q+1, n_ext);
+  strcpy (p+1, n_ext);
 
 //printf ("filename %s is now %s\n", oldname, newname);
 
@@ -3662,12 +3646,11 @@ void DH_replace_file_extension (char * newname, const char * oldname, char * n_e
   dirp = opendir (buffer);
   if (dirp)
   {
-    leaf = (char *) leafname (newname);
     while ((dp = readdir (dirp)) != NULL)
     {
       if (strcasecmp (leaf, dp -> d_name) == 0)
       {
-	sprintf (newname, "%s"DIRSEP"%s", buffer, dp -> d_name);
+	strcpy (leaf, dp -> d_name);
 	break;
       }
     }
