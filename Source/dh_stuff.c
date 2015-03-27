@@ -30,6 +30,9 @@ extern char * obituary_messages [];
 /* Strings from d_main.c */
 extern char * dmain_messages [];
 extern char * dmain_messages_orig [];
+extern char * demo_names [];
+extern char * demo_names_orig [];
+
 extern char * startup_messages [];
 
 /* Strings from m_menu.c */
@@ -2237,6 +2240,7 @@ static void write_all_texts (FILE * fout)
   counter = write_a_text_bank (fout, (const char **)finale_backdrops, counter);
   counter = write_a_text_bank (fout, (const char **)got_messages, counter);
   counter = write_a_text_bank (fout, (const char **)dmain_messages, counter);
+  counter = write_a_text_bank (fout, (const char **)demo_names, counter);
   counter = write_a_text_bank (fout, (const char **)menu_messages, counter);
   counter = write_a_text_bank (fout, (const char **)endmsg, counter);
   counter = write_a_text_bank (fout, (const char **)door_messages, counter);
@@ -2368,6 +2372,21 @@ static unsigned int replace_got_messages_text (char * orig, char * newt)
   return (1);
 }
 
+/* ---------------------------------------------------------------------------- */
+
+static unsigned int replace_demo_messages_text (char * orig, char * newt)
+{
+  unsigned int counter;
+
+  counter = dh_search_str_tab_a ((const char **)demo_names_orig, orig);
+  if (counter != -1)
+  {
+    demo_names [counter] = newt;
+    return (0);
+  }
+
+  return (1);
+}
 /* ---------------------------------------------------------------------------- */
 
 static unsigned int dh_match_length (const char * s1, const char * s2)
@@ -2918,6 +2937,26 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     }
   }
 
+  if (strcasecmp (ttext, "BGFLATE1") == 0)
+  {
+    return (&finale_backdrops[BG_FLOOR4_8]);
+  }
+
+  if (strcasecmp (ttext, "BGFLATE2") == 0)
+  {
+    return (&finale_backdrops[BG_SFLR6_1]);
+  }
+
+  if (strcasecmp (ttext, "BGFLATE3") == 0)
+  {
+    return (&finale_backdrops[BG_MFLR8_4]);
+  }
+
+  if (strcasecmp (ttext, "BGFLATE4") == 0)
+  {
+    return (&finale_backdrops[BG_MFLR8_3]);
+  }
+
   if (strcasecmp (ttext, "BGFLAT06") == 0)
   {
     return (&finale_backdrops[BG_SLIME16]);
@@ -2946,6 +2985,13 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   if (strcasecmp (ttext, "BGFLAT31") == 0)
   {
     return (&finale_backdrops[BG_RROCK19]);
+  }
+
+  if (strncasecmp (ttext, "DEMO", 4))
+  {
+    counter1 = ttext [4];
+    if ((counter1 >= '1') && (counter1 <= '4'))
+      return (&demo_names [counter1-'1']);
   }
 
   counter1 = dh_search_str_tab_a (dehack_monster_obit_strings, ttext);
@@ -3259,6 +3305,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      if (replace_text_levelx (string1, string2))
 	      if (replace_finale_text (string1, string2))
 	      if (replace_got_messages_text (string1, string2))
+	      if (replace_demo_messages_text (string1, string2))
 	      if (replace_startup_text (string1, string2))
 	      if (replace_menu_text (string1, string2))
 	      if (replace_quit_text (string1, string2))

@@ -93,6 +93,27 @@ char * dmain_messages [ARRAY_SIZE(dmain_messages_orig)];
 char * startup_messages [10];
 
 /* ----------------------------------------------------------- */
+
+typedef enum
+{
+  DN_DEMO1,
+  DN_DEMO2,
+  DN_DEMO3,
+  DN_DEMO4
+};
+
+char * demo_names_orig [] =
+{
+  "DEMO1",
+  "DEMO2",
+  "DEMO3",
+  "DEMO4",
+  NULL,
+};
+
+char * demo_names [ARRAY_SIZE(demo_names_orig)];
+
+/* ----------------------------------------------------------- */
 /* Strings from f_finale.c */
 extern char*	finale_messages[];
 extern char*	finale_messages_orig[];
@@ -294,6 +315,7 @@ static void init_text_messages (void)
 
   init_a_text_block (sprnames, sprnames_orig);
   init_a_text_block (dmain_messages, dmain_messages_orig);
+  init_a_text_block (demo_names, demo_names_orig);
   init_a_text_block (finale_messages, finale_messages_orig);
   init_a_text_block (finale_backdrops, finale_backdrops_orig);
   init_a_text_block (got_messages, got_messages_orig);
@@ -650,7 +672,7 @@ void D_AdvanceDemo (void)
 	  S_StartMusic (mus_intro);
 	break;
       case 1:
-	G_DeferedPlayDemo ("demo1");
+	G_DeferedPlayDemo (demo_names [DN_DEMO1]);
 	break;
       case 2:
 	pagetic = 200;
@@ -658,7 +680,7 @@ void D_AdvanceDemo (void)
 	pagename = finale_backdrops[BG_CREDIT];
 	break;
       case 3:
-	G_DeferedPlayDemo ("demo2");
+	G_DeferedPlayDemo (demo_names [DN_DEMO2]);
 	break;
       case 4:
 	gamestate = GS_DEMOSCREEN;
@@ -679,11 +701,11 @@ void D_AdvanceDemo (void)
 	}
 	break;
       case 5:
-	G_DeferedPlayDemo ("demo3");
+	G_DeferedPlayDemo (demo_names [DN_DEMO3]);
 	break;
 	// THE DEFINITIVE DOOM Special Edition demo
       case 6:
-	G_DeferedPlayDemo ("demo4");
+	G_DeferedPlayDemo (demo_names [DN_DEMO4]);
 	break;
     }
 }
