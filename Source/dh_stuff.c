@@ -2987,6 +2987,11 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     return (&finale_backdrops[BG_RROCK19]);
   }
 
+  if (strcasecmp (ttext, "BGCASTCALL") == 0)
+  {
+    return (&finale_backdrops[BG_BOSSBACK]);
+  }
+
   if (strncasecmp (ttext, "DEMO", 4))
   {
     counter1 = ttext [4];
