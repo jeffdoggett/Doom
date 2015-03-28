@@ -94,7 +94,7 @@ char * startup_messages [10];
 
 /* ----------------------------------------------------------- */
 
-typedef enum
+enum
 {
   DN_DEMO1,
   DN_DEMO2,
