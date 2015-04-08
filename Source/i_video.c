@@ -55,6 +55,7 @@ int XShmGetEventBase( Display* dpy ); // problems with g++?
 #include "v_video.h"
 #include "m_argv.h"
 #include "d_main.h"
+#include "am_map.h"
 
 #include "doomdef.h"
 
@@ -100,6 +101,8 @@ static int	lastmousex = 0;
 static int	lastmousey = 0;
 static boolean	mousemoved = false;
 static boolean	shmFinished;
+static unsigned char devparm_black;
+static unsigned char devparm_white;
 
 extern int	novert;
 
@@ -571,9 +574,9 @@ void I_FinishUpdate (void)
     if (tics > 20) tics = 20;
 
     for (i=0 ; i<tics*2 ; i+=2)
-	screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0xff;
+	screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_white;
     for ( ; i<20*2 ; i+=2)
-	screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0x0;
+	screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_black;
   }
 
   switch (X_visualinfo.depth)
@@ -668,6 +671,12 @@ void I_SetPalette (byte* palette)
   unsigned int red;
   unsigned int green;
   unsigned int blue;
+
+  if (devparm)
+  {
+    devparm_black = AM_load_colour (0, 0, 0, palette);
+    devparm_white = AM_load_colour (255, 255, 255, palette);
+  }
 
 #ifdef __cplusplus
   if (X_visualinfo.c_class == PseudoColor && X_visualinfo.depth == 8)

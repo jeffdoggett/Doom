@@ -4,17 +4,8 @@
    Based on i_video.c so some of the comments herein are ID's
 */
 
-#include "doomstat.h"
-#include "i_system.h"
-#include "v_video.h"
-#include "m_argv.h"
-#include "d_main.h"
-
-#include "doomdef.h"
-
+#include "includes.h"
 #include <kernel.h>
-#include <stdlib.h>
-#include "acorn.h"
 
 extern boolean	menuactive;
 extern int 	novert;
@@ -49,6 +40,9 @@ static unsigned int   lastmousebut;
 static unsigned int   rpc_palette;  /* = True when using 8 bit screen mode and */
 				    /* RPC palette is available (256 entries) */
 static unsigned char menu_in_use = 0;
+
+static unsigned char devparm_black;
+static unsigned char devparm_white;
 
 typedef struct
 {
@@ -864,9 +858,9 @@ void I_FinishUpdate (void)
 	if (tics > 20) tics = 20;
 
 	for (i=0 ; i<tics*2 ; i+=2)
-	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0xff;
+	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_white;
 	for ( ; i<20*2 ; i+=2)
-	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0x0;
+	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_black;
     }
 
 
@@ -1195,6 +1189,12 @@ static void set_palette_8 (byte * palette)
 //
 void I_SetPalette (byte* palette)
 {
+  if (devparm)
+  {
+    devparm_black = AM_load_colour (0, 0, 0, palette);
+    devparm_white = AM_load_colour (255, 255, 255, palette);
+  }
+
   switch (screen_mode)
   {
     case MODE_USER_DEF:
