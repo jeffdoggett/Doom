@@ -53,7 +53,7 @@ static const char rcsid[] = "$Id: r_main.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #define FIELDOFVIEW		2048
 
 
-
+static unsigned int	r_frame_count;
 int			viewangleoffset;
 
 // increment every time a check is made
@@ -497,6 +497,17 @@ void R_InitTables (void)
 }
 
 
+angle_t R_GetVertexViewAngle (vertex_t *v)
+{
+  if (v->angletime != r_frame_count)
+  {
+    v->angletime = r_frame_count;
+    return (v->viewangle = R_PointToAngle (v->x, v->y));
+  }
+
+  return (v->viewangle);
+}
+
 
 //
 // R_InitTextureMapping
@@ -894,6 +905,7 @@ void R_SetupFrame (player_t* player)
 //
 void R_RenderPlayerView (player_t* player)
 {
+    r_frame_count++;
     R_SetupFrame (player);
 
     // Clear buffers.

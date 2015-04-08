@@ -70,9 +70,10 @@
 //
 typedef struct
 {
-    fixed_t	x;
-    fixed_t	y;
-
+  fixed_t	x;
+  fixed_t	y;
+  angle_t	viewangle;
+  unsigned int	angletime;
 } vertex_t;
 
 

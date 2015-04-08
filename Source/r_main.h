@@ -171,6 +171,7 @@ R_AddPointToBox
   fixed_t*	box );
 
 
+angle_t R_GetVertexViewAngle (vertex_t *v);
 
 //
 // REFRESH - the actual rendering functions.
