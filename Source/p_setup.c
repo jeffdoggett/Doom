@@ -237,7 +237,7 @@ void P_LoadSegs (int lump)
     linedef = USHORT(ml->linedef);
     if (linedef >= numlines)
     {
-      printf ("P_LoadSegs: linedef = %u/%u\n", linedef, linedef);
+      printf ("P_LoadSegs: linedef = %u/%u\n", linedef, numlines);
       linedef = 0;
     }
     ldef = &lines[linedef];
