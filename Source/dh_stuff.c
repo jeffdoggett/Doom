@@ -3514,9 +3514,6 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      counter1 = dh_search_str_tab_a (dehack_codeptr_frames, string1);
 	      if (counter1 != -1)
 	      {
-		unsigned int p;
-		p = get_action_function_num (states[counter2].action.acv);
-
 		states[counter2].pcount = action_player_type [counter1];
 		states[counter2].action.acv = action_ptrs[counter1].acv;
 		// printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
