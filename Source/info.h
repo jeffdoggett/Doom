@@ -1155,8 +1155,9 @@ typedef struct
   long			frame;
   long			tics;
   // void		(*action) ();
-  actionf_t			action;
-  statenum_t			nextstate;
+  unsigned int		pcount;
+  actionf_t		action;
+  statenum_t		nextstate;
   long			misc1, misc2;
 } state_t;
 

@@ -2155,6 +2155,7 @@ void D_DoomMain (void)
   }
 
   DH_remove_duplicate_mapinfos ();
+  dh_validate_state_table_function_pointers ();
 
   // printf ("M_Init: Init miscellaneous info.\n");
   M_Init ();					// Must be after the MAPINFO readers...

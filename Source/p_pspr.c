@@ -170,9 +170,11 @@ P_SetPsprite
 	// Modified handling.
 	if (state->action.acp2)
 	{
+	  if (state->pcount == 2)
 	    state->action.acp2(player, psp);
-	    if (!psp->state)
-		break;
+
+	  if (!psp->state)
+	      break;
 	}
 
 	stnum = psp->state->nextstate;

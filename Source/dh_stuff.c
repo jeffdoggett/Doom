@@ -482,23 +482,23 @@ static const actionf_t action_ptrs[] =
 static const unsigned char action_player_type[] =
 {
   255,
-  1, 1, 1, 1,	// {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
-  1, 1, 1, 1,	// {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
-  1, 1, 1, 1,	// {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
-  1, 1, 1, 1,	// {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
-  1, 1, 1, 1,	// {A_GunFlash}, {A_FireMissile}, {A_Saw}, {A_FirePlasma},
-  1, 1, 0, 0, 0,// {A_BFGsound}, {A_FireBFG}, {A_BFGSpray}, {A_Explode}, {A_Pain},
-  0, 0, 0, 0, 0,// {A_PlayerScream}, {A_Fall}, {A_XScream}, {A_Look}, {A_Chase},
-  0, 0, 0, 0, 0,// {A_FaceTarget}, {A_PosAttack}, {A_Scream}, {A_SPosAttack}, {A_VileChase},
-  0, 0, 0, 0, 0,// {A_VileStart}, {A_VileTarget}, {A_VileAttack}, {A_StartFire}, {A_Fire},
-  0, 0, 0, 0, 0,// {A_FireCrackle}, {A_Tracer}, {A_SkelWhoosh}, {A_SkelFist}, {A_SkelMissile},
-  0, 0, 0, 0,	// {A_FatRaise}, {A_FatAttack1}, {A_FatAttack2}, {A_FatAttack3},
-  0, 0, 0, 0,	// {A_BossDeath}, {A_CPosAttack}, {A_CPosRefire}, {A_TroopAttack},
-  0, 0, 0, 0,	// {A_SargAttack}, {A_HeadAttack}, {A_BruisAttack}, {A_SkullAttack},
-  0, 0, 0, 0,	// {A_Metal}, {A_SpidRefire}, {A_BabyMetal}, {A_BspiAttack},
-  0, 0, 0, 0, 0,// {A_Hoof}, {A_CyberAttack}, {A_PainAttack}, {A_PainDie}, {A_KeenDie},
-  0, 0, 0, 0,	// {A_BrainPain}, {A_BrainScream}, {A_BrainDie}, {A_BrainAwake},
-  0, 0, 0, 0	// {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
+  2, 2, 2, 2,	// {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
+  2, 2, 2, 2,	// {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
+  2, 2, 2, 2,	// {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
+  2, 2, 2, 2,	// {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
+  2, 2, 2, 2,	// {A_GunFlash}, {A_FireMissile}, {A_Saw}, {A_FirePlasma},
+  2, 2, 1, 1, 1,// {A_BFGsound}, {A_FireBFG}, {A_BFGSpray}, {A_Explode}, {A_Pain},
+  1, 1, 1, 1, 1,// {A_PlayerScream}, {A_Fall}, {A_XScream}, {A_Look}, {A_Chase},
+  1, 1, 1, 1, 1,// {A_FaceTarget}, {A_PosAttack}, {A_Scream}, {A_SPosAttack}, {A_VileChase},
+  1, 1, 1, 1, 1,// {A_VileStart}, {A_VileTarget}, {A_VileAttack}, {A_StartFire}, {A_Fire},
+  1, 1, 1, 1, 1,// {A_FireCrackle}, {A_Tracer}, {A_SkelWhoosh}, {A_SkelFist}, {A_SkelMissile},
+  1, 1, 1, 1,	// {A_FatRaise}, {A_FatAttack1}, {A_FatAttack2}, {A_FatAttack3},
+  1, 1, 1, 1,	// {A_BossDeath}, {A_CPosAttack}, {A_CPosRefire}, {A_TroopAttack},
+  1, 1, 1, 1,	// {A_SargAttack}, {A_HeadAttack}, {A_BruisAttack}, {A_SkullAttack},
+  1, 1, 1, 1,	// {A_Metal}, {A_SpidRefire}, {A_BabyMetal}, {A_BspiAttack},
+  1, 1, 1, 1, 1,// {A_Hoof}, {A_CyberAttack}, {A_PainAttack}, {A_PainDie}, {A_KeenDie},
+  1, 1, 1, 1,	// {A_BrainPain}, {A_BrainScream}, {A_BrainDie}, {A_BrainAwake},
+  1, 1, 1, 1	// {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
 };
 
 /* These tables are in the same order as the declarations of the messages */
@@ -1707,6 +1707,38 @@ static unsigned int get_action_function_num (actionf_v aname)
 }
 
 /* ---------------------------------------------------------------------------- */
+/*
+   Do a quick spin through the state tables and ensure that we have
+   set these correctly. Should never actually change anything!
+   Was written initially to ensure that I had filled in the table in
+   info.c correctly.
+*/
+
+void dh_validate_state_table_function_pointers (void)
+{
+  unsigned int q,s;
+  unsigned int num;
+  state_t* state;
+
+  num = 0;
+  state = states;
+  do
+  {
+    if (state->action.acv)
+    {
+      q = get_action_function_num (state->action.acv);
+      s = action_player_type [q];
+      if (state->pcount != s)
+      {
+	printf ("State %u function type corrected from %u to %u\n", num, state->pcount, s);
+	state->pcount = s;
+      }
+    }
+    state++;
+  } while (++num < NUMSTATES);
+}
+
+/* ---------------------------------------------------------------------------- */
 /* pointer [number] (frame [record]) = frame [value] */
 
 /* The pointer number is the n'th frame discounting the NULL pointers */
@@ -1735,23 +1767,13 @@ static void dh_write_to_pointer (unsigned int number, unsigned int record, unsig
     }
     else
     {
-      p = get_action_function_num (states_ptr_copy[record].acv);
       q = get_action_function_num (states_ptr_copy[value].acv);
-
-      if ((action_player_type [q] != 255)
-       && (action_player_type [p] != action_player_type [q]))
-      {
-	fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
-		dehack_codeptr_frames [p], dehack_codeptr_frames [q], line_no-1);
-      }
-      else
-      {
-	states[record].action.acv = states_ptr_copy[value].acv;
+      states[record].pcount = action_player_type [q];
+      states[record].action.acv = states_ptr_copy[value].acv;
 #if 0
-	printf ("Pointer copied from frame %d to %d (A_%s -> A_%s)\n",
+      printf ("Pointer copied from frame %d to %d (A_%s -> A_%s)\n",
 		value, record, dehack_codeptr_frames [p], dehack_codeptr_frames [q]);
 #endif
-      }
     }
   }
 }
@@ -3495,17 +3517,9 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		unsigned int p;
 		p = get_action_function_num (states[counter2].action.acv);
 
-		if ((action_player_type [counter1] != 255)
-		 && (action_player_type [p] != action_player_type [counter1]))
-		{
-		  fprintf (stderr, "Cannot replace A_%s with A_%s at line %d\n",
-			dehack_codeptr_frames [p], dehack_codeptr_frames [counter1], dh_line_number-1);
-		}
-		else
-		{
-		  states[counter2].action.acv = action_ptrs[counter1].acv;
-		  // printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
-		}
+		states[counter2].pcount = action_player_type [counter1];
+		states[counter2].action.acv = action_ptrs[counter1].acv;
+		// printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
 	      }
 	    }
 	    break;
