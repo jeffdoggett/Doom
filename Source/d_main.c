@@ -1754,7 +1754,10 @@ static void D_LoadWads (void)
 static void D_ShowStartupMessage (void)
 {
   unsigned int	p,q;
-  char		file[256];
+  unsigned int	len;
+  char *	p1;
+  char *	p2;
+  char *	linebuf;
 
   q = 0;
   p = 0;
@@ -1762,10 +1765,11 @@ static void D_ShowStartupMessage (void)
   {
     if (startup_messages [p] && startup_messages[p][0])
     {
-      unsigned int len;
-      char * p1;
-      char * p2;
-      p1 = file;
+      len = strlen (startup_messages [p]);
+      linebuf = malloc (len+10);
+      if (linebuf == NULL)
+        break;
+      p1 = linebuf;
       sprintf (p1, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
       do
       {
@@ -1790,6 +1794,7 @@ static void D_ShowStartupMessage (void)
 	putchar ('\n');		// Write the LF that we clobbered.
 	p1 = p2 + 1;
       } while (*p1);
+      free (linebuf);
       q++;
     }
   } while (++p < ARRAY_SIZE(startup_messages));

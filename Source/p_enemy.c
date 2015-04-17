@@ -88,10 +88,6 @@ dirtype_t diags[] =
 mobj_t*		soundtarget;
 
 //-----------------------------------------------------------------------------
-
-void A_Fall (mobj_t *actor);
-
-//-----------------------------------------------------------------------------
 /*
   Icarus level 24 (The Haunting) and Hr level 26 (Afterlife)
   are setup to create ghosts when a Vile resurrects crushed bodies.
@@ -1314,7 +1310,6 @@ void A_VileStart (mobj_t* actor)
 // A_Fire
 // Keep fire in front of player unless out of sight
 //
-void A_Fire (mobj_t* actor);
 
 void A_StartFire (mobj_t* actor)
 {
