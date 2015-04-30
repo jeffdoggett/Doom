@@ -936,6 +936,7 @@ static void F_CastDrawer (void)
   int drawstyle;
   fixed_t scale;
   patch_t* patch;
+  mobjinfo_t* info;
   spritedef_t* sprdef;
   spriteframe_t* sprframe;
 
@@ -956,10 +957,12 @@ static void F_CastDrawer (void)
   if (sprframe->flip[rot])
     drawstyle |= 1;			/* Bit 0 = draw flipped */
 
-  if (castorder[castnum].type == MT_SHADOWS)
+  info = &mobjinfo[castorder[castnum].type];
+
+  if (info->flags & MF_SHADOW)
     drawstyle |= 2;			/* Bit 1 = draw fuzzy */
 
-  scale = mobjinfo[castorder[castnum].type].scale;
+  scale = info->scale;
 
 #if 0
   if (scale == FRACUNIT)		/* Always do it! */
