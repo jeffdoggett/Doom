@@ -381,7 +381,7 @@ EV_DoCeiling
 	      default:
 		msec = P_FindModelCeilingSector (sec->ceilingheight,secnum);
 	    }
-	    if (sec)
+	    if (msec)
 	      ceiling -> secspecial = msec;
 	  }
 	}
