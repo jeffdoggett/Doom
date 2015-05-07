@@ -30,6 +30,21 @@ static const char rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "includes.h"
 
+char * screenshot_messages_orig [] =
+{
+  "screen shot",
+  "DOOM",
+  NULL
+};
+
+char * screenshot_messages [ARRAY_SIZE(screenshot_messages_orig)];
+
+typedef enum
+{
+  SC_MESSAGE,
+  SC_FILENAME,
+} screenshot_texts_t;
+
 //-----------------------------------------------------------------------------
 //
 // M_DrawText
@@ -585,7 +600,7 @@ void M_ScreenShot (void)
   do
   {
     i++;
-    sprintf (lbmname, "%s"DIRSEP"DOOM%04u"EXTSEP"pcx", basedefaultdir, i);
+    sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", basedefaultdir, screenshot_messages[SC_FILENAME], i);
   } while (access(lbmname,0) != -1);	// file doesn't exist
 
   // save the pcx file
@@ -596,7 +611,10 @@ void M_ScreenShot (void)
   set_riscos_filetype (lbmname, 0x697);
 #endif
 
-  players[consoleplayer].message = HU_printf ("screen shot - %s", lbmname);
+  players[consoleplayer].message = HU_printf ("%s - %s", screenshot_messages[SC_MESSAGE], lbmname);
+#ifdef NORMALUNIX
+  printf ("%s\n", players[consoleplayer].message);
+#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -108,7 +108,7 @@ char * demo_names_orig [] =
   "DEMO2",
   "DEMO3",
   "DEMO4",
-  NULL,
+  NULL
 };
 
 char * demo_names [ARRAY_SIZE(demo_names_orig)];
@@ -135,6 +135,10 @@ extern char * menu_messages [];
 extern char * menu_messages_orig [];
 extern char * endmsg [];
 extern char * endmsg_orig [];
+
+/* Strings from m_misc.c */
+extern char * screenshot_messages [];
+extern char * screenshot_messages_orig [];
 
 /* Strings from p_doors.c */
 extern char * door_messages [];
@@ -320,6 +324,7 @@ static void init_text_messages (void)
   init_a_text_block (finale_backdrops, finale_backdrops_orig);
   init_a_text_block (got_messages, got_messages_orig);
   init_a_text_block (menu_messages, menu_messages_orig);
+  init_a_text_block (screenshot_messages, screenshot_messages_orig);
   init_a_text_block (endmsg, endmsg_orig);
   init_a_text_block (door_messages, door_messages_orig);
   init_a_text_block (save_game_messages, save_game_messages_orig);

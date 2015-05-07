@@ -43,6 +43,10 @@ extern char * endmsg [];
 extern char * endmsg_orig [];
 extern int qty_endmsg_nums;
 
+/* Strings from m_misc.c */
+extern char * screenshot_messages [];
+extern char * screenshot_messages_orig [];
+
 /* Strings from p_doors.c */
 extern char * door_messages [];
 extern char * door_messages_orig [];
@@ -668,6 +672,12 @@ static const char * const menu_message_names [] =
   "GAMMALVL3",
   "GAMMALVL4",
   "EMPTYSTRING",
+  NULL
+};
+
+static const char * const screenshot_message_names [] =
+{
+  "SCREENSHOT",
   NULL
 };
 
@@ -2194,6 +2204,7 @@ static void write_all_texts (FILE * fout)
   counter = write_a_text_bank (fout, (const char **)sound_names_copy, counter);
   counter = write_a_text_bank (fout, (const char **)music_names_copy, counter);
   counter = write_a_text_bank (fout, (const char **)sprnames_orig, counter);
+  counter = write_a_text_bank (fout, (const char **)screenshot_messages, counter);
 
   pos = 0;
   do
@@ -2407,6 +2418,22 @@ static unsigned int replace_menu_text (char * orig, char * newt)
   if (counter != -1)
   {
     menu_messages [counter] = newt;
+    return (0);
+  }
+
+  return (1);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static unsigned int replace_screenshot_text (char * orig, char * newt)
+{
+  unsigned int counter;
+
+  counter = dh_search_str_tab_a ((const char **)screenshot_messages_orig, orig);
+  if (counter != -1)
+  {
+    screenshot_messages [counter] = newt;
     return (0);
   }
 
@@ -2987,6 +3014,12 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     return (&castorder[counter1].name);
   }
 
+  counter1 = dh_search_str_tab_a (screenshot_message_names, ttext);
+  if (counter1 != -1)
+  {
+    return (&screenshot_messages[counter1]);
+  }
+
   return (NULL);
 }
 
@@ -3269,6 +3302,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      if (replace_chat_messages (string1, string2))
 	      if (replace_player_names (string1, string2))
 	      if (replace_sprite_names (string1, string2))
+	      if (replace_screenshot_text (string1, string2))
 	      {
 		if (M_CheckParm ("-showunknown"))
 		  fprintf (stderr, "DeHackEd:Failed to match text at line %d\n%s\n%s", counter2,string1,string2);
