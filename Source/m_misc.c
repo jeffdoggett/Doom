@@ -33,7 +33,7 @@ static const char rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 char * screenshot_messages_orig [] =
 {
   "screen shot",
-  "DOOM",
+  "DOOM00.pcx", 
   NULL
 };
 
@@ -585,22 +585,25 @@ WritePCXfile
 //
 void M_ScreenShot (void)
 {
-  int		i;
+  int	i;
   byte*	linear;
-  char	lbmname[40];
+  char	pcxname [6];
+  char	lbmname [80];
 
   // munge planar buffer to linear
   linear = screens[2];
   I_ReadScreen (linear);
 
+  // I only want the first four characters as I now use a four digit index...
+  memcpy (pcxname, screenshot_messages[SC_FILENAME], 4);
+  pcxname [4] = 0;
 
   // find a file name to save it to
-
   i=~0;
   do
   {
     i++;
-    sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", basedefaultdir, screenshot_messages[SC_FILENAME], i);
+    sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", basedefaultdir, pcxname, i);
   } while (access(lbmname,0) != -1);	// file doesn't exist
 
   // save the pcx file
