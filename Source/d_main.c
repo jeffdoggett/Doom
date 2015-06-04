@@ -1374,19 +1374,20 @@ static void IdentifyVersion (void)
       strcat (wad_dirname, DIRSEP"Iwads");
 
       doomwaddir = wad_dirname;
-      printf ("doomwaddir = %s\n", doomwaddir);
+      // printf ("doomwaddir = %s\n", doomwaddir);
+
+      p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
+      if (p)
+      {
+	doomwadpath = myargv[p+1];
+      }
+      else
+      {
+	doomwadpath = getenv ("DOOMWADPATH");
+      }
     }
   }
 
-  p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
-  if (p)
-  {
-    doomwadpath = myargv[p+1];
-  }
-  else
-  {
-    doomwadpath = getenv ("DOOMWADPATH");
-  }
 #endif
 
   mkdir (basedefaultdir, 0755);
