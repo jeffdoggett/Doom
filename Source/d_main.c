@@ -1093,6 +1093,41 @@ static int search_for_iwad (char * wad_filename, const char *doomwaddir, const c
 
 //-----------------------------------------------------------------------------
 
+static int search_for_iwad_in_path (char * wad_filename, const char *doomwadpath, const char * iwadname, unsigned int reqd_pwad)
+{
+  char cc;
+  int iwad;
+  char * ptr;
+  char doomwaddir [200];
+
+  if (doomwadpath)
+  {
+    ptr = doomwaddir;
+    do
+    {
+      cc = *doomwadpath++;
+      if ((cc == 0) || (cc == ':') || (cc == ','))
+      {
+	*ptr = 0;
+	if (M_CheckParm ("-showdirsearch"))
+	  printf ("Searching path element %s\n", doomwaddir);
+	iwad = search_for_iwad (wad_filename, doomwaddir, iwadname, reqd_pwad);
+	if (iwad)
+	  return (iwad);
+	ptr = doomwaddir;
+      }
+      else
+      {
+	*ptr++ = cc;
+      }
+    } while (cc);
+  }
+
+  return (0);
+}
+
+//-----------------------------------------------------------------------------
+
 #ifdef NORMALUNIX
 static int is_a_writable_directory (const char * name)
 {
@@ -1157,6 +1192,66 @@ static int already_in_wadlist (const char * filename, char * suffix)
 #define get_wad_filename(d,r,f)  sprintf(d,"%s"DIRSEP"%s"EXTSEP"wad",r,f);
 
 //-----------------------------------------------------------------------------
+
+static int search_for_specific_wad_in_path (const char * path, const char * name)
+{
+  char cc;
+  char * ptr;
+  char doomwaddir [200];
+  char wad_filename [200];
+
+  if (path)
+  {
+    ptr = doomwaddir;
+    do
+    {
+      cc = *path++;
+      if ((cc == 0) || (cc == ':') || (cc == ','))
+      {
+	*ptr = 0;
+	get_wad_filename (wad_filename, doomwaddir, name);
+	if (M_CheckParm ("-showdirsearch"))
+	  printf ("Checking for %s\n", wad_filename);
+	if (!wad_present (wad_filename))
+	{
+	  IdentifyIwad (wad_filename);
+	  return (1);
+	}
+	ptr = doomwaddir;
+      }
+      else
+      {
+	*ptr++ = cc;
+      }
+    } while (cc);
+  }
+
+  return (0);
+}
+
+//-----------------------------------------------------------------------------
+
+#if 0
+#define search_for_specific_wad(p1,p2,n)		\
+	   ((search_for_specific_wad_in_path (p1,n))	\
+	|| (search_for_specific_wad_in_path (p2,n)))
+
+#endif
+
+#ifndef search_for_specific_wad
+static int search_for_specific_wad (const char * path1, const char * path2, const char * name)
+{
+  int rc;
+
+  rc = search_for_specific_wad_in_path (path1, name);
+
+  if (rc == 0)
+    rc = search_for_specific_wad_in_path (path2, name);
+
+  return (rc);
+}
+#endif
+//-----------------------------------------------------------------------------
 //
 // IdentifyVersion
 // Checks availability of IWAD files by name,
@@ -1170,6 +1265,7 @@ static void IdentifyVersion (void)
   unsigned int reqd_pwad;
   char * f;
   const char *doomwaddir;
+  const char *doomwadpath;
   char wad_filename [200];
   char wad_dirname [200];
 
@@ -1193,6 +1289,16 @@ static void IdentifyVersion (void)
       doomwaddir = wad_dirname;
       // printf ("doomwaddir = %s\n", doomwaddir);
     }
+  }
+
+  p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
+  if (p)
+  {
+    doomwadpath = myargv[p+1];
+  }
+  else
+  {
+    doomwadpath = getenv("DOOMWADPATH");
   }
 
   basedefaultdir [0] = 0;
@@ -1271,6 +1377,16 @@ static void IdentifyVersion (void)
       printf ("doomwaddir = %s\n", doomwaddir);
     }
   }
+
+  p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
+  if (p)
+  {
+    doomwadpath = myargv[p+1];
+  }
+  else
+  {
+    doomwadpath = getenv ("DOOMWADPATH");
+  }
 #endif
 
   mkdir (basedefaultdir, 0755);
@@ -1337,6 +1453,12 @@ static void IdentifyVersion (void)
       return;
     }
 
+    if (search_for_iwad_in_path (wad_filename, doomwadpath, myargv[p+1], 0))
+    {
+      IdentifyIwad (wad_filename);
+      return;
+    }
+
     /* Try the same directory as the executable */
     dirname (wad_dirname, myargv [0]);
     if ((strcmp (wad_dirname, doomwaddir))
@@ -1395,79 +1517,62 @@ static void IdentifyVersion (void)
 
   if ((reqd_pwad == 0) || (reqd_pwad >= 4))
   {
-    get_wad_filename (wad_filename, doomwaddir, "doom2f");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "doom2f"))
     {
       // C'est ridicule!
       // Let's handle languages in config files, okay?
       language = french;
       printf("French version\n");
-      IdentifyIwad (wad_filename);
       return;
     }
-    get_wad_filename (wad_filename, doomwaddir, "doom2");
-    if (!wad_present (wad_filename))
+
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "doom2"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
   }
 
   if (reqd_pwad == 0)
   {
-    get_wad_filename (wad_filename, doomwaddir, "plutonia");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "plutonia"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
 
-    get_wad_filename (wad_filename, doomwaddir, "tnt");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "tnt"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
   }
 
   if (reqd_pwad < 4)
   {
-    get_wad_filename (wad_filename, doomwaddir, "doomu");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "doomu"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
 
-    get_wad_filename (wad_filename, doomwaddir, "doom");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "doom"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
   }
 
   if ((reqd_pwad == 0) || (reqd_pwad >= 4))
   {
-    get_wad_filename (wad_filename, doomwaddir, "freedoom2");
-    if (!wad_present (wad_filename))
+    if (search_for_specific_wad (doomwaddir, doomwadpath, "freedoom2"))
     {
-      IdentifyIwad (wad_filename);
       return;
     }
   }
 
-  get_wad_filename (wad_filename, doomwaddir, "freedoom1");
-  if (!wad_present (wad_filename))
+  if (search_for_specific_wad (doomwaddir, doomwadpath, "freedoom1"))
   {
-    IdentifyIwad (wad_filename);
     return;
   }
 
-  get_wad_filename (wad_filename, doomwaddir, "doom1");
-  if (!wad_present (wad_filename))
+  if (search_for_specific_wad (doomwaddir, doomwadpath, "doom1"))
   {
-    IdentifyIwad (wad_filename);
     return;
   }
 
