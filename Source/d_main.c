@@ -1360,6 +1360,8 @@ static void IdentifyVersion (void)
   else
     strcpy (basedefaultdir, "<Choices$Dir>.dsg");
 
+  doomwadpath = NULL;
+
   p = M_CheckParm ("-iwad_dir");	// Have we been given a directory on the command line?
   if (p)
   {
