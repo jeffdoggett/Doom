@@ -45,6 +45,7 @@
 #define DIRSEPC		'.'
 #define EXTSEP		"/"
 #define EXTSEPC		'/'
+#define PATHSEPC	','
 #else
 //#define SAVEGAMEDIR	""
 #define SAVEGAMENAME	"doomsav"
@@ -52,6 +53,7 @@
 #define DIRSEPC		'/'
 #define EXTSEP		"."
 #define EXTSEPC		'.'
+#define PATHSEPC	':'
 #endif
 
 

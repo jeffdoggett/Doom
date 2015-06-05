@@ -1092,35 +1092,60 @@ static int search_for_iwad (char * wad_filename, const char *doomwaddir, const c
 }
 
 //-----------------------------------------------------------------------------
+/*
+  Extract the next element from the path variable.
+  Remove any trailing '/' (or . for riscos)
+*/
+
+static const char * next_path_element (char * dest, const char * path)
+{
+  char cc;
+  char *ptr;
+
+  ptr = dest;
+  do
+  {
+    cc = *path;
+    if ((cc == 0) || (cc == PATHSEPC))
+    {
+      *ptr = 0;
+      while (ptr > (dest+1))
+      {
+	ptr--;
+	if (*ptr != DIRSEPC)
+	  break;
+	*ptr = 0;
+      }
+      break;
+    }
+    else
+    {
+      *ptr++ = cc;
+      path++;
+    }
+  } while (1);
+
+  return (path);
+}
+
+//-----------------------------------------------------------------------------
 
 static int search_for_iwad_in_path (char * wad_filename, const char *doomwadpath, const char * iwadname, unsigned int reqd_pwad)
 {
-  char cc;
   int iwad;
-  char * ptr;
   char doomwaddir [200];
 
   if (doomwadpath)
   {
-    ptr = doomwaddir;
-    do
+    while (*doomwadpath)
     {
-      cc = *doomwadpath++;
-      if ((cc == 0) || (cc == ':') || (cc == ','))
-      {
-	*ptr = 0;
-	if (M_CheckParm ("-showdirsearch"))
-	  printf ("Searching path element %s\n", doomwaddir);
-	iwad = search_for_iwad (wad_filename, doomwaddir, iwadname, reqd_pwad);
-	if (iwad)
-	  return (iwad);
-	ptr = doomwaddir;
-      }
-      else
-      {
-	*ptr++ = cc;
-      }
-    } while (cc);
+      doomwadpath = next_path_element (doomwaddir, doomwadpath);
+      if (M_CheckParm ("-showdirsearch"))
+	printf ("Searching path element %s\n", doomwaddir);
+      iwad = search_for_iwad (wad_filename, doomwaddir, iwadname, reqd_pwad);
+      if (iwad)
+	return (iwad);
+    }
   }
 
   return (0);
@@ -1195,35 +1220,23 @@ static int already_in_wadlist (const char * filename, char * suffix)
 
 static int search_for_specific_wad_in_path (const char * path, const char * name)
 {
-  char cc;
-  char * ptr;
   char doomwaddir [200];
   char wad_filename [200];
 
   if (path)
   {
-    ptr = doomwaddir;
-    do
+    while (*path)
     {
-      cc = *path++;
-      if ((cc == 0) || (cc == ':') || (cc == ','))
+      path = next_path_element (doomwaddir, path);
+      get_wad_filename (wad_filename, doomwaddir, name);
+      if (M_CheckParm ("-showdirsearch"))
+	printf ("Checking for %s\n", wad_filename);
+      if (!wad_present (wad_filename))
       {
-	*ptr = 0;
-	get_wad_filename (wad_filename, doomwaddir, name);
-	if (M_CheckParm ("-showdirsearch"))
-	  printf ("Checking for %s\n", wad_filename);
-	if (!wad_present (wad_filename))
-	{
-	  IdentifyIwad (wad_filename);
-	  return (1);
-	}
-	ptr = doomwaddir;
+	IdentifyIwad (wad_filename);
+	return (1);
       }
-      else
-      {
-	*ptr++ = cc;
-      }
-    } while (cc);
+    }
   }
 
   return (0);
@@ -1351,8 +1364,6 @@ static void IdentifyVersion (void)
 #endif
 
 #ifdef __riscos
-  /* Have to be careful with the getenv call here as we cannot call it twice */
-  /* without taking a copy, as it corrupts the workspace next time. */
 
   f = getenv ("DoomSavDir");
   if (f)
@@ -1360,7 +1371,8 @@ static void IdentifyVersion (void)
   else
     strcpy (basedefaultdir, "<Choices$Dir>.dsg");
 
-  doomwadpath = NULL;
+  /* Have to be careful with the getenv call here as we cannot call it */
+  /* twice without taking a copy, as it corrupts the workspace next time. */
 
   p = M_CheckParm ("-iwad_dir");	// Have we been given a directory on the command line?
   if (p)
@@ -1370,24 +1382,27 @@ static void IdentifyVersion (void)
   else
   {
     doomwaddir = getenv ("DOOMWADDIR");
-    if (!doomwaddir)
+    if (doomwaddir)
+    {
+      strcpy (wad_dirname, doomwaddir);
+    }
+    else
     {
       dirname (wad_dirname, myargv [0]);
       strcat (wad_dirname, DIRSEP"Iwads");
-
-      doomwaddir = wad_dirname;
       // printf ("doomwaddir = %s\n", doomwaddir);
-
-      p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
-      if (p)
-      {
-	doomwadpath = myargv[p+1];
-      }
-      else
-      {
-	doomwadpath = getenv ("DOOMWADPATH");
-      }
     }
+    doomwaddir = wad_dirname;
+  }
+
+  p = M_CheckParm ("-iwad_path");	// Have we been given a directory on the command line?
+  if (p)
+  {
+    doomwadpath = myargv[p+1];
+  }
+  else
+  {
+    doomwadpath = getenv ("DOOMWADPATH");
   }
 
 #endif
@@ -1881,7 +1896,7 @@ static void D_ShowStartupMessage (void)
       len = strlen (startup_messages [p]);
       linebuf = malloc (len+10);
       if (linebuf == NULL)
-        break;
+	break;
       p1 = linebuf;
       sprintf (p1, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
       do
@@ -1901,7 +1916,7 @@ static void D_ShowStartupMessage (void)
 	    }
 	  }
 	}
-        printf ("%s\n", p1);
+	printf ("%s\n", p1);
 	if (p2 == NULL)
 	  break;
 	putchar ('\n');		// Write the LF that we clobbered.
