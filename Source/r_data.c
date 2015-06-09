@@ -35,6 +35,7 @@ static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 extern void * alloca (unsigned int);
 #endif
 
+// #define MIN_SIZE_LUMP	12
 
 int		numflats;
 int		numspritelumps;
@@ -131,7 +132,7 @@ R_DrawColumnInCache
 	if (count > 0)
 	{
 	    memcpy (cache + position, source, count);
-            memset (marks + position, 0xff, count);
+	    memset (marks + position, 0xff, count);
 	}
 	patch = (column_t *)(  (byte *)patch + patch->length + 4);
     }
@@ -158,8 +159,8 @@ static void R_GenerateComposite (int texnum)
     int			x2;
     int			i;
     column_t*		patchcol;
-    dshort_t*           collump;
-    unsigned int*       colofs;
+    dshort_t*		collump;
+    unsigned int*	colofs;
     byte*		marks;
     byte*		source;
 
@@ -170,7 +171,7 @@ static void R_GenerateComposite (int texnum)
 		      (void **)&texturecomposite[texnum]);
 
     if ((marks = (byte*)malloc(texture->width * texture->height)) == NULL)
-        I_Error("R_GenerateComposite: couldn't alloc marks");
+	I_Error("R_GenerateComposite: couldn't alloc marks");
 
     memset(marks, 0, texture->width * texture->height);
 
@@ -184,12 +185,12 @@ static void R_GenerateComposite (int texnum)
 	 i<texture->patchcount;
 	 i++, patch++)
     {
-        if (patch->patch == -1)
+	if (patch->patch == -1)
 	{
 	  realpatch = &dummyPatch.patch;
 	  patchsize = sizeof(dummyPatch);
 	}
-        else
+	else
 	{
 	  realpatch = W_CacheLumpNum (patch->patch, PU_CACHE);
 	  patchsize = (unsigned int)(lumpinfo[patch->patch].size);
@@ -211,47 +212,47 @@ static void R_GenerateComposite (int texnum)
 	  /* Column has multiple patches?*/
 	  if (collump[x] < 0)
 	  {
-            unsigned int pcoloff = LONG(realpatch->columnofs[x-x1]);;
+	    unsigned int pcoloff = LONG(realpatch->columnofs[x-x1]);;
 
 	    if (pcoloff <= patchsize)
 	    {
 	      patchcol = (column_t *)((byte *)realpatch + pcoloff);
 	      R_DrawColumnInCache (patchcol,
-                                   block + colofs[x],
-                                   patch->originy,
-                                   texture->height,
-                                   marks + x * texture->height);
+				   block + colofs[x],
+				   patch->originy,
+				   texture->height,
+				   marks + x * texture->height);
 	    }
 	  }
 	}
     }
 
     if ((source = malloc(texture->height)) == NULL)
-        I_Error("R_GenerateComposite: couldn't alloc source");
+	I_Error("R_GenerateComposite: couldn't alloc source");
     for (i=0; i<texture->width; i++)
     {
-        if (collump[i] == -1)
-        {
-            column_t *col = (column_t*)(block + colofs[i] - 3);
-            const byte* mark = marks + i * texture->height;
-            int j = 0;
+	if (collump[i] == -1)
+	{
+	    column_t *col = (column_t*)(block + colofs[i] - 3);
+	    const byte* mark = marks + i * texture->height;
+	    int j = 0;
 
-            memcpy(source, (byte*)col + 3, texture->height);
+	    memcpy(source, (byte*)col + 3, texture->height);
 
-            while (1)
-            {
-                while (j < texture->height && !mark[j]) j++;
-                if (j >= texture->height)
-                {
-                    col->topdelta = 0xff;
-                    break;
-                }
-                col->topdelta = (byte)j;
-                for (col->length=0; j<texture->height && mark[j]; j++) col->length++;
-                memcpy((byte*)col + 3, source + col->topdelta, col->length);
-                col = (column_t*)((byte*)col + col->length + 4);
-            }
-        }
+	    while (1)
+	    {
+		while (j < texture->height && !mark[j]) j++;
+		if (j >= texture->height)
+		{
+		    col->topdelta = 0xff;
+		    break;
+		}
+		col->topdelta = (byte)j;
+		for (col->length=0; j<texture->height && mark[j]; j++) col->length++;
+		memcpy((byte*)col + 3, source + col->topdelta, col->length);
+		col = (column_t*)((byte*)col + col->length + 4);
+	    }
+	}
     }
     free(source);
     free(marks);
@@ -275,8 +276,8 @@ static void R_GenerateLookup (int texnum)
     int			x1;
     int			x2;
     int			i;
-    dshort_t*           collump;
-    unsigned int*       colofs;
+    dshort_t*		collump;
+    unsigned int*	colofs;
     int			csize;
     struct {dushort_t patches, posts;} *patchcount;
     unsigned int	lumpsize;
@@ -307,16 +308,16 @@ static void R_GenerateLookup (int texnum)
 	 i<texture->patchcount;
 	 i++, patch++)
     {
-        if (patch->patch == -1)
-        {
+	if (patch->patch == -1)
+	{
 	  realpatch = &dummyPatch.patch;
 	  lumpsize = sizeof(dummyPatch);
 	}
 	else
 	{
 	  realpatch = W_CacheLumpNum (patch->patch, PU_CACHE);
-          lumpsize = (unsigned int)lumpinfo[patch->patch].size;
-        }
+	  lumpsize = (unsigned int)lumpinfo[patch->patch].size;
+	}
 
 	x1 = patch->originx;
 	x2 = x1 + SHORT(realpatch->width);
@@ -330,27 +331,27 @@ static void R_GenerateLookup (int texnum)
 	    x2 = texture->width;
 	for ( ; x<x2 ; x++)
 	{
-            /* to fix Medusa bug */
-            const column_t *col;
-            unsigned int ofs;
+	    /* to fix Medusa bug */
+	    const column_t *col;
+	    unsigned int ofs;
 
 	    ofs = LONG(realpatch->columnofs[x-x1]);
 
 	    collump[x] = patch->patch;
 	    colofs[x] = ofs+3;
 
-            /* safety */
-            if (ofs < lumpsize)
-            {
-                col = (column_t*)((byte*)realpatch + ofs);
-                while ((ofs < lumpsize) && (col->topdelta != 0xff))
+	    /* safety */
+	    if (ofs < lumpsize)
+	    {
+		col = (column_t*)((byte*)realpatch + ofs);
+		while ((ofs < lumpsize) && (col->topdelta != 0xff))
 		{
 		  patchcount[x].posts++;
 		  ofs += col->length + 4;
-                  col = (column_t*)((byte*)realpatch + ofs);
+		  col = (column_t*)((byte*)realpatch + ofs);
 		}
-                patchcount[x].patches++;
-            }
+		patchcount[x].patches++;
+	    }
 	}
     }
 
@@ -358,9 +359,9 @@ static void R_GenerateLookup (int texnum)
 
     for (x=0, csize=0; x<texture->width ; x++)
     {
-        int	pcnt;
+	int	pcnt;
 
-        pcnt = patchcount[x].patches;
+	pcnt = patchcount[x].patches;
 	if (!pcnt)
 	{
 	  char namet [10];
@@ -377,9 +378,9 @@ static void R_GenerateLookup (int texnum)
 	{
 	    /* Use the cached block.*/
 	    collump[x] = -1;
-            colofs[x] = csize + 3;
-            csize += 4*patchcount[x].posts + 1;
-            /* changed texturecolumnofs, texture may safely be > 64k now */
+	    colofs[x] = csize + 3;
+	    csize += 4*patchcount[x].posts + 1;
+	    /* changed texturecolumnofs, texture may safely be > 64k now */
 #if 0
 	    if (texturecompositesize[texnum] > 0x10000-texture->height)
 	    {
@@ -779,142 +780,142 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
     }
     else
     {
-	  valid = true;   /* Assume ok */
+      valid = true;   /* Assume ok */
 
-	  if ((lump_ptr->name[0] == 0)			 /* If this hasn't already been invalidated */
-#ifdef REMOVE_ZERO_SIZE_LUMPS
-	   || (lump_ptr->size == 0)
+      if ((lump_ptr->name[0] == 0)		/* If this hasn't already been invalidated */
+#ifdef MIN_SIZE_LUMP
+       || (lump_ptr->size < MIN_SIZE_LUMP)
 #endif
-	   || (strncasecmp (lump_ptr->name, end, 8) == 0)	/* Nested? */
-	   || (strncasecmp (lump_ptr->name, eend, 8) == 0)
-	   || (W_CheckNumForNameLinear (lump_ptr->name) != lump)) /* If there's another one at a higher pos */
+       || (strncasecmp (lump_ptr->name, end, 8) == 0)	/* Nested? */
+       || (strncasecmp (lump_ptr->name, eend, 8) == 0)
+       || (W_CheckNumForNameLinear (lump_ptr->name) != lump)) /* If there's another one at a higher pos */
+      {
+	valid = false;
+      }
+      else if (doing_sprites)
+      {
+	if (lump_ptr->name[6])		/* Does it have a flipped section ? */
+	{
+	  memcpy (sprname, lump_ptr->name, 8);
+	  sprname [8] = 0;
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
+	  if (i != -1)
 	  {
-	    valid = false;
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	  }
-	  else if (doing_sprites)
+
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	  if (i != -1)
 	  {
-	    if (lump_ptr->name[6])    /* Does it have a flipped section ? */
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+	  }
+
+	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
+	  {				/* Remove all rotated sprites */
+    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
+    	    while (i != -1)
+    	    {
+     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
+    	    }
+	  }
+	  else				/* Having found a rotated sprite, remove */
+	  {				/* any non-rotated ones below */
+	    sprname [5] = '0';
+	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	    if (i != -1)
 	    {
-	      memcpy (sprname, lump_ptr->name, 8);
-	      sprname [8] = 0;
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-              if (sprname [5] == '0')      /* If this a non-rotated sprite then */
-              {                            /* Remove all rotated sprites */
-    	        i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	        while (i != -1)
-    	        {
-     		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-    	          i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	        }
-              }
-              else                        /* Having found a rotated sprite, remove */
-              {                           /* any non-rotated ones below */
-                sprname [5] = '0';
-                i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	        if (i != -1)
-	        {
-		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	        }
-	        memcpy (sprname, lump_ptr->name, 8);
-              }
-
-	      sprname [4] = lump_ptr->name [6];
-	      sprname [5] = lump_ptr->name [7];
-	      sprname [6] = lump_ptr->name [4];
-	      sprname [7] = lump_ptr->name [5];
-
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-              if (sprname [5] == '0')      /* If this a non-rotated sprite then */
-              {                            /* Remove all rotated sprites */
-    	        i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	        while (i != -1)
-    	        {
-     		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-    	          i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	        }
-              }
-              else                        /* Having found a rotated sprite, remove */
-              {                           /* any non-rotated ones below */
-                sprname [5] = '0';
-                i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	        if (i != -1)
-	        {
-		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	        }
-              }
+	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	    }
-	    else
+	    memcpy (sprname, lump_ptr->name, 8);
+	  }
+
+	  sprname [4] = lump_ptr->name [6];
+	  sprname [5] = lump_ptr->name [7];
+	  sprname [6] = lump_ptr->name [4];
+	  sprname [7] = lump_ptr->name [5];
+
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
+	  if (i != -1)
+	  {
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+	  }
+
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	  if (i != -1)
+	  {
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+	  }
+
+	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
+	  {				/* Remove all rotated sprites */
+    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
+    	    while (i != -1)
+    	    {
+     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
+    	    }
+	  }
+	  else				/* Having found a rotated sprite, remove */
+	  {				/* any non-rotated ones below */
+	    sprname [5] = '0';
+	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	    if (i != -1)
 	    {
-	      memcpy (sprname, lump_ptr->name, 8);
-	      sprname [8] = 0;
-	      sprname [6] = lump_ptr->name [4];
-	      sprname [7] = lump_ptr->name [5];
-
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-	      i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	      if (i != -1)
-	      {
-		lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	      }
-
-              if (sprname [5] == '0')      /* If this a non-rotated sprite then */
-              {                            /* Remove all rotated sprites */
-    	        i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	        while (i != -1)
-    	        {
-     		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-    	          i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	        }
-              }
-              else                        /* Having found a rotated sprite, remove */
-              {                           /* any non-rotated ones below */
-                sprname [5] = '0';
-                i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	        if (i != -1)
-	        {
-		  lumpinfo[i].name[0] = 0;   /* Lose the lower one */
-	        }
-              }
+	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	    }
 	  }
+	}
+	else
+	{
+	  memcpy (sprname, lump_ptr->name, 8);
+	  sprname [8] = 0;
+	  sprname [6] = lump_ptr->name [4];
+	  sprname [7] = lump_ptr->name [5];
 
-	  if (valid == true)		   /* If this is the first one */
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
+	  if (i != -1)
 	  {
-	    total++;
-	    if ((total & 127) == 0)
-	      printf (".");
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	  }
-	  else
+
+	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	  if (i != -1)
 	  {
-	    lump_ptr->name[0] = 0;   /* It's a duplicate, so destroy it! */
+	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	  }
+
+	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
+	  {				/* Remove all rotated sprites */
+    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
+    	    while (i != -1)
+    	    {
+     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
+    	    }
+	  }
+	  else				/* Having found a rotated sprite, remove */
+	  {				/* any non-rotated ones below */
+	    sprname [5] = '0';
+	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
+	    if (i != -1)
+	    {
+	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
+	    }
+	  }
+	}
+      }
+
+      if (valid == true)		/* If this is the first one */
+      {
+	total++;
+	if ((total & 127) == 0)
+	  printf (".");
+      }
+      else
+      {
+	lump_ptr->name[0] = 0;		/* It's a duplicate, so destroy it! */
+      }
     }
   } while (lump);
 
@@ -962,8 +963,8 @@ void R_InitFlats (void)
     }
     else
     if ((lump_ptr->name[0])
-#ifdef REMOVE_ZERO_SIZE_LUMPS
-     && (lump_ptr->size)
+#ifdef MIN_SIZE_LUMP
+     && (lump_ptr->size >= MIN_SIZE_LUMP)
 #endif
      && (strncasecmp (lump_ptr->name, "F_START", 8))
      && (strncasecmp (lump_ptr->name, "FF_START", 8)))
@@ -1030,8 +1031,8 @@ void R_InitSpriteLumps (void)
     }
     else
     if ((lump_ptr->name[0])
-#ifdef REMOVE_ZERO_SIZE_LUMPS
-     && (lump_ptr -> size)
+#ifdef MIN_SIZE_LUMP
+     && (lump_ptr -> size >= MIN_SIZE_LUMP)
 #endif
      && (strncasecmp (lump_ptr->name, "S_START", 8))
      && (strncasecmp (lump_ptr->name, "SS_START", 8)))
@@ -1119,7 +1120,7 @@ static void R_InitDummyPatch(void)
     patch->topoffset = SHORT(0);
     off = (byte*)(&dummyPatch.column) - (byte*)(&dummyPatch.patch);
     for (i=0; i<8; i++)
-        dummyPatch.patch.columnofs[i] = LONG(off);
+	dummyPatch.patch.columnofs[i] = LONG(off);
 
     column->topdelta = 0xff;
     column->length = 0x00;
@@ -1185,7 +1186,7 @@ int R_CheckFlatNumForName (const char* name)
     {
       cc = *name++;
       if (cc == 0)
-        break;
+	break;
       cc = toupper (cc);	// case insensitive
       *ptr_d++ = cc;
     } while (--p);
