@@ -353,78 +353,106 @@ static const char * const dehack_codeptrs [] =
   NULL
 };
 
-static const char * const dehack_codeptr_frames [] =
+typedef struct
 {
-  "NULL",
-  "Light0", "WeaponReady", "Lower", "Raise",
-  "Punch", "ReFire", "FirePistol", "Light1",
-  "FireShotgun", "Light2", "FireShotgun2", "CheckReload",
-  "OpenShotgun2", "LoadShotgun2", "CloseShotgun2", "FireCGun",
-  "GunFlash", "FireMissile", "Saw", "FirePlasma",
-  "BFGsound", "FireBFG", "BFGSpray", "Explode", "Pain",
-  "PlayerScream", "Fall", "XScream", "Look", "Chase",
-  "FaceTarget", "PosAttack", "Scream", "SPosAttack", "VileChase",
-  "VileStart", "VileTarget", "VileAttack", "StartFire", "Fire",
-  "FireCrackle", "Tracer", "SkelWhoosh", "SkelFist", "SkelMissile",
-  "FatRaise", "FatAttack1", "FatAttack2", "FatAttack3",
-  "BossDeath", "CPosAttack", "CPosRefire", "TroopAttack",
-  "SargAttack", "HeadAttack", "BruisAttack", "SkullAttack",
-  "Metal", "SpidRefire", "BabyMetal", "BspiAttack",
-  "Hoof", "CyberAttack", "PainAttack", "PainDie", "KeenDie",
-  "BrainPain", "BrainScream", "BrainDie", "BrainAwake",
-  "BrainSpit", "SpawnSound", "SpawnFly", "BrainExplode",
-  NULL
-};
-
-/* In same order as above!!! */
-
-static const actionf_t action_ptrs[] =
-{
-  {NULL},
-  {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
-  {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
-  {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
-  {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
-  {A_GunFlash}, {A_FireMissile}, {A_Saw}, {A_FirePlasma},
-  {A_BFGsound}, {A_FireBFG}, {A_BFGSpray}, {A_Explode}, {A_Pain},
-  {A_PlayerScream}, {A_Fall}, {A_XScream}, {A_Look}, {A_Chase},
-  {A_FaceTarget}, {A_PosAttack}, {A_Scream}, {A_SPosAttack}, {A_VileChase},
-  {A_VileStart}, {A_VileTarget}, {A_VileAttack}, {A_StartFire}, {A_Fire},
-  {A_FireCrackle}, {A_Tracer}, {A_SkelWhoosh}, {A_SkelFist}, {A_SkelMissile},
-  {A_FatRaise}, {A_FatAttack1}, {A_FatAttack2}, {A_FatAttack3},
-  {A_BossDeath}, {A_CPosAttack}, {A_CPosRefire}, {A_TroopAttack},
-  {A_SargAttack}, {A_HeadAttack}, {A_BruisAttack}, {A_SkullAttack},
-  {A_Metal}, {A_SpidRefire}, {A_BabyMetal}, {A_BspiAttack},
-  {A_Hoof}, {A_CyberAttack}, {A_PainAttack}, {A_PainDie}, {A_KeenDie},
-  {A_BrainPain}, {A_BrainScream}, {A_BrainDie}, {A_BrainAwake},
-  {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
-};
+  const char * const name;
+  actionf_t pointer;
+  char arg_count;  
+} codeptrs_t;
 
 /* We cannot replace a A_* function that takes a mobj pointer */
 /* with one that takes a player_t pointer as *bad* things happen. */
 /* Harmony.wad wants to use A_CloseShotgun2 in place of A_BFGSpray */
 /* which crashes doom. */
 
-static const unsigned char action_player_type[] =
+static const codeptrs_t codeptr_frames [] =
 {
-  255,
-  2, 2, 2, 2,	// {A_Light0}, {A_WeaponReady}, {A_Lower}, {A_Raise},
-  2, 2, 2, 2,	// {A_Punch}, {A_ReFire}, {A_FirePistol}, {A_Light1},
-  2, 2, 2, 2,	// {A_FireShotgun}, {A_Light2}, {A_FireShotgun2}, {A_CheckReload},
-  2, 2, 2, 2,	// {A_OpenShotgun2}, {A_LoadShotgun2}, {A_CloseShotgun2}, {A_FireCGun},
-  2, 2, 2, 2,	// {A_GunFlash}, {A_FireMissile}, {A_Saw}, {A_FirePlasma},
-  2, 2, 1, 1, 1,// {A_BFGsound}, {A_FireBFG}, {A_BFGSpray}, {A_Explode}, {A_Pain},
-  1, 1, 1, 1, 1,// {A_PlayerScream}, {A_Fall}, {A_XScream}, {A_Look}, {A_Chase},
-  1, 1, 1, 1, 1,// {A_FaceTarget}, {A_PosAttack}, {A_Scream}, {A_SPosAttack}, {A_VileChase},
-  1, 1, 1, 1, 1,// {A_VileStart}, {A_VileTarget}, {A_VileAttack}, {A_StartFire}, {A_Fire},
-  1, 1, 1, 1, 1,// {A_FireCrackle}, {A_Tracer}, {A_SkelWhoosh}, {A_SkelFist}, {A_SkelMissile},
-  1, 1, 1, 1,	// {A_FatRaise}, {A_FatAttack1}, {A_FatAttack2}, {A_FatAttack3},
-  1, 1, 1, 1,	// {A_BossDeath}, {A_CPosAttack}, {A_CPosRefire}, {A_TroopAttack},
-  1, 1, 1, 1,	// {A_SargAttack}, {A_HeadAttack}, {A_BruisAttack}, {A_SkullAttack},
-  1, 1, 1, 1,	// {A_Metal}, {A_SpidRefire}, {A_BabyMetal}, {A_BspiAttack},
-  1, 1, 1, 1, 1,// {A_Hoof}, {A_CyberAttack}, {A_PainAttack}, {A_PainDie}, {A_KeenDie},
-  1, 1, 1, 1,	// {A_BrainPain}, {A_BrainScream}, {A_BrainDie}, {A_BrainAwake},
-  1, 1, 1, 1	// {A_BrainSpit}, {A_SpawnSound}, {A_SpawnFly}, {A_BrainExplode}
+  { "NULL",		NULL,			0 },
+  { "Light0",		A_Light0,		2 },	// These functions take two args
+  { "WeaponReady",	A_WeaponReady,		2 },
+  { "Lower",		A_Lower,		2 },
+  { "Raise",		A_Raise,		2 },
+  { "Punch",		A_Punch,		2 },
+  { "ReFire",		A_ReFire,		2 },
+  { "FirePistol",	A_FirePistol,		2 },
+  { "Light1",		A_Light1,		2 },
+  { "FireShotgun",	A_FireShotgun,		2 },
+  { "Light2",		A_Light2,		2 },
+  { "FireShotgun2",	A_FireShotgun2,		2 },
+  { "CheckReload",	A_CheckReload,		2 },
+  { "OpenShotgun2",	A_OpenShotgun2,		2 },
+  { "LoadShotgun2",	A_LoadShotgun2,		2 },
+  { "CloseShotgun2",	A_CloseShotgun2,	2 },
+  { "FireCGun",		A_FireCGun,		2 },
+  { "GunFlash",		A_GunFlash,		2 },
+  { "FireMissile",	A_FireMissile,		2 },
+  { "Saw",		A_Saw,			2 },
+  { "FirePlasma",	A_FirePlasma,		2 },
+  { "BFGsound",		A_BFGsound,		2 },
+  { "FireBFG",		A_FireBFG,		2 },
+  
+  { "BFGSpray",		A_BFGSpray,		1 },	// And these take one arg.
+  { "Explode",		A_Explode,		1 },
+  { "Pain",		A_Pain,			1 },
+  { "PlayerScream",	A_PlayerScream,		1 },
+  { "Fall",		A_Fall,			1 },
+  { "XScream",		A_XScream,		1 },
+  { "Look",		A_Look,			1 },
+  { "Chase",		A_Chase,		1 },
+  { "FaceTarget",	A_FaceTarget,		1 },
+  { "PosAttack",	A_PosAttack,		1 },
+  { "Scream",		A_Scream,		1 },
+  { "SPosAttack",	A_SPosAttack,		1 },
+  { "VileChase",	A_VileChase,		1 },
+  { "VileStart",	A_VileStart,		1 },
+  { "VileTarget",	A_VileTarget,		1 },
+  { "VileAttack",	A_VileAttack,		1 },
+  { "StartFire",	A_StartFire,		1 },
+  { "Fire",		A_Fire,			1 },
+  { "FireCrackle",	A_FireCrackle,		1 },
+  { "Tracer",		A_Tracer,		1 },
+  { "SkelWhoosh",	A_SkelWhoosh,		1 },
+  { "SkelFist",		A_SkelFist,		1 },
+  { "SkelMissile",	A_SkelMissile,		1 },
+  { "FatRaise",		A_FatRaise,		1 },
+  { "FatAttack1",	A_FatAttack1,		1 },
+  { "FatAttack2",	A_FatAttack2,		1 },
+  { "FatAttack3",	A_FatAttack3,		1 },
+  { "BossDeath",	A_BossDeath,		1 },
+  { "CPosAttack",	A_CPosAttack,		1 },
+  { "CPosRefire",	A_CPosRefire,		1 },
+  { "TroopAttack",	A_TroopAttack,		1 },
+  { "SargAttack",	A_SargAttack,		1 },
+  { "HeadAttack",	A_HeadAttack,		1 },
+  { "BruisAttack",	A_BruisAttack,		1 },
+  { "SkullAttack",	A_SkullAttack,		1 },
+  { "Metal",		A_Metal,		1 },
+  { "SpidRefire",	A_SpidRefire,		1 },
+  { "BabyMetal",	A_BabyMetal,		1 },
+  { "BspiAttack",	A_BspiAttack,		1 },
+  { "Hoof",		A_Hoof,			1 },
+  { "CyberAttack",	A_CyberAttack,		1 },
+  { "PainAttack",	A_PainAttack,		1 },
+  { "PainDie",		A_PainDie,		1 },
+  { "KeenDie",		A_KeenDie,		1 },
+  { "BrainPain",	A_BrainPain,		1 },
+  { "BrainScream",	A_BrainScream,		1 },
+  { "BrainDie",		A_BrainDie,		1 },
+  { "BrainAwake",	A_BrainAwake,		1 },
+  { "BrainSpit",	A_BrainSpit,		1 },
+  { "SpawnSound",	A_SpawnSound,		1 },
+  { "SpawnFly",		A_SpawnFly,		1 },
+  { "BrainExplode",	A_BrainExplode,		1 },
+  { "Detonate",		A_Detonate,		1 },
+  { "Mushroom",		A_Mushroom,		1 },
+  { "Die",		A_Die,			1 },
+  { "Spawn",		A_Spawn,		1 },
+  { "Turn",		A_Turn,			1 },
+  { "Face",		A_Face,			1 },
+  { "Scratch",		A_Scratch,		1 },
+  { "PlaySound",	A_PlaySound,		1 },
+  { "RandomJump",	A_RandomJump,		1 },
+  { "LineEffect",	A_LineEffect,		1 }
 };
 
 /* These tables are in the same order as the declarations of the messages */
@@ -1624,18 +1652,40 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
 
 /* ---------------------------------------------------------------------------- */
 
-static unsigned int get_action_function_num (actionf_v aname)
+static const codeptrs_t * get_action_function_from_ptr (actionf_v aname)
 {
   unsigned int p;
+  const codeptrs_t * ptr;
 
-  p = 0;
+  p = ARRAY_SIZE(codeptr_frames);
+  ptr = codeptr_frames;
   do
   {
-    if (action_ptrs [p].acv == aname)
-      return (p);
-  } while (++p < ARRAY_SIZE (action_ptrs));
+    if (ptr->pointer.acv == aname)
+      return (ptr);
+    ptr++;
+  } while (--p);
 
-  return (0);
+  return (NULL);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static const codeptrs_t * get_action_function_from_name (const char * name)
+{
+  unsigned int p;
+  const codeptrs_t * ptr;
+
+  p = ARRAY_SIZE(codeptr_frames);
+  ptr = codeptr_frames;
+  do
+  {
+    if (strcasecmp (ptr->name, name) == 0)
+      return (ptr);
+    ptr++;
+  } while (--p);
+
+  return (NULL);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1651,6 +1701,7 @@ void dh_validate_state_table_function_pointers (void)
   unsigned int q,s;
   unsigned int num;
   state_t* state;
+  const codeptrs_t * ptr;
 
   num = 0;
   state = states;
@@ -1658,12 +1709,15 @@ void dh_validate_state_table_function_pointers (void)
   {
     if (state->action.acv)
     {
-      q = get_action_function_num (state->action.acv);
-      s = action_player_type [q];
-      if (state->pcount != s)
+      ptr = get_action_function_from_ptr (state->action.acv);
+      if (ptr)
       {
-	printf ("State %u function type corrected from %u to %u\n", num, state->pcount, s);
-	state->pcount = s;
+	s = ptr->arg_count;
+	if (state->pcount != s)
+	{
+	  printf ("State %u function type corrected from %u to %u\n", num, state->pcount, s);
+	  state->pcount = s;
+	}
       }
     }
     state++;
@@ -1678,7 +1732,8 @@ void dh_validate_state_table_function_pointers (void)
 static void dh_write_to_pointer (unsigned int number, unsigned int record, unsigned int value, unsigned int line_no)
 {
   int counter;
-  int p,q;
+  int p;
+  const codeptrs_t * ptr;
 
   if ((value < NUMSTATES) && (record < NUMSTATES))
   {
@@ -1699,12 +1754,17 @@ static void dh_write_to_pointer (unsigned int number, unsigned int record, unsig
     }
     else
     {
-      q = get_action_function_num (states_ptr_copy[value].acv);
-      states[record].pcount = action_player_type [q];
+      ptr = get_action_function_from_ptr (states_ptr_copy[value].acv);
+      if (ptr)
+	states[record].pcount = ptr->arg_count;
       states[record].action.acv = states_ptr_copy[value].acv;
 #if 0
-      printf ("Pointer copied from frame %d to %d (A_%s -> A_%s)\n",
-		value, record, dehack_codeptr_frames [p], dehack_codeptr_frames [q]);
+      {
+	const codeptrs_t * ptr_d;
+	ptr_d = get_action_function_from_ptr (states_ptr_copy[record].acv);
+	printf ("Pointer copied from frame %d to %d (A_%s -> A_%s)\n",
+		value, record, ptr->name, ptr_d->name);
+      }
 #endif
     }
   }
@@ -3463,16 +3523,21 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    counter1 = dh_search_str_tab (dehack_codeptrs, a_line);
 	    if (counter1 != -1)
 	    {
+	      const codeptrs_t * ptr;
 	      /* The docs say that the "A_" at the start of each name */
 	      /* isn't used, however they're there in secur.wad */
 	      if (strncasecmp (string1, "A_", 2) == 0)
 		string1 += 2;
-	      counter1 = dh_search_str_tab_a (dehack_codeptr_frames, string1);
-	      if (counter1 != -1)
+	      ptr = get_action_function_from_name (string1);
+	      if (ptr == NULL)
 	      {
-		states[counter2].pcount = action_player_type [counter1];
-		states[counter2].action.acv = action_ptrs[counter1].acv;
-		// printf ("Frame %u set to %s\n", counter2, dehack_codeptr_frames [counter1]);
+		counter1 = -1;
+	      }
+	      else
+	      {
+		states[counter2].pcount = ptr->arg_count;
+		states[counter2].action.acv = ptr->pointer.acv;
+		// printf ("Frame %u set to %s\n", counter2, ptr->name);
 	      }
 	    }
 	    break;

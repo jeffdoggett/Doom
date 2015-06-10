@@ -114,6 +114,17 @@ extern void A_BrainSpit (mobj_t* mo);
 extern void A_SpawnSound (mobj_t* mo);
 extern void A_SpawnFly (mobj_t* mo);
 extern void A_BrainExplode (mobj_t* mo);
+extern void A_Detonate (mobj_t* mo);
+extern void A_Mushroom (mobj_t* mo);
+extern void A_Die (mobj_t* mo);
+extern void A_Spawn (mobj_t* mo);
+extern void A_Turn (mobj_t* mo);
+extern void A_Face (mobj_t* mo);
+extern void A_Scratch (mobj_t* mo);
+extern void A_PlaySound (mobj_t* mo);
+extern void A_RandomJump (mobj_t* mo);
+extern void A_LineEffect (mobj_t* mo);
+
 extern void P_Massacre (void);
 
 #endif
