@@ -160,6 +160,28 @@ int64_t _ll_srdv (int64_t b, int64_t a)
 
 /* --------------------------------------------------------------------------------- */
 
+uint64_t _ll_udiv (uint64_t a, uint64_t b)
+{
+  uint64_t answer;
+
+  // printf ("_ll_udiv %lld %d\n", a,b);
+
+  if (b > 0xFFFFFFFF)
+  {
+    /* Bodge it to make it fit! */
+    do
+    {
+      a = a >> 1;
+      b = b >> 1;
+    } while (b > 0xFFFFFFFF);
+  }
+
+  answer = div64_32 (a, (uint32_t) b);
+  return (answer);
+}
+
+/* --------------------------------------------------------------------------------- */
+
 #ifdef MATHS_64_TESTING
 
 /* --------------------------------------------------------------------------------- */

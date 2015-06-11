@@ -2347,11 +2347,16 @@ void A_Detonate(mobj_t *mo)
 //
 void A_Mushroom(mobj_t *actor)
 {
-    int         i, j, n = actor->info->damage;
+  int		i, j, n;
+  fixed_t	misc1;
+  fixed_t	misc2;
 
-    // Mushroom parameters are part of code pointer's state
-    fixed_t     misc1 = (actor->state->misc1 ? actor->state->misc1 : FRACUNIT * 4);
-    fixed_t     misc2 = (actor->state->misc2 ? actor->state->misc2 : FRACUNIT / 2);
+  // Mushroom parameters are part of code pointer's state
+  n = actor->info->damage;
+  if ((misc1 = (fixed_t)actor->state->misc1) == 0)
+    misc1 = FRACUNIT * 4;
+  if ((misc2 = (fixed_t)actor->state->misc2) == 0)
+    misc2 = FRACUNIT / 2;
 
     A_Explode(actor);                                           // First make normal explosion
 
@@ -2381,8 +2386,8 @@ void A_Mushroom(mobj_t *actor)
 //
 void A_Spawn (mobj_t *mo)
 {
-    if (mo->state->misc1)
-        P_SpawnMobj(mo->x, mo->y, (mo->state->misc2 << FRACBITS) + mo->z, mo->state->misc1 - 1);
+  if (mo->state->misc1)
+    P_SpawnMobj(mo->x, mo->y, (fixed_t)(mo->state->misc2 << FRACBITS) + mo->z, (mobjtype_t)(mo->state->misc1 - 1));
 }
 
 void A_Turn (mobj_t *mo)
@@ -2398,19 +2403,19 @@ void A_Face (mobj_t *mo)
 void A_Scratch (mobj_t *mo)
 {
     mo->target && (A_FaceTarget(mo), P_CheckMeleeRange(mo)) ?
-        mo->state->misc2 ? S_StartSound(mo, mo->state->misc2) : (void)0,
-        P_DamageMobj(mo->target, mo, mo, mo->state->misc1) : (void)0;
+        mo->state->misc2 ? S_StartSound(mo, (fixed_t)mo->state->misc2) : (void)0,
+        P_DamageMobj(mo->target, mo, mo, (fixed_t)mo->state->misc1) : (void)0;
 }
 
 void A_PlaySound (mobj_t *mo)
 {
-    S_StartSound(mo->state->misc2 ? NULL : mo, mo->state->misc1);
+    S_StartSound(mo->state->misc2 ? NULL : mo, (fixed_t)mo->state->misc1);
 }
 
 void A_RandomJump (mobj_t *mo)
 {
     if (P_Random() < mo->state->misc2)
-        P_SetMobjState(mo, mo->state->misc1);
+        P_SetMobjState(mo, (statenum_t)mo->state->misc1);
 }
 
 //
