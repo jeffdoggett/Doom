@@ -357,7 +357,7 @@ typedef struct
 {
   const char * const name;
   actionf_t pointer;
-  char arg_count;  
+  char arg_count;
 } codeptrs_t;
 
 /* We cannot replace a A_* function that takes a mobj pointer */
@@ -390,7 +390,7 @@ static const codeptrs_t codeptr_frames [] =
   { "FirePlasma",	A_FirePlasma,		2 },
   { "BFGsound",		A_BFGsound,		2 },
   { "FireBFG",		A_FireBFG,		2 },
-  
+
   { "BFGSpray",		A_BFGSpray,		1 },	// And these take one arg.
   { "Explode",		A_Explode,		1 },
   { "Pain",		A_Pain,			1 },
@@ -1698,7 +1698,7 @@ static const codeptrs_t * get_action_function_from_name (const char * name)
 
 void dh_validate_state_table_function_pointers (void)
 {
-  unsigned int q,s;
+  unsigned int s;
   unsigned int num;
   state_t* state;
   const codeptrs_t * ptr;
