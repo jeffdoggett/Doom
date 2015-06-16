@@ -315,21 +315,24 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	  if (dest > scrnlimit)
 	    break;
 
-	  // Lookup framebuffer, and retrieve
-	  //  a pixel that is either one column
-	  //  left or right of the current one.
-	  // Add index from colormap to index.
-	  source = dest+(fuzzoffset[fuzzpos]*SCREENWIDTH);
-	  if (source < screens[scrn])
-	    source = screens[scrn];
-	  if (source > scrnlimit)
-	    source = scrnlimit;
+	  if (dest >= screens[scrn])
+	  {
+	    // Lookup framebuffer, and retrieve
+	    //  a pixel that is either one column
+	    //  left or right of the current one.
+	    // Add index from colormap to index.
+	    source = dest+(fuzzoffset[fuzzpos]*SCREENWIDTH);
+	    if (source < screens[scrn])
+	      source = screens[scrn];
+	    if (source > scrnlimit)
+	      source = scrnlimit;
 
-	  *dest = colormaps[6*256+*source];
+	    *dest = colormaps[6*256+*source];
 
-	  // Clamp table lookup index.
-	  if (++fuzzpos >= ARRAY_SIZE (fuzzoffset))
-	    fuzzpos = 0;
+	    // Clamp table lookup index.
+	    if (++fuzzpos >= ARRAY_SIZE (fuzzoffset))
+	      fuzzpos = 0;
+	  }
 
 	  dest += SCREENWIDTH;
 	  row += yiscale;
@@ -342,7 +345,8 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	{
 	  if (dest >= scrnlimit)
 	    break;
-	  *dest = source [row >> FRACBITS];
+	  if (dest >= screens[scrn])
+	    *dest = source [row >> FRACBITS];
 	  dest += SCREENWIDTH;
 	  row += yiscale;
         } while ((row >> FRACBITS) < column->length);
