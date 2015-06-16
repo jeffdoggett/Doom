@@ -3251,8 +3251,8 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    else
 	    {
 	      current_job = JOB_NULL;
-	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d) at line %d\n",
-	  			     params[0],dh_line_number);
+	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
+	  			     params[0],NUMSTATES,dh_line_number);
 	    }
 	    break;
 
@@ -3519,6 +3519,13 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      break;
 
 	    counter2 = atoi (a_line + counter2);
+	    if (counter2 >= NUMSTATES)
+	    {
+	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
+	  			     counter2,NUMSTATES,dh_line_number);
+	      counter1 = -1;
+	      break;
+	    }
 
 	    counter1 = dh_search_str_tab (dehack_codeptrs, a_line);
 	    if (counter1 != -1)
