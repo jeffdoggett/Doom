@@ -173,6 +173,8 @@ typedef enum
     NUMSPRITES
 } spritenum_t;
 
+#define SPR_NULL	((spritenum_t) 0)
+
 typedef enum
 {
     S_NULL,
