@@ -494,16 +494,13 @@ P_SetThingPosition (mobj_t* thing)
 // to P_BlockLinesIterator, then make one or more calls
 // to it.
 //
-boolean
-P_BlockLinesIterator
-( int			x,
-  int			y,
-  boolean(*func)(line_t*) )
+boolean P_BlockLinesIterator (int x, int y, boolean(*func)(line_t*))
 {
   if (x < 0 || y < 0 || x >= bmapwidth || y >= bmapheight)
     return true;
   else
   {
+    uint32_t * blockmapindex = &blockmaphead[4];
     int offset = blockmapindex[y * bmapwidth + x];
     const uint32_t *list;
 

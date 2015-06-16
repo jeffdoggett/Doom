@@ -245,7 +245,6 @@ P_RadiusAttack
 //
 extern byte*		rejectmatrix;	// for fast sight rejection
 extern unsigned int	rejectmatrixsize;
-extern uint32_t*	blockmapindex;	// offsets in blockmap are from here
 extern uint32_t*	blockmaphead;
 extern int		bmapwidth;
 extern int		bmapheight;	// in mapblocks

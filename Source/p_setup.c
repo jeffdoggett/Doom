@@ -79,7 +79,6 @@ side_t*		sides;
 // Blockmap size.
 int		bmapwidth;
 int		bmapheight;	// size in mapblocks
-uint32_t*	blockmapindex;	// int for larger maps
 // offsets in blockmap are from here
 uint32_t*	blockmaphead;
 // origin of block map
@@ -655,25 +654,32 @@ void P_LoadSideDefs (int lump)
 //
 // P_LoadBlockMap
 //
-void P_LoadBlockMap (int lump)
+static int P_LoadBlockMap (int lump)
 {
   unsigned int i;
   unsigned int count;		// number of 16 bit blockmap entries
+  unsigned int blockmapsize;
   uint16_t *wadblockmaplump;	// blockmap lump temp
   uint32_t firstlist, lastlist;	// blockmap block list bounds
   uint32_t overflow_corr;
   uint32_t prev_bme;		// for detecting overflow wrap
 
 
-  count = W_LumpLength(lump) / 2;
+  blockmapsize = W_LumpLength (lump);
+//printf ("blockmap size = %u (0x%X) %u/%u\n", blockmapsize, blockmapsize, lump, numlumps);
+
+  if (blockmapsize < 8)
+  {
+#ifdef NORMALUNIX
+    printf ("Blockmap is too small (%u)\n", blockmapsize);
+#endif
+    return (1);
+  }
+
+  count = blockmapsize / 2;
   wadblockmaplump = W_CacheLumpNum(lump, PU_LEVEL);
   overflow_corr = 0;
   prev_bme = 0;
-
-  // [WDJ] when zennode has not been run, this code will corrupt Zone memory.
-  // It assumes a minimum size blockmap.
-  if (count < 5)
-      I_Error("Missing blockmap, node builder has not been run.\n");
 
   // [WDJ] Do endian as read from blockmap lump temp
   blockmaphead = Z_Malloc(sizeof(*blockmaphead) * count, PU_LEVEL, NULL);
@@ -693,7 +699,6 @@ void P_LoadBlockMap (int lump)
   bmaporgy = blockmaphead[1] << FRACBITS;
   bmapwidth = blockmaphead[2];
   bmapheight = blockmaphead[3];
-  blockmapindex = &blockmaphead[4];
   firstlist = 4 + bmapwidth * bmapheight;
   lastlist = count - 1;
 
@@ -705,7 +710,12 @@ void P_LoadBlockMap (int lump)
 #endif
 
   if (firstlist >= lastlist || bmapwidth < 1 || bmapheight < 1)
-    I_Error("Blockmap corrupt, must run node builder on wad.\n");
+  {
+//  I_Error("Blockmap corrupt, must run node builder on wad.\n");
+    Z_Free (blockmaphead);
+    Z_Free (wadblockmaplump);
+    return (1);
+  }
 
   // read blockmap index array
   for (i = 4; i < firstlist; i++)		// for all entries in wad offset index
@@ -736,11 +746,18 @@ void P_LoadBlockMap (int lump)
       }
     }
 
-    if (bme > lastlist)
-	I_Error("Blockmap offset[%i]= %i, exceeds bounds.\n", i, bme);
-    if (bme < firstlist
-     || wadblockmaplump[bme] != 0) // not start list
-      I_Error("Bad blockmap offset[%i]= %i.\n", i, bme);
+    if ((bme > lastlist)
+     || (bme < firstlist)
+     || (wadblockmaplump[bme] != 0))		// not start list
+    {
+#ifdef NORMALUNIX
+      printf ("Invalid Blockmap offset[%u]= %u (%u-%u)\n", i, bme, firstlist, lastlist);
+#endif
+      Z_Free (blockmaphead);
+      Z_Free (wadblockmaplump);
+      return (1);
+    }
+
     blockmaphead[i] = bme;
   }
 
@@ -754,12 +771,203 @@ void P_LoadBlockMap (int lump)
     blockmaphead[i] = (bme == 0xffff ? (uint32_t)(-1) : (uint32_t)bme);
   }
 
-  // clear out mobj chains
-  count = sizeof(*blocklinks) * bmapwidth * bmapheight;
-  blocklinks = Z_Malloc(count, PU_LEVEL, NULL);
-  memset(blocklinks, 0, count);
+  Z_Free (wadblockmaplump);
+  return (0);			// All ok!
 }
 
+//-----------------------------------------------------------------------------
+//
+// killough 10/98:
+//
+// Rewritten to use faster algorithm.
+//
+// New procedure uses Bresenham-like algorithm on the linedefs, adding the
+// linedef to each block visited from the beginning to the end of the linedef.
+//
+// The algorithm's complexity is on the order of nlines*total_linedef_length.
+//
+// Please note: This section of code is not interchangable with TeamTNT's
+// code which attempts to fix the same problem.
+//
+static void P_CreateBlockMap (void)
+{
+  int		i;
+  fixed_t	minx = MAXINT;
+  fixed_t	miny = MAXINT;
+  fixed_t	maxx = MININT;
+  fixed_t	maxy = MININT;
+
+  // First find limits of map
+  for (i = 0; i < numvertexes; i++)
+  {
+    if ((vertexes[i].x >> FRACBITS) < minx)
+      minx = vertexes[i].x >> FRACBITS;
+    else if ((vertexes[i].x >> FRACBITS) > maxx)
+      maxx = vertexes[i].x >> FRACBITS;
+    if ((vertexes[i].y >> FRACBITS) < miny)
+      miny = vertexes[i].y >> FRACBITS;
+    else if ((vertexes[i].y >> FRACBITS) > maxy)
+      maxy = vertexes[i].y >> FRACBITS;
+  }
+
+  // Save blockmap parameters
+  bmaporgx = minx << FRACBITS;
+  bmaporgy = miny << FRACBITS;
+  bmapwidth = ((maxx - minx) >> MAPBTOFRAC) + 1;
+  bmapheight = ((maxy - miny) >> MAPBTOFRAC) + 1;
+
+  // Compute blockmap, which is stored as a 2d array of variable-sized lists.
+  //
+  // Pseudocode:
+  //
+  // For each linedef:
+  //
+  //   Map the starting and ending vertices to blocks.
+  //
+  //   Starting in the starting vertex's block, do:
+  //
+  //     Add linedef to current block's list, dynamically resizing it.
+  //
+  //     If current block is the same as the ending vertex's block, exit loop.
+  //
+  //     Move to an adjacent block by moving towards the ending block in
+  //     either the x or y direction, to the block which contains the linedef.
+  {
+    // blocklist structure
+    typedef struct
+    {
+      int n, nalloc, *list;
+    } bmap_t;
+
+    unsigned int    tot = bmapwidth * bmapheight;	// size of blockmap
+    bmap_t	    *bmap = calloc(sizeof(*bmap), tot);	// array of blocklists
+
+    if (bmap == NULL)
+      I_Error ("P_CreateBlockMap: Unable to claim bmap\n");
+
+    for (i = 0; i < numlines; i++)
+    {
+      // starting coordinates
+      int x = (lines[i].v1->x >> FRACBITS) - minx;
+      int y = (lines[i].v1->y >> FRACBITS) - miny;
+
+      // x - y deltas
+      int adx = lines[i].dx >> FRACBITS;
+      int dx = (adx < 0 ? -1 : 1);
+      int ady = lines[i].dy >> FRACBITS;
+      int dy = (ady < 0 ? -1 : 1);
+
+      // difference in preferring to move across y (>0) instead of x (<0)
+      int diff = !adx ? 1 : !ady ? -1 :
+	  (((x >> MAPBTOFRAC) << MAPBTOFRAC)
+	  + (dx > 0 ? MAPBLOCKUNITS - 1 : 0) - x) * (ady = abs(ady)) * dx
+	  - (((y >> MAPBTOFRAC) << MAPBTOFRAC)
+	  + (dy > 0 ? MAPBLOCKUNITS - 1 : 0) - y) * (adx = abs(adx)) * dy;
+
+      // starting block, and pointer to its blocklist structure
+      int b = (y >> MAPBTOFRAC) * bmapwidth + (x >> MAPBTOFRAC);
+
+      // ending block
+      int bend = (((lines[i].v2->y >> FRACBITS) - miny) >> MAPBTOFRAC) * bmapwidth
+	  + (((lines[i].v2->x >> FRACBITS) - minx) >> MAPBTOFRAC);
+
+      // delta for pointer when moving across y
+      dy *= bmapwidth;
+
+      // deltas for diff inside the loop
+      adx <<= MAPBTOFRAC;
+      ady <<= MAPBTOFRAC;
+
+      // Now we simply iterate block-by-block until we reach the end block.
+      while ((unsigned int)b < tot)       // failsafe -- should ALWAYS be true
+      {
+	// Increase size of allocated list if necessary
+	if (bmap[b].n >= bmap[b].nalloc)
+	  bmap[b].list = realloc(bmap[b].list, (bmap[b].nalloc = bmap[b].nalloc ?
+	    bmap[b].nalloc * 2 : 8)*sizeof*bmap->list);
+
+	// Add linedef to end of list
+	bmap[b].list[bmap[b].n++] = i;
+
+	// If we have reached the last block, exit
+	if (b == bend)
+	  break;
+
+	// Move in either the x or y direction to the next block
+	if (diff < 0)
+	{
+	  diff += ady;
+	  b += dx;
+	}
+	else
+	{
+	  diff -= adx;
+	  b += dy;
+	}
+      }
+    }
+
+    // Compute the total size of the blockmap.
+    //
+    // Compression of empty blocks is performed by reserving two offset words
+    // at tot and tot+1.
+    //
+    // 4 words, unused if this routine is called, are reserved at the start.
+    {
+      int count = tot + 6;  // we need at least 1 word per block, plus reserved's
+
+      for (i = 0; (unsigned int)i < tot; i++)
+      {
+	if (bmap[i].n)
+	  count += bmap[i].n + 2;     // 1 header word + 1 trailer word + blocklist
+      }
+
+      // Allocate blockmap lump with computed count
+      blockmaphead = Z_Malloc(sizeof(*blockmaphead) * count, PU_LEVEL, 0);
+    }
+
+    // Now compress the blockmap.
+    {
+      int	ndx = tot += 4; // Advance index to start of linedef lists
+      bmap_t	*bp = bmap;     // Start of uncompressed blockmap
+
+      blockmaphead[ndx++] = 0;    // Store an empty blockmap list at start
+      blockmaphead[ndx++] = -1;   // (Used for compression)
+
+      for (i = 4; (unsigned int)i < tot; i++, bp++)
+      {
+	if (bp->n)					// Non-empty blocklist
+	{
+	  blockmaphead[blockmaphead[i] = ndx++] = 0;	// Store index & header
+	  do
+	    blockmaphead[ndx++] = bp->list[--bp->n];	// Copy linedef list
+	  while (bp->n);
+	  blockmaphead[ndx++] = -1;			// Store trailer
+	  free(bp->list);				// Free linedef list
+	}
+	else
+	{
+	  // Empty blocklist: point to reserved empty blocklist
+	  blockmaphead[i] = tot;
+	}
+      }
+
+      free (bmap);					// Free uncompressed blockmap
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void P_ClearMobjChains (void)
+{
+  unsigned int count;
+
+  // clear out mobj chains
+  count = sizeof(*blocklinks) * bmapwidth * bmapheight;
+  blocklinks = Z_Malloc (count, PU_LEVEL, NULL);
+  memset (blocklinks, 0, count);
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -1062,12 +1270,13 @@ P_SetupLevel
     leveltime = 0;
 
     // note: most of this ordering is important
-    P_LoadBlockMap (lumpnum+ML_BLOCKMAP);
     P_LoadVertexes (lumpnum+ML_VERTEXES);
     P_LoadSectors (lumpnum+ML_SECTORS);
     P_LoadSideDefs (lumpnum+ML_SIDEDEFS);
-
     P_LoadLineDefs (lumpnum+ML_LINEDEFS);
+    if (P_LoadBlockMap (lumpnum+ML_BLOCKMAP))
+      P_CreateBlockMap ();
+    P_ClearMobjChains ();
     P_LoadSubsectors (lumpnum+ML_SSECTORS);
     P_LoadNodes (lumpnum+ML_NODES);
     P_LoadSegs (lumpnum+ML_SEGS);
