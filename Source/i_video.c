@@ -1292,6 +1292,10 @@ void I_InitGraphics (void)
 //else
 //  screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
   Init_Colour_Map ();
+
+  /* Clear the display */
+  memset (screens[0], 0, sizeof (screens [0]));
+  I_FinishUpdate ();
 }
 
 /***************************************************************************/
