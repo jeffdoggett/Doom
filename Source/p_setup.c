@@ -176,19 +176,7 @@ void P_LoadSegs (int lump)
   li = segs;
   for (i=0 ; i<numsegs ; i++, li++)
   {
-    unsigned int v;
-
-    v = USHORT(ml->v1);
-    if (v >= numvertexes)
-      I_Error ("P_LoadSegs: invalid vertex %u", v);
-
-    li->v1 = &vertexes[v];
-
-    v = USHORT(ml->v2);
-    if (v >= numvertexes)
-      I_Error ("P_LoadSegs: invalid vertex %u", v);
-
-    li->v2 = &vertexes[v];
+    unsigned int v1,v2;
 
     li->angle = (SHORT(ml->angle))<<16;
 
@@ -236,7 +224,7 @@ void P_LoadSegs (int lump)
     linedef = USHORT(ml->linedef);
     if (linedef >= numlines)
     {
-      printf ("P_LoadSegs: linedef = %u/%u\n", linedef, numlines);
+      printf ("P_LoadSegs: Seg %i linedef = %u/%u\n", i, linedef, numlines);
       linedef = 0;
     }
     ldef = &lines[linedef];
@@ -244,7 +232,7 @@ void P_LoadSegs (int lump)
     side = USHORT(ml->side);
     if (side > 1)
     {
-      printf ("P_LoadSegs: side = %u\n", side);
+      printf ("P_LoadSegs: Seg %i side = %u\n", i, side);
       side = 0;
     }
     li->sidedef = &sides[ldef->sidenum[side]];
@@ -253,6 +241,36 @@ void P_LoadSegs (int lump)
 	li->backsector = sides[ldef->sidenum[side^1]].sector;
     else
 	li->backsector = 0;
+
+
+    v1 = USHORT(ml->v1);
+    v2 = USHORT(ml->v2);
+
+    // e6y
+    // check and fix wrong references to non-existent vertexes
+    // see e1m9 @ NIVELES.WAD
+    // http://www.doomworld.com/idgames/index.php?id=12647
+    if ((v1 >= numvertexes) || (v2 >= numvertexes))
+    {
+      printf ("P_LoadSegs: Seg %i references invalid vertex %i,%i (%i).\n", i, v1, v2, numvertexes);
+
+      if (li->sidedef == &sides[li->linedef->sidenum[0]])
+      {
+	li->v1 = lines[linedef].v1;
+	li->v2 = lines[linedef].v2;
+      }
+      else
+      {
+	li->v1 = lines[linedef].v2;
+	li->v2 = lines[linedef].v1;
+      }
+    }
+    else
+    {
+      li->v1 = &vertexes[v1];
+      li->v2 = &vertexes[v2];
+    }
+
 #ifdef PADDED_STRUCTS
     ml = (mapseg_t *) ((byte *) ml + 12);
 #else
