@@ -30,8 +30,7 @@ static const char rcsid[] = "$Id: info.c,v 1.3 1997/01/26 07:45:00 b1 Exp $";
 // Data.
 #include "includes.h"
 
-char *sprnames [NUMSPRITES+1];
-char *sprnames_orig[NUMSPRITES+1] =
+char *sprnames_orig[] =
 {
     "TROO","SHTG","PUNG","PISG","PISF","SHTF","SHT2","CHGG","CHGF","MISG",
     "MISF","SAWG","PLSG","PLSF","BFGG","BFGF","BLUD","PUFF","BAL1","BAL2",
@@ -46,15 +45,15 @@ char *sprnames_orig[NUMSPRITES+1] =
     "POL3","POL1","POL6","GOR2","GOR3","GOR4","GOR5","SMIT","COL1","COL2",
     "COL3","COL4","CAND","CBRA","COL6","TRE1","TRE2","ELEC","CEYE","FSKU",
     "COL5","TBLU","TGRN","TRED","SMBT","SMGT","SMRT","HDB1","HDB2","HDB3",
-    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2",
-#ifdef BOOM
-    "TNT1",
-#endif
-    NULL
+    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2","TNT1","DOGS",
+    "PLS1","PLS2","BON3","BON4",NULL
 };
 
+char *sprnames [ARRAY_SIZE(sprnames_orig)];
 
-state_t states[NUMSTATES] =
+//-----------------------------------------------------------------------------
+
+state_t states[] =
 {
     {SPR_TROO,0,-1,0,{NULL},S_NULL,0,0},		// S_NULL
     {SPR_SHTG,4,0,2,{A_Light0},S_NULL,0,0},		// S_LIGHTDONE
@@ -1023,39 +1022,46 @@ state_t states[NUMSTATES] =
     {SPR_TLP2,32769,4,0,{NULL},S_TECH2LAMP3,0,0}, 	// S_TECH2LAMP2
     {SPR_TLP2,32770,4,0,{NULL},S_TECH2LAMP4,0,0}, 	// S_TECH2LAMP3
     {SPR_TLP2,32771,4,0,{NULL},S_TECH2LAMP,0,0},	// S_TECH2LAMP4
-    // Null states for DeHackEd compatability
-    {SPR_NULL,0,-1,0,NULL,S_TNT1,0,0},			// S_TNT1
-    {SPR_NULL,0 | FF_FULLBRIGHT,1000,0,NULL,S_GRENADE,0,0},// S_GRENADE
-    {SPR_NULL,1 | FF_FULLBRIGHT,4,0,NULL,S_DETONATE2,0,0},// S_DETONATE
-    {SPR_NULL,2 | FF_FULLBRIGHT,6,0,NULL,S_DETONATE3,0,0},// S_DETONATE2
-    {SPR_NULL,3 | FF_FULLBRIGHT,10,0,NULL,S_NULL,0,0},	// S_DETONATE3
-    {SPR_NULL,0,10,0,NULL,S_DOGS_STND2,0,0},		// S_DOGS_STND
-    {SPR_NULL,1,10,0,NULL,S_DOGS_STND,0,0},		// S_DOGS_STND2
-    {SPR_NULL,0,2,0,NULL,S_DOGS_RUN2,0,0},		// S_DOGS_RUN1
-    {SPR_NULL,0,2,0,NULL,S_DOGS_RUN3,0,0},		// S_DOGS_RUN2
-    {SPR_NULL,1,2,0,NULL,S_DOGS_RUN4,0,0},		// S_DOGS_RUN3
-    {SPR_NULL,1,2,0,NULL,S_DOGS_RUN5,0,0},		// S_DOGS_RUN4
-    {SPR_NULL,2,2,0,NULL,S_DOGS_RUN6,0,0},		// S_DOGS_RUN5
-    {SPR_NULL,2,2,0,NULL,S_DOGS_RUN7,0,0},		// S_DOGS_RUN6
-    {SPR_NULL,3,2,0,NULL,S_DOGS_RUN8,0,0},		// S_DOGS_RUN7
-    {SPR_NULL,3,2,0,NULL,S_DOGS_RUN1,0,0},		// S_DOGS_RUN8
-    {SPR_NULL,4,8,0,NULL,S_DOGS_ATK2,0,0},		// S_DOGS_ATK1
-    {SPR_NULL,5,8,0,NULL,S_DOGS_ATK3,0,0},		// S_DOGS_ATK2
-    {SPR_NULL,6,8,0,NULL,S_DOGS_RUN1,0,0},		// S_DOGS_ATK3
-    {SPR_NULL,7,2,0,NULL,S_DOGS_PAIN2,0,0},		// S_DOGS_PAIN
-    {SPR_NULL,7,2,0,NULL,S_DOGS_RUN1,0,0},		// S_DOGS_PAIN2
-    {SPR_NULL,8,8,0,NULL,S_DOGS_DIE2,0,0},		// S_DOGS_DIE1
-    {SPR_NULL,9,8,0,NULL,S_DOGS_DIE3,0,0},		// S_DOGS_DIE2
-    {SPR_NULL,10,4,0,NULL,S_DOGS_DIE4,0,0},		// S_DOGS_DIE3
-    {SPR_NULL,11,4,0,NULL,S_DOGS_DIE5,0,0},		// S_DOGS_DIE4
-    {SPR_NULL,12,4,0,NULL,S_DOGS_DIE6,0,0},		// S_DOGS_DIE5
-    {SPR_NULL,13,-1,0,NULL,S_NULL,0,0},			// S_DOGS_DIE6
-    {SPR_NULL,13,5,0,NULL,S_DOGS_RAISE2,0,0},		// S_DOGS_RAISE1
-    {SPR_NULL,12,5,0,NULL,S_DOGS_RAISE3,0,0},		// S_DOGS_RAISE2
-    {SPR_NULL,11,5,0,NULL,S_DOGS_RAISE4,0,0},		// S_DOGS_RAISE3
-    {SPR_NULL,10,5,0,NULL,S_DOGS_RAISE5,0,0},		// S_DOGS_RAISE4
-    {SPR_NULL,9,5,0,NULL,S_DOGS_RAISE6,0,0},		// S_DOGS_RAISE5
-    {SPR_NULL,8,5,0,NULL,S_DOGS_RUN1,0,0},		// S_DOGS_RAISE6
+
+    {SPR_TNT1,0,-1,0,NULL,S_TNT1},			// S_TNT1	// phares 3/8/98
+
+    // killough 8/9/98: grenade
+    {SPR_MISL,32768,1000,1,A_Die,S_GRENADE},		// S_GRENADE
+
+    // killough 8/10/98: variable damage explosion
+    {SPR_MISL,32769,4,1,A_Scream,S_DETONATE2},		// S_DETONATE
+    {SPR_MISL,32770,6,1,A_Detonate,S_DETONATE3},	// S_DETONATE2
+    {SPR_MISL,32771,10,0,NULL,S_NULL},			// S_DETONATE3
+
+    // killough 7/19/98: Marine's best friend :)
+    {SPR_DOGS,0,10,1,A_Look,S_DOGS_STND2},		// S_DOGS_STND
+    {SPR_DOGS,1,10,1,A_Look,S_DOGS_STND},		// S_DOGS_STND2
+    {SPR_DOGS,0,2,1,A_Chase,S_DOGS_RUN2},		// S_DOGS_RUN1
+    {SPR_DOGS,0,2,1,A_Chase,S_DOGS_RUN3},		// S_DOGS_RUN2
+    {SPR_DOGS,1,2,1,A_Chase,S_DOGS_RUN4},		// S_DOGS_RUN3
+    {SPR_DOGS,1,2,1,A_Chase,S_DOGS_RUN5},		// S_DOGS_RUN4
+    {SPR_DOGS,2,2,1,A_Chase,S_DOGS_RUN6},		// S_DOGS_RUN5
+    {SPR_DOGS,2,2,1,A_Chase,S_DOGS_RUN7},		// S_DOGS_RUN6
+    {SPR_DOGS,3,2,1,A_Chase,S_DOGS_RUN8},		// S_DOGS_RUN7
+    {SPR_DOGS,3,2,1,A_Chase,S_DOGS_RUN1},		// S_DOGS_RUN8
+    {SPR_DOGS,4,8,1,A_FaceTarget,S_DOGS_ATK2},		// S_DOGS_ATK1
+    {SPR_DOGS,5,8,1,A_FaceTarget,S_DOGS_ATK3},		// S_DOGS_ATK2
+    {SPR_DOGS,6,8,1,A_SargAttack,S_DOGS_RUN1},		// S_DOGS_ATK3
+    {SPR_DOGS,7,2,0,NULL,S_DOGS_PAIN2},			// S_DOGS_PAIN
+    {SPR_DOGS,7,2,1,A_Pain,S_DOGS_RUN1},		// S_DOGS_PAIN2
+    {SPR_DOGS,8,8,0,NULL,S_DOGS_DIE2},			// S_DOGS_DIE1
+    {SPR_DOGS,9,8,1,A_Scream,S_DOGS_DIE3},		// S_DOGS_DIE2
+    {SPR_DOGS,10,4,0,NULL,S_DOGS_DIE4},			// S_DOGS_DIE3
+    {SPR_DOGS,11,4,1,A_Fall,S_DOGS_DIE5},		// S_DOGS_DIE4
+    {SPR_DOGS,12,4,0,NULL,S_DOGS_DIE6},			// S_DOGS_DIE5
+    {SPR_DOGS,13,-1,NULL,S_NULL},			// S_DOGS_DIE6
+    {SPR_DOGS,13,5,0,NULL,S_DOGS_RAISE2},		// S_DOGS_RAISE1
+    {SPR_DOGS,12,5,0,NULL,S_DOGS_RAISE3},		// S_DOGS_RAISE2
+    {SPR_DOGS,11,5,0,NULL,S_DOGS_RAISE4},		// S_DOGS_RAISE3
+    {SPR_DOGS,10,5,0,NULL,S_DOGS_RAISE5},		// S_DOGS_RAISE4
+    {SPR_DOGS,9,5,0,NULL,S_DOGS_RAISE6},		// S_DOGS_RAISE5
+    {SPR_DOGS,8,5,0,NULL,S_DOGS_RUN1},			// S_DOGS_RAISE6
+
     {SPR_NULL,0,10,0,NULL,S_OLDBFG2,0,0},		// S_OLDBFG1
     {SPR_NULL,1,1,0,NULL,S_OLDBFG3,0,0},		// S_OLDBFG2
     {SPR_NULL,1,1,0,NULL,S_OLDBFG4,0,0},		// S_OLDBFG3
@@ -1099,40 +1105,62 @@ state_t states[NUMSTATES] =
     {SPR_NULL,1,1,0,NULL,S_OLDBFG42,0,0},		// S_OLDBFG41
     {SPR_NULL,1,0,0,NULL,S_OLDBFG43,0,0},		// S_OLDBFG42
     {SPR_NULL,1,20,0,NULL,S_BFG,0,0},			// S_OLDBFG43
-    {SPR_NULL,0 | FF_FULLBRIGHT,6,0,NULL,S_PLS1BALL2,0,0},// S_PLS1BALL
-    {SPR_NULL,1 | FF_FULLBRIGHT,6,0,NULL,S_PLS1BALL,0,0},// S_PLS1BALL2
-    {SPR_NULL,2 | FF_FULLBRIGHT,4,0,NULL,S_PLS1EXP2,0,0},// S_PLS1EXP
-    {SPR_NULL,3 | FF_FULLBRIGHT,4,0,NULL,S_PLS1EXP3,0,0},// S_PLS1EXP2
-    {SPR_NULL,4 | FF_FULLBRIGHT,4,0,NULL,S_PLS1EXP4,0,0},// S_PLS1EXP3
-    {SPR_NULL,5 | FF_FULLBRIGHT,4,0,NULL,S_PLS1EXP5,0,0},// S_PLS1EXP4
-    {SPR_NULL,6 | FF_FULLBRIGHT,4,0,NULL,S_NULL,0,0},	// S_PLS1EXP5
-    {SPR_NULL,0 | FF_FULLBRIGHT,4,0,NULL,S_PLS2BALL2,0,0},// S_PLS2BALL
-    {SPR_NULL,1 | FF_FULLBRIGHT,4,0,NULL,S_PLS2BALL,0,0},// S_PLS2BALL2
-    {SPR_NULL,2 | FF_FULLBRIGHT,6,0,NULL,S_PLS2BALLX2,0,0},// S_PLS2BALLX1
-    {SPR_NULL,3 | FF_FULLBRIGHT,6,0,NULL,S_PLS2BALLX2,0,0},// S_PLS2BALLX2
-    {SPR_NULL,4 | FF_FULLBRIGHT,6,0,NULL,S_NULL,0,0},	// S_PLS2BALLX3
-    {SPR_NULL,0,6,0,NULL,S_BON3,0,0},			// S_BON3
-    {SPR_NULL,0,6,0,NULL,S_BON4,0,0},			// S_BON4
-    {SPR_NULL,0,10,0,NULL,S_BSKUL_STND,0,0},		// S_BSKUL_STND
-    {SPR_NULL,1,5,0,NULL,S_BSKUL_RUN2,0,0},		// S_BSKUL_RUN1
-    {SPR_NULL,2,5,0,NULL,S_BSKUL_RUN3,0,0},		// S_BSKUL_RUN2
-    {SPR_NULL,3,5,0,NULL,S_BSKUL_RUN4,0,0},		// S_BSKUL_RUN3
-    {SPR_NULL,0,5,0,NULL,S_BSKUL_RUN1,0,0},		// S_BSKUL_RUN4
-    {SPR_NULL,4,4,0,NULL,S_BSKUL_ATK2,0,0},		// S_BSKUL_ATK1
-    {SPR_NULL,5,5,0,NULL,S_BSKUL_ATK3,0,0},		// S_BSKUL_ATK2
-    {SPR_NULL,5,4,0,NULL,S_BSKUL_RUN1,0,0},		// S_BSKUL_ATK3
-    {SPR_NULL,6,4,0,NULL,S_BSKUL_PAIN2,0,0},		// S_BSKUL_PAIN1
-    {SPR_NULL,7,2,0,NULL,S_BSKUL_RUN1,0,0},		// S_BSKUL_PAIN2
-    {SPR_NULL,8,4,0,NULL,S_BSKUL_RUN1,0,0},		// S_BSKUL_PAIN3
-    {SPR_NULL,9,5,0,NULL,S_BSKUL_DIE2,0,0},		// S_BSKUL_DIE1
-    {SPR_NULL,10,5,0,NULL,S_BSKUL_DIE3,0,0},		// S_BSKUL_DIE2
-    {SPR_NULL,11,5,0,NULL,S_BSKUL_DIE4,0,0},		// S_BSKUL_DIE3
-    {SPR_NULL,12,5,0,NULL,S_BSKUL_DIE5,0,0},		// S_BSKUL_DIE4
-    {SPR_NULL,13,5,0,NULL,S_BSKUL_DIE6,0,0},		// S_BSKUL_DIE5
-    {SPR_NULL,14,5,0,NULL,S_BSKUL_DIE7,0,0},		// S_BSKUL_DIE6
-    {SPR_NULL,15,5,0,NULL,S_BSKUL_DIE8,0,0},		// S_BSKUL_DIE7
-    {SPR_NULL,16,5,0,NULL,S_BSKUL_DIE8,0,0},		// S_BSKUL_DIE8
+
+    // killough 7/19/98: First plasma fireball in the beta:
+    {SPR_PLS1,32768,6,0,NULL,S_PLS1BALL2},		// S_PLS1BALL
+    {SPR_PLS1,32769,6,0,NULL,S_PLS1BALL},		// S_PLS1BALL2
+    {SPR_PLS1,32770,4,0,NULL,S_PLS1EXP2},		// S_PLS1EXP
+    {SPR_PLS1,32771,4,0,NULL,S_PLS1EXP3},		// S_PLS1EXP2
+    {SPR_PLS1,32772,4,0,NULL,S_PLS1EXP4},		// S_PLS1EXP3
+    {SPR_PLS1,32773,4,0,NULL,S_PLS1EXP5},		// S_PLS1EXP4
+    {SPR_PLS1,32774,4,0,NULL,S_NULL},			// S_PLS1EXP5
+
+    // killough 7/19/98: Second plasma fireball in the beta:
+    {SPR_PLS2,32768,4,0,NULL,S_PLS2BALL2},		// S_PLS2BALL
+    {SPR_PLS2,32769,4,0,NULL,S_PLS2BALL},		// S_PLS2BALL2
+    {SPR_PLS2,32770,6,0,NULL,S_PLS2BALLX2},		// S_PLS2BALLX1
+    {SPR_PLS2,32771,6,0,NULL,S_PLS2BALLX3},		// S_PLS2BALLX2
+    {SPR_PLS2,32772,6,0,NULL,S_NULL},			// S_PLS2BALLX3
+
+    {SPR_BON3,0,6,0,NULL,S_BON3},			// S_BON3  // killough 7/11/98:
+    {SPR_BON4,0,6,0,NULL,S_BON4},			// S_BON4  // beta bonus items
+
+    // killough 10/98: beta lost souls attacked from a distance,
+    // animated with colors, and stayed in the air when killed.
+    // This is an approximation, but I'm sure it can be improved.
+
+    // spawnstate
+    {SPR_SKUL,0,10,1,A_Look,S_BSKUL_STND},		// S_BSKUL_STND
+
+    // chasestate
+    {SPR_SKUL,1,5,1,A_Chase,S_BSKUL_RUN2},		// S_BSKUL_RUN1
+    {SPR_SKUL,2,5,1,A_Chase,S_BSKUL_RUN3},		// S_BSKUL_RUN2
+    {SPR_SKUL,3,5,1,A_Chase,S_BSKUL_RUN4},		// S_BSKUL_RUN3
+    {SPR_SKUL,0,5,1,A_Chase,S_BSKUL_RUN1},		// S_BSKUL_RUN4
+
+    // missilestate
+    {SPR_SKUL,4,4,1,A_FaceTarget,S_BSKUL_ATK2},		// S_BSKUL_ATK1
+    {SPR_SKUL,5,5,0,NULL/*1,A_BetaSkullAttack*/,S_BSKUL_ATK3},	// S_BSKUL_ATK2
+    {SPR_SKUL,5,4,0,NULL,S_BSKUL_RUN1},			// S_BSKUL_ATK3
+
+    // painstate
+    {SPR_SKUL,6,4,0,NULL,S_BSKUL_PAIN2},		// S_BSKUL_PAIN1
+    {SPR_SKUL,7,2,1,A_Pain,S_BSKUL_RUN1},		// S_BSKUL_PAIN2
+    {SPR_SKUL,8,4,0,NULL,S_BSKUL_RUN1},			// S_BSKUL_PAIN3
+
+    // deathstate
+    {SPR_SKUL, 9,5,0,NULL,S_BSKUL_DIE2},		// S_BSKUL_DIE1
+    {SPR_SKUL,10,5,0,NULL,S_BSKUL_DIE3},		// S_BSKUL_DIE2
+    {SPR_SKUL,11,5,0,NULL,S_BSKUL_DIE4},		// S_BSKUL_DIE3
+    {SPR_SKUL,12,5,0,NULL,S_BSKUL_DIE5},		// S_BSKUL_DIE4
+    {SPR_SKUL,13,5,1,A_Scream,S_BSKUL_DIE6},		// S_BSKUL_DIE5
+    {SPR_SKUL,14,5,0,NULL,S_BSKUL_DIE7},		// S_BSKUL_DIE6
+    {SPR_SKUL,15,5,1,A_Fall,S_BSKUL_DIE8},		// S_BSKUL_DIE7
+    {SPR_SKUL,16,5,0,NULL/*1,A_Stop*/,S_BSKUL_DIE8},		// S_BSKUL_DIE8
+
+
     {SPR_NULL,1 | FF_FULLBRIGHT,8,0,NULL,S_EXPLODE2,0,0},// S_MUSHROOM
+
     {SPR_NULL,14,5,0,NULL,S_PLAY_GDIE2,0,0},		// S_PLAY_GDIE1
     {SPR_NULL,15,5,0,NULL,S_PLAY_GDIE3,0,0},		// S_PLAY_GDIE2
     {SPR_NULL,16,5,0,NULL,S_PLAY_GDIE4,0,0},		// S_PLAY_GDIE3
@@ -1144,6 +1172,7 @@ state_t states[NUMSTATES] =
     {SPR_NULL,22,-1,0,NULL,S_NULL,0,0}			// S_PLAY_GDIE9
 };
 
+//-----------------------------------------------------------------------------
 
 mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 {
@@ -5118,68 +5147,106 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
 	0,							// flags2
 	S_NULL, 						// raisestate
 	FRACUNIT						// scale
-    }
-#ifdef BOOM
-    ,
-								// For use with wind and current effects
-    {								// MT_PUSH
-	5001,							// doomednum
-	S_TNT1, 						// spawnstate
-	1000,							// spawnhealth
-	S_NULL, 						// seestate
-	sfx_None,						// seesound
-	8,							// reactiontime
-	sfx_None,						// attacksound
-	S_NULL, 						// painstate
-	0,							// painchance
-	sfx_None,						// painsound
-	S_NULL, 						// meleestate
-	S_NULL, 						// missilestate
-	S_NULL, 						// deathstate
-	S_NULL, 						// xdeathstate
-	sfx_None,						// deathsound
-	0,							// speed
-	8*FRACUNIT,						// radius
-	8*FRACUNIT,						// pickupradius
-	8*FRACUNIT,						// height
-	10,							// mass
-	0,							// damage
-	sfx_None,						// activesound
-	MF_NOBLOCKMAP,						// flags
-	0,							// flags2
-	S_NULL, 						// raisestate
-	FRACUNIT						// scale
     },
 
-								// For use with wind and current effects
-    {								// MT_PULL
-	5002,							// doomednum
-	S_TNT1, 						// spawnstate
-	1000,							// spawnhealth
-	S_NULL, 						// seestate
-	sfx_None,						// seesound
-	8,							// reactiontime
-	sfx_None,						// attacksound
-	S_NULL, 						// painstate
-	0,							// painchance
-	sfx_None,						// painsound
-	S_NULL, 						// meleestate
-	S_NULL, 						// missilestate
-	S_NULL, 						// deathstate
-	S_NULL, 						// xdeathstate
-	sfx_None,						// deathsound
-	0,							// speed
-	8*FRACUNIT,						// radius
-	8*FRACUNIT,						// pickupradius
-	8*FRACUNIT,						// height
-	10,							// mass
-	0,							// damage
-	sfx_None,						// activesound
-	MF_NOBLOCKMAP,						// flags
-	0,							// flags2
-	S_NULL, 						// raisestate
-	FRACUNIT						// scale
-    }
-#endif
+  // For use with wind and current effects
+  {   // MT_PUSH                       // phares
+    5001,           // doomednum       //   |      //jff 5/11/98 deconflict
+    S_TNT1,         // spawnstate      //   V      // with DOSDoom
+    1000,           // spawnhealth
+    S_NULL,         // seestate
+    sfx_None,       // seesound
+    8,              // reactiontime
+    sfx_None,       // attacksound
+    S_NULL,         // painstate
+    0,              // painchance
+    sfx_None,       // painsound
+    S_NULL,         // meleestate
+    S_NULL,         // missilestate
+    S_NULL,         // deathstate
+    S_NULL,         // xdeathstate
+    sfx_None,       // deathsound
+    0,              // speed
+    8,              // radius
+    8,						// pickupradius
+    8,              // height
+    10,             // mass
+    0,              // damage
+    sfx_None,       // activesound
+    MF_NOBLOCKMAP,  // flags
+    S_NULL          // raisestate
+  },
+
+  // For use with wind and current effects
+  {   // MT_PULL
+    5002,           // doomednum                   //jff 5/11/98 deconflict
+    S_TNT1,         // spawnstate                  // with DOSDoom
+    1000,           // spawnhealth
+    S_NULL,         // seestate
+    sfx_None,       // seesound
+    8,              // reactiontime
+    sfx_None,       // attacksound
+    S_NULL,         // painstate
+    0,              // painchance
+    sfx_None,       // painsound
+    S_NULL,         // meleestate
+    S_NULL,         // missilestate
+    S_NULL,         // deathstate
+    S_NULL,         // xdeathstate
+    sfx_None,       // deathsound
+    0,              // speed
+    8,              // radius
+    8,						// pickupradius
+    8,              // height
+    10,             // mass
+    0,              // damage
+    sfx_None,       // activesound
+    MF_NOBLOCKMAP,  // flags
+    S_NULL          // raisestate
+  },
+
+  // Marine's best friend :)      // killough 7/19/98
+  {					// MT_DOGS
+    888,				// doomednum
+    S_DOGS_STND,			// spawnstate
+    500,				// spawnhealth
+    S_DOGS_RUN1,			// seestate
+    sfx_dgsit,				// seesound
+    8,					// reactiontime
+    sfx_dgatk,				// attacksound
+    S_DOGS_PAIN,			// painstate
+    180,				// painchance
+    sfx_dgpain,				// painsound
+    S_DOGS_ATK1,			// meleestate
+    0,					// missilestate
+    S_DOGS_DIE1,			// deathstate
+    S_NULL,				// xdeathstate
+    sfx_dgdth,				// deathsound
+    10,					// speed
+    12*FRACUNIT,			// radius
+    12*FRACUNIT,			// pickupradius
+    28*FRACUNIT,			// height
+    100,				// mass
+    0,					// damage
+    sfx_dgact,				// activesound
+    MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, // flags
+    0,					// flags2
+    S_DOGS_RAISE1			// raisestate
+  }
 };
 
+//-----------------------------------------------------------------------------
+//#define CHECK_INFO_ARRAY_SIZES
+#ifdef CHECK_INFO_ARRAY_SIZES
+
+void check_array_sizes (void)
+{
+  if (ARRAY_SIZE(sprnames) != (NUMSPRITES+1))
+    printf ("sprnames %u/%u\n", ARRAY_SIZE(sprnames_orig), (NUMSPRITES+1));
+
+  if (ARRAY_SIZE(states) != (NUMSTATES))
+    printf ("states %u/%u\n", ARRAY_SIZE(states), (NUMSTATES));
+}
+
+#endif
+//-----------------------------------------------------------------------------

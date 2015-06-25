@@ -167,9 +167,12 @@ typedef enum
     SPR_BRS1,
     SPR_TLMP,
     SPR_TLP2,
-#ifdef BOOM
     SPR_TNT1,
-#endif
+    SPR_DOGS,
+    SPR_PLS1,
+    SPR_PLS2,
+    SPR_BON3,
+    SPR_BON4,
     NUMSPRITES
 } spritenum_t;
 
@@ -1421,10 +1424,9 @@ typedef enum {
     MT_MISC84,
     MT_MISC85,
     MT_MISC86,
-#ifdef BOOM
     MT_PUSH,
     MT_PULL,
-#endif
+    MT_DOGS,
     NUMMOBJTYPES
 } mobjtype_t;
 

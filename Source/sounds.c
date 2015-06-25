@@ -226,6 +226,12 @@ sfxinfo_t S_sfx[] =
   { "skesit", false, 70, 0, -1, -1, 0 },
   { "skeatk", false, 70, 0, -1, -1, 0 },
   { "radio", false, 60, 0, -1, -1, 0 },
+  // killough 11/98: dog sounds
+  { "dgsit",  false,   98, 0, -1, -1, 0 },
+  { "dgatk",  false,   70, 0, -1, -1, 0 },
+  { "dgact",  false,  120, 0, -1, -1, 0 },
+  { "dgdth",  false,   70, 0, -1, -1, 0 },
+  { "dgpain", false,   96, 0, -1, -1, 0 },
   { 0, false, 0, 0, 0, 0, 0 }
 };
 
@@ -261,6 +267,9 @@ char * sound_names_copy [ARRAY_SIZE(S_sfx)];
   "bspwlk", "vilact", "noway", "barexp", "punch", "hoof", "metal", "chgun",
   "tink", "bdopn", "bdcls", "itmbk", "flame", "flamst", "getpow", "bospit",
   "boscub", "bossit", "bospn", "bosdth", "manatk", "mandth", "sssit", "ssdth",
-  "keenpn", "keendt", "skeact", "skesit", "skeatk", "radio", NULL
+  "keenpn", "keendt", "skeact", "skesit", "skeatk", "radio",
+  // killough 11/98: dog sounds
+  "dgsit", "dgatk", "dgact", "dgdth", "dgpain",
+  NULL
 };
 #endif
