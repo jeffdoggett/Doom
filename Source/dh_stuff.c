@@ -3535,6 +3535,18 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      /* isn't used, however they're there in secur.wad */
 	      if (strncasecmp (string1, "A_", 2) == 0)
 		string1 += 2;
+
+	      counter1 = 0;
+	      do
+	      {
+		cc = string1 [counter1++];
+		if ((!isalpha(cc)) && (!isdigit(cc)))
+		{
+		  string1 [counter1-1] = 0;
+		  break;
+		}
+	      } while (string1 [counter1]);
+
 	      ptr = get_action_function_from_name (string1);
 	      if (ptr == NULL)
 	      {
