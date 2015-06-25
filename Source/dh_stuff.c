@@ -1341,7 +1341,7 @@ static int find_thing_bitname (char * str)
   do
   {
     cc = str [len];
-    if (cc <= ' ')
+    if (!isalpha(cc))
       cc = 0;
     buf [len++] = cc;
   } while (cc);
@@ -1356,6 +1356,19 @@ static int find_thing_bitname (char * str)
   } while (--count);
 
   return (0);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static char * next_bits_arg (char * ptr)
+{
+  while (isalpha(*ptr))
+    ptr++;
+
+  while (*ptr == ' ')
+    ptr++;
+
+  return (ptr);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1377,11 +1390,12 @@ static void decode_things_bits (unsigned int * params, char * string1)
       case '+': params [0] += flag; break;
       case '&': params [0] &= flag; break;
     }
-    string1 = next_arg (string1);
+    string1 = next_bits_arg (string1);
     if (*string1 == 0)
       break;
-    operator = *string1;
-    string1 = next_arg (string1);
+    operator = *string1++;
+    while (*string1 == ' ')
+      string1++;
   } while (*string1);
 }
 
@@ -3169,6 +3183,11 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
     {
       dh_fgets_x (a_line, sizeof (a_line) - 4, fin, filetop_pos);
       dh_line_number++;
+
+#ifdef SHOW_DEHACKED_LINES
+      printf ("DH %u:%s\n", dh_line_number, a_line);
+#endif
+
       if (a_line [0] == '#')
 	continue;
 
