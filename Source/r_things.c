@@ -279,7 +279,10 @@ void R_InitSpriteDefs (char** namelist)
 
 	for (frame = 0 ; frame < maxframe ; frame++)
 	{
-	    switch ((int)sprtemp[frame].rotate)
+	    spriteframe_t * sprptr;
+
+	    sprptr = &sprtemp[frame];
+	    switch ((int)sprptr->rotate)
 	    {
 	      case -1:
 		// no rotations were found for that frame at all
@@ -295,32 +298,113 @@ void R_InitSpriteDefs (char** namelist)
 		// must have all 8 frames
 		for (rotation=0 ; rotation<8 ; rotation++)
 		{
-		  if (sprtemp[frame].lump[rotation] == -1)
+		  if (sprptr->lump[rotation] == -1)
 		  {
 #if 0
 		    printf ("R_InitSprites: Sprite %s frame %c "
 			     "is missing rotation %u\n",
 			     namelist[i], frame+'A', rotation);
 #endif
-		    if (rotation)
+
+		    switch (rotation)
 		    {
-		      sprtemp[frame].lump[rotation] = sprtemp[frame].lump[rotation-1];
-		    }
-		    else
-		    {
-		      done = 0;
-		      for (rot=rotation ; rot<8 ; rot++)
-		      {
-			if (sprtemp[frame].lump[rot] != -1)
+		      case 1-1:
+			if (sprptr->lump[5-1] != -1)
 			{
-			  sprtemp[frame].lump[rotation] = sprtemp[frame].lump[rot];
-			  done = 1;
-			  break;
+			  sprptr->lump[rotation] = sprptr->lump[5-1];
+			  sprptr->flip[rotation] = !sprptr->flip[5-1];
+			  sprptr->index[rotation] = sprptr->index[5-1];
 			}
-		      }
-		      if (done == 0)
+			break;
+
+		      case 5-1:
+			if (sprptr->lump[1-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[1-1];
+			  sprptr->flip[rotation] = !sprptr->flip[1-1];
+			  sprptr->index[rotation] = sprptr->index[1-1];
+			}
+			break;
+
+		      case 3-1:
+			if (sprptr->lump[7-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[7-1];
+			  sprptr->flip[rotation] = !sprptr->flip[7-1];
+			  sprptr->index[rotation] = sprptr->index[7-1];
+			}
+			break;
+
+		      case 7-1:
+			if (sprptr->lump[3-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[3-1];
+			  sprptr->flip[rotation] = !sprptr->flip[3-1];
+			  sprptr->index[rotation] = sprptr->index[3-1];
+			}
+			break;
+
+		      case 4-1:
+			if (sprptr->lump[6-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[6-1];
+			  sprptr->flip[rotation] = !sprptr->flip[6-1];
+			  sprptr->index[rotation] = sprptr->index[6-1];
+			}
+			break;
+
+		      case 6-1:
+			if (sprptr->lump[4-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[4-1];
+			  sprptr->flip[rotation] = !sprptr->flip[4-1];
+			  sprptr->index[rotation] = sprptr->index[4-1];
+			}
+			break;
+
+		      case 2-1:
+			if (sprptr->lump[8-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[8-1];
+			  sprptr->flip[rotation] = !sprptr->flip[8-1];
+			  sprptr->index[rotation] = sprptr->index[8-1];
+			}
+			break;
+
+		      case 8-1:
+			if (sprptr->lump[2-1] != -1)
+			{
+			  sprptr->lump[rotation] = sprptr->lump[2-1];
+			  sprptr->flip[rotation] = !sprptr->flip[2-1];
+			  sprptr->index[rotation] = sprptr->index[2-1];
+			}
+			break;
+		    }
+
+		    if (sprptr->lump[rotation] == -1)
+		    {
+		      if (rotation)
 		      {
-			sprtemp[frame].rotate = 0;
+			sprptr->lump[rotation] = sprptr->lump[rotation-1];
+			sprptr->index[rotation] = sprptr->index[rotation-1];
+		      }
+		      else
+		      {
+			done = 0;
+			for (rot=rotation ; rot<8 ; rot++)
+			{
+			  if (sprptr->lump[rot] != -1)
+			  {
+			    sprptr->lump[rotation] = sprptr->lump[rot];
+			    sprptr->index[rotation] = sprptr->index[rot];
+			    done = 1;
+			    break;
+			  }
+			}
+			if (done == 0)
+			{
+			  sprptr->rotate = false;
+			}
 		      }
 		    }
 		  }
@@ -402,8 +486,8 @@ static vissprite_t* R_NewVisSprite (fixed_t distance)
       if (((vis->mobjflags & MF_SHOOTABLE) == 0)
        && (vis->distance < distance))
       {
-        rc = vis;
-        distance = vis->distance;
+	rc = vis;
+	distance = vis->distance;
       }
       vis++;
     } while (--count);
@@ -596,8 +680,7 @@ void R_ProjectSprite (mobj_t* thing)
   // decide which patch to use for sprite relative to player
 #ifdef RANGECHECK
   if ((unsigned)thing->sprite >= numsprites)
-    I_Error ("R_ProjectSprite: invalid sprite number %i ",
-		thing->sprite);
+    I_Error ("R_ProjectSprite: invalid sprite number %i/%i", thing->sprite,numsprites);
 #endif
   sprdef = &sprites[thing->sprite];
 #ifdef RANGECHECK
@@ -1019,17 +1102,17 @@ void R_DrawSprite (vissprite_t* spr)
 
 
 	// clip this piece of the sprite
-        // killough 3/27/98: optimized and made much shorter
+	// killough 3/27/98: optimized and made much shorter
 
-        if (ds->silhouette&SIL_BOTTOM && spr->gz < ds->bsilheight) //bottom sil
-            for (x = r1; x <= r2; x++)
-                if (clipbot[x] == -2)
-                    clipbot[x] = ds->sprbottomclip[x];
+	if (ds->silhouette&SIL_BOTTOM && spr->gz < ds->bsilheight) //bottom sil
+	    for (x = r1; x <= r2; x++)
+		if (clipbot[x] == -2)
+		    clipbot[x] = ds->sprbottomclip[x];
 
-        if (ds->silhouette&SIL_TOP && spr->gzt > ds->tsilheight)   // top sil
-            for (x = r1; x <= r2; x++)
-                if (cliptop[x] == -2)
-                    cliptop[x] = ds->sprtopclip[x];
+	if (ds->silhouette&SIL_TOP && spr->gzt > ds->tsilheight)   // top sil
+	    for (x = r1; x <= r2; x++)
+		if (cliptop[x] == -2)
+		    cliptop[x] = ds->sprtopclip[x];
 
     }
 
