@@ -42,6 +42,7 @@ EV_Teleport (line_t* line, int side, mobj_t* thing)
   fixed_t	oldx;
   fixed_t	oldy;
   fixed_t	oldz;
+  player_t	*player;
 
   /* don't teleport missiles */
   /* Don't teleport if hit back of line, */
@@ -67,8 +68,12 @@ EV_Teleport (line_t* line, int side, mobj_t* thing)
       if (P_TeleportMove (thing, m->x, m->y, m->z, false))
       {
 	thing->z = thing->floorz;  //fixme: not needed?
-	if (thing->player)
-	  thing->player->viewz = thing->z+thing->player->viewheight;
+
+	/* Adjust player's view, in case there has been a height change */
+	/* Voodoo dolls are excluded by making sure player->mo == thing. */
+	player = thing->player;
+	if (player && (player->mo == thing))
+	  player->viewz = thing->z+player->viewheight;
 
 	// spawn teleport fog at source and destination
 	fog = P_SpawnMobj (oldx, oldy, oldz, MT_TFOG);
@@ -82,7 +87,7 @@ EV_Teleport (line_t* line, int side, mobj_t* thing)
 	S_StartSound (fog, sfx_telept);
 
 	// don't move for a bit
-	if (thing->player)
+	if (player)
 	  thing->reactiontime = 18;
 
 	thing->angle = m->angle;
