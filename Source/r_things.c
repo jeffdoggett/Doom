@@ -195,6 +195,7 @@ void R_InitSpriteDefs (char** namelist)
     int 	intname;
     int 	frame;
     int 	rotation;
+    int 	rot;
     int 	lump;
     int 	done;
 
@@ -293,10 +294,37 @@ void R_InitSpriteDefs (char** namelist)
 	      case 1:
 		// must have all 8 frames
 		for (rotation=0 ; rotation<8 ; rotation++)
-		    if (sprtemp[frame].lump[rotation] == -1)
-			I_Error ("R_InitSprites: Sprite %s frame %c "
-				 "is missing rotations",
-				 namelist[i], frame+'A');
+		{
+		  if (sprtemp[frame].lump[rotation] == -1)
+		  {
+#if 0
+		    printf ("R_InitSprites: Sprite %s frame %c "
+			     "is missing rotation %u\n",
+			     namelist[i], frame+'A', rotation);
+#endif
+		    if (rotation)
+		    {
+		      sprtemp[frame].lump[rotation] = sprtemp[frame].lump[rotation-1];
+		    }
+		    else
+		    {
+		      done = 0;
+		      for (rot=rotation ; rot<8 ; rot++)
+		      {
+			if (sprtemp[frame].lump[rot] != -1)
+			{
+			  sprtemp[frame].lump[rotation] = sprtemp[frame].lump[rot];
+			  done = 1;
+			  break;
+			}
+		      }
+		      if (done == 0)
+		      {
+			sprtemp[frame].rotate = 0;
+		      }
+		    }
+		  }
+		}
 		break;
 	    }
 	}
