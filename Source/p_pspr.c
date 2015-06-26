@@ -683,7 +683,7 @@ A_FireBFG
 
 void A_FireOldBFG (player_t *player, pspdef_t *psp)
 {
-  int type = MT_PLASMA1;
+  mobjtype_t type = MT_PLASMA1;
 
   if (weaponrecoil && !(player->mo->flags & MF_NOCLIP))
     P_Thrust(player, ANG180 + player->mo->angle,
@@ -729,7 +729,10 @@ void A_FireOldBFG (player_t *player, pspdef_t *psp)
     th->momy = finesine[an1>>ANGLETOFINESHIFT] * 25;
     th->momz = finetangent[an2>>ANGLETOFINESHIFT] * 25;
     P_CheckMissileSpawn(th);
-  } while ((type != MT_PLASMA2) && (type = MT_PLASMA2)); //killough: obfuscated!
+    if (type == MT_PLASMA2)
+      break;
+    type = MT_PLASMA2;
+  } while (1);
 }
 
 //-----------------------------------------------------------------------------
