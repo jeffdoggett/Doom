@@ -1140,7 +1140,7 @@ state_t states[] =
 
     // missilestate
     {SPR_SKUL,4,4,1,A_FaceTarget,S_BSKUL_ATK2},		// S_BSKUL_ATK1
-    {SPR_SKUL,5,5,0,NULL/*1,A_BetaSkullAttack*/,S_BSKUL_ATK3},	// S_BSKUL_ATK2
+    {SPR_SKUL,5,5,1,A_BetaSkullAttack,S_BSKUL_ATK3},	// S_BSKUL_ATK2
     {SPR_SKUL,5,4,0,NULL,S_BSKUL_RUN1},			// S_BSKUL_ATK3
 
     // painstate
@@ -1156,7 +1156,7 @@ state_t states[] =
     {SPR_SKUL,13,5,1,A_Scream,S_BSKUL_DIE6},		// S_BSKUL_DIE5
     {SPR_SKUL,14,5,0,NULL,S_BSKUL_DIE7},		// S_BSKUL_DIE6
     {SPR_SKUL,15,5,1,A_Fall,S_BSKUL_DIE8},		// S_BSKUL_DIE7
-    {SPR_SKUL,16,5,0,NULL/*1,A_Stop*/,S_BSKUL_DIE8},		// S_BSKUL_DIE8
+    {SPR_SKUL,16,5,1,A_Stop,S_BSKUL_DIE8},		// S_BSKUL_DIE8
 
 
     {SPR_NULL,1 | FF_FULLBRIGHT,8,0,NULL,S_EXPLODE2,0,0},// S_MUSHROOM

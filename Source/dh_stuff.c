@@ -426,6 +426,8 @@ static const codeptrs_t codeptr_frames [] =
   { "HeadAttack",	A_HeadAttack,		1 },
   { "BruisAttack",	A_BruisAttack,		1 },
   { "SkullAttack",	A_SkullAttack,		1 },
+  { "BetaSkullAttack",	A_BetaSkullAttack,	1 },
+  { "Stop",		A_Stop,			1 },
   { "Metal",		A_Metal,		1 },
   { "SpidRefire",	A_SpidRefire,		1 },
   { "BabyMetal",	A_BabyMetal,		1 },
@@ -1721,18 +1723,19 @@ void dh_validate_state_table_function_pointers (void)
   state = states;
   do
   {
+    s = 0;
     if (state->action.acv)
     {
       ptr = get_action_function_from_ptr (state->action.acv);
       if (ptr)
       {
 	s = ptr->arg_count;
-	if (state->pcount != s)
-	{
-	  printf ("State %u function type corrected from %u to %u\n", num, state->pcount, s);
-	  state->pcount = s;
-	}
       }
+    }
+    if (state->pcount != s)
+    {
+      printf ("State %u function type corrected from %u to %u\n", num, state->pcount, s);
+      state->pcount = s;
     }
     state++;
   } while (++num < NUMSTATES);

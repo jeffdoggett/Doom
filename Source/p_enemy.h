@@ -97,6 +97,8 @@ extern void A_SargAttack (mobj_t* mo);
 extern void A_HeadAttack (mobj_t* mo);
 extern void A_BruisAttack (mobj_t* mo);
 extern void A_SkullAttack (mobj_t* mo);
+extern void A_BetaSkullAttack (mobj_t* mo);
+extern void A_Stop (mobj_t* mo);
 extern void A_Metal (mobj_t* mo);
 extern void A_SpidRefire (mobj_t* mo);
 extern void A_BabyMetal (mobj_t* mo);
