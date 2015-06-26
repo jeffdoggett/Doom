@@ -1424,10 +1424,17 @@ typedef enum {
     MT_MISC84,
     MT_MISC85,
     MT_MISC86,
-    MT_PUSH,
-    MT_PULL,
-    MT_DOGS,
-    NUMMOBJTYPES
+    MT_PUSH,	// controls push source                     // phares
+    MT_PULL,	// controls pull source                     // phares 3/20/98
+
+    MT_DOGS,	// killough 7/19/98: Marine's best friend
+
+    MT_PLASMA1,	// killough 7/11/98: first  of alternating beta plasma fireballs
+    MT_PLASMA2,	// killough 7/11/98: second of alternating beta plasma fireballs
+    MT_SCEPTRE,	// killough 7/11/98: evil sceptre in beta version
+    MT_BIBLE,	// killough 7/11/98: unholy bible in beta version
+
+    NUMMOBJTYPES  // Counter of how many there are
 } mobjtype_t;
 
 typedef struct

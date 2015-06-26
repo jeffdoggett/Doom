@@ -1062,49 +1062,26 @@ state_t states[] =
     {SPR_DOGS,9,5,0,NULL,S_DOGS_RAISE6},		// S_DOGS_RAISE5
     {SPR_DOGS,8,5,0,NULL,S_DOGS_RUN1},			// S_DOGS_RAISE6
 
-    {SPR_NULL,0,10,0,NULL,S_OLDBFG2,0,0},		// S_OLDBFG1
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG3,0,0},		// S_OLDBFG2
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG4,0,0},		// S_OLDBFG3
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG5,0,0},		// S_OLDBFG4
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG6,0,0},		// S_OLDBFG5
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG7,0,0},		// S_OLDBFG6
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG8,0,0},		// S_OLDBFG7
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG9,0,0},		// S_OLDBFG8
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG10,0,0},		// S_OLDBFG9
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG11,0,0},		// S_OLDBFG10
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG12,0,0},		// S_OLDBFG11
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG13,0,0},		// S_OLDBFG12
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG14,0,0},		// S_OLDBFG13
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG15,0,0},		// S_OLDBFG14
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG16,0,0},		// S_OLDBFG15
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG17,0,0},		// S_OLDBFG16
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG18,0,0},		// S_OLDBFG17
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG19,0,0},		// S_OLDBFG18
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG20,0,0},		// S_OLDBFG19
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG21,0,0},		// S_OLDBFG20
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG22,0,0},		// S_OLDBFG21
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG23,0,0},		// S_OLDBFG22
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG24,0,0},		// S_OLDBFG23
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG25,0,0},		// S_OLDBFG24
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG26,0,0},		// S_OLDBFG25
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG27,0,0},		// S_OLDBFG26
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG28,0,0},		// S_OLDBFG27
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG29,0,0},		// S_OLDBFG28
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG30,0,0},		// S_OLDBFG29
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG31,0,0},		// S_OLDBFG30
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG32,0,0},		// S_OLDBFG31
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG33,0,0},		// S_OLDBFG32
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG34,0,0},		// S_OLDBFG33
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG35,0,0},		// S_OLDBFG34
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG36,0,0},		// S_OLDBFG35
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG37,0,0},		// S_OLDBFG36
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG38,0,0},		// S_OLDBFG37
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG39,0,0},		// S_OLDBFG38
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG40,0,0},		// S_OLDBFG39
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG41,0,0},		// S_OLDBFG40
-    {SPR_NULL,1,1,0,NULL,S_OLDBFG42,0,0},		// S_OLDBFG41
-    {SPR_NULL,1,0,0,NULL,S_OLDBFG43,0,0},		// S_OLDBFG42
-    {SPR_NULL,1,20,0,NULL,S_BFG,0,0},			// S_OLDBFG43
+    // killough 7/11/98: beta BFG begins here
+    // S_OLDBFG1
+
+#define BFGDELAY 1
+#define OLDBFG_1FRAMES(x) {SPR_BFGG,1,BFGDELAY,2,A_FireOldBFG,x+S_OLDBFG1+2},
+#define OLDBFG_2FRAMES(x) OLDBFG_1FRAMES(x) OLDBFG_1FRAMES(x+1)
+#define OLDBFG_4FRAMES(x) OLDBFG_2FRAMES(x) OLDBFG_2FRAMES(x+2)
+#define OLDBFG_8FRAMES(x) OLDBFG_4FRAMES(x) OLDBFG_4FRAMES(x+4)
+    {SPR_BFGG,0,10,2,A_BFGsound,S_OLDBFG1+1},		// S_OLDBFG1
+
+    OLDBFG_8FRAMES(0)
+    OLDBFG_8FRAMES(8)
+    OLDBFG_8FRAMES(16) 
+    OLDBFG_8FRAMES(24)
+    OLDBFG_8FRAMES(32)
+
+    {SPR_BFGG,1,0,2,A_Light0,S_OLDBFG43},		// S_OLDBFG42
+    {SPR_BFGG,1,20,2,A_ReFire,S_BFG},			// S_OLDBFG43
+
+    // killough 7/11/98: end of beta BFG
 
     // killough 7/19/98: First plasma fireball in the beta:
     {SPR_PLS1,32768,6,0,NULL,S_PLS1BALL2},		// S_PLS1BALL
@@ -5232,11 +5209,127 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, // flags
     0,					// flags2
     S_DOGS_RAISE1			// raisestate
+  },
+
+  // killough 7/11/98: this is the first of two plasma fireballs in the beta
+  {   // MT_PLASMA1
+    -1,   // doomednum
+    S_PLS1BALL,   // spawnstate
+    1000,   // spawnhealth
+    S_NULL,   // seestate
+    sfx_plasma,   // seesound
+    8,    // reactiontime
+    sfx_None,   // attacksound
+    S_NULL,   // painstate
+    0,    // painchance
+    sfx_None,   // painsound
+    S_NULL,   // meleestate
+    S_NULL,   // missilestate
+    S_PLS1EXP,    // deathstate
+    S_NULL,   // xdeathstate
+    sfx_firxpl,   // deathsound
+    25*FRACUNIT,    // speed
+    13*FRACUNIT,    // radius
+    13*FRACUNIT,    // pickupradius
+    8*FRACUNIT,   // height
+    100,    // mass
+    4,    // damage
+    sfx_None,   // activesound
+    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
+    0,					// flags2
+    S_NULL    // raisestate
+  },
+  
+  // killough 7/11/98: this is the second of two plasma fireballs in the beta
+  {   // MT_PLASMA2
+    -1,   // doomednum
+    S_PLS2BALL,   // spawnstate
+    1000,   // spawnhealth
+    S_NULL,   // seestate
+    sfx_plasma,   // seesound
+    8,    // reactiontime
+    sfx_None,   // attacksound
+    S_NULL,   // painstate
+    0,    // painchance
+    sfx_None,   // painsound
+    S_NULL,   // meleestate
+    S_NULL,   // missilestate
+    S_PLS2BALLX1,    // deathstate
+    S_NULL,   // xdeathstate
+    sfx_firxpl,   // deathsound
+    25*FRACUNIT,    // speed
+    6*FRACUNIT,    // radius
+    6*FRACUNIT,    // pickupradius
+    8*FRACUNIT,   // height
+    100,    // mass
+    4,    // damage
+    sfx_None,   // activesound
+    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
+    0,					// flags2
+    S_NULL    // raisestate
+  },
+
+  // killough 7/11/98: this is the evil sceptre in the beta version
+  {   // MT_SCEPTRE
+    2016,   // doomednum
+    S_BON3,   // spawnstate
+    1000,   // spawnhealth
+    S_NULL,   // seestate
+    sfx_None,   // seesound
+    8,    // reactiontime
+    sfx_None,   // attacksound
+    S_NULL,   // painstate
+    0,    // painchance
+    sfx_None,   // painsound
+    S_NULL,   // meleestate
+    S_NULL,   // missilestate
+    S_NULL,   // deathstate
+    S_NULL,   // xdeathstate
+    sfx_None,   // deathsound
+    0,    // speed
+    10*FRACUNIT,    // radius
+    10*FRACUNIT,    // pickupradius
+    16*FRACUNIT,    // height
+    100,    // mass
+    0,    // damage
+    sfx_None,   // activesound
+    MF_SPECIAL|MF_COUNTITEM,    // flags
+    0,					// flags2
+    S_NULL    // raisestate
+  },
+
+  // killough 7/11/98: this is the unholy bible in the beta version
+  {   // MT_BIBLE
+    2017,   // doomednum
+    S_BON4,   // spawnstate
+    1000,   // spawnhealth
+    S_NULL,   // seestate
+    sfx_None,   // seesound
+    8,    // reactiontime
+    sfx_None,   // attacksound
+    S_NULL,   // painstate
+    0,    // painchance
+    sfx_None,   // painsound
+    S_NULL,   // meleestate
+    S_NULL,   // missilestate
+    S_NULL,   // deathstate
+    S_NULL,   // xdeathstate
+    sfx_None,   // deathsound
+    0,    // speed
+    20*FRACUNIT,    // radius
+    20*FRACUNIT,    // pickupradius
+    10*FRACUNIT,    // height
+    100,    // mass
+    0,    // damage
+    sfx_None,   // activesound
+    MF_SPECIAL|MF_COUNTITEM,    // flags
+    0,					// flags2
+    S_NULL    // raisestate
   }
 };
 
 //-----------------------------------------------------------------------------
-//#define CHECK_INFO_ARRAY_SIZES
+// #define CHECK_INFO_ARRAY_SIZES
 #ifdef CHECK_INFO_ARRAY_SIZES
 
 void check_array_sizes (void)
@@ -5246,6 +5339,9 @@ void check_array_sizes (void)
 
   if (ARRAY_SIZE(states) != (NUMSTATES))
     printf ("states %u/%u\n", ARRAY_SIZE(states), (NUMSTATES));
+
+  if (ARRAY_SIZE(mobjinfo) != (NUMMOBJTYPES))
+    printf ("mobjinfo %u/%u\n", ARRAY_SIZE(mobjinfo), (NUMMOBJTYPES));
 }
 
 #endif

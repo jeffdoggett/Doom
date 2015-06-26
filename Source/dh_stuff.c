@@ -390,6 +390,7 @@ static const codeptrs_t codeptr_frames [] =
   { "FirePlasma",	A_FirePlasma,		2 },
   { "BFGsound",		A_BFGsound,		2 },
   { "FireBFG",		A_FireBFG,		2 },
+  { "FireOldBFG",	A_FireOldBFG,		2 },
 
   { "BFGSpray",		A_BFGSpray,		1 },	// And these take one arg.
   { "Explode",		A_Explode,		1 },

@@ -61,6 +61,7 @@ extern void A_Saw (player_t* player, pspdef_t* psp);
 extern void A_FirePlasma (player_t* player, pspdef_t* psp);
 extern void A_BFGsound (player_t* player, pspdef_t* psp);
 extern void A_FireBFG (player_t* player, pspdef_t* psp);
+extern void A_FireOldBFG (player_t *player, pspdef_t *psp);
 
 extern void A_BFGSpray (mobj_t* mo);
 extern void A_Explode (mobj_t* mo);

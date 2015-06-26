@@ -675,6 +675,65 @@ A_FireBFG
 
 //-----------------------------------------------------------------------------
 //
+// A_FireOldBFG
+//
+// This function emulates Doom's Pre-Beta BFG
+// By Lee Killough 6/6/98, 7/11/98, 7/19/98, 8/20/98
+//
+
+void A_FireOldBFG (player_t *player, pspdef_t *psp)
+{
+  int type = MT_PLASMA1;
+
+  if (weaponrecoil && !(player->mo->flags & MF_NOCLIP))
+    P_Thrust(player, ANG180 + player->mo->angle,
+	     512*recoil[wp_plasma]);
+
+  player->ammo[weaponinfo[player->readyweapon].ammo]--;
+
+  player->extralight = 2;
+
+  do
+  {
+    mobj_t *th, *mo = player->mo;
+    angle_t an = mo->angle;
+    angle_t an1 = ((P_Random()&127) - 64) * (ANG90/768) + an;
+    angle_t an2 = ((P_Random()&127) - 64) * (ANG90/640) + ANG90;
+//  extern int autoaim;
+
+//  if (autoaim)
+    {
+      // killough 8/2/98: make autoaiming prefer enemies
+      int mask = 1;	// MF_FRIEND
+      fixed_t slope;
+      do
+      {
+	slope = P_AimLineAttack(mo, an, 16*64*FRACUNIT);
+	if (!linetarget)
+	  slope = P_AimLineAttack(mo, an += 1<<26, 16*64*FRACUNIT);
+	if (!linetarget)
+	  slope = P_AimLineAttack(mo, an -= 2<<26, 16*64*FRACUNIT);
+	if (!linetarget)
+	  slope = 0, an = mo->angle;
+      } while (mask && (mask=0, !linetarget));	// killough 8/2/98
+      an1 += an - mo->angle;
+      an2 += tantoangle[slope >> DBITS];
+    }
+
+    th = P_SpawnMobj(mo->x, mo->y,
+		     mo->z + 62*FRACUNIT - player->psprites[ps_weapon].sy,
+		     type);
+    th->target = mo;
+    th->angle = an1;
+    th->momx = finecosine[an1>>ANGLETOFINESHIFT] * 25;
+    th->momy = finesine[an1>>ANGLETOFINESHIFT] * 25;
+    th->momz = finetangent[an2>>ANGLETOFINESHIFT] * 25;
+    P_CheckMissileSpawn(th);
+  } while ((type != MT_PLASMA2) && (type = MT_PLASMA2)); //killough: obfuscated!
+}
+
+//-----------------------------------------------------------------------------
+//
 // A_FirePlasma
 //
 void
