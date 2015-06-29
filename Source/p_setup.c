@@ -609,8 +609,9 @@ static void P_LoadZNodes (int lump)
   for (i = currSeg = 0; i < numSubs; i++)
   {
     subsectors[i].firstline = currSeg;
-    subsectors[i].numlines = read_16((unsigned char *) &mseg->numsegs);
-    currSeg += read_32((unsigned char *) &mseg->numsegs);
+    numSegs = read_32((unsigned char *) &mseg->numsegs);
+    subsectors[i].numlines = numSegs;
+    currSeg += numSegs;
     mseg++;
   }
   data += numSubs * sizeof(mapsubsector_znod_t);
