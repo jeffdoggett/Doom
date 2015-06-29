@@ -4213,7 +4213,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 
   newtext = NULL;
 
-  // printf ("Looking for text lump %s\n", ptr);
+  // printf ("set_enter_exit_text:Looking for text lump %s\n", ptr);
   lump = W_CheckNumForName (ptr);
   if (lump == -1)
   {
@@ -4389,6 +4389,7 @@ void Parse_Mapinfo (char * ptr, char * top)
   unsigned int map;
   unsigned int intertext;
   unsigned int doing_episode;
+  unsigned int textislump;
   char * ptr2;
   char * newtext;
   bossdeath_t * bd_ptr;
@@ -4736,99 +4737,122 @@ void Parse_Mapinfo (char * ptr, char * top)
       intertext = read_int (ptr + 11);
       episode = 255;
       map = 255;
+      textislump = 0;
+    }
+    else if (strncasecmp (ptr, "entertextislump", 9) == 0)
+    {
+      textislump |= 1;
     }
     else if (strncasecmp (ptr, "entertext", 9) == 0)
     {
       i = dh_inchar (ptr, '"');
-      j = dh_instr (ptr, "lookup");
-      if ((j) && (j < i))
+      if (textislump & 1)
       {
-	ptr = set_enter_exit_text (ptr+j+5, 0, intertext, episode, map);
-      }
-      else if (i && (ptr[i] == '$'))
-      {
-	ptr = set_enter_exit_text (ptr+i+1, 0, intertext, episode, map);
+	ptr = set_enter_exit_text (ptr+i, 0, intertext, episode, map);
       }
       else
       {
-	if (i == 0)
-	{
-	  ptr = next_line (ptr,top);
-	  i = dh_inchar (ptr, '"');
-	}
-	if (i)
-	{
-	  l = dh_inchar (ptr + i, '"');
-	  if (l)
-	  {
-	    newtext = malloc (l+10);
-	    if (newtext)
-	    {
-	      l--;
-	      strncpy (newtext, ptr+i, l);
-	      newtext [l] = 0;
-	      ptr += l;
-	      dh_remove_americanisms (newtext);
-	      if (finale_clusterdefs == 0)
-	      {
-		finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-		if (finale_clusterdefs)
-		  memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	      }
-	      if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-	      {
-		finale_clusterdefs[intertext].entertext = newtext;
-		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		// printf ("Enter Text %u = %s\n", intertext, newtext);
-	      }
-	    }
-	  }
-	}
-      }
+       j = dh_instr (ptr, "lookup");
+       if ((j) && (j < i))
+       {
+	 ptr = set_enter_exit_text (ptr+j+5, 0, intertext, episode, map);
+       }
+       else if (i && (ptr[i] == '$'))
+       {
+	 ptr = set_enter_exit_text (ptr+i+1, 0, intertext, episode, map);
+       }
+       else
+       {
+	 if (i == 0)
+	 {
+	   ptr = next_line (ptr,top);
+	   i = dh_inchar (ptr, '"');
+	 }
+	 if (i)
+	 {
+	   l = dh_inchar (ptr + i, '"');
+	   if (l)
+	   {
+	     newtext = malloc (l+10);
+	     if (newtext)
+	     {
+	       l--;
+	       strncpy (newtext, ptr+i, l);
+	       newtext [l] = 0;
+	       ptr += l;
+	       dh_remove_americanisms (newtext);
+	       if (finale_clusterdefs == 0)
+	       {
+		 finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+		 if (finale_clusterdefs)
+		   memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+	       }
+	       if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
+	       {
+		 finale_clusterdefs[intertext].entertext = newtext;
+		 finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+		 // printf ("Enter Text %u = %s\n", intertext, newtext);
+	       }
+	     }
+	   }
+	 }
+       }
+     }
+    }
+    else if (strncasecmp (ptr, "exittextislump", 9) == 0)
+    {
+      textislump |= 2;
     }
     else if (strncasecmp (ptr, "exittext", 8) == 0)
     {
       i = dh_inchar (ptr, '"');
-      j = dh_instr (ptr, "lookup");
-      if ((j) && (j < i))
+      if (textislump & 2)
       {
-	ptr = set_enter_exit_text (ptr+j+5, 1, intertext, episode, map);
-      }
-      else if (i && (ptr[i] == '$'))
-      {
-	ptr = set_enter_exit_text (ptr+i+1, 1, intertext, episode, map);
+	ptr = set_enter_exit_text (ptr+i, 1, intertext, episode, map);
       }
       else
       {
-	if (i == 0)
+	j = dh_instr (ptr, "lookup");
+	if ((j) && (j < i))
 	{
-	  ptr = next_line (ptr,top);
-	  i = dh_inchar (ptr, '"');
+	  ptr = set_enter_exit_text (ptr+j+5, 1, intertext, episode, map);
 	}
-	if (i)
+	else if (i && (ptr[i] == '$'))
 	{
-	  l = dh_inchar (ptr + i, '"');
-	  if (l)
+	  ptr = set_enter_exit_text (ptr+i+1, 1, intertext, episode, map);
+	}
+	else
+	{
+	  if (i == 0)
 	  {
-	    newtext = malloc (l+10);
-	    if (newtext)
+	    ptr = next_line (ptr,top);
+	    i = dh_inchar (ptr, '"');
+	  }
+	  if (i)
+	  {
+	    l = dh_inchar (ptr + i, '"');
+	    if (l)
 	    {
-	      l--;
-	      strncpy (newtext, ptr+i, l);
-	      ptr += l;
-	      newtext [l] = 0;
-	      dh_remove_americanisms (newtext);
-	      if (finale_clusterdefs == 0)
+	      newtext = malloc (l+10);
+	      if (newtext)
 	      {
-		finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-		if (finale_clusterdefs)
-		  memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	      }
-	      if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-	      {
-		finale_clusterdefs[intertext].exittext = newtext;
-		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		// printf ("Exit Text %u = %s\n", intertext, newtext);
+		l--;
+		strncpy (newtext, ptr+i, l);
+		ptr += l;
+		newtext [l] = 0;
+		dh_remove_americanisms (newtext);
+		if (finale_clusterdefs == 0)
+		{
+		  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+		  if (finale_clusterdefs)
+		    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+		}
+		if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
+		{
+		  finale_clusterdefs[intertext].exittext = newtext;
+		  finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+		  // printf ("Exit Text %u = %s\n", intertext, newtext);
+		}
 	      }
 	    }
 	  }
