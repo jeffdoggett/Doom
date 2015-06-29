@@ -521,32 +521,15 @@ EV_DoGenLockedDoor
 }
 
 /* ---------------------------------------------------------------------------- */
-/* Returns:
-	0 = No doors opened
-	1 = Opened at least 1 door
-*/
 
-int
-EV_DoGenDoor
-( line_t*	line,
-  vldoor_e	type,
-  mobj_t*	thing )
+static int EV_DoGenDoorSec (sector_t* sec, line_t* line, vldoor_e type, mobj_t* thing)
 {
   int		rtn;
   int		door_type;
   int		newheight;
-  sector_t*	sec;
   vldoor_t*	door;
 
   rtn = 0;
-
-  if (((line ->flags & ML_TWOSIDED) == 0)
-   || ((sec = sides[ line->sidenum[0^1]] .sector) == NULL))
-  {
-    line->special = 0;			// Yet another badly built wad!!
-    return (rtn);
-  }
-
 
   door = sec->ceilingdata;
   if (door)
@@ -582,8 +565,7 @@ EV_DoGenDoor
   // new door thinker
   door = get_door_block (sec);
   door->type = type;
-
-  if (line -> tag)
+  if ((line) && (line->tag))
     door->line = line;
 
   switch (genshift(type,DoorSpeed,DoorSpeedShift))
@@ -653,6 +635,53 @@ EV_DoGenDoor
       T_Makedoorsound (door);
       break;
   }
+  return (rtn);
+}
+
+/* ---------------------------------------------------------------------------- */
+/* Returns:
+	0 = No doors opened
+	1 = Opened at least 1 door
+*/
+
+int
+EV_DoGenDoor
+( line_t*	line,
+  vldoor_e	type,
+  mobj_t*	thing )
+{
+  int		rtn;
+  int		secnum;
+  sector_t*	sec;
+
+  rtn = 0;
+
+  /* If it is a push trigger then the tag is used to control the lighting */
+  /* otherwise it is a standard tagged action. */
+
+  switch ((int) type & 7)
+  {
+    case PushOnce:
+    case PushMany:
+      if (((line ->flags & ML_TWOSIDED) == 0)
+       || ((sec = sides[ line->sidenum[0^1]] .sector) == NULL))
+      {
+	line->special = 0;			// Yet another badly built wad!!
+	return (rtn);
+      }
+      rtn = EV_DoGenDoorSec (sec, line, type, thing);
+      break;
+
+    default:
+      secnum = -1;
+      while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
+      {
+	sec = &sectors[secnum];
+	rtn |= EV_DoGenDoorSec (sec, NULL, type, thing);
+      }
+      break;
+  }
+
   return (rtn);
 }
 
