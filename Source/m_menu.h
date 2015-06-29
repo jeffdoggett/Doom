@@ -56,6 +56,8 @@ void M_StartControlPanel (void);
 
 void M_SetEpiKey (unsigned int episode, unsigned int key);
 void M_SetEpiSel (unsigned int episode);
+void M_SetEpiName (unsigned int episode, char * name, unsigned int len);
+unsigned int M_GetNextEpi (unsigned int map);
 void M_SetNextEpiSel (unsigned int episode);
 
 #endif

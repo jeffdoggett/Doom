@@ -524,6 +524,15 @@ static map_starts_t start_doom1_tab [] =
 
 static map_starts_t start_doom2_tab [] =
 {
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
+  { 255, 1 },
   { 255, 1 }
 };
 
@@ -591,7 +600,8 @@ map_starts_t * G_Access_MapStartTab (unsigned int episode)
 {
   if (gamemode == commercial)
   {
-    return (&start_doom2_tab [0]);
+    if (episode > 9) episode = 0;
+    return (&start_doom2_tab [episode]);
   }
   else
   {

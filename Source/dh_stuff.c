@@ -4414,12 +4414,14 @@ void Parse_Mapinfo (char * ptr, char * top)
     if (strncasecmp (ptr, "episode ", 8) == 0)
     {
       ptr = read_map_num (&episode, &map, ptr+8);
+      if (episode == 255)
+      	episode = M_GetNextEpi (map);
       doing_episode = 1;
       intertext = 0;
     }
     else if (strncasecmp (ptr, "name ", 5) == 0)
     {
-      /* Note: Nerve.wad gets to here but episode == 255 */
+      /* Note: Nerve.wad gets to here. */
       if ((doing_episode) && (episode < 10)
        && (dh_instr (ptr, "HUSTR_E") == 0))
       {
@@ -4447,6 +4449,29 @@ void Parse_Mapinfo (char * ptr, char * top)
 	  episode_names [episode] = newtext;
 	  // printf ("Episode %u name is \'%s\'\n", episode, newtext);
 	}
+      }
+    }
+    else if (strncasecmp (ptr, "picname ", 8) == 0)
+    {
+      if ((doing_episode) && (episode < 10))
+      {
+	ptr += 8;
+	while ((*ptr == ' ') || (*ptr == '=')) ptr++;
+	if (*ptr == '\"')
+	{
+	  ptr++;
+	  l = dh_inchar (ptr , '"');
+	  if (l)
+	    l--;
+	  else
+	    l = strlen (ptr);
+	}
+	else
+	{
+	  l = strlen (ptr);
+	}
+	M_SetEpiName (episode, ptr, l);
+//	printf ("Set menu name(patch) for episode %u to %s\n", episode, ptr);
       }
     }
     else if (strncasecmp (ptr, "key ", 4) == 0)

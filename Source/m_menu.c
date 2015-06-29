@@ -609,6 +609,47 @@ void M_SetEpiKey (unsigned int episode, unsigned int key)
 
 /* ----------------------------------------------------------------------- */
 /*
+   Sets the episode name (patch) from the MAPINFO.
+   Gets called before we reorganise the menu, so
+   safe to just index in....
+*/
+
+void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
+{
+  menuitem_t * m_ptr;
+
+  if (episode < ARRAY_SIZE(EpisodeMenu))
+  {
+    m_ptr = &EpisodeMenu [episode];
+    strncpy (m_ptr -> name, name, len);
+    m_ptr -> name [len] = 0;
+  }
+}
+
+/* ----------------------------------------------------------------------- */
+/*
+   Return the next available episode slot
+*/
+
+unsigned int M_GetNextEpi (unsigned int map)
+{
+  static unsigned int nextepisode = 0;
+  map_starts_t * map_info_p;
+
+  if (nextepisode < ARRAY_SIZE(episode_num))
+  {
+    map_info_p = G_Access_MapStartTab (nextepisode);
+    map_info_p -> start_map = map;
+//  printf ("STARTING MAP %d %d\n", nextepisode, map_info_p -> start_map);
+    episode_num [nextepisode] = nextepisode;
+    EpiDef.numitems = nextepisode + 1;
+  }
+
+  return (nextepisode++);
+}
+
+/* ----------------------------------------------------------------------- */
+/*
    When we play a map, set the menu cursor to the current position
 */
 
@@ -1046,7 +1087,8 @@ void M_NewGame(int choice)
 	return;
     }
 
-    if ( gamemode == commercial )
+//  if ( gamemode == commercial )
+    if (EpiDef.numitems == 0)
 	M_SetupNextMenu(&NewDef);
     else
 	M_SetupNextMenu(&EpiDef);
@@ -1056,7 +1098,7 @@ void M_NewGame(int choice)
 //
 //      M_Episode
 //
-int     epi;
+static int epi;
 
 void M_DrawEpisode(void)
 {
@@ -2228,6 +2270,29 @@ void M_Init (void)
       ReadDef1.x = 330;
       ReadDef1.y = 165;
       ReadMenu1[0].routine = M_FinishReadThis;
+
+#if 0
+      episode = 0;
+      m_ptr = &EpisodeMenu[0];
+      do
+      {
+	if ((W_CheckNumForName (m_ptr->name) == -1)
+	 && (episode_names [episode] == NULL))
+	  break;
+	m_ptr++;
+      } while (++episode < ARRAY_SIZE (EpisodeMenu));
+
+      EpiDef.numitems = episode;
+#else
+      episode = EpiDef.numitems;
+#endif
+      while (episode > 4)
+      {
+	if (EpiDef.y > 30)
+	  EpiDef.y -= 4;
+	episode--;
+      }
+      EpiDef.x = 16;		// Bodged for Valiant.wad, must do properly!
       break;
 
     case shareware:
