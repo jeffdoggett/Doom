@@ -141,10 +141,14 @@ typedef enum
 
 static fixed_t GetOffset (vertex_t *v1, vertex_t *v2)
 {
-    fixed_t     dx = (v1->x - v2->x) >> FRACBITS;
-    fixed_t     dy = (v1->y - v2->y) >> FRACBITS;
+  double hypot;
+  fixed_t     dx = (v1->x - v2->x) >> FRACBITS;
+  fixed_t     dy = (v1->y - v2->y) >> FRACBITS;
 
-    return ((fixed_t)(sqrt((dx * dx) + (dy * dy))) << FRACBITS);
+  dx = (dx * dx);
+  dy = (dy * dy);
+  hypot = (double)dx + (double)dy;
+  return ((fixed_t)(sqrt(hypot)) << FRACBITS);
 }
 
 //-----------------------------------------------------------------------------
@@ -571,8 +575,9 @@ static void P_LoadZNodes (int lump)
   }
   else
   {
-    newvertarray = calloc(orgVerts + newVerts, sizeof(vertex_t));
-    memcpy(newvertarray, vertexes, orgVerts * sizeof(vertex_t));
+    newvertarray = Z_Malloc ((orgVerts + newVerts) * sizeof(vertex_t),PU_LEVEL,0);
+    memset (newvertarray, 0, (orgVerts + newVerts) * sizeof(vertex_t));
+    memcpy (newvertarray, vertexes, orgVerts * sizeof(vertex_t));
   }
 
   for (i = 0; i < newVerts; i++)
@@ -591,7 +596,7 @@ static void P_LoadZNodes (int lump)
       lines[i].v1 = lines[i].v1 - vertexes + newvertarray;
       lines[i].v2 = lines[i].v2 - vertexes + newvertarray;
     }
-    free(vertexes);
+    Z_Free (vertexes);
     vertexes = newvertarray;
     numvertexes = orgVerts + newVerts;
   }
@@ -601,7 +606,7 @@ static void P_LoadZNodes (int lump)
   data += sizeof(numSubs);
 
   numsubsectors = numSubs;
-  if (numsubsectors <= 0)
+  if (numsubsectors == 0)
       I_Error("P_LoadZNodes: no subsectors in level");
   subsectors = Z_Malloc (numsubsectors*sizeof(subsector_t),PU_LEVEL,0);
 
@@ -1495,8 +1500,10 @@ static mapformat_t P_CheckMapFormat (int lumpnum)
     byte        *nodes = NULL;
     int         b;
 
-    if ((b = lumpnum + ML_NODES) < numlumps && (nodes = W_CacheLumpNum(b, PU_CACHE))
-        && W_LumpLength(b) > 0)
+    b = lumpnum + ML_NODES;
+    if ((b < numlumps)
+     && ((nodes = W_CacheLumpNum (b, PU_CACHE)) != NULL)
+     && (W_LumpLength (b) != 0))
     {
         if (!memcmp(nodes, "xNd4\0\0\0\0", 8))
         {
