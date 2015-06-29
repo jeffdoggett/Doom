@@ -377,7 +377,7 @@ static unsigned char episode_num [ARRAY_SIZE(EpisodeMenu)] =
 
 static menu_t  EpiDef =
 {
-    3,			// # of menu items (Filled in later if more...)
+    0,			// # of menu items (Filled in later if more...)
     &MainDef,		// previous menu
     EpisodeMenu,	// menuitem_t ->
     M_DrawEpisode,	// drawing routine ->
@@ -633,9 +633,10 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
 
 unsigned int M_GetNextEpi (unsigned int map)
 {
-  static unsigned int nextepisode = 0;
+  unsigned int nextepisode;
   map_starts_t * map_info_p;
 
+  nextepisode = EpiDef.numitems;
   if (nextepisode < ARRAY_SIZE(episode_num))
   {
     map_info_p = G_Access_MapStartTab (nextepisode);
@@ -645,7 +646,7 @@ unsigned int M_GetNextEpi (unsigned int map)
     EpiDef.numitems = nextepisode + 1;
   }
 
-  return (nextepisode++);
+  return (nextepisode);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2299,6 +2300,7 @@ void M_Init (void)
       // Episode 2 and 3 are handled,
       // branching to an ad screen.
       EpiDef.menuitems = &EpisodeMenu[1];
+      EpiDef.numitems = 3;
       break;
 
     case registered:
