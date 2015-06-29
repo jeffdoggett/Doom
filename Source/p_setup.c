@@ -136,7 +136,8 @@ typedef enum
 {
   DOOMBSP = 0,
   DEEPBSP = 1,
-  ZDBSPX  = 2
+  ZDBSPX  = 2,
+  ZDBCPX  = 3
 } mapformat_t;
 
 static fixed_t GetOffset (vertex_t *v1, vertex_t *v2)
@@ -1497,34 +1498,39 @@ void R_CalcSegsLength (void)
 static mapformat_t P_CheckMapFormat (int lumpnum)
 {
     mapformat_t format = DOOMBSP;
-    byte        *nodes = NULL;
-    int         b;
+    byte	*nodes = NULL;
+    int	 	b;
 
     b = lumpnum + ML_NODES;
     if ((b < numlumps)
      && ((nodes = W_CacheLumpNum (b, PU_CACHE)) != NULL)
      && (W_LumpLength (b) != 0))
     {
-        if (!memcmp(nodes, "xNd4\0\0\0\0", 8))
-        {
+	if (!memcmp(nodes, "xNd4\0\0\0\0", 8))
+	{
 #ifdef NORMALUNIX
-            printf ("This map has DeePBSP v4 Extended nodes.\n");
+	    printf ("This map has DeePBSP v4 Extended nodes.\n");
 #endif
-            format = DEEPBSP;
-        }
-        else if (!memcmp(nodes, "XNOD", 4))
-        {
+	    format = DEEPBSP;
+	}
+	else if (!memcmp(nodes, "XNOD", 4))
+	{
 #ifdef NORMALUNIX
-                printf ("This map has ZDoom uncompressed normal nodes.\n");
+	  printf ("This map has ZDoom uncompressed normal nodes.\n");
 #endif
-                format = ZDBSPX;
-        }
-        else if (!memcmp(nodes, "ZNOD", 4))
-            I_Error("Compressed ZDoom nodes are not supported yet.\n");
+	  format = ZDBSPX;
+	}
+	else if (!memcmp(nodes, "ZNOD", 4))
+	{
+#ifdef NORMALUNIX
+	  printf ("This map has Compressed ZDoom nodes.\n");
+#endif
+	  format = ZDBCPX;
+	}
     }
 
     if (nodes)
-        Z_Free (nodes);
+	Z_Free (nodes);
 
 //  printf ("P_CheckMapFormat = %u\n", (int) format);
     return (format);
@@ -1544,7 +1550,6 @@ P_SetupLevel
     int		i;
     int		lumpnum;
     unsigned int nomonsterbits;
-    mapformat_t mapformat;
 
     totalkills = totalitems = totalsecret = wminfo.maxfrags = 0;
     wminfo.partime = 150*(35*5);
@@ -1601,20 +1606,27 @@ P_SetupLevel
     P_ClearMobjChains ();
 
 
-    mapformat = P_CheckMapFormat (lumpnum);
-    if (mapformat == ZDBSPX)
-        P_LoadZNodes(lumpnum + ML_NODES);
-    //else if (mapformat == DEEPBSP)
-    //{
-    //    P_LoadSubsectors_DeePBSP(lumpnum + ML_SSECTORS);
-    //    P_LoadNodes_DeePBSP(lumpnum + ML_NODES);
-    //    P_LoadSegs_DeePBSP(lumpnum + ML_SEGS);
-    //}
-    else
+    switch ((int) P_CheckMapFormat (lumpnum))
     {
-      P_LoadSubsectors (lumpnum+ML_SSECTORS);
-      P_LoadNodes (lumpnum+ML_NODES);
-      P_LoadSegs (lumpnum+ML_SEGS);
+      case DOOMBSP:
+	P_LoadSubsectors (lumpnum+ML_SSECTORS);
+	P_LoadNodes (lumpnum+ML_NODES);
+	P_LoadSegs (lumpnum+ML_SEGS);
+	break;
+
+      case ZDBSPX:
+	P_LoadZNodes (lumpnum + ML_NODES);
+	break;
+
+      case  DEEPBSP:
+//	P_LoadSubsectors_DeePBSP (lumpnum + ML_SSECTORS);
+//	P_LoadNodes_DeePBSP (lumpnum + ML_NODES);
+//	P_LoadSegs_DeePBSP (lumpnum + ML_SEGS);
+	I_Error ("Deep BSP maps not supported\n");
+	break;
+
+      default: // ZDBCPX
+	I_Error ("Compressed ZDoom maps not supported\n");
     }
 
     rejectmatrix = W_CacheLumpNum (lumpnum+ML_REJECT,PU_LEVEL);
