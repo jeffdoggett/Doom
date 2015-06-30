@@ -805,33 +805,37 @@ void R_ProjectSprite (mobj_t* thing)
 // R_AddSprites
 // During BSP traversal, this adds sprites by sector.
 //
-void R_AddSprites (sector_t* sec)
+// killough 9/18/98: add lightlevel as parameter, fixing underwater lighting
+
+void R_AddSprites(sector_t* sec, int lightlevel)
 {
-    mobj_t*		thing;
-    int 		lightnum;
+  mobj_t *thing;
+  int    lightnum;
 
-    // BSP is traversed by subsector.
-    // A sector might have been split into several
-    //	subsectors during BSP building.
-    // Thus we check whether its already added.
-    if (sec->validcount == validcount)
-	return;
+  // BSP is traversed by subsector.
+  // A sector might have been split into several
+  //  subsectors during BSP building.
+  // Thus we check whether its already added.
 
-    // Well, now it will be done.
-    sec->validcount = validcount;
+  if (sec->validcount == validcount)
+    return;
 
-    lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+extralight;
+  // Well, now it will be done.
+  sec->validcount = validcount;
 
-    if (lightnum < 0)
-	spritelights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	spritelights = scalelight[LIGHTLEVELS-1];
-    else
-	spritelights = scalelight[lightnum];
+  lightnum = (lightlevel >> LIGHTSEGSHIFT)+extralight;
 
-    // Handle all things in sector.
-    for (thing = sec->thinglist ; thing ; thing = thing->snext)
-	R_ProjectSprite (thing);
+  if (lightnum < 0)
+    spritelights = scalelight[0];
+  else if (lightnum >= LIGHTLEVELS)
+    spritelights = scalelight[LIGHTLEVELS-1];
+  else
+    spritelights = scalelight[lightnum];
+
+  // Handle all things in sector.
+
+  for (thing = sec->thinglist; thing; thing = thing->snext)
+    R_ProjectSprite(thing);
 }
 
 

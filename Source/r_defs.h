@@ -130,6 +130,15 @@ typedef	struct
     int			linecount;
     struct line_s**	lines;	// [linecount] size
 
+  // killough 10/98: support skies coming from sidedefs. Allows scrolling
+  // skies and other effects. No "level info" kind of lump is needed,
+  // because you can use an arbitrary number of skies per level with this
+  // method. This field only applies when skyflatnum is used for floorpic
+  // or ceilingpic, because the rest of Doom needs to know which is sky
+  // and which isn't, etc.
+
+    int sky;
+
 #ifdef USE_BOOM_P_ChangeSector
     struct msecnode_s*	touching_thinglist;
 #endif

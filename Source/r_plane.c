@@ -300,7 +300,7 @@ R_FindPlane
     pint offset;
     visplane_t*	check;
 
-    if (picnum == skyflatnum)
+    if ((picnum == skyflatnum) || (picnum & PL_SKYFLAT))
     {
 	height = 0;			// all skys map together
 	lightlevel = 0;
@@ -462,13 +462,16 @@ R_MakeSpans
 // R_DrawPlanes
 // At the end of each frame.
 //
+
 void R_DrawPlanes (void)
 {
     visplane_t*		pl;
     int			light;
     int			i,x;
     int			stop;
+    int			flip;
     int			angle;
+    int			texnum;
 
 #ifdef RANGECHECK
     if (ds_p - drawsegs > MAXDRAWSEGS)
@@ -504,9 +507,10 @@ void R_DrawPlanes (void)
 	if (pl->minx > pl->maxx)
 	    continue;
 
+	x = pl->picnum;
 
 	// sky flat
-	if (pl->picnum == skyflatnum)
+	if ((x == skyflatnum) || (pl->picnum & PL_SKYFLAT))
 	{
 	    dc_iscale = skyiscale;
 	    // Sky is allways drawn full bright,
@@ -514,10 +518,34 @@ void R_DrawPlanes (void)
 	    // Because of this hack, sky is not affected
 	    //  by INVUL inverse mapping.
 		  // BRAD: So I fix it....
-      // See http://doom.wikia.com/wiki/Invulnerability_colormap_bug
-      //dc_colormap = colormaps;
-      dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
+	    // See http://doom.wikia.com/wiki/Invulnerability_colormap_bug
+	    //dc_colormap = colormaps;
+	    dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
 	    dc_texturemid = skytexturemid;
+	    if (x & PL_SKYFLAT)
+	    {
+	      // Sky Linedef
+	      const line_t *l = &lines[x & ~PL_SKYFLAT];
+
+	      // Sky transferred from first sidedef
+	      const side_t *s = *l->sidenum + sides;
+
+	      // Texture comes from upper texture of reference sidedef
+	      texnum = texturetranslation[s->toptexture];
+
+	      // We sometimes flip the picture horizontally.
+	      //
+	      // Doom always flipped the picture, so we make it optional,
+	      // to make it easier to use the new feature, while to still
+	      // allow old sky textures to be used.
+	      
+	      flip = l->special==272 ? 0u : ~0u;
+	    }
+	    else
+	    {
+	      texnum = skytexture;
+	      flip = 0;
+	    }
 	    for (x=pl->minx ; x <= pl->maxx ; x++)
 	    {
 		dc_yl = pl->top[x];
@@ -525,9 +553,9 @@ void R_DrawPlanes (void)
 
 		if (dc_yl <= dc_yh)
 		{
-		    angle = (viewangle + xtoviewangle[x])>>ANGLETOSKYSHIFT;
+		    angle = ((viewangle + xtoviewangle[x])^flip)>>ANGLETOSKYSHIFT;
 		    dc_x = x;
-		    dc_source = R_GetColumn(skytexture, angle);
+		    dc_source = R_GetColumn(texnum, angle);
 		    colfunc ();
 		}
 	    }
@@ -535,7 +563,6 @@ void R_DrawPlanes (void)
 	}
 
 	// regular flat
-	x = pl->picnum;
 
 	if ((unsigned)x >= (unsigned)numflats)
 	{
@@ -548,7 +575,7 @@ void R_DrawPlanes (void)
 	else
 	{
 	  i = flatlumps [flattranslation [x]];
-        }
+	}
 
 	ds_source = W_CacheLumpNum (i, PU_STATIC);
 
@@ -581,3 +608,5 @@ void R_DrawPlanes (void)
 	Z_ChangeTag (ds_source, PU_CACHE);
     }
 }
+
+//----------------------------------------------------------------------------

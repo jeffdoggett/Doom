@@ -121,10 +121,10 @@ R_ClipSolidWallSegment
 	    // Post is entirely visible (above start),
 	    //  so insert a new clippost.
 	    R_StoreWallRange (first, last);
-            // 1/11/98 killough: performance tuning using fast memmove
-            memmove(start+1,start,(++newend-start)*sizeof(*start));
-            start->first = first;
-            start->last = last;
+	    // 1/11/98 killough: performance tuning using fast memmove
+	    memmove(start+1,start,(++newend-start)*sizeof(*start));
+	    start->first = first;
+	    start->last = last;
 	    return;
 	}
 
@@ -288,8 +288,8 @@ int R_DoorClosed(void)
 
 
 sector_t *R_FakeFlat(sector_t *sec, sector_t *tempsec,
-                    int *floorlightlevel, int *ceilinglightlevel,
-                    boolean back)
+		    int *floorlightlevel, int *ceilinglightlevel,
+		    boolean back)
 {
   if (floorlightlevel)
 #if 1
@@ -320,84 +320,84 @@ sector_t *R_FakeFlat(sector_t *sec, sector_t *tempsec,
       tempsec->ceilingheight = s->ceilingheight;
 
       if ((underwater && (tempsec->  floorheight = sec->floorheight,
-                         tempsec->ceilingheight = s->floorheight-1,
-                         !back)) || viewz <= s->floorheight)
-      {                   /* head-below-floor hack */
-         tempsec->floorpic    = s->floorpic;
-         tempsec->floor_xoffs = s->floor_xoffs;
-         tempsec->floor_yoffs = s->floor_yoffs;
+			 tempsec->ceilingheight = s->floorheight-1,
+			 !back)) || viewz <= s->floorheight)
+      {		   /* head-below-floor hack */
+	 tempsec->floorpic    = s->floorpic;
+	 tempsec->floor_xoffs = s->floor_xoffs;
+	 tempsec->floor_yoffs = s->floor_yoffs;
 
-         if (underwater)
-         {
-           if (s->ceilingpic == skyflatnum)
-           {
-               tempsec->floorheight   = tempsec->ceilingheight+1;
-               tempsec->ceilingpic    = tempsec->floorpic;
-               tempsec->ceiling_xoffs = tempsec->floor_xoffs;
-               tempsec->ceiling_yoffs = tempsec->floor_yoffs;
-           }
-           else
-           {
-               tempsec->ceilingpic    = s->ceilingpic;
-               tempsec->ceiling_xoffs = s->ceiling_xoffs;
-               tempsec->ceiling_yoffs = s->ceiling_yoffs;
-           }
-         }
-         tempsec->lightlevel  = s->lightlevel;
+	 if (underwater)
+	 {
+	   if (s->ceilingpic == skyflatnum)
+	   {
+	       tempsec->floorheight   = tempsec->ceilingheight+1;
+	       tempsec->ceilingpic    = tempsec->floorpic;
+	       tempsec->ceiling_xoffs = tempsec->floor_xoffs;
+	       tempsec->ceiling_yoffs = tempsec->floor_yoffs;
+	   }
+	   else
+	   {
+	       tempsec->ceilingpic    = s->ceilingpic;
+	       tempsec->ceiling_xoffs = s->ceiling_xoffs;
+	       tempsec->ceiling_yoffs = s->ceiling_yoffs;
+	   }
+	 }
+	 tempsec->lightlevel  = s->lightlevel;
 
-         if (floorlightlevel)
+	 if (floorlightlevel)
 #if 1
-           *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
-           sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
+	   *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
+	   sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
 #else
 	   *floorlightlevel = s->lightlevel;
 #endif
 
-         if (ceilinglightlevel)
+	 if (ceilinglightlevel)
 #if 1
-           *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
-           sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
+	   *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
+	   sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
 #else
 	   *ceilinglightlevel = s->lightlevel;
 #endif
       }
       else
        if (heightsec != -1 && viewz >= sectors[heightsec].ceilingheight &&
-           sec->ceilingheight > s->ceilingheight)
+	   sec->ceilingheight > s->ceilingheight)
        {   /* Above-ceiling hack */
-           tempsec->ceilingheight = s->ceilingheight;
-           tempsec->floorheight   = s->ceilingheight + 1;
+	   tempsec->ceilingheight = s->ceilingheight;
+	   tempsec->floorheight   = s->ceilingheight + 1;
 
-           tempsec->floorpic    = tempsec->ceilingpic    = s->ceilingpic;
-           tempsec->floor_xoffs = tempsec->ceiling_xoffs = s->ceiling_xoffs;
-           tempsec->floor_yoffs = tempsec->ceiling_yoffs = s->ceiling_yoffs;
+	   tempsec->floorpic    = tempsec->ceilingpic    = s->ceilingpic;
+	   tempsec->floor_xoffs = tempsec->ceiling_xoffs = s->ceiling_xoffs;
+	   tempsec->floor_yoffs = tempsec->ceiling_yoffs = s->ceiling_yoffs;
 
-           if (s->floorpic != skyflatnum)
-           {
-               tempsec->ceilingheight = sec->ceilingheight;
-               tempsec->floorpic      = s->floorpic;
-               tempsec->floor_xoffs   = s->floor_xoffs;
-               tempsec->floor_yoffs   = s->floor_yoffs;
-           }
+	   if (s->floorpic != skyflatnum)
+	   {
+	       tempsec->ceilingheight = sec->ceilingheight;
+	       tempsec->floorpic      = s->floorpic;
+	       tempsec->floor_xoffs   = s->floor_xoffs;
+	       tempsec->floor_yoffs   = s->floor_yoffs;
+	   }
 
-           tempsec->lightlevel  = s->lightlevel;
+	   tempsec->lightlevel  = s->lightlevel;
 
-           if (floorlightlevel)
+	   if (floorlightlevel)
 #if 1
-             *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
-             sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
+	     *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
+	     sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
 #else
 	   *floorlightlevel = s->lightlevel;
 #endif
-           if (ceilinglightlevel)
+	   if (ceilinglightlevel)
 #if 1
-             *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
-             sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
+	     *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
+	     sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
 #else
 	     *ceilinglightlevel = s->lightlevel;
 #endif
       }
-      sec = tempsec;              /* Use other sector */
+      sec = tempsec;	      /* Use other sector */
   }
   return sec;
 }
@@ -668,61 +668,73 @@ static boolean R_CheckBBox (fixed_t* bspcoord)
 //
 static void R_Subsector (int num)
 {
-    int			count;
-    seg_t*		line;
-    subsector_t*	sub;
-    sector_t		tempsec;              /* killough 3/7/98: deep water hack */
-    int			floorlightlevel;      /* killough 3/16/98: set floor lightlevel */
-    int			ceilinglightlevel;    /* killough 4/11/98 */
+  int	 count;
+  seg_t       *line;
+  subsector_t *sub;
+  sector_t    tempsec;	      // killough 3/7/98: deep water hack
+  int	 floorlightlevel;      // killough 3/16/98: set floor lightlevel
+  int	 ceilinglightlevel;    // killough 4/11/98
 
 #ifdef RANGECHECK
-    if (num>=numsubsectors)
-	I_Error ("R_Subsector: ss %i with numss = %i",
-		 num,
-		 numsubsectors);
+  if (num>=numsubsectors)
+    I_Error ("R_Subsector: ss %i with numss = %i", num, numsubsectors);
 #endif
 
-    sscount++;
-    sub = &subsectors[num];
-    frontsector = sub->sector;
-    count = sub->numlines;
-    line = &segs[sub->firstline];
+  sub = &subsectors[num];
+  frontsector = sub->sector;
+  count = sub->numlines;
+  line = &segs[sub->firstline];
 
-  /* killough 3/8/98, 4/4/98: Deep water / fake ceiling effect */
+  // killough 3/8/98, 4/4/98: Deep water / fake ceiling effect
   frontsector = R_FakeFlat(frontsector, &tempsec, &floorlightlevel,
-                           &ceilinglightlevel, false);   /* killough 4/11/98 */
+			   &ceilinglightlevel, false);   // killough 4/11/98
 
-  /* killough 3/7/98: Add (x,y) offsets to flats, add deep water check */
-  /* killough 3/16/98: add floorlightlevel */
+  // killough 3/7/98: Add (x,y) offsets to flats, add deep water check
+  // killough 3/16/98: add floorlightlevel
+  // killough 10/98: add support for skies transferred from sidedefs
 
-  floorplane = frontsector->floorheight < viewz || /* killough 3/7/98 */
+  floorplane = frontsector->floorheight < viewz || // killough 3/7/98
     (frontsector->heightsec != -1 &&
      sectors[frontsector->heightsec].ceilingpic == skyflatnum) ?
     R_FindPlane(frontsector->floorheight,
-                frontsector->floorpic,
-                floorlightlevel,               /* killough 3/16/98 */
-                frontsector->floor_xoffs,      /* killough 3/7/98 */
-                frontsector->floor_yoffs
-                ) : NULL;
+		frontsector->floorpic == skyflatnum &&  // killough 10/98
+		frontsector->sky & PL_SKYFLAT ? frontsector->sky :
+		frontsector->floorpic,
+		floorlightlevel,		// killough 3/16/98
+		frontsector->floor_xoffs,	// killough 3/7/98
+		frontsector->floor_yoffs
+		) : NULL;
+
   ceilingplane = frontsector->ceilingheight > viewz ||
     frontsector->ceilingpic == skyflatnum ||
     (frontsector->heightsec != -1 &&
      sectors[frontsector->heightsec].floorpic == skyflatnum) ?
-    R_FindPlane(frontsector->ceilingheight,   /* killough 3/8/98 */
-                frontsector->ceilingpic,
-                ceilinglightlevel,             /* killough 4/11/98 */
-                frontsector->ceiling_xoffs,    /* killough 3/7/98 */
-                frontsector->ceiling_yoffs
-                ) : NULL;
-  R_AddSprites (sub->sector); /*jff 9/11/98 passing frontsector here was */
-                              /*causing the underwater fireball medusa problem */
-                              /*when R_FakeFlat substituted a fake sector */
+    R_FindPlane(frontsector->ceilingheight,	// killough 3/8/98
+		frontsector->ceilingpic == skyflatnum &&  // kilough 10/98
+		frontsector->sky & PL_SKYFLAT ? frontsector->sky :
+		frontsector->ceilingpic,
+		ceilinglightlevel,		// killough 4/11/98
+		frontsector->ceiling_xoffs,	// killough 3/7/98
+		frontsector->ceiling_yoffs
+		) : NULL;
 
-    while (count--)
-    {
-	R_AddLine (line);
-	line++;
-    }
+  // killough 9/18/98: Fix underwater slowdown, by passing real sector
+  // instead of fake one. Improve sprite lighting by basing sprite
+  // lightlevels on floor & ceiling lightlevels in the surrounding area.
+  //
+  // 10/98 killough:
+  //
+  // NOTE: TeamTNT fixed this bug incorrectly, messing up sprite lighting!!!
+  // That is part of the 242 effect!!!  If you simply pass sub->sector to
+  // the old code you will not get correct lighting for underwater sprites!!!
+  // Either you must pass the fake sector and handle validcount here, on the
+  // real sector, or you must account for the lighting in some other way,
+  // like passing it as an argument.
+
+  R_AddSprites(sub->sector, (floorlightlevel+ceilinglightlevel)/2);
+
+  while (count--)
+    R_AddLine (line++);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -748,7 +760,7 @@ void R_RenderBSPNode(int bspnum)
     // Possibly divide back space.
 
       if (!R_CheckBBox(bsp->bbox[side^1]))
-        return;
+	return;
 
       bspnum = bsp->children[side^1];
     }

@@ -45,7 +45,7 @@ extern fixed_t		pspriteiscale;
 
 
 void R_DrawMaskedColumn (column_t* column);
-void R_AddSprites (sector_t* sec);
+void R_AddSprites(sector_t* sec, int lightlevel);
 void R_InitSprites (char** namelist);
 void R_ClearSprites (void);
 void R_DrawMasked (void);
