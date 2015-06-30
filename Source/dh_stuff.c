@@ -4388,6 +4388,7 @@ void Parse_Mapinfo (char * ptr, char * top)
   unsigned int episode;
   unsigned int map;
   unsigned int intertext;
+  unsigned int doing_default;
   unsigned int doing_episode;
   unsigned int textislump;
   char * ptr2;
@@ -4400,6 +4401,8 @@ void Parse_Mapinfo (char * ptr, char * top)
   episode = 9;
   map = 9;
   intertext = 1;
+  doing_episode = 0;
+  doing_default = 0;
   bd_ptr = boss_death_table_2;
 
   if (bd_ptr)
@@ -4411,12 +4414,18 @@ void Parse_Mapinfo (char * ptr, char * top)
   do
   {
     while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
-    if (strncasecmp (ptr, "episode ", 8) == 0)
+
+    if (strncasecmp (ptr, "defaultmap", 10) == 0)
+    {
+      doing_default = 1;
+    }
+    else if (strncasecmp (ptr, "episode ", 8) == 0)
     {
       ptr = read_map_num (&episode, &map, ptr+8);
       if (episode == 255)
       	episode = M_GetNextEpi (map);
       doing_episode = 1;
+      doing_default = 0;
       intertext = 0;
     }
     else if (strncasecmp (ptr, "name ", 5) == 0)
@@ -4489,6 +4498,7 @@ void Parse_Mapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "map ", 4) == 0)
     {
       doing_episode = 0;
+      doing_default = 0;
       intertext = 0;
       ptr2 = read_map_num (&episode, &map, ptr+4);
       replace_map_name (ptr+4, episode, map);
@@ -4541,6 +4551,7 @@ void Parse_Mapinfo (char * ptr, char * top)
       ptr += 5;
       j = dh_inchar (ptr, '='); if (j) ptr += j;
       j = dh_inchar (ptr, '"'); if (j) ptr += j;
+      while (*ptr <= ' ') ptr++;
       if (strncasecmp (ptr, "End", 3) == 0)
       {
 	j = 255;
@@ -4560,6 +4571,7 @@ void Parse_Mapinfo (char * ptr, char * top)
       ptr += 11;
       j = dh_inchar (ptr, '='); if (j) ptr += j;
       j = dh_inchar (ptr, '"'); if (j) ptr += j;
+      while (*ptr <= ' ') ptr++;
       if (strncasecmp (ptr, "End", 3) == 0)
       {
 	i = 255;
@@ -4666,8 +4678,33 @@ void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "sky1 ", 5) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+      if (doing_default)
+      {
+        mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+        ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+        newtext = mdest_ptr -> sky;
+        i = 1;
+        do
+        {
+          mdest_ptr = G_Access_MapInfoTab_E (255, i);
+          mdest_ptr -> sky = newtext;
+        } while (++i < 100);
+        i = 0;
+        do
+        {
+          j = 0;
+          do
+          {
+            mdest_ptr = G_Access_MapInfoTab_E (i, j);
+            mdest_ptr -> sky = newtext;
+          } while (++j < 10);
+        } while (++i < 10);
+      }
+      else
+      {
+        mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+        ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+      }
     }
     else if (strncasecmp (ptr, "map07special", 12) == 0)
     {
