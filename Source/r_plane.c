@@ -471,6 +471,7 @@ void R_DrawPlanes (void)
     int			stop;
     int			flip;
     int			angle;
+    int			vangle;
     int			texnum;
 
 #ifdef RANGECHECK
@@ -521,7 +522,7 @@ void R_DrawPlanes (void)
 	    // See http://doom.wikia.com/wiki/Invulnerability_colormap_bug
 	    //dc_colormap = colormaps;
 	    dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
-	    dc_texturemid = skytexturemid;
+	    vangle = viewangle;
 	    if (x & PL_SKYFLAT)
 	    {
 	      // Sky Linedef
@@ -533,16 +534,28 @@ void R_DrawPlanes (void)
 	      // Texture comes from upper texture of reference sidedef
 	      texnum = texturetranslation[s->toptexture];
 
+	      // Horizontal offset is turned into an angle offset,
+	      // to allow sky rotation as well as careful positioning.
+	      // However, the offset is scaled very small, so that it
+	      // allows a long-period of sky rotation.
+
+	      vangle += s->textureoffset;
+
+	      // Vertical offset allows careful sky positioning.
+
+	      dc_texturemid = s->rowoffset - 28*FRACUNIT;
+
 	      // We sometimes flip the picture horizontally.
 	      //
 	      // Doom always flipped the picture, so we make it optional,
 	      // to make it easier to use the new feature, while to still
 	      // allow old sky textures to be used.
-	      
+
 	      flip = l->special==272 ? 0u : ~0u;
 	    }
 	    else
 	    {
+	      dc_texturemid = skytexturemid;
 	      texnum = skytexture;
 	      flip = 0;
 	    }
@@ -553,7 +566,7 @@ void R_DrawPlanes (void)
 
 		if (dc_yl <= dc_yh)
 		{
-		    angle = ((viewangle + xtoviewangle[x])^flip)>>ANGLETOSKYSHIFT;
+		    angle = ((vangle + xtoviewangle[x])^flip)>>ANGLETOSKYSHIFT;
 		    dc_x = x;
 		    dc_source = R_GetColumn(texnum, angle);
 		    colfunc ();

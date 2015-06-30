@@ -142,14 +142,9 @@ typedef enum
 
 static fixed_t GetOffset (vertex_t *v1, vertex_t *v2)
 {
-  double hypot;
   fixed_t     dx = (v1->x - v2->x) >> FRACBITS;
   fixed_t     dy = (v1->y - v2->y) >> FRACBITS;
-
-  dx = (dx * dx);
-  dy = (dy * dy);
-  hypot = (double)dx + (double)dy;
-  return ((fixed_t)(sqrt(hypot)) << FRACBITS);
+  return (((fixed_t)sqrt((double)dx*dx + (double)dy*dy)) << FRACBITS);
 }
 
 //-----------------------------------------------------------------------------
