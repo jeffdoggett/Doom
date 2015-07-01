@@ -245,8 +245,7 @@ void *Z_Calloc (size_t size, uint32_t tag, void **user)
   void * rc;
 
   rc = Z_Malloc (size, tag, user);
-  memset (rc, 0, size);
-  return (rc);
+  return (memset (rc, 0, size));
 }
 
 #if 0

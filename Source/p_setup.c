@@ -108,7 +108,7 @@ mapthing_t	playerstarts[MAXPLAYERS];
 //-----------------------------------------------------------------------------
 /* ARM cannot read from non-word aligned locations! */
 
-static unsigned int read_32 (unsigned char * ptr)
+static unsigned int read_32 (const unsigned char * ptr)
 {
   unsigned int rc;
 
@@ -121,7 +121,7 @@ static unsigned int read_32 (unsigned char * ptr)
 
 //-----------------------------------------------------------------------------
 
-static unsigned int read_16 (unsigned char * ptr)
+static unsigned int read_16 (const unsigned char * ptr)
 {
   unsigned int rc;
 
@@ -130,6 +130,19 @@ static unsigned int read_16 (unsigned char * ptr)
   return (rc);
 }
 
+//-----------------------------------------------------------------------------
+#if 0
+static unsigned int read_s16 (const unsigned char * ptr)
+{
+  unsigned int rc;
+
+  rc = *ptr++;
+  rc |= (*ptr << 8);
+  if (rc & 0x8000)
+    rc |= 0xFFFF0000;
+  return (rc);
+}
+#endif
 //-----------------------------------------------------------------------------
 
 typedef enum
@@ -657,6 +670,204 @@ static void P_LoadZNodes (int lump)
     no++;
   }
   Z_Free (zndata);
+}
+
+//-----------------------------------------------------------------------------
+
+static void P_LoadSegs_V4 (int lump)
+{
+  int  i;
+  const mapseg_v4_t *data;
+  seg_t *li;
+  const mapseg_v4_t *ml;
+
+#ifdef PADDED_STRUCTS
+  numsegs = W_LumpLength (lump) / 16;
+#else
+  numsegs = W_LumpLength (lump) / sizeof(mapseg_v4_t);
+#endif
+  segs = Z_Calloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
+  data = (const mapseg_v4_t *) W_CacheLumpNum (lump,PU_STATIC);
+
+  if ((!data) || (!numsegs))
+    I_Error("P_LoadSegs_V4: no segs in level");
+
+  ml = data;
+  li = segs;
+  for (i = 0; i < numsegs; i++)
+  {
+    int v1, v2;
+    int side, linedef;
+    line_t *ldef;
+
+//  li->miniseg = false; // figgi -- there are no minisegs in classic BSP nodes
+
+    li->angle  = read_16 ((unsigned char *) &ml->angle)<<FRACBITS;
+    li->offset = read_16 ((unsigned char *) &ml->offset)<<FRACBITS;
+    linedef = read_16 ((unsigned char *) &ml->linedef);
+
+    //e6y: check for wrong indexes
+    if ((unsigned)linedef >= (unsigned)numlines)
+    {
+      I_Error("P_LoadSegs_V4: seg %d references a non-existent linedef %d",
+        i, (unsigned)linedef);
+    }
+
+    ldef = &lines[linedef];
+    li->linedef = ldef;
+    side = read_16 ((unsigned char *) &ml->side);
+
+    //e6y: fix wrong side index
+    if (side != 0 && side != 1)
+    {
+      printf ("P_LoadSegs_V4: seg %d contains wrong side index %d. Replaced with 1.\n", i, side);
+      side = 1;
+    }
+
+    //e6y: check for wrong indexes
+    if ((unsigned)ldef->sidenum[side] >= (unsigned)numsides)
+    {
+      I_Error("P_LoadSegs_V4: linedef %d for seg %d references a non-existent sidedef %d",
+        linedef, i, (unsigned)ldef->sidenum[side]);
+    }
+
+    li->sidedef = &sides[ldef->sidenum[side]];
+
+    /* cph 2006/09/30 - our frontsector can be the second side of the
+    * linedef, so must check for NO_INDEX in case we are incorrectly
+    * referencing the back of a 1S line */
+    if (ldef->sidenum[side] != NO_INDEX)
+    {
+      li->frontsector = sides[ldef->sidenum[side]].sector;
+    }
+    else
+    {
+      li->frontsector = 0;
+      printf ("P_LoadSegs_V4: front of seg %i has no sidedef\n", i);
+    }
+
+    if (ldef->flags & ML_TWOSIDED && ldef->sidenum[side^1]!=NO_INDEX)
+      li->backsector = sides[ldef->sidenum[side^1]].sector;
+    else
+      li->backsector = 0;
+
+    v1 = read_32((unsigned char *) &ml->v1);
+    v2 = read_32((unsigned char *) &ml->v2);
+
+    // e6y
+    // check and fix wrong references to non-existent vertexes
+    // see e1m9 @ NIVELES.WAD
+    // http://www.doomworld.com/idgames/index.php?id=12647
+    if ((v1 >= numvertexes) || (v2 >= numvertexes))
+    {
+      printf ("P_LoadSegs: Seg %i references invalid vertex %i,%i (%i).\n", i, v1, v2, numvertexes);
+
+      if (li->sidedef == &sides[li->linedef->sidenum[0]])
+      {
+	li->v1 = lines[linedef].v1;
+	li->v2 = lines[linedef].v2;
+      }
+      else
+      {
+	li->v1 = lines[linedef].v2;
+	li->v2 = lines[linedef].v1;
+      }
+    }
+    else
+    {
+      li->v1 = &vertexes[v1];
+      li->v2 = &vertexes[v2];
+    }
+
+    // Recalculate seg offsets that are sometimes incorrect
+    // with certain nodebuilders. Fixes among others, line 20365
+    // of DV.wad, map 5
+    li->offset = GetOffset(li->v1, (side ? ldef->v2 : ldef->v1));
+
+    li++;
+    ml++;
+  }
+
+  Z_Free ((void*) data);	// cph - release the data
+}
+
+//-----------------------------------------------------------------------------
+
+static void P_LoadSubsectors_V4 (int lump)
+{
+  /* cph 2006/07/29 - make data a const mapsubsector_t *, so the loop below is simpler & gives no constness warnings */
+  int i;
+  const mapsubsector_v4_t *data;
+  const mapsubsector_v4_t * ms;
+  subsector_t*	ss;
+
+  numsubsectors = W_LumpLength (lump) / 6 /*sizeof(mapsubsector_v4_t)*/;
+
+  subsectors = Z_Calloc (numsubsectors*sizeof(subsector_t),PU_LEVEL,0);
+  data = (const mapsubsector_v4_t *) W_CacheLumpNum (lump,PU_STATIC);
+
+  if ((!data) || (!numsubsectors))
+    I_Error("P_LoadSubsectors_V4: no subsectors in level");
+
+  ms = data;
+  ss = subsectors;
+  for (i = 0; i < numsubsectors; i++)
+  {
+    ss->numlines = read_16 (ms->numsegs);
+    ss->firstline = read_32 (ms->firstseg);
+    ms = (const mapsubsector_v4_t *) ((byte *) ms + 6);
+    ss++;
+  }
+
+  Z_Free ((void *) data);	// cph - release the data
+}
+
+//-----------------------------------------------------------------------------
+
+static void P_LoadNodes_V4 (int lump)
+{
+  int  i;
+  const byte *data; // cph - const*
+  node_t *no;
+  const mapnode_v4_t *mn;
+
+  numnodes = (W_LumpLength (lump) - 8) / sizeof(mapnode_v4_t);
+  nodes = Z_Calloc (numnodes * sizeof(node_t),PU_LEVEL,0);
+  data = W_CacheLumpNum (lump,PU_STATIC); // cph - wad lump handling updated
+
+  if ((!data) || (!numnodes))
+  {
+    // allow trivial maps
+    if (numsubsectors == 1)
+      printf ("P_LoadNodes_V4: trivial map (no nodes, one subsector)\n");
+    else
+      I_Error("P_LoadNodes_V4: no nodes in level");
+  }
+
+  no = nodes;
+  mn = (const mapnode_v4_t *) (data + 8);	// skip header
+  for (i = 0; i < numnodes; i++)
+  {
+    int j;
+
+    no->x = read_16 ((unsigned char*) &mn->x)<<FRACBITS;
+    no->y = read_16 ((unsigned char*) &mn->y)<<FRACBITS;
+    no->dx = read_16 ((unsigned char*) &mn->dx)<<FRACBITS;
+    no->dy = read_16 ((unsigned char*) &mn->dy)<<FRACBITS;
+
+    for (j=0 ; j<2 ; j++)
+    {
+      int k;
+      no->children[j] = read_32 ((unsigned char*) &mn->children[j]);
+
+      for (k=0 ; k<4 ; k++)
+        no->bbox[j][k] = read_16 ((unsigned char*) &mn->bbox[j][k])<<FRACBITS;
+    }
+    no++;
+    mn++;
+  }
+
+  Z_Free ((void*)data);	// cph - release the data
 }
 
 //-----------------------------------------------------------------------------
@@ -1484,21 +1695,24 @@ void R_CalcSegsLength (void)
 // format or DeePBSP format and/or LINEDEFS and THINGS lumps in Hexen format
 static mapformat_t P_CheckMapFormat (int lumpnum)
 {
-    mapformat_t format = DOOMBSP;
-    byte	*nodes = NULL;
-    int	 	b;
+  mapformat_t 	format = DOOMBSP;
+  byte		*nodes;
+  int	 	b;
 
-    b = lumpnum + ML_NODES;
-    if ((b < numlumps)
-     && ((nodes = W_CacheLumpNum (b, PU_CACHE)) != NULL)
-     && (W_LumpLength (b) != 0))
+  b = lumpnum + ML_NODES;
+  if (b < numlumps)
+  {
+    nodes = W_CacheLumpNum (b, PU_CACHE);
+    if (nodes)
     {
+      if (W_LumpLength (b) != 0)
+      {
 	if (!memcmp(nodes, "xNd4\0\0\0\0", 8))
 	{
 #ifdef NORMALUNIX
-	    printf ("This map has DeePBSP v4 Extended nodes.\n");
+	  printf ("This map has DeePBSP v4 Extended nodes.\n");
 #endif
-	    format = DEEPBSP;
+	  format = DEEPBSP;
 	}
 	else if (!memcmp(nodes, "XNOD", 4))
 	{
@@ -1514,13 +1728,13 @@ static mapformat_t P_CheckMapFormat (int lumpnum)
 #endif
 	  format = ZDBCPX;
 	}
+      }
+      Z_Free (nodes);
     }
+  }
 
-    if (nodes)
-	Z_Free (nodes);
-
-//  printf ("P_CheckMapFormat = %u\n", (int) format);
-    return (format);
+//printf ("P_CheckMapFormat = %u\n", (int) format);
+  return (format);
 }
 
 //-----------------------------------------------------------------------------
@@ -1605,11 +1819,10 @@ P_SetupLevel
 	P_LoadZNodes (lumpnum + ML_NODES);
 	break;
 
-      case  DEEPBSP:
-//	P_LoadSubsectors_DeePBSP (lumpnum + ML_SSECTORS);
-//	P_LoadNodes_DeePBSP (lumpnum + ML_NODES);
-//	P_LoadSegs_DeePBSP (lumpnum + ML_SEGS);
-	I_Error ("Deep BSP maps not supported\n");
+      case DEEPBSP:
+	P_LoadSubsectors_V4 (lumpnum+ML_SSECTORS);
+	P_LoadNodes_V4 (lumpnum+ML_NODES);
+	P_LoadSegs_V4 (lumpnum+ML_SEGS);
 	break;
 
       default: // ZDBCPX
