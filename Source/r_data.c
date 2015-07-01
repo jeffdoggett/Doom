@@ -170,10 +170,8 @@ static void R_GenerateComposite (int texnum)
 		      PU_STATIC,
 		      (void **)&texturecomposite[texnum]);
 
-    if ((marks = (byte*)malloc(texture->width * texture->height)) == NULL)
+    if ((marks = (byte*)calloc(texture->width, texture->height)) == NULL)
 	I_Error("R_GenerateComposite: couldn't alloc marks");
-
-    memset(marks, 0, texture->width * texture->height);
 
     collump = texturecolumnlump[texnum];
     colofs = texturecolumnofs[texnum];
@@ -295,12 +293,10 @@ static void R_GenerateLookup (int texnum)
     /*  that are covered by more than one patch.*/
     /* Fill in the lump / offset, so columns*/
     /*  with only a single patch are all done.*/
-    patchcount = malloc(sizeof(*patchcount) * texture->width);
+    patchcount = calloc (sizeof(*patchcount), texture->width);
 
     if (patchcount == NULL)
 	I_Error("R_GenerateLookup: Couldn't claim memory for patchcount");
-
-    memset (patchcount, 0, sizeof(*patchcount) * texture->width);
 
     patch = texture->patches;
 
@@ -532,7 +528,7 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
     }
     // printf ("Adding texture %s at pos %u\n", name, pos);
 
-    texture = textures[pos] = Z_Malloc (sizeof(texture_t)
+    texture = textures[pos] = Z_Calloc (sizeof(texture_t)
 				+ sizeof(texpatch_t)*(SHORT(mtexture->patchcount)-1),
 				PU_STATIC, 0);
 
@@ -570,11 +566,8 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
       mpatch++;
 #endif
     }
-    texturecolumnlump[pos] = Z_Malloc (texture->width*sizeof(dshort_t), PU_STATIC,0);
-    texturecolumnofs[pos] = Z_Malloc (texture->width*sizeof(unsigned int), PU_STATIC,0);
-    // init for safety
-    memset (texturecolumnlump[pos], 0, texture->width * sizeof(dshort_t));
-    memset (texturecolumnofs[pos], 0, texture->width * sizeof(unsigned int));
+    texturecolumnlump[pos] = Z_Calloc (texture->width*sizeof(dshort_t), PU_STATIC,0);
+    texturecolumnofs[pos] = Z_Calloc (texture->width*sizeof(unsigned int), PU_STATIC,0);
 
     j = 1;
     while (j*2 <= texture->width)
@@ -679,15 +672,13 @@ void R_InitTextures (void)
   numtextures = R_merge_textures ("TEXTURE2", j, NULL);
   // printf ("numtextures = %u\n", numtextures);
 
-  textures = Z_Malloc (numtextures*sizeof(texture_t*), PU_STATIC, NULL);
-  texturecolumnlump = Z_Malloc (numtextures*sizeof(dshort_t*), PU_STATIC, NULL);
-  texturecolumnofs = Z_Malloc (numtextures*sizeof(unsigned int*), PU_STATIC, NULL);
-  texturecomposite = Z_Malloc (numtextures*sizeof(byte*), PU_STATIC, NULL);
-  texturecompositesize = Z_Malloc (numtextures*sizeof(int), PU_STATIC, NULL);
-  texturewidthmask = Z_Malloc (numtextures*sizeof(int), PU_STATIC, NULL);
-  textureheight = Z_Malloc (numtextures*sizeof(fixed_t), PU_STATIC, NULL);
-
-  memset (textures, 0, numtextures*sizeof(texture_t*));
+  textures = Z_Calloc (numtextures*sizeof(texture_t*), PU_STATIC, NULL);
+  texturecolumnlump = Z_Calloc (numtextures*sizeof(dshort_t*), PU_STATIC, NULL);
+  texturecolumnofs = Z_Calloc (numtextures*sizeof(unsigned int*), PU_STATIC, NULL);
+  texturecomposite = Z_Calloc (numtextures*sizeof(byte*), PU_STATIC, NULL);
+  texturecompositesize = Z_Calloc (numtextures*sizeof(int), PU_STATIC, NULL);
+  texturewidthmask = Z_Calloc (numtextures*sizeof(int), PU_STATIC, NULL);
+  textureheight = Z_Calloc (numtextures*sizeof(fixed_t), PU_STATIC, NULL);
 
   j = R_merge_textures ("TEXTURE1", 0, patchlookup);
   j = R_merge_textures ("TEXTURE2", j, patchlookup);

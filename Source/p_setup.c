@@ -203,8 +203,7 @@ void P_LoadSegs (int lump)
 #else
   numsegs = W_LumpLength (lump) / sizeof(mapseg_t);
 #endif
-  segs = Z_Malloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
-  memset (segs, 0, numsegs*sizeof(seg_t));
+  segs = Z_Calloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
   data = W_CacheLumpNum (lump,PU_STATIC);
 
 #if 0
@@ -335,11 +334,10 @@ void P_LoadSubsectors (int lump)
     subsector_t*	ss;
 
     numsubsectors = W_LumpLength (lump) / sizeof(mapsubsector_t);
-    subsectors = Z_Malloc (numsubsectors*sizeof(subsector_t),PU_LEVEL,0);
+    subsectors = Z_Calloc (numsubsectors*sizeof(subsector_t),PU_LEVEL,0);
     data = W_CacheLumpNum (lump,PU_STATIC);
 
     ms = (mapsubsector_t *)data;
-    memset (subsectors,0, numsubsectors*sizeof(subsector_t));
     ss = subsectors;
 
     for (i=0 ; i<numsubsectors ; i++, ss++, ms++)
@@ -367,8 +365,7 @@ void P_LoadSectors (int lump)
 #else
     numsectors = W_LumpLength (lump) / sizeof(mapsector_t);
 #endif
-    sectors = Z_Malloc (numsectors*sizeof(sector_t),PU_LEVEL,0);
-    memset (sectors, 0, numsectors*sizeof(sector_t));
+    sectors = Z_Calloc (numsectors*sizeof(sector_t),PU_LEVEL,0);
     data = W_CacheLumpNum (lump,PU_STATIC);
 
     ms = (mapsector_t *)data;
@@ -571,8 +568,7 @@ static void P_LoadZNodes (int lump)
   }
   else
   {
-    newvertarray = Z_Malloc ((orgVerts + newVerts) * sizeof(vertex_t),PU_LEVEL,0);
-    memset (newvertarray, 0, (orgVerts + newVerts) * sizeof(vertex_t));
+    newvertarray = Z_Calloc ((orgVerts + newVerts) * sizeof(vertex_t),PU_LEVEL,0);
     memcpy (newvertarray, vertexes, orgVerts * sizeof(vertex_t));
   }
 
@@ -627,8 +623,7 @@ static void P_LoadZNodes (int lump)
     I_Error("P_LoadZNodes: Incorrect number of segs in nodes. (%u/%u", numSegs, currSeg);
 
   numsegs = numSegs;
-  segs = Z_Malloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
-  memset (segs, 0, numsegs*sizeof(seg_t));
+  segs = Z_Calloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
 
   data = P_LoadZSegs (data);
 
@@ -637,8 +632,7 @@ static void P_LoadZNodes (int lump)
   data += sizeof(numNodes);
 
   numnodes = numNodes;
-  nodes = Z_Malloc (numNodes*sizeof(node_t),PU_LEVEL,0);
-  memset (nodes, 0, numNodes*sizeof(node_t));
+  nodes = Z_Calloc (numNodes*sizeof(node_t),PU_LEVEL,0);
 
   no = nodes;
   mn = (const mapnode_znod_t *)data;
@@ -779,8 +773,7 @@ void P_LoadLineDefs (int lump)
 #else
     numlines = W_LumpLength (lump) / sizeof(maplinedef_t);
 #endif
-    lines = Z_Malloc (numlines*sizeof(line_t),PU_LEVEL,0);
-    memset (lines, 0, numlines*sizeof(line_t));
+    lines = Z_Calloc (numlines*sizeof(line_t),PU_LEVEL,0);
     data = W_CacheLumpNum (lump,PU_STATIC);
 
     mld = (maplinedef_t *)data;
@@ -895,8 +888,7 @@ void P_LoadSideDefs (int lump)
 #else
     numsides = W_LumpLength (lump) / sizeof(mapsidedef_t);
 #endif
-    sides = Z_Malloc (numsides*sizeof(side_t),PU_LEVEL,0);
-    memset (sides, 0, numsides*sizeof(side_t));
+    sides = Z_Calloc (numsides*sizeof(side_t),PU_LEVEL,0);
     data = W_CacheLumpNum (lump,PU_STATIC);
 
     msd = (mapsidedef_t *)data;

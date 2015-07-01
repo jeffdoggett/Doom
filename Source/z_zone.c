@@ -240,12 +240,16 @@ void *Z_Realloc(void *ptr, size_t n, uint32_t tag, void **user)
   return p;
 }
 
-#if 0
-void *Z_Calloc (size_t n1, size_t n2, uint32_t tag, void **user)
+void *Z_Calloc (size_t size, uint32_t tag, void **user)
 {
-    return ((n1 *= n2) ? memset(Z_Malloc(n1, tag, user), 0, n1) : NULL);
+  void * rc;
+
+  rc = Z_Malloc (size, tag, user);
+  memset (rc, 0, size);
+  return (rc);
 }
 
+#if 0
 char *Z_Strdup (const char *s, uint32_t tag, void **user)
 {
     return strcpy ((char *)Z_Malloc(strlen(s) + 1, tag, user), s);

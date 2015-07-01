@@ -106,7 +106,10 @@ void R_DrawColumn (void)
     if ((unsigned)dc_x >= SCREENWIDTH
 	|| dc_yl < 0
 	|| dc_yh >= SCREENHEIGHT)
-	I_Error ("R_DrawColumn: %i to %i at %i", dc_yl, dc_yh, dc_x);
+    {
+	printf ("R_DrawColumn: %i to %i at %i", dc_yl, dc_yh, dc_x);
+	return;
+    }
 #endif
 
     dest = ylookup[dc_yl] + dc_x + viewwindowx;

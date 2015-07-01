@@ -68,7 +68,7 @@ void *Z_Malloc (size_t size, uint32_t tag, void **ptr);
 void Z_Free (void *ptr);
 void Z_FreeTags (uint32_t lowtag, uint32_t hightag);
 void Z_ChangeTag (void *ptr, uint32_t tag);
-void *Z_Calloc (size_t n1, size_t n2, uint32_t tag, void **user);
+void *Z_Calloc (size_t size, uint32_t tag, void **user);
 void *Z_Realloc (void *ptr, size_t n, uint32_t tag, void **user);
 char *Z_Strdup (const char *s, uint32_t tag, void **user);
 
