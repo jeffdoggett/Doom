@@ -549,7 +549,6 @@ static void P_LoadZNodes (int lump)
   byte			*data;
   byte			*zndata;
   unsigned int		i;
-  int			len;
 
   unsigned int		orgVerts, newVerts;
   unsigned int		numSubs, currSeg;
@@ -563,7 +562,6 @@ static void P_LoadZNodes (int lump)
 
 
   zndata = W_CacheLumpNum(lump, PU_LEVEL);
-  len = W_LumpLength(lump);
 
   // skip header
   data = zndata + 4;
