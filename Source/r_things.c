@@ -556,8 +556,8 @@ void R_DrawMaskedColumn (column_t* column)
 	if (dc_yl <= dc_yh)
 	{
 	    dc_source = (byte *)column + 3;
-	    dc_texturemid = basetexturemid - (column->topdelta<<FRACBITS);
-	    // dc_source = (byte *)column + 3 - column->topdelta;
+	    dc_texturemid = basetexturemid - (topdelta<<FRACBITS);
+	    // dc_source = (byte *)column + 3 - topdelta;
 
 	    // Drawn by either R_DrawColumn
 	    //	or (SHADOW) R_DrawFuzzColumn.
