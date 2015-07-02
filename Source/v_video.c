@@ -228,7 +228,6 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
   fixed_t row;
   int td;
   int topdelta;
-  int lasttopdelta;
   int lastlength;
 
   if (xscale == FRACUNIT)
@@ -271,20 +270,19 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
     else
       column = (column_t *)((byte *)patch + LONG(patch->columnofs[col>>FRACBITS]));
 
-    lasttopdelta = -1;
+    topdelta = -1;
     lastlength = 0;
 
     // step through the posts in a column
     while ((td = column->topdelta) != 0xff)
     {
-      if (((col - xiscale) != col)
-       && (td == lasttopdelta))		// Bodge for oversize patches
+      if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
       {
-	topdelta += lastlength;
+	topdelta += td;
       }
       else
       {
-	lasttopdelta = topdelta = td;
+	topdelta = td;
       }
       lastlength = column->length;
       //dest = desttop + (topdelta*SCREENWIDTH*(scale>>FRACBITS));
@@ -336,7 +334,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 
 	  dest += SCREENWIDTH;
 	  row += yiscale;
-        } while ((row >> FRACBITS) < column->length);
+        } while ((row >> FRACBITS) < lastlength);
       }
       else
       {
@@ -349,10 +347,10 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	    *dest = source [row >> FRACBITS];
 	  dest += SCREENWIDTH;
 	  row += yiscale;
-        } while ((row >> FRACBITS) < column->length);
+        } while ((row >> FRACBITS) < lastlength);
       }
 
-      column = (column_t *)((byte *)column + column->length + 4);
+      column = (column_t *)((byte *)column + lastlength + 4);
     }
     desttop++;
     col += xiscale;

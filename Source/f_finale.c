@@ -1011,6 +1011,9 @@ F_DrawPatchCol
   int		col )
 {
   int y;
+  int td;
+  int topdelta;
+  int lastlength;
   fixed_t row;
   fixed_t colm;
   fixed_t xscale,yscale;
@@ -1048,13 +1051,25 @@ F_DrawPatchCol
   colm = 0;
   do
   {
+    topdelta = -1;
+    lastlength = 0;
     column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
 
     // step through the posts in a column
-    while (column->topdelta != 0xff )
+    while ((td = column->topdelta) != 0xff )
     {
+      if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
+      {
+	topdelta += td;
+      }
+      else
+      {
+	topdelta = td;
+      }
+
+      lastlength = column->length;
       source = (byte *)column + 3;
-      dest = desttop + (column->topdelta*SCREENWIDTH);
+      dest = desttop + (topdelta*SCREENWIDTH);
 
       row = 0;
       do
@@ -1062,9 +1077,9 @@ F_DrawPatchCol
 	*dest = source [row >> FRACBITS];
 	dest += SCREENWIDTH;
 	row += yiscale;
-      } while ((row >> FRACBITS) < column->length);
+      } while ((row >> FRACBITS) < lastlength);
 
-      column = (column_t *)(  (byte *)column + column->length + 4 );
+      column = (column_t *)(  (byte *)column + lastlength + 4 );
     }
     desttop++;
     colm += xiscale;

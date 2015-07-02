@@ -520,15 +520,30 @@ void R_DrawMaskedColumn (column_t* column)
     int 	topscreen;
     int 	bottomscreen;
     fixed_t	basetexturemid;
+    int		td;
+    int		topdelta;
+    int		lastlength;
 
     basetexturemid = dc_texturemid;
+    topdelta = -1;
+    lastlength = 0;
 
-    for ( ; column->topdelta != 0xff ; )
+    while ((td = column->topdelta) != 0xff)
     {
+	if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
+	{
+	  topdelta += td;
+	}
+	else
+	{
+	  topdelta = td;
+	}
+
+	lastlength = column->length;
 	// calculate unclipped screen coordinates
 	//  for post
-	topscreen = sprtopscreen + spryscale*column->topdelta;
-	bottomscreen = topscreen + spryscale*column->length;
+	topscreen = sprtopscreen + spryscale*topdelta;
+	bottomscreen = topscreen + spryscale*lastlength;
 
 	dc_yl = (topscreen+FRACUNIT-1)>>FRACBITS;
 	dc_yh = (bottomscreen-1)>>FRACBITS;
@@ -548,7 +563,7 @@ void R_DrawMaskedColumn (column_t* column)
 	    //	or (SHADOW) R_DrawFuzzColumn.
 	    colfunc ();
 	}
-	column = (column_t *)(	(byte *)column + column->length + 4);
+	column = (column_t *)(	(byte *)column + lastlength + 4);
     }
 
     dc_texturemid = basetexturemid;

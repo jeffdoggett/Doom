@@ -111,14 +111,30 @@ R_DrawColumnInCache
     int		position;
     byte*	source;
     byte*	dest;
+    int		td;
+    int		topdelta;
+    int		lastlength;
 
+    topdelta = -1;
+    lastlength = 0;
     dest = (byte *)cache + 3;
 
-    while (patch->topdelta != 0xff)
+    while ((td = patch->topdelta) != 0xff)
     {
+#if 0
+	if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
+	{
+	  topdelta += td;
+	}
+	else
+#endif
+	{
+	  topdelta = td;
+	}
+
 	source = (byte *)patch + 3;
-	count = patch->length;
-	position = originy + patch->topdelta;
+	lastlength = count = patch->length;
+	position = originy + topdelta;
 
 	if (position < 0)
 	{
@@ -134,7 +150,7 @@ R_DrawColumnInCache
 	    memcpy (cache + position, source, count);
 	    memset (marks + position, 0xff, count);
 	}
-	patch = (column_t *)(  (byte *)patch + patch->length + 4);
+	patch = (column_t *)(  (byte *)patch + lastlength + 4);
     }
 }
 
