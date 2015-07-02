@@ -513,7 +513,7 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
   do
   {
     if (!(pos&63))
-      printf (".");
+      putchar ('.');
 
     offset = LONG(*directory);
     directory++;
@@ -715,7 +715,11 @@ void R_InitTextures (void)
 
   // Precalculate whatever possible.
   for (i=0 ; i<numtextures ; i++)
+  {
+    if ((i & 255) == 0)
+      putchar ('.');
     R_GenerateLookup (i);
+  }
 
   // Create translation table for global animation.
   texturetranslation = Z_Malloc ((numtextures+1)*sizeof(int), PU_STATIC, NULL);
@@ -915,7 +919,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       {
 	total++;
 	if ((total & 127) == 0)
-	  printf (".");
+	  putchar ('.');
       }
       else
       {
@@ -975,7 +979,7 @@ void R_InitFlats (void)
      && (strncasecmp (lump_ptr->name, "FF_START", 8)))
     {
       if (!(i&63))
-	printf (".");
+	putchar ('.');
       if (i < numflats)
       {
 	flattranslation[i] = i;
@@ -1043,7 +1047,7 @@ void R_InitSpriteLumps (void)
      && (strncasecmp (lump_ptr->name, "SS_START", 8)))
     {
       if (!(i&63))
-	printf (".");
+	putchar ('.');
       patch = W_CacheLumpNum (lump, PU_CACHE);
       if (i < numspritelumps)
       {
