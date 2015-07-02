@@ -340,7 +340,7 @@ R_RenderMaskedSegRange
 
 	      if (t + (int64_t) textureheight[texnum] * spryscale < 0 ||
 		  t > (int64_t) SCREENHEIGHT << FRACBITS*2)
-		continue;        // skip if the texture is out of screen's range
+		continue;	// skip if the texture is out of screen's range
 
 	      sprtopscreen = (fixed_t)(t >> FRACBITS);
 	    }
@@ -593,8 +593,8 @@ R_StoreWallRange
       timesofar = I_GetTime ();
       if ((timesofar - drawsegstarttime) > 5)
       {
-        // printf ("R_StoreWallRange timed out at %u\n", ds_p-drawsegs);
-        return;
+	// printf ("R_StoreWallRange timed out at %u\n", ds_p-drawsegs);
+	return;
       }
     }
 
@@ -756,39 +756,39 @@ R_StoreWallRange
 	    worldtop = worldhigh;
 	}
 
+      markfloor = (boolean) (worldlow != worldbottom
+	|| backsector->floorpic != frontsector->floorpic
+	|| backsector->lightlevel != frontsector->lightlevel
 
-	if (worldlow != worldbottom
-	    || backsector->floorpic != frontsector->floorpic
-	    || backsector->lightlevel != frontsector->lightlevel
-            /* killough 3/7/98: Add checks for (x,y) offsets */
-            || backsector->floor_xoffs != frontsector->floor_xoffs
-            || backsector->floor_yoffs != frontsector->floor_yoffs
-            /* killough 4/15/98: prevent 2s normals */
-            /* from bleeding through deep water */
-            || frontsector->heightsec != -1
-            /* killough 4/17/98: draw floors if different light levels */
-            || backsector->floorlightsec != frontsector->floorlightsec)
-	{
-	    markfloor = true;
-	}
-	else
-	{
-	    // same plane on both sides
-	    markfloor = false;
-	}
+	// killough 3/7/98: Add checks for (x,y) offsets
+	|| backsector->floor_xoffs != frontsector->floor_xoffs
+	|| backsector->floor_yoffs != frontsector->floor_yoffs
 
+	// killough 4/15/98: prevent 2s normals
+	// from bleeding through deep water
+	|| frontsector->heightsec != -1
 
-	if (worldhigh != worldtop
-	    || backsector->ceilingpic != frontsector->ceilingpic
-	    || backsector->lightlevel != frontsector->lightlevel)
-	{
-	    markceiling = true;
-	}
-	else
-	{
-	    // same plane on both sides
-	    markceiling = false;
-	}
+	// killough 4/17/98: draw floors if different light levels
+	|| backsector->floorlightsec != frontsector->floorlightsec
+	);
+
+      markceiling = (boolean) (worldhigh != worldtop
+	|| backsector->ceilingpic != frontsector->ceilingpic
+	|| backsector->lightlevel != frontsector->lightlevel
+
+	// killough 3/7/98: Add checks for (x,y) offsets
+	|| backsector->ceiling_xoffs != frontsector->ceiling_xoffs
+	|| backsector->ceiling_yoffs != frontsector->ceiling_yoffs
+
+	// killough 4/15/98: prevent 2s normals
+	// from bleeding through fake ceilings
+	|| (frontsector->heightsec != -1 &&
+	    frontsector->ceilingpic!=skyflatnum)
+
+	// killough 4/17/98: draw ceilings if different light levels
+	|| backsector->ceilinglightsec != frontsector->ceilinglightsec
+	);
+
 
 	if (backsector->ceilingheight <= frontsector->floorheight
 	    || backsector->floorheight >= frontsector->ceilingheight)
@@ -836,8 +836,28 @@ R_StoreWallRange
 		rw_bottomtexturemid = worldlow;
 	}
 	rw_toptexturemid += sidedef->rowoffset;
+
+      // killough 3/27/98: reduce offset
+      {
+	fixed_t h;
+	tex = sidedef->toptexture;
+	if (tex >= numtextures) tex = 0;
+	h = textureheight[tex];
+	if (h & (h-FRACUNIT))
+	  rw_toptexturemid %= h;
+      }
+
 	rw_bottomtexturemid += sidedef->rowoffset;
 
+      // killough 3/27/98: reduce offset
+      {
+	fixed_t h;
+	tex = sidedef->bottomtexture;
+	if (tex >= numtextures) tex = 0;
+	h = textureheight[tex];
+	if (h & (h-FRACUNIT))
+	  rw_bottomtexturemid %= h;
+      }
 	// allocate space for masked texture tables
 	if (sidedef->midtexture)
 	{
@@ -898,19 +918,16 @@ R_StoreWallRange
     //  of the view plane, it is definitely invisible
     //  and doesn't need to be marked.
 
-
-    if (frontsector->floorheight >= viewz)
+    // killough 3/7/98: add deep water check
+    if (frontsector->heightsec == -1)
     {
-	// above view plane
+      if (frontsector->floorheight >= viewz)       // above view plane
 	markfloor = false;
-    }
-
-    if (frontsector->ceilingheight <= viewz
-	&& frontsector->ceilingpic != skyflatnum)
-    {
-	// below view plane
+      if (frontsector->ceilingheight <= viewz &&
+	  frontsector->ceilingpic != skyflatnum)   // below view plane
 	markceiling = false;
     }
+
 
 
     // calculate incremental stepping values for texture edges
@@ -943,10 +960,20 @@ R_StoreWallRange
 
     // render it
     if (markceiling)
+    {
+      if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
 	ceilingplane = R_CheckPlane (ceilingplane, rw_x, rw_stopx-1);
+      else
+	markceiling = false;
+    }
 
     if (markfloor)
+    {
+      if (floorplane)     // killough 4/11/98: add NULL ptr checks
 	floorplane = R_CheckPlane (floorplane, rw_x, rw_stopx-1);
+      else
+	markfloor = false;
+    }
 
     R_RenderSegLoop ();
 

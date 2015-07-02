@@ -314,13 +314,9 @@ R_FindPlane
 	    && xoffs == check->xoffs
 	    && yoffs == check->yoffs)
 	{
-	    break;
+	  return check;
 	}
     }
-
-
-    if (check < lastvisplane)
-	return check;
 
     if (lastvisplane - visplanes >= (MAXVISPLANES-1))
     {
@@ -333,7 +329,7 @@ R_FindPlane
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
-    check->minx = SCREENWIDTH;
+    check->minx = viewwidth;		// Was SCREENWIDTH -- killough 11/98
     check->maxx = -1;
     check->xoffs = xoffs;
     check->yoffs = yoffs;
@@ -511,7 +507,7 @@ void R_DrawPlanes (void)
 	x = pl->picnum;
 
 	// sky flat
-	if ((x == skyflatnum) || (pl->picnum & PL_SKYFLAT))
+	if ((x == skyflatnum) || (x & PL_SKYFLAT))
 	{
 	    dc_iscale = skyiscale;
 	    // Sky is allways drawn full bright,
