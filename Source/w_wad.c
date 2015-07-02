@@ -955,6 +955,24 @@ W_CacheLumpName0
 
 /* ---------------------------------------------------------------------------- */
 //
+// Release a lump back to the cache, so that it can be reused later
+// without having to read from disk again, or alternatively, discarded
+// if we run out of memory.
+//
+// Back in Vanilla Doom, this was just done using Z_ChangeTag
+// directly, but now that we have WAD mmap, things are a bit more
+// complicated ...
+//
+void W_ReleaseLumpNum (unsigned int lumpnum)
+{
+  if (lumpnum >= numlumps)
+      I_Error("W_ReleaseLumpNum: %i >= numlumps", lumpnum);
+
+  Z_ChangeTag (lumpcache[lumpnum], PU_CACHE);
+}
+
+/* ---------------------------------------------------------------------------- */
+//
 // W_Profile
 //
 #if 0

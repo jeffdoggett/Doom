@@ -193,7 +193,7 @@ void P_LoadVertexes (int lump)
     }
 
     // Free buffer memory.
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ void P_LoadSegs (int lump)
 #endif
   }
 
-  Z_Free (data);
+  W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -359,7 +359,7 @@ void P_LoadSubsectors (int lump)
 	ss->firstline = USHORT(ms->firstseg);
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -404,7 +404,7 @@ void P_LoadSectors (int lump)
 #endif
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -462,7 +462,7 @@ void P_LoadNodes (int lump)
 	}
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -669,7 +669,8 @@ static void P_LoadZNodes (int lump)
     mn++;
     no++;
   }
-  Z_Free (zndata);
+
+  W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -788,7 +789,7 @@ static void P_LoadSegs_V4 (int lump)
     ml++;
   }
 
-  Z_Free ((void*) data);	// cph - release the data
+  W_ReleaseLumpNum (lump);	// cph - release the data
 }
 
 //-----------------------------------------------------------------------------
@@ -819,7 +820,7 @@ static void P_LoadSubsectors_V4 (int lump)
     ss++;
   }
 
-  Z_Free ((void *) data);	// cph - release the data
+  W_ReleaseLumpNum (lump);	// cph - release the data
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +868,7 @@ static void P_LoadNodes_V4 (int lump)
     mn++;
   }
 
-  Z_Free ((void*)data);	// cph - release the data
+  W_ReleaseLumpNum (lump);	// cph - release the data
 }
 
 //-----------------------------------------------------------------------------
@@ -959,7 +960,7 @@ static unsigned int P_LoadThings (int lump)
 #endif
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 
     return (nomonsterbits);
 }
@@ -1080,7 +1081,7 @@ void P_LoadLineDefs (int lump)
 
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -1120,7 +1121,7 @@ void P_LoadSideDefs (int lump)
 
     }
 
-    Z_Free (data);
+    W_ReleaseLumpNum (lump);
 }
 
 //-----------------------------------------------------------------------------
@@ -1729,7 +1730,7 @@ static mapformat_t P_CheckMapFormat (int lumpnum)
 	  format = ZDBCPX;
 	}
       }
-      Z_Free (nodes);
+      W_ReleaseLumpNum (b);
     }
   }
 

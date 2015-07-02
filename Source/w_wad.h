@@ -88,6 +88,7 @@ void	W_ReadLump (int lump, void *dest);
 void*	W_CacheLumpNum (int lump, int tag);
 void*	W_CacheLumpName (const char* name, int tag);
 void*	W_CacheLumpName0 (const char* name, int tag);
+void W_ReleaseLumpNum (unsigned int lumpnum);
 int W_SameWadfile (int lump1, int lump2);
 
 #ifdef BOOM
