@@ -836,28 +836,8 @@ R_StoreWallRange
 		rw_bottomtexturemid = worldlow;
 	}
 	rw_toptexturemid += sidedef->rowoffset;
-
-      // killough 3/27/98: reduce offset
-      {
-	fixed_t h;
-	tex = sidedef->toptexture;
-	if (tex >= numtextures) tex = 0;
-	h = textureheight[tex];
-	if (h & (h-FRACUNIT))
-	  rw_toptexturemid %= h;
-      }
-
 	rw_bottomtexturemid += sidedef->rowoffset;
 
-      // killough 3/27/98: reduce offset
-      {
-	fixed_t h;
-	tex = sidedef->bottomtexture;
-	if (tex >= numtextures) tex = 0;
-	h = textureheight[tex];
-	if (h & (h-FRACUNIT))
-	  rw_bottomtexturemid %= h;
-      }
 	// allocate space for masked texture tables
 	if (sidedef->midtexture)
 	{
