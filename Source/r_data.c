@@ -1229,23 +1229,12 @@ int R_CheckFlatNumForName (const char* name)
 int R_FlatNumForName (const char* name)
 {
   int 	i;
-  char	namet[9];
 
   i = R_CheckFlatNumForName (name);
 
-  /* Emergency check for broken pwads! */
   if (i == -1)
-    i = W_CheckNumForName (name);
+    i = skyflatnum;
 
-  if (i == -1)
-  {
-    if (M_CheckParm ("-ignorebadtextures"))
-      return (0);
-
-    namet[8] = 0;
-    memcpy (namet, name,8);
-    I_Error ("R_FlatNumForName: %s not found",namet);
-  }
   return i;
 }
 
@@ -1287,43 +1276,17 @@ int R_CheckTextureNumForName (const char *name)
 //
 // R_TextureNumForName
 // Calls R_CheckTextureNumForName,
-//  aborts with error message.
 //
+
 int R_TextureNumForName (const char* name)
 {
   int 	i;
   int	j;
-  char	namet[9];
 
   i = R_CheckTextureNumForName (name);
   if (i == -1)
-  {
-    j = W_CheckNumForName (name);	// Allow for broken pwads
-    if (j != -1)
-    {
-#if 0
-      if ((j > firstcollump)
-       && (j < lastcollump))
-      {
-	if (M_CheckParm ("-noaltcolourmaps") == 0)
-	{
-	  R_InitColormaps (j);
-	  R_InitLightTables ();
-	}
-      }
-#endif
-      return (j);
-    }
+    i = 1;
 
-    if ((M_CheckParm ("-ignorebadtextures") == 0)
-     && (name [0] > ' '))
-    {
-      namet[8] = 0;
-      memcpy (namet, name,8);
-      printf ("R_TextureNumForName: %s not found\n", namet);
-    }
-    i = 0;
-  }
   return i;
 }
 
