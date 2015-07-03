@@ -855,16 +855,28 @@ static boolean F_CastResponder (event_t* ev)
         return true;
     }
 
-    // go into death frame
-    castdeath = 50;			// Timer in case someone has messed
+    /* The PAC-MAN character in original.wad crashes here, so */
+    /* only do this with items that are shootable. */
+    if (((mobjinfo[castorder[castnum].type].flags & MF_SHOOTABLE) == 0)
+     || (mobjinfo[castorder[castnum].type].deathstate == S_NULL))
+    {
+      castdeath = 10;
+    }
+    else
+    {
+      // go into death frame
+      castdeath = 50;			// Timer in case someone has messed
 					// up the DeHacked and this baddie
 					// never actually dies.
 
-    caststate = &states[mobjinfo[castorder[castnum].type].deathstate];
-    casttics = (int)caststate->tics;
+      caststate = &states[mobjinfo[castorder[castnum].type].deathstate];
+      casttics = (int)caststate->tics;
+    }
+
     castframes = 0;
     castrot = 0;
     castattacking = false;
+
     if (mobjinfo[castorder[castnum].type].deathsound)
 	S_StartSound (NULL, mobjinfo[castorder[castnum].type].deathsound);
 
