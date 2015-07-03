@@ -153,127 +153,117 @@ R_DrawColumnInCache
 }
 
 
-
 //
 // R_GenerateComposite
 // Using the texture definition,
 //  the composite texture is created from the patches,
 //  and each column is cached.
 //
-/* Medusa fix taken from Boom sources */
-static void R_GenerateComposite (int texnum)
+// Rewritten by Lee Killough for performance and to fix Medusa bug
+//
+static void R_GenerateComposite(int texnum)
 {
-    byte*		block;
-    texture_t*		texture;
-    texpatch_t*		patch;
-    patch_t*		realpatch;
-    unsigned int	patchsize;
-    int			x;
-    int			x1;
-    int			x2;
-    int			i;
-    column_t*		patchcol;
-    dshort_t*		collump;
-    unsigned int*	colofs;
-    byte*		marks;
-    byte*		source;
+    // [crispy] initialize composite background to black (index 0)
+    byte	 *block = (byte *)Z_Calloc(texturecompositesize[texnum], PU_STATIC,
+						(void **)&texturecomposite[texnum]);
+    texture_t    *texture = textures[texnum];
+    // Composite the columns together.
+    texpatch_t   *patch = texture->patches;
+    dshort_t	 *collump = texturecolumnlump[texnum];
+    unsigned int *colofs = texturecolumnofs[texnum]; // killough 4/9/98: make 32-bit
+    int		 i;
+    // killough 4/9/98: marks to identify transparent regions in merged textures
+    byte	 *source;
+    byte	 *marks = (byte *)calloc(texture->width, texture->height);
 
-    texture = textures[texnum];
 
-    block = Z_Malloc (texturecompositesize[texnum],
-		      PU_STATIC,
-		      (void **)&texturecomposite[texnum]);
-
-    if ((marks = (byte*)calloc(texture->width, texture->height)) == NULL)
-	I_Error("R_GenerateComposite: couldn't alloc marks");
-
-    collump = texturecolumnlump[texnum];
-    colofs = texturecolumnofs[texnum];
-
-    /* Composite the columns together.*/
-    patch = texture->patches;
-
-    for (i=0 , patch = texture->patches;
-	 i<texture->patchcount;
-	 i++, patch++)
+    for (i = texture->patchcount; --i >= 0; patch++)
     {
-	if (patch->patch == -1)
-	{
-	  realpatch = &dummyPatch.patch;
-	  patchsize = sizeof(dummyPatch);
-	}
-	else
-	{
-	  realpatch = W_CacheLumpNum (patch->patch, PU_CACHE);
-	  patchsize = (unsigned int)(lumpinfo[patch->patch].size);
-	}
+	patch_t   *realpatch = (patch_t *)W_CacheLumpNum(patch->patch, PU_CACHE);
+	int       x, x1 = patch->originx, x2 = x1 + SHORT(realpatch->width);
+	const int *cofs = realpatch->columnofs - x1;
 
-	x1 = patch->originx;
-	x2 = x1 + SHORT(realpatch->width);
-
-	if (x1<0)
-	    x = 0;
-	else
-	    x = x1;
-
+	if (x1 < 0)
+	    x1 = 0;
 	if (x2 > texture->width)
 	    x2 = texture->width;
-
-	for ( ; x<x2 ; x++)
-	{
-	  /* Column has multiple patches?*/
-	  if (collump[x] < 0)
-	  {
-	    unsigned int pcoloff = LONG(realpatch->columnofs[x-x1]);;
-
-	    if (pcoloff <= patchsize)
-	    {
-	      patchcol = (column_t *)((byte *)realpatch + pcoloff);
-	      R_DrawColumnInCache (patchcol,
-				   block + colofs[x],
-				   patch->originy,
-				   texture->height,
-				   marks + x * texture->height);
-	    }
-	  }
-	}
+	for (x = x1; x < x2 ; x++)
+	    if (collump[x] == -1)		// Column has multiple patches?
+		// killough 1/25/98, 4/9/98: Fix medusa bug.
+		R_DrawColumnInCache((column_t *)((byte *)realpatch + LONG(cofs[x])),
+				    block + colofs[x], patch->originy,
+				    texture->height, marks + x * texture->height);
     }
 
-    if ((source = malloc(texture->height)) == NULL)
-	I_Error("R_GenerateComposite: couldn't alloc source");
-    for (i=0; i<texture->width; i++)
-    {
-	if (collump[i] == -1)
+    // killough 4/9/98: Next, convert multipatched columns into true columns,
+    // to fix Medusa bug while still allowing for transparent regions.
+
+    source = (byte *)malloc(texture->height);	// temporary column
+    for (i = 0; i < texture->width; i++)
+	if (collump[i] == -1)			// process only multipatched columns
 	{
-	    column_t *col = (column_t*)(block + colofs[i] - 3);
-	    const byte* mark = marks + i * texture->height;
+	    column_t *col = (column_t *)(block + colofs[i] - 3);	// cached column
+	    const byte *mark = marks + i * texture->height;
 	    int j = 0;
+	    int	lj = 0;
 
-	    memcpy(source, (byte*)col + 3, texture->height);
+	    // save column in temporary so we can shuffle it around
+	    memcpy(source, (byte *)col + 3, texture->height);
 
-	    while (1)
+	    for (;;)  // reconstruct the column by scanning transparency marks
 	    {
-		while (j < texture->height && !mark[j]) j++;
-		if (j >= texture->height)
+		unsigned int len;		// killough 12/98
+		unsigned int diff;		// jad
+
+		while (j < texture->height && !mark[j]) // skip transparent cells
+		    j++;
+
+		if (j >= texture->height)	// if at end of column
 		{
-		    col->topdelta = 0xff;
+		    col->topdelta = -1;		// end-of-column marker
 		    break;
 		}
-		col->topdelta = (byte)j;
-		for (col->length=0; j<texture->height && mark[j]; j++) col->length++;
-		memcpy((byte*)col + 3, source + col->topdelta, col->length);
-		col = (column_t*)((byte*)col + col->length + 4);
+
+		// Allow for tall textures.
+		if (j > 254)
+		{
+		  diff = j - lj;
+		  while (diff > 128)
+		  {
+		    col->topdelta = 128;
+		    col->length = 0;
+		    col = (column_t *)((byte *)col + 4); // next post
+		    diff -= 128;
+		  }
+		  col->topdelta = diff;
+		}
+		else
+		{
+		  col->topdelta = j;		// starting offset of post
+		}
+
+		lj = j;
+		// killough 12/98:
+		// Use 32-bit len counter, to support tall 1s multipatched textures
+
+		for (len = 0; j < texture->height && mark[j] && len<129; j++)
+		    len++;			      // count opaque cells
+
+		col->length = len;
+
+		// copy opaque cells from the temporary back into the column
+		memcpy((byte *)col + 3, source + lj, len);
+		col = (column_t *)((byte *)col + len + 4); // next post
 	    }
 	}
-    }
-    free(source);
-    free(marks);
+    free(source);	// free temporary column
+    free(marks);	// free transparency marks
 
-    /* Now that the texture has been built in column cache,*/
-    /*  it is purgable from zone memory.*/
-    Z_ChangeTag (block, PU_CACHE);
+    // Now that the texture has been built in column cache,
+    // it is purgable from zone memory.
+
+    Z_ChangeTag(block, PU_CACHE);
 }
-
 
 
 //
@@ -1281,7 +1271,6 @@ int R_CheckTextureNumForName (const char *name)
 int R_TextureNumForName (const char* name)
 {
   int 	i;
-  int	j;
 
   i = R_CheckTextureNumForName (name);
   if (i == -1)
