@@ -335,8 +335,8 @@ R_FindPlane
     check->yoffs = yoffs;
 
     // memset (check->top,0xff,sizeof(check->top));
-    for (x = 0; x < SCREENWIDTH; x++)
-      check->top[x] = 0xffff;
+    for (x = 0; x < ARRAY_SIZE(check->top); x++)
+      check->top[x] = 0xFFFF;
 
     return check;
 }
@@ -380,76 +380,66 @@ R_CheckPlane
 	intrh = stop;
     }
 
-    for (x=intrl ; x<= intrh ; x++)
-	if (pl->top[x] != 0xffff)
-	    break;
+    for (x = intrl; (x <= intrh) && (pl->top[x] == 0xFFFF); x++);
 
-    if (x > intrh)
+    // [crispy] fix HOM if ceilingplane and floorplane are the same
+    // visplane (e.g. both skies)
+    if (!(pl == floorplane && markceiling && floorplane == ceilingplane) && x > intrh)
     {
 	pl->minx = unionl;
 	pl->maxx = unionh;
-
-	// use the same one
-	return pl;
     }
-
-    if (lastvisplane - visplanes >= (MAXVISPLANES-1))
+    else
     {
-      offset = R_IncreaseVisplanes ();
-      pl = (visplane_t*)((pint) pl + offset);
+      if (lastvisplane - visplanes >= (MAXVISPLANES-1))
+      {
+	offset = R_IncreaseVisplanes ();
+	pl = (visplane_t*)((pint) pl + offset);
+      }
+
+      // make a new visplane
+      lastvisplane->height = pl->height;
+      lastvisplane->picnum = pl->picnum;
+      lastvisplane->lightlevel = pl->lightlevel;
+      lastvisplane->xoffs = pl->xoffs;
+      lastvisplane->yoffs = pl->yoffs;
+
+      pl = lastvisplane++;
+      pl->minx = start;
+      pl->maxx = stop;
+
+      // memset (pl->top,0xff,sizeof(pl->top));
+      for (x = 0; x < ARRAY_SIZE(pl->top); x++)
+	pl->top[x] = 0xFFFF;
     }
 
-    // make a new visplane
-    lastvisplane->height = pl->height;
-    lastvisplane->picnum = pl->picnum;
-    lastvisplane->lightlevel = pl->lightlevel;
-    lastvisplane->xoffs = pl->xoffs;
-    lastvisplane->yoffs = pl->yoffs;
-
-    pl = lastvisplane++;
-    pl->minx = start;
-    pl->maxx = stop;
-
-    // memset (pl->top,0xff,sizeof(pl->top));
-    for (x = 0; x < SCREENWIDTH; x++)
-      pl->top[x] = 0xffff;
-
-    return pl;
+    return (pl);
 }
 
 
 //
 // R_MakeSpans
 //
-static void
-R_MakeSpans
-( int		x,
-  int		t1,
-  int		b1,
-  int		t2,
-  int		b2 )
+static void R_MakeSpans (visplane_t *pl)
 {
-    while (t1 < t2 && t1<=b1)
-    {
-	R_MapPlane (t1,spanstart[t1],x-1);
-	t1++;
-    }
-    while (b1 > b2 && b1>=t1)
-    {
-	R_MapPlane (b1,spanstart[b1],x-1);
-	b1--;
-    }
+  int x;
 
-    while (t2 < t1 && t2<=b2)
-    {
-	spanstart[t2] = x;
-	t2++;
-    }
-    while (b2 > b1 && b2>=t2)
-    {
-	spanstart[b2] = x;
-	b2--;
-    }
+  for (x = pl->minx; x <= pl->maxx + 1; ++x)
+  {
+    unsigned short  t1 = pl->top[x - 1];
+    unsigned short  b1 = pl->bottom[x - 1];
+    unsigned short  t2 = pl->top[x];
+    unsigned short  b2 = pl->bottom[x];
+
+    for (; t1 < t2 && t1 <= b1; ++t1)
+      R_MapPlane(t1, spanstart[t1], x - 1);
+    for (; b1 > b2 && b1 >= t1; --b1)
+      R_MapPlane(b1, spanstart[b1], x - 1);
+    while (t2 < t1 && t2 <= b2)
+      spanstart[t2++] = x;
+    while (b2 > b1 && b2 >= t2)
+      spanstart[b2--] = x;
+  }
 }
 
 
@@ -464,7 +454,6 @@ void R_DrawPlanes (void)
     visplane_t*		pl;
     int			light;
     int			i,x;
-    int			stop;
     int			flip;
     int			angle;
     int			vangle;
@@ -601,18 +590,10 @@ void R_DrawPlanes (void)
 
 	planezlight = zlight[light];
 
-	pl->top[pl->maxx+1] = 0xffff;
-	pl->top[pl->minx-1] = 0xffff;
+	pl->top[pl->maxx+1] = 0xFFFF;
+	pl->top[pl->minx-1] = 0xFFFF;
 
-	stop = pl->maxx + 1;
-
-	for (x=pl->minx ; x<= stop ; x++)
-	{
-	    R_MakeSpans(x,pl->top[x-1],
-			pl->bottom[x-1],
-			pl->top[x],
-			pl->bottom[x]);
-	}
+	R_MakeSpans (pl);
 
 	Z_ChangeTag (ds_source, PU_CACHE);
     }
