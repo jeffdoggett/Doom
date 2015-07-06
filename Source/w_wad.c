@@ -177,16 +177,16 @@ void W_RemoveDuplicates (void)
       if ((((int*)lump_p1 -> name)[0] == ((int*)lump_p2 -> name)[0])
        && (((int*)lump_p1 -> name)[1] == ((int*)lump_p2 -> name)[1]))
       {
-        // printf ("Removed %s\n", lump_p2 -> name);
-        lump_p2 -> name [0] = 0;			// Duplicate found - remove it.
-        do						// And move to next wad
-        {
-          lump_p2--;
-        } while ((lump_p2 >= lumpinfo) && (lump_p2 -> handle == (lump_p2 + 1) -> handle));
+	// printf ("Removed %s\n", lump_p2 -> name);
+	lump_p2 -> name [0] = 0;			// Duplicate found - remove it.
+	do						// And move to next wad
+	{
+	  lump_p2--;
+	} while ((lump_p2 >= lumpinfo) && (lump_p2 -> handle == (lump_p2 + 1) -> handle));
       }
       else
       {
-        lump_p2--;
+	lump_p2--;
       }
     }
     lump_p1--;
@@ -194,7 +194,6 @@ void W_RemoveDuplicates (void)
 
   duplicates_removed = 1;
 }
-
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -223,7 +222,6 @@ void W_AddFile (const char *filename)
     wadinfo_t		header;
     lumpinfo_t* 	lump_p;
     unsigned		i;
-    char		cc;
     FILE* 		handle;
     int 		length;
     int 		startlump;
@@ -332,9 +330,10 @@ void W_AddFile (const char *filename)
 	lump_p->position = LONG(fileinfo->filepos);
 	lump_p->size = LONG(fileinfo->size);
 	strncpy (lump_p->name, fileinfo->name, 8);
-#if 1
+#if 0
 	if (its_a_wad == 3)
 	{
+	  char cc;
 	  if ((strncmp (lump_p->name, "MAP", 3) == 0)
 	   && (lump_p->name [5] == 0)
 	   && ((cc = lump_p->name [3]) >= '0')
@@ -371,6 +370,44 @@ void W_AddFile (const char *filename)
       lump_p++;
       fileinfo++;
     } while (++i < numlumps);
+
+
+#if 1
+    if (its_a_wad == 3)
+    {
+      i = startlump;
+      lump_p = &lumpinfo[startlump];
+      do
+      {
+	if ((strcasecmp ((lump_p+1)->name, "THINGS") == 0)
+	 && (strncasecmp ((lump_p+2)->name, "LINEDEFS", 8) == 0)
+	 && (strncasecmp ((lump_p+3)->name, "SIDEDEFS", 8) == 0)
+	 && (strncasecmp ((lump_p+4)->name, "VERTEXES", 8) == 0)
+	 && (strcasecmp ((lump_p+5)->name, "SEGS") == 0)
+	 && (strncasecmp ((lump_p+6)->name, "SSECTORS", 8) == 0)
+	 && (strcasecmp ((lump_p+7)->name, "NODES") == 0)
+	 && (strcasecmp ((lump_p+8)->name, "SECTORS") == 0)
+	 && (strcasecmp ((lump_p+9)->name, "REJECT") == 0)
+	 && (strncasecmp ((lump_p+10)->name, "BLOCKMAP", 8) == 0))
+	{
+	  if (strncasecmp (lump_p->name, "MAP", 3))
+	    maps_found |= 1;
+	  else
+	    maps_found |= 2;
+
+	  printf (" %s", lump_p->name);
+	  if (++length > 11)
+	  {
+	    putchar ('\n');
+	    length = 0;
+	  }
+	}
+	lump_p++;
+	fileinfo++;
+      } while (++i < numlumps);
+    }
+#endif
+
 
     if (length)
       putchar ('\n');
@@ -664,7 +701,7 @@ int W_CheckNumForNameMasked (const char* name, char * mask, int startlump)
     {
       cc = *name++;
       if (cc == 0)
-        break;
+	break;
       cc = toupper (cc);	// case insensitive
       *ptr_d++ = cc;
     } while (--p);
@@ -729,7 +766,7 @@ int W_CheckNumForNameLinear (const char* name)
     {
       cc = *name++;
       if (cc == 0)
-        break;
+	break;
       cc = toupper (cc);	// case insensitive
       *ptr_d++ = cc;
     } while (--p);
@@ -786,7 +823,7 @@ int W_CheckNumForName (const char* name)
     {
       cc = *name++;
       if (cc == 0)
-        break;
+	break;
       cc = toupper (cc);	// case insensitive
       *ptr_d++ = cc;
     } while (--p);
