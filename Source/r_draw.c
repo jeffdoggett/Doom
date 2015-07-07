@@ -37,6 +37,8 @@ static const char rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 // status bar height at bottom of screen
 #define SBARHEIGHT		32
 
+#define R_ADDRESS(scrn, px, py) \
+    (screens[scrn] + (viewwindowy + (py)) * SCREENWIDTH + (viewwindowx + (px)))
 //
 // All drawing to the view buffer is accomplished in this file.
 // The other refresh files only know about ccordinates,
@@ -53,7 +55,6 @@ int		scaledviewwidth;
 int		viewheight;
 int		viewwindowx;
 int		viewwindowy;
-byte*		ylookup[MAXHEIGHT];
 
 // Color tables for different players,
 //  translate a limited part to another
@@ -93,6 +94,7 @@ void R_DrawColumn (void)
 {
     int			count;
     byte*		dest;
+    byte*		scrnlimit;
     fixed_t		frac;
     fixed_t		fracstep;
 
@@ -103,16 +105,15 @@ void R_DrawColumn (void)
 	return;
 
 #ifdef RANGECHECK
-    if ((unsigned)dc_x >= SCREENWIDTH
-	|| dc_yl < 0
-	|| dc_yh >= SCREENHEIGHT)
+    if ((unsigned)dc_x >= SCREENWIDTH)
     {
 	printf ("R_DrawColumn: %i to %i at %i\n", dc_yl, dc_yh, dc_x);
 	return;
     }
 #endif
 
-    dest = ylookup[dc_yl] + dc_x + viewwindowx;
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
 
     // Determine scaling,
     //  which is the only mapping to be done.
@@ -121,16 +122,20 @@ void R_DrawColumn (void)
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
     do
     {
-	// Re-map color indices from wall texture column
-	//  using a lighting/special effects LUT.
-	*dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+	if (dest > scrnlimit)
+	  break;
+
+	if (dest >= screens[0])
+	{
+	  // Re-map color indices from wall texture column
+	  //  using a lighting/special effects LUT.
+	  *dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+	}
 
 	dest += SCREENWIDTH;
 	frac += fracstep;
-
     } while (--count);
 }
 
@@ -156,7 +161,7 @@ void R_DrawColumn (void)
 
     source = dc_source;
     colormap = dc_colormap;
-    dest = ylookup[dc_yl] + dc_x + viewwindowx;
+    dest = R_ADDRESS(0, dc_x, dc_yl);
 
     fracstep = dc_iscale<<9;
     frac = (dc_texturemid + (dc_yl-centery)*dc_iscale)<<9;
@@ -222,8 +227,8 @@ void R_DrawColumnLow (void)
     // Blocky mode, need to multiply by 2.
     dc_x <<= 1;
 
-    dest = ylookup[dc_yl] + dc_x + viewwindowx;
-    dest2 = ylookup[dc_yl] + dc_x+1 + viewwindowx;
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    dest2 = dest + 1;
 
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl-centery)*fracstep;
@@ -332,7 +337,7 @@ void R_DrawFuzzColumn (void)
     lim_hi = lim_lo + (SCREENWIDTH*SCREENHEIGHT);
 
     // Does not work with blocky mode.
-    dest = ylookup[dc_yl] + dc_x + viewwindowx;
+    dest = R_ADDRESS(0, dc_x, dc_yl);
 
     // Looks familiar.
     fracstep = dc_iscale;
@@ -384,6 +389,7 @@ void R_DrawTranslatedColumn (void)
 {
     int			count;
     byte*		dest;
+    byte*		scrnlimit;
     fixed_t		frac;
     fixed_t		fracstep;
 
@@ -392,12 +398,11 @@ void R_DrawTranslatedColumn (void)
 	return;
 
 #ifdef RANGECHECK
-    if ((unsigned)dc_x >= SCREENWIDTH
-	|| dc_yl < 0
-	|| dc_yh >= SCREENHEIGHT)
+    if ((unsigned)dc_x >= SCREENWIDTH)
     {
-	I_Error ( "R_DrawTranslatedColumn: %i to %i at %i",
+	printf ( "R_DrawTranslatedColumn: %i to %i at %i\n",
 		  dc_yl, dc_yh, dc_x);
+	return;
     }
 
 #endif
@@ -423,7 +428,8 @@ void R_DrawTranslatedColumn (void)
 
 
     // FIXME. As above.
-    dest = ylookup[dc_yl] + dc_x + viewwindowx;
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
 
     // Looks familiar.
     fracstep = dc_iscale;
@@ -432,14 +438,19 @@ void R_DrawTranslatedColumn (void)
     // Here we do an additional index re-mapping.
     do
     {
-	// Translation tables are used
-	//  to map certain colorramps to other ones,
-	//  used with PLAY sprites.
-	// Thus the "green" ramp of the player 0 sprite
-	//  is mapped to gray, red, black/indigo.
-	*dest = dc_colormap[dc_translation[dc_source[frac>>FRACBITS]]];
-	dest += SCREENWIDTH;
+	if (dest > scrnlimit)
+	  break;
 
+	if (dest >= screens[0])
+	{
+	  // Translation tables are used
+	  //  to map certain colorramps to other ones,
+	  //  used with PLAY sprites.
+	  // Thus the "green" ramp of the player 0 sprite
+	  //  is mapped to grey, red, black/indigo.
+	  *dest = dc_colormap[dc_translation[dc_source[frac>>FRACBITS]]];
+	}
+	dest += SCREENWIDTH;
 	frac += fracstep;
     } while (--count);
 }
@@ -450,7 +461,7 @@ void R_DrawTranslatedColumn (void)
 //
 // R_InitTranslationTables
 // Creates the translation tables to map
-//  the green color ramp to gray, brown, red.
+//  the green color ramp to grey, brown, red.
 // Assumes a given structure of the PLAYPAL.
 // Could be read from a lump instead.
 //
@@ -466,7 +477,7 @@ void R_InitTranslationTables (void)
     {
 	if (i >= 0x70 && i<= 0x7f)
 	{
-	    // map green ramp to gray, brown, red
+	    // map green ramp to grey, brown, red
 	    translationtables[i] = 0x60 + (i&0xf);
 	    translationtables [i+256] = 0x40 + (i&0xf);
 	    translationtables [i+512] = 0x20 + (i&0xf);
@@ -539,7 +550,7 @@ void R_DrawSpan (void)
     xfrac = ds_xfrac;
     yfrac = ds_yfrac;
 
-    dest = ylookup[ds_y] + ds_x1 + viewwindowx;
+    dest = R_ADDRESS(0, ds_x1, ds_y);
 
     // We do not check for zero spans here?
     count = (ds_x2 - ds_x1) + 1;
@@ -585,7 +596,7 @@ void R_DrawSpan (void)
 
     source = ds_source;
     colormap = ds_colormap;
-    dest = ylookup[ds_y] + ds_x1 + viewwindowx;
+    dest = R_ADDRESS(0, ds_x1, ds_y);
     count = ds_x2 - ds_x1 + 1;
 
     while (count >= 4)
@@ -665,7 +676,7 @@ void R_DrawSpanLow (void)
     ds_x1 <<= 1;
     ds_x2 <<= 1;
 
-    dest = ylookup[ds_y] + ds_x1 + viewwindowx;
+    dest = R_ADDRESS(0, ds_x1, ds_y);
 
 
     count = (ds_x2 - ds_x1) + 1;
@@ -713,10 +724,6 @@ R_InitBuffer
       sbarheight = (SBARHEIGHT * sbarscale) >> FRACBITS;
       viewwindowy = (SCREENHEIGHT-sbarheight-height) >> 1;
     }
-
-    // Preclaculate all row offsets.
-    for (i=0 ; i<height ; i++)
-	ylookup[i] = screens[0] + (i+viewwindowy)*SCREENWIDTH;
 }
 
 
