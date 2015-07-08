@@ -112,10 +112,7 @@ typedef struct
 
 
 // Retrieve column data for span blitting.
-byte*
-R_GetColumn
-( int		tex,
-  int		col );
+byte *R_GetColumn (int tex, int col, boolean opaque);
 
 
 // I/O, setting up the stuff.

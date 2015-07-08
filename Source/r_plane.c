@@ -553,7 +553,7 @@ void R_DrawPlanes (void)
 		{
 		    angle = ((vangle + xtoviewangle[x])^flip)>>ANGLETOSKYSHIFT;
 		    dc_x = x;
-		    dc_source = R_GetColumn(texnum, angle);
+		    dc_source = R_GetColumn(texnum, angle, false);
 		    colfunc ();
 		}
 	    }

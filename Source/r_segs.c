@@ -349,7 +349,7 @@ R_RenderMaskedSegRange
 
 	    // draw the texture
 	    col = (column_t *)(
-		(byte *)R_GetColumn(texnum,maskedtexturecol[dc_x]) -3);
+		(byte *)R_GetColumn(texnum,maskedtexturecol[dc_x],false) -3);
 
 	    R_DrawMaskedColumn (col);
 	    maskedtexturecol[dc_x] = MAXDSHORT;
@@ -451,7 +451,7 @@ void R_RenderSegLoop (void)
 	    dc_yl = yl;
 	    dc_yh = yh;
 	    dc_texturemid = rw_midtexturemid;
-	    dc_source = R_GetColumn(midtexture,texturecolumn);
+	    dc_source = R_GetColumn(midtexture,texturecolumn,true);
 	    colfunc ();
 	    ceilingclip[rw_x] = viewheight;
 	    floorclip[rw_x] = -1;
@@ -473,7 +473,7 @@ void R_RenderSegLoop (void)
 		    dc_yl = yl;
 		    dc_yh = mid;
 		    dc_texturemid = rw_toptexturemid;
-		    dc_source = R_GetColumn(toptexture,texturecolumn);
+		    dc_source = R_GetColumn(toptexture,texturecolumn,true);
 		    colfunc ();
 		    ceilingclip[rw_x] = mid;
 		}
@@ -502,8 +502,7 @@ void R_RenderSegLoop (void)
 		    dc_yl = mid;
 		    dc_yh = yh;
 		    dc_texturemid = rw_bottomtexturemid;
-		    dc_source = R_GetColumn(bottomtexture,
-					    texturecolumn);
+		    dc_source = R_GetColumn(bottomtexture,texturecolumn,true);
 		    colfunc ();
 		    floorclip[rw_x] = mid;
 		}
