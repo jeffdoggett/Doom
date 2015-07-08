@@ -155,7 +155,7 @@ R_DrawColumnInCache
 //
 // Rewritten by Lee Killough for performance and to fix Medusa bug
 //
-static void R_GenerateComposite(int texnum)
+static void R_GenerateComposite (int texnum)
 {
     // [crispy] initialize composite background to black (index 0)
     byte	 *block = (byte *)Z_Calloc(texturecompositesize[texnum], PU_STATIC,
@@ -170,6 +170,8 @@ static void R_GenerateComposite(int texnum)
     byte	 *source;
     byte	 *marks = (byte *)calloc(texture->width, texture->height);
 
+    if (marks == NULL)
+      I_Error ("R_GenerateComposite: Failed to allocate memory\n");
 
     for (i = texture->patchcount; --i >= 0; patch++)
     {
@@ -193,6 +195,9 @@ static void R_GenerateComposite(int texnum)
     // to fix Medusa bug while still allowing for transparent regions.
 
     source = (byte *)malloc(texture->height);	// temporary column
+    if (source == NULL)
+      I_Error ("R_GenerateComposite: Failed to allocate memory\n");
+
     for (i = 0; i < texture->width; i++)
 	if (collump[i] == -1)			// process only multipatched columns
 	{
@@ -283,6 +288,9 @@ static void R_GenerateLookup (int texnum)
     // killough 12/98: First count the number of patches per column.
     const texpatch_t	*patch = texture->patches;
     int			i = texture->patchcount;
+
+    if (count == NULL)
+      I_Error ("R_GenerateLookup: Failed to allocate memory\n");
 
     while (--i >= 0)
     {
