@@ -406,6 +406,9 @@ byte *R_GetColumn (int tex, int col, boolean opaque)
     return ((byte *)W_CacheLumpNum(lump, PU_CACHE) + ofs2);
   }
 
+  if (!texturecomposite[tex])
+    R_GenerateComposite(tex);
+
   ofs = texturecolumnofs[tex][col];
   return (texturecomposite[tex] + ofs);
 }
