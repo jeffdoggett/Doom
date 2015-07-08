@@ -552,7 +552,7 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
     }
     texturecolumnlump[pos] = Z_Calloc (texture->width*sizeof(**texturecolumnlump), PU_STATIC,0);
     texturecolumnofs[pos]  = Z_Calloc (texture->width*sizeof(**texturecolumnofs), PU_STATIC,0);
-    texturecolumnofs2[pos] = Z_Malloc (texture->width*sizeof(**texturecolumnofs2), PU_STATIC, 0);
+    texturecolumnofs2[pos] = Z_Calloc (texture->width*sizeof(**texturecolumnofs2), PU_STATIC, 0);
 
     j = 1;
     while (j*2 <= texture->width)
@@ -921,10 +921,10 @@ void R_InitFlats (void)
   numflats = R_CountEntities ("F_START", "F_END", 0);
 
   // Create translation table for global animation.
-  flattranslation = Z_Malloc ((numflats+1)*sizeof(*flattranslation), PU_STATIC, 0);
+  flattranslation = Z_Calloc ((numflats+1)*sizeof(*flattranslation), PU_STATIC, 0);
 
   // Create translation table for flat lumps.
-  flatlumps = Z_Malloc ((numflats+1)*sizeof(*flatlumps), PU_STATIC, 0);
+  flatlumps = Z_Calloc ((numflats+1)*sizeof(*flatlumps), PU_STATIC, 0);
 
   i = 0;
   lump = 0;
@@ -989,9 +989,9 @@ void R_InitSpriteLumps (void)
 
   numspritelumps = R_CountEntities ("S_START", "S_END", 1);
 
-  spritewidth = Z_Malloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
-  spriteoffset = Z_Malloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
-  spritetopoffset = Z_Malloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
+  spritewidth = Z_Calloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
+  spriteoffset = Z_Calloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
+  spritetopoffset = Z_Calloc (numspritelumps*sizeof(fixed_t), PU_STATIC, NULL);
 
   i = 0;
   lump = 0;
