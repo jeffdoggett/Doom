@@ -146,7 +146,7 @@ R_DrawColumnInCache
     }
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_GenerateComposite
 // Using the texture definition,
@@ -264,7 +264,7 @@ static void R_GenerateComposite (int texnum)
     Z_ChangeTag(block, PU_CACHE);
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_GenerateLookup
 //
@@ -405,9 +405,6 @@ byte *R_GetColumn (int tex, int col, boolean opaque)
     ofs2 = texturecolumnofs2[tex][col];
     return ((byte *)W_CacheLumpNum(lump, PU_CACHE) + ofs2);
   }
-
-  if (!texturecomposite[tex])
-    R_GenerateComposite(tex);
 
   ofs = texturecolumnofs[tex][col];
   return (texturecomposite[tex] + ofs);
@@ -698,9 +695,10 @@ void R_InitTextures (void)
   // Precalculate whatever possible.
   for (i=0 ; i<numtextures ; i++)
   {
-    if ((i & 255) == 0)
+    if ((i & 127) == 0)
       putchar ('.');
     R_GenerateLookup (i);
+    R_GenerateComposite (i);
   }
 
   // Create translation table for global animation.
