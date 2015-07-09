@@ -706,7 +706,6 @@ R_InitBuffer
 ( int		width,
   int		height )
 {
-    int		i;
     int		sbarheight;
 
     // Handle resize,
