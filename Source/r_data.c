@@ -24,6 +24,7 @@
 //-----------------------------------------------------------------------------
 
 
+
 #if 0
 static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #endif
@@ -35,7 +36,11 @@ static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 extern void * alloca (unsigned int);
 #endif
 
+//-----------------------------------------------------------------------------
 // #define MIN_SIZE_LUMP	12
+// #define USE_OLD_R_GenerateComposite
+// #define USE_OLD_R_GenerateLookup
+//-----------------------------------------------------------------------------
 
 int		numflats;
 int		numspritelumps;
@@ -86,6 +91,7 @@ int		prevcollump = 0;
 //  but any columns with multiple patches
 //  will have new column_ts generated.
 //
+#ifdef USE_OLD_R_GenerateComposite
 
 /* use this in case a patch is undefined */
 static struct dummy_patch_s
@@ -94,6 +100,7 @@ static struct dummy_patch_s
   column_t column;
 } dummyPatch;	/* initialized in R_InitDummyPatch */
 
+#endif
 /* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawColumnInCache
@@ -123,11 +130,13 @@ R_DrawColumnInCache
 
     while ((td = patch->topdelta) != 0xff)
     {
+#if 0
 	if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
 	{
 	  topdelta += td;
 	}
 	else
+#endif
 	{
 	  topdelta = td;
 	}
@@ -155,7 +164,7 @@ R_DrawColumnInCache
 }
 
 /* ------------------------------------------------------------------------------------------------ */
-#if 0
+#ifdef USE_OLD_R_GenerateComposite
 //
 // R_GenerateComposite
 // Using the texture definition,
@@ -182,9 +191,7 @@ static void R_GenerateComposite (int texnum)
 
     texture = textures[texnum];
 
-    block = Z_Malloc (texturecompositesize[texnum],
-		      PU_STATIC,
-		      (void **)&texturecomposite[texnum]);
+    block = Z_Calloc (texturecompositesize[texnum], PU_STATIC, (void **)&texturecomposite[texnum]);
 
     if ((marks = (byte*)calloc(texture->width, texture->height)) == NULL)
 	I_Error("R_GenerateComposite: couldn't alloc marks");
@@ -334,54 +341,36 @@ static void R_GenerateComposite (int texnum)
 	    column_t *col = (column_t *)(block + colofs[i] - 3);	// cached column
 	    const byte *mark = marks + i * texture->height;
 	    int j = 0;
-	    int	lj = 0;
+
 
 	    // save column in temporary so we can shuffle it around
 	    memcpy(source, (byte *)col + 3, texture->height);
 
-	    for (;;)  // reconstruct the column by scanning transparency marks
+	    while (1)		// reconstruct the column by scanning transparency marks
 	    {
-		unsigned int len;		// killough 12/98
-		unsigned int diff;		// jad
+		unsigned int len;			// killough 12/98
 
-		while (j < texture->height && !mark[j]) // skip transparent cells
+		while (j < texture->height && !mark[j])	// skip transparent cells
 		    j++;
 
-		if (j >= texture->height)	// if at end of column
+		if (j >= texture->height)		// if at end of column
 		{
-		    col->topdelta = -1;		// end-of-column marker
+		    col->topdelta = -1;			// end-of-column marker
 		    break;
 		}
 
-		// Allow for tall textures.
-		if (j > 254)
-		{
-		  diff = j - lj;
-		  while (diff > 128)
-		  {
-		    col->topdelta = 128;
-		    col->length = 0;
-		    col = (column_t *)((byte *)col + 4); // next post
-		    diff -= 128;
-		  }
-		  col->topdelta = diff;
-		}
-		else
-		{
-		  col->topdelta = j;		// starting offset of post
-		}
+		col->topdelta = j;			// starting offset of post
 
-		lj = j;
 		// killough 12/98:
 		// Use 32-bit len counter, to support tall 1s multipatched textures
 
-		for (len = 0; j < texture->height && mark[j] && len<129; j++)
-		    len++;			      // count opaque cells
+		for (len = 0; j < texture->height && mark[j]; j++)
+		    len++;				// count opaque cells
 
-		col->length = len;
+		col->length = len;	// killough 12/98: intentionally truncate length
 
 		// copy opaque cells from the temporary back into the column
-		memcpy((byte *)col + 3, source + lj, len);
+		memcpy((byte *)col + 3, source + col->topdelta, len);
 		col = (column_t *)((byte *)col + len + 4); // next post
 	    }
 	}
@@ -395,7 +384,7 @@ static void R_GenerateComposite (int texnum)
 }
 #endif
 /* ------------------------------------------------------------------------------------------------ */
-#if 0
+#ifdef USE_OLD_R_GenerateLookup
 //
 // R_GenerateLookup
 //
@@ -1367,6 +1356,7 @@ static void R_CheckStructs (void)
 #endif
 
 /* ------------------------------------------------------------------------------------------------ */
+#ifdef USE_OLD_R_GenerateComposite
 
 static void R_InitDummyPatch(void)
 {
@@ -1391,6 +1381,7 @@ static void R_InitDummyPatch(void)
       printf("%2d: %2x\n", i, ((byte*)&dummyPatch)[i]);*/
 }
 
+#endif
 /* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitData
@@ -1400,7 +1391,9 @@ static void R_InitDummyPatch(void)
 //
 void R_InitData (void)
 {
+#ifdef USE_OLD_R_GenerateComposite
     R_InitDummyPatch ();
+#endif
 #ifndef PADDED_STRUCTS
     R_CheckStructs ();
 #endif
