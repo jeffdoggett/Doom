@@ -74,6 +74,7 @@ int		firstcollump;
 int		lastcollump;
 int		prevcollump = 0;
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // MAPTEXTURE_T CACHING
 // When a texture is first needed,
@@ -93,6 +94,7 @@ static struct dummy_patch_s
   column_t column;
 } dummyPatch;	/* initialized in R_InitDummyPatch */
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawColumnInCache
 // Clip and draw a column
@@ -661,7 +663,7 @@ static unsigned int R_merge_textures (char * name, unsigned int total, pint *pat
 // Initializes the texture list
 //  with the textures from the world map.
 //
-void R_InitTextures (void)
+static void R_InitTextures (void)
 {
   unsigned int i,j;
   pint*	patchlookup;
@@ -693,6 +695,7 @@ void R_InitTextures (void)
 
   j = R_merge_textures ("TEXTURE1", 0, patchlookup);
   j = R_merge_textures ("TEXTURE2", j, patchlookup);
+  free (patchlookup);
   // printf ("numtextures = %u -> %u\n", numtextures, j);
 
   if (j > numtextures)
@@ -731,8 +734,6 @@ void R_InitTextures (void)
       }
 #endif
   }
-
-  free (patchlookup);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -937,12 +938,11 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
   return (total);
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitFlats
 //
-void R_InitFlats (void)
+static void R_InitFlats (void)
 {
   unsigned int	i;
   unsigned int	lump;
@@ -1003,14 +1003,14 @@ void R_InitFlats (void)
   }
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitSpriteLumps
 // Finds the width and hoffset of all sprites in the wad,
 //  so the sprite does not need to be cached completely
 //  just for having the header info ready during rendering.
 //
-void R_InitSpriteLumps (void)
+static void R_InitSpriteLumps (void)
 {
   unsigned int	i;
   unsigned int	lump;
@@ -1073,8 +1073,7 @@ void R_InitSpriteLumps (void)
   }
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitColormaps
 //
@@ -1110,6 +1109,7 @@ void R_InitColormaps (int lump)
   }
 }
 
+/* ------------------------------------------------------------------------------------------------ */
 #ifndef PADDED_STRUCTS
 static void R_CheckStructs (void)
 {
@@ -1120,6 +1120,7 @@ static void R_CheckStructs (void)
 }
 #endif
 
+/* ------------------------------------------------------------------------------------------------ */
 
 static void R_InitDummyPatch(void)
 {
@@ -1144,7 +1145,7 @@ static void R_InitDummyPatch(void)
       printf("%2d: %2x\n", i, ((byte*)&dummyPatch)[i]);*/
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitData
 // Locates all the lumps
@@ -1168,7 +1169,7 @@ void R_InitData (void)
     printf ("\n");
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_CheckFlatNumForName
 // Returns -1 if name not found.
@@ -1225,8 +1226,7 @@ int R_CheckFlatNumForName (const char* name)
     return -1;
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_FlatNumForName
 // Retrieval, get a flat number for a flat name.
@@ -1243,9 +1243,7 @@ int R_FlatNumForName (const char* name)
   return i;
 }
 
-
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_CheckTextureNumForName
 // Check whether texture is available.
@@ -1276,8 +1274,7 @@ int R_CheckTextureNumForName (const char *name)
   return -1;
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_TextureNumForName
 // Calls R_CheckTextureNumForName,
@@ -1294,9 +1291,7 @@ int R_TextureNumForName (const char* name)
   return i;
 }
 
-
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_PrecacheLevel
 // Preloads all relevant graphics for the level.
@@ -1429,6 +1424,4 @@ void R_PrecacheLevel (void)
     }
 }
 
-
-
-
+/* ------------------------------------------------------------------------------------------------ */
