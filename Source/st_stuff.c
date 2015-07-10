@@ -109,9 +109,9 @@ static const unsigned char * const keypatches [] =
 {
   NULL,NULL,NULL,
   NULL,NULL,NULL,
-  STKEYS6,STKEYS7,STKEYS8	  
+  STKEYS6,STKEYS7,STKEYS8
 };
-		
+
 /* ----------------------------------------------------------------- */
 
 //
@@ -474,6 +474,11 @@ unsigned char	cheat_ammo_seq[] =
     0xb2, 0x26, 0xf2, 0x66, 0xa2, 0xff	// idkfa
 };
 
+unsigned char	cheat_keys_seq[] =
+{
+    0xb2, 0x26, 0xf2, 0xa2, 1, 0, 0xff	// idka
+};
+
 unsigned char	cheat_ammonokey_seq[] =
 {
     0xb2, 0x26, 0x66, 0xa2, 0xff	// idfa
@@ -529,6 +534,7 @@ cheatseq_t	cheat_mus = { cheat_mus_seq, 0 };
 cheatseq_t	cheat_god = { cheat_god_seq, 0 };
 cheatseq_t	cheat_ammo = { cheat_ammo_seq, 0 };
 cheatseq_t	cheat_ammonokey = { cheat_ammonokey_seq, 0 };
+cheatseq_t	cheat_keys = { cheat_keys_seq, 0 };
 cheatseq_t	cheat_noclip = { cheat_noclip_seq, 0 };
 cheatseq_t	cheat_commercial_noclip = { cheat_commercial_noclip_seq, 0 };
 
@@ -657,6 +663,23 @@ ST_Responder (event_t* ev)
 	  plyr->cards[i] = true;
 
 	plyr->message = stat_bar_messages [ST_STSTR_KFAADDED];
+      }
+      else if (cht_CheckCheat(&cheat_keys, ev->data1))
+      {
+	char	buf[3];
+	int		keynum;
+	cht_GetParam(&cheat_keys, buf);
+	keynum = buf [0];
+	if (keynum >= '1')
+	{
+	  keynum -= '1';
+          if (keynum < 6)
+	  {
+	    char * msg;
+	    msg = P_GiveCard (plyr, (card_t) keynum);
+	    if (msg) plyr->message = msg;
+	  }
+	}
       }
       // 'mus' cheat for changing music
       else if (cht_CheckCheat(&cheat_mus, ev->data1))

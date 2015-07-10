@@ -333,16 +333,16 @@ P_GiveArmour
 //
 // P_GiveCard
 //
-static void
-P_GiveCard
+char * P_GiveCard
 ( player_t*	player,
   card_t	card )
 {
   if (player->cards[card])
-    return;
+    return (NULL);
 
   player->bonuscount = BONUSADD;
-  player->cards[card] = (boolean)1;
+  player->cards[card] = true;
+  return (got_messages [(int)P_GOTBLUECARD+card]);
 }
 
 //-----------------------------------------------------------------------------
@@ -540,49 +540,43 @@ P_TouchSpecialThing
       // cards
       // leave cards for everyone
     case SPR_BKEY:
-      if (!player->cards[it_bluecard])
-	  player->message = got_messages [P_GOTBLUECARD];
-      P_GiveCard (player, it_bluecard);
+      msg = P_GiveCard (player, it_bluecard);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
 
     case SPR_YKEY:
-      if (!player->cards[it_yellowcard])
-	  player->message = got_messages [P_GOTYELWCARD];
-      P_GiveCard (player, it_yellowcard);
+      msg = P_GiveCard (player, it_yellowcard);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
 
     case SPR_RKEY:
-      if (!player->cards[it_redcard])
-	  player->message = got_messages [P_GOTREDCARD];
-      P_GiveCard (player, it_redcard);
+      msg = P_GiveCard (player, it_redcard);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
 
     case SPR_BSKU:
-      if (!player->cards[it_blueskull])
-	  player->message = got_messages [P_GOTBLUESKUL];
-      P_GiveCard (player, it_blueskull);
+      msg = P_GiveCard (player, it_blueskull);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
 
     case SPR_YSKU:
-      if (!player->cards[it_yellowskull])
-	  player->message = got_messages [P_GOTYELWSKUL];
-      P_GiveCard (player, it_yellowskull);
+      msg = P_GiveCard (player, it_yellowskull);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
 
     case SPR_RSKU:
-      if (!player->cards[it_redskull])
-	  player->message = got_messages [P_GOTREDSKULL];
-      P_GiveCard (player, it_redskull);
+      msg = P_GiveCard (player, it_redskull);
+      if (msg) player->message = msg;
       if (!netgame)
 	  break;
       return;
