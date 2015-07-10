@@ -261,7 +261,7 @@ void *Z_Realloc (void *ptr, size_t n, uint32_t tag, void **user)
 
 
   if ((ptr != NULL)			// Don't bother if same size as before
-   && (n != (block = (memblock_t *)((char *)ptr - HEADER_SIZE))->size))
+   && (n == (block = (memblock_t *)((char *)ptr - HEADER_SIZE))->size))
   {
     p = ptr;
   }
