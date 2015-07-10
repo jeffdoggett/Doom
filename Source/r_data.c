@@ -711,19 +711,26 @@ void R_InitTextures (void)
     textureheight = Z_Realloc (textureheight,numtextures * sizeof(*textureheight), PU_STATIC, NULL);
   }
 
+  // Create translation table for global animation.
+  texturetranslation = Z_Malloc ((numtextures+1)*sizeof(*texturetranslation), PU_STATIC, NULL);
+
   // Precalculate whatever possible.
   for (i=0 ; i<numtextures ; i++)
   {
     if ((i & 127) == 0)
       putchar ('.');
-    R_GenerateLookup (i);
-  }
-
-  // Create translation table for global animation.
-  texturetranslation = Z_Malloc ((numtextures+1)*sizeof(*texturetranslation), PU_STATIC, NULL);
-
-  for (i=0 ; i<numtextures ; i++)
     texturetranslation[i] = i;
+    R_GenerateLookup (i);
+#if 1
+    /* Experimental code... JAD */
+    for (j=0; j<textures[i]->width; j++)
+      if (texturecolumnlump[i][j] == -1)
+      {
+	R_GenerateComposite (i);
+	break;
+      }
+#endif
+  }
 
   free (patchlookup);
 }
