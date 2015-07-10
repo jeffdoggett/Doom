@@ -48,6 +48,7 @@ typedef struct memblock
   uint32_t		tag;
 } memblock_t;
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // size of block header
 // cph - base on sizeof(memblock_t), which can be larger than CHUNK_SIZE on
@@ -58,6 +59,7 @@ static const size_t	HEADER_SIZE = (sizeof(memblock_t) + CHUNK_SIZE - 1)
 
 static memblock_t	*blockbytag[PU_MAX];
 
+/* ------------------------------------------------------------------------------------------------ */
 // 0 means unlimited, any other value is a hard limit
 // static uint32_t		memory_size;
 // static uint32_t		free_memory;
@@ -76,6 +78,8 @@ void Z_Init (void)
   } while (++p < PU_MAX);
 }
 
+/* ------------------------------------------------------------------------------------------------ */
+
 static void add_to_list (memblock_t *block)
 {
   uint32_t tag;
@@ -89,6 +93,8 @@ static void add_to_list (memblock_t *block)
   block -> next = next;
   block -> prev = NULL;
 }
+
+/* ------------------------------------------------------------------------------------------------ */
 
 static void remove_from_list (memblock_t *block)
 {
@@ -107,6 +113,7 @@ static void remove_from_list (memblock_t *block)
     prev -> next = next;
 }
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // Z_Malloc
 // You can pass a NULL user if the tag is < PU_PURGELEVEL.
@@ -119,7 +126,7 @@ static void remove_from_list (memblock_t *block)
 // but we only free the blocks we actually end up using; we don't
 // free all the stuff we just pass on the way.
 //
-void *Z_Malloc (size_t size, uint32_t tag, void **user)
+static void * zone_malloc (size_t size, uint32_t tag, void **user)
 {
   size_t psize;
   unsigned char * rc;
@@ -147,7 +154,7 @@ void *Z_Malloc (size_t size, uint32_t tag, void **user)
   while ((block = ((memblock_t *)malloc(psize + HEADER_SIZE))) == NULL)
   {
     if (!blockbytag[PU_CACHE])
-      I_Error ("Z_Malloc: Failure trying to allocate %lu bytes", (uint32_t)size);
+      return (NULL);
     Z_FreeTags (PU_CACHE, PU_CACHE);
   }
 
@@ -162,8 +169,24 @@ void *Z_Malloc (size_t size, uint32_t tag, void **user)
   if (user)				// if there is a user
     *user = rc;				// set user to point to new block
 
-  return rc;
+  return (rc);
 }
+
+/* ------------------------------------------------------------------------------------------------ */
+
+void * Z_Malloc (size_t size, uint32_t tag, void **user)
+{
+  void * rc;
+
+  rc = zone_malloc (size, tag, user);
+  if ((rc == NULL)
+   && (size))
+    I_Error ("Z_Malloc: Failure trying to allocate %lu bytes", (uint32_t)size);
+
+  return (rc);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 
 void Z_Free (void *p)
 {
@@ -185,6 +208,8 @@ void Z_Free (void *p)
   free (block);
 }
 
+/* ------------------------------------------------------------------------------------------------ */
+
 void Z_FreeTags (uint32_t lowtag, uint32_t hightag)
 {
   memblock_t *block;
@@ -203,6 +228,8 @@ void Z_FreeTags (uint32_t lowtag, uint32_t hightag)
     }
   }
 }
+
+/* ------------------------------------------------------------------------------------------------ */
 
 void Z_ChangeTag (void *ptr, uint32_t tag)
 {
@@ -225,20 +252,55 @@ void Z_ChangeTag (void *ptr, uint32_t tag)
   add_to_list (block);
 }
 
-void *Z_Realloc(void *ptr, size_t n, uint32_t tag, void **user)
-{
-  void *p = Z_Malloc(n, tag, user);
+/* ------------------------------------------------------------------------------------------------ */
 
-  if (ptr)
+void *Z_Realloc (void *ptr, size_t n, uint32_t tag, void **user)
+{
+  void *p;
+  memblock_t *block;
+
+
+  if ((ptr != NULL)			// Don't bother if same size as before
+   && (n != (block = (memblock_t *)((char *)ptr - HEADER_SIZE))->size))
   {
-    memblock_t *block = (memblock_t *)((char *)ptr - HEADER_SIZE);
-    memcpy (p, ptr, n <= block->size ? n : block->size);
-    Z_Free (ptr);
-    if (user)		// in case Z_Free nullified same user
-      *user = p;
+    p = ptr;
   }
-  return p;
+  else
+  {
+    p = zone_malloc (n, tag, user);
+
+    /* If the allocation failed, but the new amount is */
+    /* smaller then just go with the original size. */
+
+    if (p == NULL)			// malloc(0) returns NULL
+    {
+      if (n == 0)			// Did we request 0 bytes?
+      {
+	if (ptr)
+	  Z_Free (ptr);
+      }
+      else
+      {
+	if ((ptr == NULL)
+	 || (n > block->size))
+	  I_Error ("Z_Realloc: Failure trying to allocate %lu bytes", (uint32_t)n);
+	p = ptr;
+      }
+    }
+    else if (ptr)
+    {
+      memcpy (p, ptr, n <= block->size ? n : block->size);
+      Z_Free (ptr);
+    }
+  }
+
+  if (user)				// in case Z_Free nullified same user
+    *user = p;
+
+  return (p);
 }
+
+/* ------------------------------------------------------------------------------------------------ */
 
 void *Z_Calloc (size_t size, uint32_t tag, void **user)
 {
@@ -248,9 +310,13 @@ void *Z_Calloc (size_t size, uint32_t tag, void **user)
   return (memset (rc, 0, size));
 }
 
+/* ------------------------------------------------------------------------------------------------ */
+
 #if 0
 char *Z_Strdup (const char *s, uint32_t tag, void **user)
 {
     return strcpy ((char *)Z_Malloc(strlen(s) + 1, tag, user), s);
 }
 #endif
+
+/* ------------------------------------------------------------------------------------------------ */
