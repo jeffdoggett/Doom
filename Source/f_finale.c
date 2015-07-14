@@ -112,7 +112,8 @@ char *	finale_backdrops_orig [] =
 
 char *	finale_backdrops [ARRAY_SIZE(finale_backdrops_orig)];
 
-clusterdefs_t * finale_clusterdefs = 0;
+clusterdefs_t * finale_clusterdefs_head = 0;
+
 
 static char* finaletext;
 static char* finaleflat;
@@ -123,6 +124,46 @@ static char* nextfinaleflat;
 static void F_StartCast (void);
 void	F_CastTicker (void);
 static boolean F_CastResponder (event_t *ev);
+
+// --------------------------------------------------------------------------------------------
+
+clusterdefs_t * F_Create_ClusterDef (unsigned int num)
+{
+  clusterdefs_t * cp;
+  clusterdefs_t ** cpp;
+
+  cpp = &finale_clusterdefs_head;
+
+  while ((cp = *cpp) != NULL)
+  {
+    if (cp -> cnumber == num)
+      return (cp);
+    cpp = &cp -> next;
+  }
+
+  cp = malloc (sizeof (clusterdefs_t));
+  if (cp)
+  {
+    *cpp = cp;
+    memset (cp, 0, sizeof (clusterdefs_t));
+    cp -> cnumber = num;
+  }
+
+  return (cp);
+}
+
+// --------------------------------------------------------------------------------------------
+
+clusterdefs_t * F_Access_ClusterDef (unsigned int num)
+{
+  clusterdefs_t * cp;
+
+  cp = finale_clusterdefs_head;
+  if (cp)
+    while ((cp -> cnumber != num) && ((cp = cp -> next) != NULL));
+
+  return (cp);
+}
 
 // --------------------------------------------------------------------------------------------
 
@@ -150,7 +191,7 @@ static void F_DetermineIntermissionTexts (void)
    && (W_SameWadfile (0, G_MapLump (gameepisode, gamemap)) == 0))
     return;
 
-  if (finale_clusterdefs)
+  if (finale_clusterdefs_head)
   {
     map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
 
@@ -178,11 +219,15 @@ static void F_DetermineIntermissionTexts (void)
 	return;
     }
 
-    cp = &finale_clusterdefs [cluster];
-    finaletext = cp -> exittext;
-    finaleflat = cp -> flat;
-    if (cp -> pic)
-      finalepic = cp -> pic;
+    cp = F_Access_ClusterDef (cluster);
+    if (cp)
+    {
+      finaletext = cp -> exittext;
+      finaleflat = cp -> flat;
+      if ((cp -> pic)
+       && (W_CheckNumForName (cp -> pic) != -1))
+	finalepic = cp -> pic;
+    }
 
     /* Big problem here.				*/
     /* Ideally, if we are returning from a secret level */
@@ -194,9 +239,12 @@ static void F_DetermineIntermissionTexts (void)
 
     if (map_info_n)
     {
-      cp = &finale_clusterdefs [map_info_n -> cluster];
-      nextfinaletext = cp -> entertext;
-      nextfinaleflat = cp -> flat;
+      cp = F_Access_ClusterDef (map_info_n -> cluster);
+      if (cp)
+      {
+	nextfinaletext = cp -> entertext;
+	nextfinaleflat = cp -> flat;
+      }
     }
 
     if ((finaletext == NULL)
@@ -459,7 +507,22 @@ void F_Ticker (void)
     if ( gamemode == commercial)
 	return;
 
-    if (!finalestage && finalecount>strlen (finaletext)*TEXTSPEED + TEXTWAIT)
+    if (finalestage)
+      return;
+
+    fc = strlen (finaletext)*TEXTSPEED;
+    if ((finalecount > 50)
+     && (finalecount < fc)
+     && (WI_checkForAccelerate ()))
+    {
+      finalecount = fc;
+      return;
+    }
+
+    
+    if ((finalecount > fc)
+     && ((WI_checkForAccelerate ())
+      || (finalecount > (fc + TEXTWAIT))))
     {
       finalecount = 0;
       if (nextfinaletext)

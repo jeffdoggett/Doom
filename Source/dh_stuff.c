@@ -16,7 +16,7 @@ extern char*	finale_backdrops[];
 extern char*	finale_backdrops_orig[];
 extern char*	cast_names_copy[];
 extern castinfo_t castorder[];
-extern clusterdefs_t * finale_clusterdefs;
+extern clusterdefs_t * finale_clusterdefs_head;
 
 /* Structs from p_enemy.c */
 extern bossdeath_t boss_death_table[];
@@ -4075,7 +4075,7 @@ static void show_map_dests (map_dests_t * map_ptr)
 void DH_remove_duplicate_mapinfos (void)
 {
   unsigned int i;
-  unsigned int intertext;
+  clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   bossdeath_t * bd_ptr_1;
   map_dests_t * map_ptr;
@@ -4133,35 +4133,29 @@ void DH_remove_duplicate_mapinfos (void)
     if ((bd_ptr = boss_death_table_2) != NULL)
       show_boss_action (2, bd_ptr);
 
-    if (finale_clusterdefs)
+    if ((cp = finale_clusterdefs_head) != NULL)
     {
-      intertext = 0;
       do
       {
-	if ((pint)finale_clusterdefs[intertext].flat
-	 | (pint)finale_clusterdefs[intertext].entertext
-	 | (pint)finale_clusterdefs[intertext].exittext
-	 | (pint)finale_clusterdefs[intertext].pic)
-	{
-	  printf ("Clusterdefs %u\n", intertext);
-	  if (finale_clusterdefs[intertext].flat == 0)
-	    printf ("flat = NULL\n");
-	  else
-	    printf ("flat = %s\n", finale_clusterdefs[intertext].flat);
-	  if (finale_clusterdefs[intertext].pic == 0)
-	    printf ("pic = NULL\n");
-	  else
-	    printf ("pic = %s\n", finale_clusterdefs[intertext].pic);
-	  if (finale_clusterdefs[intertext].entertext == 0)
-	    printf ("Enter = NULL\n");
-	  else
-	    printf ("Enter = %s\n", finale_clusterdefs[intertext].entertext);
-	  if (finale_clusterdefs[intertext].exittext == 0)
-	    printf ("Exit = NULL\n");
-	  else
-	    printf ("Exit = %s\n", finale_clusterdefs[intertext].exittext);
-	}
-      } while (++intertext < QTY_CLUSTERDEFS);
+	printf ("Clusterdefs %u\n", cp->cnumber);
+	if (cp->flat == 0)
+	  printf ("flat = NULL\n");
+	else
+	  printf ("flat = %s\n", cp->flat);
+	if (cp->pic == 0)
+	  printf ("pic = NULL\n");
+	else
+	  printf ("pic = %s\n", cp->pic);
+	if (cp->entertext == 0)
+	  printf ("Enter = NULL\n");
+	else
+	  printf ("Enter = %s\n", cp->entertext);
+	if (cp->exittext == 0)
+	  printf ("Exit = NULL\n");
+	else
+	  printf ("Exit = %s\n", cp->exittext);
+	cp = cp -> next;
+      } while (cp);
     }
   }
   if (M_CheckParm ("-showmaptables"))
@@ -4194,6 +4188,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   unsigned int l;
   int lump;
   unsigned int length;
+  clusterdefs_t * cp;
   char * newtext;
   char * lump_ptr;
   char ** source;
@@ -4252,14 +4247,11 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   }
   else
   {
-    if (finale_clusterdefs == 0)
-    {
-      finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-      if (finale_clusterdefs)
-	memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-    }
+    if (intertext == -1)			// Just in case!
+      return (ptr);
 
-    if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
+    cp = F_Create_ClusterDef (intertext);
+    if (cp)
     {
       if ((episode != 255) && (map != 255))
       {
@@ -4269,9 +4261,9 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 	  mdest_ptr -> cluster = intertext;
       }
       if (doexit)
-	finale_clusterdefs[intertext].exittext = newtext;
+	cp->exittext = newtext;
       else
-	finale_clusterdefs[intertext].entertext = newtext;
+	cp->entertext = newtext;
       finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
       // printf ("Exit Text %u (%s) = %s\n", intertext, ptr, newtext);
     }
@@ -4398,6 +4390,7 @@ void Parse_Mapinfo (char * ptr, char * top)
   unsigned int textislump;
   char * ptr2;
   char * newtext;
+  clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
 
@@ -4405,7 +4398,7 @@ void Parse_Mapinfo (char * ptr, char * top)
 
   episode = 9;
   map = 9;
-  intertext = 1;
+  intertext = -1;
   doing_episode = 0;
   doing_default = 0;
   bd_ptr = boss_death_table_2;
@@ -4431,7 +4424,7 @@ void Parse_Mapinfo (char * ptr, char * top)
       	episode = M_GetNextEpi (map);
       doing_episode = 1;
       doing_default = 0;
-      intertext = 0;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "name ", 5) == 0)
     {
@@ -4504,7 +4497,7 @@ void Parse_Mapinfo (char * ptr, char * top)
     {
       doing_episode = 0;
       doing_default = 0;
-      intertext = 0;
+      intertext = -1;
       ptr2 = read_map_num (&episode, &map, ptr+4);
       replace_map_name (ptr+4, episode, map);
       ptr = ptr2;
@@ -4848,17 +4841,15 @@ void Parse_Mapinfo (char * ptr, char * top)
 	       newtext [l] = 0;
 	       ptr += l;
 	       dh_remove_americanisms (newtext);
-	       if (finale_clusterdefs == 0)
+	       if (intertext != -1)
 	       {
-		 finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-		 if (finale_clusterdefs)
-		   memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	       }
-	       if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-	       {
-		 finale_clusterdefs[intertext].entertext = newtext;
-		 finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		 // printf ("Enter Text %u = %s\n", intertext, newtext);
+		 cp = F_Create_ClusterDef (intertext);
+		 if (cp)
+		 {
+		   cp->entertext = newtext;
+		   finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+		   // printf ("Enter Text %u = %s\n", intertext, newtext);
+		 }
 	       }
 	     }
 	   }
@@ -4908,17 +4899,15 @@ void Parse_Mapinfo (char * ptr, char * top)
 		ptr += l;
 		newtext [l] = 0;
 		dh_remove_americanisms (newtext);
-		if (finale_clusterdefs == 0)
+		if (intertext != -1)
 		{
-		  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-		  if (finale_clusterdefs)
-		    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-		}
-		if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-		{
-		  finale_clusterdefs[intertext].exittext = newtext;
-		  finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		  // printf ("Exit Text %u = %s\n", intertext, newtext);
+		  cp = F_Create_ClusterDef (intertext);
+		  if (cp)
+		  {
+		    cp->exittext = newtext;
+		    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+		    // printf ("Exit Text %u = %s\n", intertext, newtext);
+		  }
 		}
 	      }
 	    }
@@ -4941,16 +4930,14 @@ void Parse_Mapinfo (char * ptr, char * top)
       if (newtext)
       {
 	strcpy (newtext, ptr);
-	if (finale_clusterdefs == 0)
+	if (intertext != -1)
 	{
-	  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	  if (finale_clusterdefs)
-	    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	}
-	if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-	{
-	  finale_clusterdefs[intertext].flat = newtext;
-	  // printf ("Cluster flat %u = \'%s\'\n", intertext, newtext);
+	  cp = F_Create_ClusterDef (intertext);
+	  if (cp)
+	  {
+	    cp->flat = newtext;
+	    // printf ("Cluster flat %u = \'%s\'\n", intertext, newtext);
+	  }
 	}
       }
     }
@@ -4969,16 +4956,14 @@ void Parse_Mapinfo (char * ptr, char * top)
       if (newtext)
       {
 	strcpy (newtext, ptr);
-	if (finale_clusterdefs == 0)
+	if (intertext != -1)
 	{
-	  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	  if (finale_clusterdefs)
-	    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	}
-	if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
-	{
-	  finale_clusterdefs[intertext].pic = newtext;
-	  // printf ("Cluster pic %u = \'%s\'\n", intertext, newtext);
+	  cp = F_Create_ClusterDef (intertext);
+	  if (cp)
+	  {
+	    cp->pic = newtext;
+	    // printf ("Cluster pic %u = \'%s\'\n", intertext, newtext);
+	  }
 	}
       }
     }
@@ -4994,6 +4979,7 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
   unsigned int i,j,l;
   unsigned int intertext;
   char * newtext;
+  clusterdefs_t * cp;
   //bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
 
@@ -5009,6 +4995,7 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
   }
 #endif
 
+  intertext = -1;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
 
   do
@@ -5126,22 +5113,17 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
       if (newtext)
       {
 	strcpy (newtext, ptr);
-	if (finale_clusterdefs == 0)
-	{
-	  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	  if (finale_clusterdefs)
-	    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
-	}
 
 	if (episode == 255)
 	  intertext = map;
 	else
 	  intertext = (episode*10)+map;
 
-	if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
+	cp = F_Create_ClusterDef (intertext);
+	if (cp)
 	{
 	  mdest_ptr -> cluster = intertext;
-	  finale_clusterdefs[intertext].flat = newtext;
+	  cp->flat = newtext;
 	  //printf ("Cluster flat %u = \'%s\'\n", intertext, newtext);
 	}
       }

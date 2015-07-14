@@ -102,15 +102,18 @@ typedef enum
   BG_TITLEPIC
 } finale_floors_t;
 
-#define QTY_CLUSTERDEFS 100
-typedef struct
+typedef struct clusterdefs_s
 {
+  struct clusterdefs_s * next;
+  unsigned int cnumber;
   char * entertext;
   char * exittext;
   char * flat;
   char * pic;
 } clusterdefs_t;
 
+clusterdefs_t * F_Access_ClusterDef (unsigned int num);
+clusterdefs_t * F_Create_ClusterDef (unsigned int num);
 
 typedef struct
 {
