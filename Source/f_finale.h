@@ -108,6 +108,7 @@ typedef struct
   char * entertext;
   char * exittext;
   char * flat;
+  char * pic;
 } clusterdefs_t;
 
 

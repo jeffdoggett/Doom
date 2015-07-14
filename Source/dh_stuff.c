@@ -4140,13 +4140,18 @@ void DH_remove_duplicate_mapinfos (void)
       {
 	if ((pint)finale_clusterdefs[intertext].flat
 	 | (pint)finale_clusterdefs[intertext].entertext
-	 | (pint)finale_clusterdefs[intertext].exittext)
+	 | (pint)finale_clusterdefs[intertext].exittext
+	 | (pint)finale_clusterdefs[intertext].pic)
 	{
 	  printf ("Clusterdefs %u\n", intertext);
 	  if (finale_clusterdefs[intertext].flat == 0)
 	    printf ("flat = NULL\n");
 	  else
 	    printf ("flat = %s\n", finale_clusterdefs[intertext].flat);
+	  if (finale_clusterdefs[intertext].pic == 0)
+	    printf ("pic = NULL\n");
+	  else
+	    printf ("pic = %s\n", finale_clusterdefs[intertext].pic);
 	  if (finale_clusterdefs[intertext].entertext == 0)
 	    printf ("Enter = NULL\n");
 	  else
@@ -4946,6 +4951,34 @@ void Parse_Mapinfo (char * ptr, char * top)
 	{
 	  finale_clusterdefs[intertext].flat = newtext;
 	  // printf ("Cluster flat %u = \'%s\'\n", intertext, newtext);
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "pic ", 4) == 0)
+    {
+      ptr += 4;
+      if (*ptr == '=') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '\"') ptr++;
+      j = dh_inchar (ptr, ' ');
+      if (j) ptr [j-1] = 0;
+      j = dh_inchar (ptr, '"');
+      if (j) ptr [j-1] = 0;
+      l = strlen (ptr);
+      newtext = malloc (l+1);
+      if (newtext)
+      {
+	strcpy (newtext, ptr);
+	if (finale_clusterdefs == 0)
+	{
+	  finale_clusterdefs = malloc (sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+	  if (finale_clusterdefs)
+	    memset (finale_clusterdefs,0,sizeof (clusterdefs_t) * QTY_CLUSTERDEFS);
+	}
+	if ((finale_clusterdefs) && (intertext < QTY_CLUSTERDEFS))
+	{
+	  finale_clusterdefs[intertext].pic = newtext;
+	  // printf ("Cluster pic %u = \'%s\'\n", intertext, newtext);
 	}
       }
     }

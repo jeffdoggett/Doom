@@ -116,6 +116,7 @@ clusterdefs_t * finale_clusterdefs = 0;
 
 static char* finaletext;
 static char* finaleflat;
+static char* finalepic;
 static char* nextfinaletext;
 static char* nextfinaleflat;
 
@@ -139,6 +140,7 @@ static void F_DetermineIntermissionTexts (void)
   nextfinaletext = NULL;
   finaleflat = NULL;
   nextfinaleflat = NULL;
+  finalepic = finale_backdrops[BG_BOSSBACK];
 
 
   /* If this map is in a PWAD and the messages haven't */
@@ -179,6 +181,8 @@ static void F_DetermineIntermissionTexts (void)
     cp = &finale_clusterdefs [cluster];
     finaletext = cp -> exittext;
     finaleflat = cp -> flat;
+    if (cp -> pic)
+      finalepic = cp -> pic;
 
     /* Big problem here.				*/
     /* Ideally, if we are returning from a secret level */
@@ -1173,7 +1177,7 @@ void F_Drawer (void)
 	break;
 
       case 2:
-	D_PageDrawer (finale_backdrops[BG_BOSSBACK]);
+	D_PageDrawer (finalepic);
 	F_CastDrawer ();
 	break;
 
