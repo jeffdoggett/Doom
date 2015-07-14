@@ -4951,17 +4951,25 @@ void Parse_Mapinfo (char * ptr, char * top)
       if (j) ptr [j-1] = 0;
       j = dh_inchar (ptr, '"');
       if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
+      if (intertext == -1)
       {
-	strcpy (newtext, ptr);
-	if (intertext != -1)
+	/* Map 7 in Valiant.wad calls up "credit" here */
+	/* but it does so before defining the cluster. */
+//	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+//	ptr = replace_map_text (&mdest_ptr -> enterpic, ptr);
+//	mdest_ptr -> exitpic = mdest_ptr -> enterpic;
+      }
+      else
+      {
+	cp = F_Create_ClusterDef (intertext);
+	if (cp)
 	{
-	  cp = F_Create_ClusterDef (intertext);
-	  if (cp)
+          l = strlen (ptr);
+	  newtext = malloc (l+1);
+	  if (newtext)
 	  {
 	    cp->pic = newtext;
+	    strcpy (newtext, ptr);
 	    // printf ("Cluster pic %u = \'%s\'\n", intertext, newtext);
 	  }
 	}
