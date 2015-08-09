@@ -880,7 +880,7 @@ int W_GetNumForName (const char* name)
 unsigned int W_LumpLength (int lump)
 {
     if (lump >= numlumps)
-	I_Error ("W_LumpLength: %i >= numlumps",lump);
+	I_Error ("W_LumpLength: %i >= numlumps (%i)",lump, numlumps);
 
     return lumpinfo[lump].size;
 }
