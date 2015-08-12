@@ -162,6 +162,7 @@ pint R_IncreaseOpenings (void)
   pint 		offset;
   pint		qty_used;
   dshort_t*	new_openings;
+  drawseg_t	*ds;		// jff 8/9/98 needed for fix from ZDoom
 
   qty_used = lastopening - openings;
   MAXOPENINGS += 10000;
@@ -171,6 +172,30 @@ pint R_IncreaseOpenings (void)
     I_Error ("R_IncreaseOpenings: no more room");
 
   offset = (pint) new_openings - (pint) openings;
+  // printf ("old = %X, new = %X, offset = %X\n", openings, new_openings, offset);
+
+  // jff 8/9/98 borrowed fix for openings from ZDOOM1.14
+  // [RH] We also need to adjust the openings pointers that
+  //    were already stored in drawsegs.
+  for (ds = drawsegs; ds < ds_p; ds++)
+  {
+    if (ds->maskedtexturecol + ds->x1 >= openings
+     && ds->maskedtexturecol + ds->x1 <= lastopening)
+    {
+      ds->maskedtexturecol = (dshort_t*) ((pint) ds->maskedtexturecol + offset);
+    }
+    if (ds->sprtopclip + ds->x1 >= openings
+     && ds->sprtopclip + ds->x1 <= lastopening)
+    {
+      ds->sprtopclip = (dshort_t*) ((pint) ds->sprtopclip + offset);
+    }
+    if (ds->sprbottomclip + ds->x1 >= openings
+     && ds->sprbottomclip + ds->x1 <= lastopening)
+    {
+      ds->sprbottomclip = (dshort_t*) ((pint) ds->sprbottomclip + offset);
+    }
+  }
+
   openings = new_openings;
   lastopening = openings + qty_used;
   //memset (lastvisplane, 0, 128 * sizeof (openings[0]));
