@@ -391,31 +391,24 @@ void V_DrawPatchFlippedScaled (int x, int y, int scrn, patch_t* patch, int draws
   if ((SHORT(patch->width) > 320)
    || (SHORT(patch->height) > 200))
   {
-    yscale = FixedDiv (SCREENHEIGHT << FRACBITS, SHORT(patch->height) << FRACBITS);
     xscale = FixedDiv (SCREENWIDTH << FRACBITS, SHORT(patch->width) << FRACBITS);
-
-    y -= SHORT(patch->topoffset);
-    x -= SHORT(patch->leftoffset);
-    if (SHORT(patch->height) < SCREENHEIGHT)
-      y += (SCREENHEIGHT - SHORT(patch->height)) / 2;
-    if (SHORT(patch->width) < SCREENWIDTH)
-      x += (SCREENWIDTH - SHORT(patch->width)) / 2;
+    yscale = FixedDiv (SCREENHEIGHT << FRACBITS, SHORT(patch->height) << FRACBITS);
   }
   else
   {
     xscale = (SCREENWIDTH << FRACBITS) / 320;
     yscale = (SCREENHEIGHT << FRACBITS) / 200;
-
-    y -= SHORT(patch->topoffset);
-    x -= SHORT(patch->leftoffset);
-
-    y = (y * yscale) >> FRACBITS;
-    x = (x * xscale) >> FRACBITS;
-
-    //y += (SCREENHEIGHT - (yscale * 200))/2;
-    //x += (SCREENWIDTH  - (xscale * 320))/2;
-    // printf ("xscale = %X, yscale = %X\n", xscale, yscale);
   }
+
+  y -= SHORT(patch->topoffset);
+  x -= SHORT(patch->leftoffset);
+
+  y = (y * yscale) >> FRACBITS;
+  x = (x * xscale) >> FRACBITS;
+
+  //y += (SCREENHEIGHT - (yscale * 200))/2;
+  //x += (SCREENWIDTH  - (xscale * 320))/2;
+  // printf ("xscale = %X, yscale = %X\n", xscale, yscale);
 
   V_DrawPatchScaleFlip (x, y, scrn, patch, xscale, yscale, drawstyle);
 }

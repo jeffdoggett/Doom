@@ -1171,30 +1171,33 @@ char	msgNames[2][9]		= {"M_MSGOFF","M_MSGON"};
 
 void M_DrawOptions(void)
 {
-  patch_t*	patch;
+  int		x,y;
+  patch_t*	patch1;
+  patch_t*	patch2;
 
   V_DrawPatchScaled (108,15,0,W_CacheLumpName("M_OPTTTL",PU_CACHE));
 
-  patch = W_CacheLumpName (OptionsMenu[1].name,PU_CACHE);
-  V_DrawPatchScaled (OptionsDef.x + SHORT(patch->width) + 2,OptionsDef.y+LINEHEIGHT*messages,0,
-			W_CacheLumpName(msgNames[showMessages],PU_CACHE));
+  patch1 = W_CacheLumpName (OptionsMenu[1].name,PU_CACHE);
+  patch2 = W_CacheLumpName (msgNames[showMessages],PU_CACHE);
+  x = OptionsDef.x + SHORT(patch1->width) + SHORT(patch2->leftoffset) + 2;
+  y = OptionsDef.y + (LINEHEIGHT*messages);
+  V_DrawPatchScaled (x,y,0,patch2);
 
-  patch = W_CacheLumpName (OptionsMenu[2].name,PU_CACHE);
-  V_DrawPatchScaled (OptionsDef.x + SHORT(patch->width) + 2,OptionsDef.y+LINEHEIGHT*detail,0,
-			W_CacheLumpName(detailNames[detailLevel],PU_CACHE));
+  patch1 = W_CacheLumpName (OptionsMenu[2].name,PU_CACHE);
+  patch2 = W_CacheLumpName (detailNames[detailLevel],PU_CACHE);
+  x = OptionsDef.x + SHORT(patch1->width) + SHORT(patch2->leftoffset) + 2;
+  y = OptionsDef.y + (LINEHEIGHT*detail);
+  V_DrawPatchScaled (x,y,0,patch2);
 
-  M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(mousesens+1),
-			10,mouseSensitivity);
-
-  M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(scrnsize+1),
-			9,screenSize);
+  M_DrawThermo (OptionsDef.x,OptionsDef.y+LINEHEIGHT*(mousesens+1),10,mouseSensitivity);
+  M_DrawThermo (OptionsDef.x,OptionsDef.y+LINEHEIGHT*(scrnsize+1),9,screenSize);
 }
 
 /* ----------------------------------------------------------------------- */
 
 void M_Options(int choice)
 {
-    M_SetupNextMenu(&OptionsDef);
+    M_SetupNextMenu (&OptionsDef);
 }
 
 /* ----------------------------------------------------------------------- */

@@ -588,8 +588,9 @@ void D_DoomLoop (void)
 //
 void D_PageTicker (void)
 {
-    if (--pagetic < 0)
-	D_AdvanceDemo ();
+  if ((menuactive == false)
+   && (--pagetic < 0))
+    D_AdvanceDemo ();
 }
 
 //-----------------------------------------------------------------------------
