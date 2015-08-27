@@ -1504,21 +1504,30 @@ M_DrawThermo
   int	thermWidth,
   int	thermDot )
 {
-    int		xx;
-    int		i;
+  int		i;
+  int		xx;
+  patch_t*	patchl;
+  patch_t*	patchm;
+  patch_t*	patchr;
+  patch_t*	patcho;
 
-    xx = x;
-    V_DrawPatchScaled (xx,y,0,W_CacheLumpName("M_THERML",PU_CACHE));
+  xx = x;
+  patchl = W_CacheLumpName("M_THERML",PU_CACHE);
+  V_DrawPatchScaled (xx,y,0,patchl);
+
+  xx += 8;
+  patchm = W_CacheLumpName("M_THERMM",PU_CACHE);
+  for (i=0;i<thermWidth;i++)
+  {
+    V_DrawPatchScaled (xx,y,0,patchm);
     xx += 8;
-    for (i=0;i<thermWidth;i++)
-    {
-	V_DrawPatchScaled (xx,y,0,W_CacheLumpName("M_THERMM",PU_CACHE));
-	xx += 8;
-    }
-    V_DrawPatchScaled (xx,y,0,W_CacheLumpName("M_THERMR",PU_CACHE));
+  }
 
-    V_DrawPatchScaled ((x+8) + thermDot*8,y,
-		       0,W_CacheLumpName("M_THERMO",PU_CACHE));
+  patchr = W_CacheLumpName("M_THERMR",PU_CACHE);
+  V_DrawPatchScaled (xx,y,0,patchr);
+
+  patcho = W_CacheLumpName("M_THERMO",PU_CACHE);
+  V_DrawPatchScaled ((x+8) + thermDot*8,y,0,patcho);
 }
 
 /* ----------------------------------------------------------------------- */
