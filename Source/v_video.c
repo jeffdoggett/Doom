@@ -246,20 +246,6 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
   }
 
   w = SHORT(patch->width);
-
-  if ((w >= 320)
-   && (SHORT(patch -> height) >= 200))
-  {
-    // Clear the screen memory first in case the graphic
-    // doesn't fill the display - which it won't do if
-    // we're larger than 320x200.
-    // Potential problem here in that colour 0 may not be
-    // black! Should really search through the palette table
-    // and find which colour maps to black.
-
-    memset (screens[scrn], 0, SCREENHEIGHT*SCREENWIDTH);
-  }
-
   desttop = screens[scrn]+(y*SCREENWIDTH)+x;
   scrnlimit = (screens[scrn] + (SCREENHEIGHT*SCREENWIDTH)) -1;
   col = 0;
