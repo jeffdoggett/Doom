@@ -1119,6 +1119,24 @@ unsigned int dh_inchar (const char * text, char search_char)
 }
 
 /* ---------------------------------------------------------------------------- */
+/* Return qty of matching characters. */
+
+static unsigned int qty_match (const char * s1, const char * s2)
+{
+  char c1,c2;
+  unsigned int len;
+
+  len = 0;
+  do
+  {
+    c1 = toupper (*s1); s1++;
+    c2 = toupper (*s2); s2++;
+  } while (c1 && (c1 == c2) && (++len));
+
+  return (len);
+}
+
+/* ---------------------------------------------------------------------------- */
 
 /* Attempts to open a file that is in the same directory as the executable */
 
@@ -4378,6 +4396,116 @@ static char * replace_map_text (char ** dest, char * ptr)
 
 /* ---------------------------------------------------------------------------- */
 
+typedef struct
+{
+  char name [8];
+  unsigned int number;
+} boss_names_t;
+
+static const boss_names_t boss_names [] =
+{
+  { "Zombie",	1<<MT_POSSESSED},	// Need to fill the correct
+  { "SHOTGUN",	1<<MT_SHOTGUY},		// names...
+  { "HEAVY",	1<<MT_CHAINGUY},
+  { "WOLF",	1<<MT_WOLFSS},
+  { "IMP",	1<<MT_TROOP},
+  { "DEMON",	1<<MT_SERGEANT},
+  { "SPECTRE",	1<<MT_SHADOWS},
+  { "LOST",	1<<MT_SKULL},
+  { "CACO",	1<<MT_HEAD},
+  { "HELL",	1<<MT_KNIGHT},
+  { "BARON",	1<<MT_BRUISER},
+  { "ARACH",	1<<MT_BABY},
+  { "PAIN",	1<<MT_PAIN},
+  { "REVEN",	1<<MT_UNDEAD},
+  { "MANCU",	1<<MT_FATSO},
+  { "ARCH",	1<<MT_VILE},
+  { "Spider",	1<<MT_SPIDER},
+  { "Cyber",	1<<MT_CYBORG}
+};
+
+static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
+{
+  unsigned int count;
+  const boss_names_t * ptr;
+
+//printf ("Looking for %d chars (%s)\n", len, name);
+  ptr = boss_names;
+  count = ARRAY_SIZE(boss_names);
+  do
+  {
+    if (qty_match (name, ptr->name) > 2)		// Three chars is plenty!
+    {
+      bd_ptr = access_boss_actions (episode, map, bd_ptr);
+      if (bd_ptr)
+	bd_ptr -> monsterbits |= ptr->number;
+      return (bd_ptr);
+    }
+    ptr++;
+  } while (--count);
+  fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
+  return (bd_ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+typedef struct
+{
+  char name [24];
+  actionf2 function;
+  unsigned int param;
+} spec_actions_t;
+
+static const spec_actions_t spec_actions [] =
+{
+  { "Door_Open",	    (actionf2) EV_DoDoor,  blazeOpen},
+  { "Door_Close",	    (actionf2) EV_DoDoor,  blazeClose},
+  { "Door_Raise",	    (actionf2) EV_DoDoor,  blazeRaise},
+//{ "Door_LockedRaise",	    (actionf2) EV_??,  	   ???},
+  { "Floor_LowerToLowest",  (actionf2) EV_DoFloor, lowerFloorToLowest},
+  { "Floor_LowerToNearest", (actionf2) EV_DoFloor, lowerFloorToNearest},
+  { "Floor_RaiseToHighest", (actionf2) EV_DoFloor, raiseFloorToHighest},
+  { "Floor_RaiseToNearest", (actionf2) EV_DoFloor, raiseFloorToNearest},
+  { "Floor_RaiseByTexture", (actionf2) EV_DoFloor, raiseToTexture }
+//{ "Stairs_BuildDown",	    (actionf2) EV_BuildStairs, ??? }
+//{ "Stairs_BuildUp",	    (actionf2) EV_BuildStairs, ??? }
+};
+
+static bossdeath_t * find_special_action (const char * name, unsigned int episode, unsigned int map, unsigned int * args, bossdeath_t * bd_ptr)
+{
+  unsigned int len;
+  unsigned int count;
+  const spec_actions_t * ptr;
+
+  len = 0;
+  while ((name [len] > ' ') && (name [len] != '\"'))
+    len++;
+
+  if (len)
+  {
+//  printf ("Looking for %d chars (%s)\n", len, name);
+    ptr = spec_actions;
+    count = ARRAY_SIZE(spec_actions);
+    do
+    {
+      if (strncasecmp (name, ptr->name, len) == 0)
+      {
+	bd_ptr = set_boss_action (bd_ptr, ptr->function, ptr->param);
+	if (bd_ptr)
+	{
+	  bd_ptr -> tag = args [0];
+	}
+	return (bd_ptr);
+      }
+      ptr++;
+    } while (--count);
+    fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
+  }
+  return (bd_ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 void Parse_Mapinfo (char * ptr, char * top)
 {
   char cc;
@@ -4393,6 +4521,7 @@ void Parse_Mapinfo (char * ptr, char * top)
   clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
+  unsigned int args [8];
 
   top = split_lines (ptr, top);
 
@@ -4772,7 +4901,7 @@ void Parse_Mapinfo (char * ptr, char * top)
 	{
 	  bd_ptr = set_boss_action (bd_ptr, (actionf2) EV_DoFloor, lowerFloorToLowest);
 	}
-	if (strncasecmp (ptr, "opendoor", 8) == 0)
+	else if (strncasecmp (ptr, "opendoor", 8) == 0)
 	{
 	  bd_ptr = set_boss_action (bd_ptr, (actionf2) EV_DoDoor, blazeOpen);
 	}
@@ -4791,6 +4920,38 @@ void Parse_Mapinfo (char * ptr, char * top)
 	  bd_ptr -> tag = read_int (ptr);
 	}
       }
+    }
+    else if (strncasecmp (ptr, "specialaction ", 14) == 0)
+    {
+      ptr += 14;
+      while (*ptr && (*ptr != '\"')) ptr++;
+      if (*ptr)
+      {
+	ptr++;
+	bd_ptr = find_boss_type (ptr, episode, map, bd_ptr);
+
+	/* split_line may have replaced the comma and quote with a new line. */
+	while (*ptr && (*ptr != '\n') && (*ptr != ',')) ptr++;
+	if (*ptr)
+	{
+	  ptr++;
+	  if (*ptr == '\"') ptr++;
+	  ptr2 = ptr;
+	  l = 0;
+	  memset (args, 0, sizeof (args));
+	  do
+	  {
+	    while (*ptr && (*ptr != ',')) ptr++;
+	    if (*ptr  == 0)
+	      break;
+
+	    ptr++;
+	    args [l] = read_int (ptr);
+	  } while (++l < ARRAY_SIZE(args));
+	  bd_ptr = find_special_action (ptr2, episode, map, args, bd_ptr);
+	}
+      }
+      if ((bd_ptr) && (bd_ptr -> func)) bd_ptr++;
     }
     else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
     {

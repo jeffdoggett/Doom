@@ -25,61 +25,7 @@
 static const char rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <sys/stat.h>
-
-#ifdef NORMALUNIX
-#include <unistd.h>
-#endif
-
-#include "doomdef.h"
-#include "doomstat.h"
-
-#include "z_zone.h"
-#include "f_finale.h"
-#include "m_argv.h"
-#include "m_misc.h"
-#include "m_menu.h"
-#include "m_random.h"
-#include "i_system.h"
-
-#include "p_setup.h"
-#include "p_saveg.h"
-#include "p_tick.h"
-
-#include "d_main.h"
-
-#include "wi_stuff.h"
-#include "hu_stuff.h"
-#include "st_stuff.h"
-#include "dh_stuff.h"
-#include "am_map.h"
-
-// Needs access to LFB.
-#include "v_video.h"
-
-#include "w_wad.h"
-
-#include "p_local.h"
-
-#include "s_sound.h"
-
-// Data.
-#include "dstrings.h"
-#include "sounds.h"
-
-// SKY handling - still the wrong place.
-#include "r_data.h"
-#include "r_sky.h"
-
-#include "g_game.h"
-
-#ifdef __riscos
-#include "acorn.h"
-#endif
+#include "includes.h"
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -2757,6 +2703,14 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	      if (strncasecmp (a_line+6, "SWITCHES ", 9) == 0)
 	      {
 		P_PatchSwitchList (a_line + 15);
+	      }
+	      else if (strncasecmp (a_line+6, "ORIGSCREENWIDTH ", 16) == 0)
+	      {
+	        ORIGSCREENWIDTH = atoi (a_line+6+16);
+	      }
+	      else if (strncasecmp (a_line+6, "ORIGSCREENHEIGHT ", 17) == 0)
+	      {
+	        ORIGSCREENHEIGHT = atoi (a_line+6+17);
 	      }
 	      else
 	      {

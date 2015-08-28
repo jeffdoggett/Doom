@@ -1975,8 +1975,8 @@ boolean M_Responder (event_t* ev)
 	    if (itemOn+1 > currentMenu->numitems-1)
 		itemOn = 0;
 	    else itemOn++;
-	    S_StartSound(NULL,sfx_pstop);
-	} while(currentMenu->menuitems[itemOn].status==-1);
+	} while((unsigned)currentMenu->menuitems[itemOn].status>2);
+	S_StartSound(NULL,sfx_pstop);
 	return true;
 
       case KEY_UPARROW:
@@ -1985,8 +1985,8 @@ boolean M_Responder (event_t* ev)
 	    if (!itemOn)
 		itemOn = currentMenu->numitems-1;
 	    else itemOn--;
-	    S_StartSound(NULL,sfx_pstop);
-	} while(currentMenu->menuitems[itemOn].status==-1);
+	} while((unsigned)currentMenu->menuitems[itemOn].status>2);
+	S_StartSound(NULL,sfx_pstop);
 	return true;
 
       case KEY_LEFTARROW:

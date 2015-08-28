@@ -100,7 +100,7 @@ typedef enum
 // For resize of screen, at start of game.
 // It will not work dynamically, see visplanes.
 //
-#define	BASE_WIDTH		320
+//#define	BASE_WIDTH		320
 
 // It is educational but futile to change this
 //  scaling e.g. to 2. Drawing of status bar,
@@ -124,6 +124,8 @@ typedef enum
 extern unsigned int SCREENWIDTH;
 extern unsigned int SCREENHEIGHT;
 
+extern unsigned int ORIGSCREENWIDTH;	// 320 in original Doom
+extern unsigned int ORIGSCREENHEIGHT;	// 200
 
 
 // The maximum number of players, multiplayer/networking.

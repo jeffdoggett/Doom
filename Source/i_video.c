@@ -93,6 +93,8 @@ static int		multiply=1;
 
 unsigned int SCREENWIDTH = MAXSCREENWIDTH;
 unsigned int SCREENHEIGHT = MAXSCREENHEIGHT;
+unsigned int ORIGSCREENWIDTH = 320;	// in original Doom
+unsigned int ORIGSCREENHEIGHT = 200;
 
 static unsigned int	palette_table [256];
 static XColor		colors [256];

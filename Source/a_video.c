@@ -439,6 +439,8 @@ static int mouse_button_conv[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
 unsigned int SCREENWIDTH = MAXSCREENWIDTH;
 unsigned int SCREENHEIGHT = MAXSCREENHEIGHT;
+unsigned int ORIGSCREENWIDTH = 320;	// in original Doom
+unsigned int ORIGSCREENHEIGHT = 200;
 
 /* -------------------------------------------------------------------------- */
 

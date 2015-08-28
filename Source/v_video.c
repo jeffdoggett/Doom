@@ -374,16 +374,16 @@ void V_DrawPatchFlippedScaled (int x, int y, int scrn, patch_t* patch, int draws
   fixed_t xscale;
   fixed_t yscale;
 
-  if ((SHORT(patch->width) > 320)
-   || (SHORT(patch->height) > 200))
+  if ((SHORT(patch->width) > ORIGSCREENWIDTH)
+   || (SHORT(patch->height) > ORIGSCREENHEIGHT))
   {
     xscale = FixedDiv (SCREENWIDTH << FRACBITS, SHORT(patch->width) << FRACBITS);
     yscale = FixedDiv (SCREENHEIGHT << FRACBITS, SHORT(patch->height) << FRACBITS);
   }
   else
   {
-    xscale = (SCREENWIDTH << FRACBITS) / 320;
-    yscale = (SCREENHEIGHT << FRACBITS) / 200;
+    xscale = (SCREENWIDTH << FRACBITS) / ORIGSCREENWIDTH;
+    yscale = (SCREENHEIGHT << FRACBITS) / ORIGSCREENHEIGHT;
   }
 
   y -= SHORT(patch->topoffset);
@@ -574,10 +574,10 @@ void V_DrawPixelScaled (int x, int y, int screen, int colour, boolean shadow)
   fixed_t xscale;
   fixed_t yscale;
 
-  if (((unsigned)x < 320) && ((unsigned)y < 200))
+  if (((unsigned)x < ORIGSCREENWIDTH) && ((unsigned)y < ORIGSCREENHEIGHT))
   {
-    xscale = (SCREENWIDTH << FRACBITS) / 320;
-    yscale = (SCREENHEIGHT << FRACBITS) / 200;
+    xscale = (SCREENWIDTH << FRACBITS) / ORIGSCREENWIDTH;
+    yscale = (SCREENHEIGHT << FRACBITS) / ORIGSCREENHEIGHT;
 
     y = (y * yscale) >> FRACBITS;
     x = (x * xscale) >> FRACBITS;
