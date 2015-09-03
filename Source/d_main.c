@@ -1508,8 +1508,8 @@ static void IdentifyVersion (void)
   /* Haven't been given a specific IWAD, but have we got a PWAD with a map? */
   reqd_pwad = 0;
 
-  p = M_CheckParm ("-file");
-  if (p)
+  p = 1;
+  while ((p = M_CheckParm_N ("-file", p)) != 0)
   {
     q = M_CheckParm ("-file_dir");
     while (++p < myargc && myargv[p][0] != '-')
@@ -1854,8 +1854,8 @@ static void D_LoadWads (void)
     D_AddFile (file);
   }
 
-  p = M_CheckParm ("-file");
-  if (p)
+  p = 1;
+  while ((p = M_CheckParm_N ("-file", p)) != 0)
   {
     // the parms after p are wadfile/lump names,
     // until end of parms or another - preceded parm

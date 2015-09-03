@@ -35,8 +35,10 @@ void M_CopyArgs (int argc, char ** argv);
 
 // Returns the position of the given parameter
 // in the arg list (0 if not found).
-unsigned int M_CheckParm (const char* check);
+unsigned int M_CheckParm_N (const char* check, unsigned int start_pos);
 
+//unsigned int M_CheckParm (const char* check);
+#define M_CheckParm(a)	M_CheckParm_N(a,1)
 
 #endif
 //-----------------------------------------------------------------------------

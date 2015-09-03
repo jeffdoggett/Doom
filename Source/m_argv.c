@@ -159,21 +159,27 @@ void M_CopyArgs (int argc, char ** argv)
 // in the program's command line arguments.
 // Returns the argument number (1 to argc-1)
 // or 0 if not present
-unsigned int M_CheckParm (const char *check)
+unsigned int M_CheckParm_N (const char* check, unsigned int start_pos)
 {
-  int i;
-
-  if (myargc > 1)
+  if (myargc > start_pos)
   {
-    i = 1;
     do
     {
       // printf ("M_CheckParm %s %s\n", check, myargv[i]);
-      if (strcasecmp(check, myargv[i]) == 0)
-	return (i);
-    } while (++i < myargc);
+      if (strcasecmp(check, myargv[start_pos]) == 0)
+	return (start_pos);
+    } while (++start_pos < myargc);
   }
   return (0);
 }
 
+/* ---------------------------------------------------------------------------- */
+#ifndef M_CheckParm
+
+unsigned int M_CheckParm (const char *check)
+{
+  return (M_CheckParm_N (check, 1);
+}
+
+#endif
 /* ---------------------------------------------------------------------------- */
