@@ -1659,6 +1659,14 @@ static void P_RemoveSlimeTrails (void)		// killough 10/98
 	      v->x = (int)(((int64_t)dx2 * (int64_t)x0 + (int64_t)dy2 * (int64_t)x1 + (int64_t)dxy * (int64_t)(y0 - y1)) / s);
 	      v->y = (int)(((int64_t)dy2 * (int64_t)y0 + (int64_t)dx2 * (int64_t)y1 + (int64_t)dxy * (int64_t)(x0 - x1)) / s);
 #endif
+	      // [crispy] wait a minute... moved more than 8 map units?
+	      // maybe that's a linguortal then, back to the original coordinates
+	      if ((ABS(v->x - x0) > (8 * FRACUNIT)) || (ABS(v->y - y0) > (8 * FRACUNIT)))
+	      {
+		v->x = x0;
+		v->y = y0;
+	      }
+
 //	      printf ("%X,%X\n", v->x, v->y);
 	    }
 	  } // Obsfucated C contest entry: :)
