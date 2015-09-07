@@ -27,6 +27,7 @@ extern int 	novert;
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int      screen_mode = 1;
+static int	vsync;
 static unsigned int * screen_addr;
 static unsigned int   palette_table   [256];
 static unsigned char  key_down_table  [128];
@@ -865,6 +866,8 @@ void I_FinishUpdate (void)
 	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_black;
     }
 
+    if (vsync)
+      _kernel_osbyte (19, 0, 0);
 
 	// draw the image
     screen_copy = screens[0];
@@ -2011,6 +2014,7 @@ void I_InitGraphics (void)
     unsigned int block [32];
     unsigned char osword_data [12];
 
+    vsync = M_CheckParm ("-vsync");
     memset (key_down_table, 0, sizeof (key_down_table));
     select_screen_mode (screen_mode);
 
