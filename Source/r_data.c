@@ -745,12 +745,17 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
     if (!(pos&63))
       putchar ('.');
 
-    offset = LONG(*directory);
+    if ((((unsigned int) directory) >= ((unsigned int)maptex+maxoff))
+     || ((offset=LONG(*directory)) >= maxoff))
+    {
+#ifdef NORMALUNIX
+      printf ("R_InitTextures: bad texture directory %X/%X %d/%d\n",
+		directory,((unsigned int)maptex+maxoff), offset, maxoff);
+#endif
+      break;
+    }
+
     directory++;
-
-    if (offset > maxoff)
-      I_Error ("R_InitTextures: bad texture directory");
-
     mtexture = (maptexture_t *) ( (byte *)maptex + offset);
 
     strncpy (name, mtexture->name, sizeof(texture->name));
