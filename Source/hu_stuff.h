@@ -53,6 +53,8 @@ extern char ** HU_access_mapname_E (unsigned int episode, unsigned int map);
 void HU_Init(void);
 void HU_Start(void);
 void HU_createWidgets (unsigned int update);
+void HU_StartSave (void);
+void HU_EndSave (void);
 
 boolean HU_Responder(event_t* ev);
 

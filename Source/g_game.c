@@ -1064,6 +1064,7 @@ void G_Ticker (void)
 	  break;
 	case ga_savegame:
 	  G_DoSaveGame ();
+	  HU_EndSave ();
 	  break;
 	case ga_playdemo:
 	  G_DoPlayDemo ();
@@ -1821,6 +1822,7 @@ char*	description )
   savegameslot = slot;
   strcpy (savedescription, description);
   sendsave = true;
+  HU_StartSave ();
 }
 
 /* -------------------------------------------------------------------------------------------- */
