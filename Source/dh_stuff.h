@@ -16,7 +16,6 @@ void Load_Mapinfo (void);
 void Change_To_Mapinfo (FILE * fin);
 void Parse_Mapinfo (char * ptr, char * top);
 void DH_remove_duplicate_mapinfos (void);
-void dh_validate_state_table_function_pointers (void);
 
 #if 0
 int dh_strcmp (const char * s1, const char * s2);

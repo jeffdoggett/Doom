@@ -200,7 +200,6 @@ typedef struct
   long		frame;
   long		tics;
   // void	(*action) ();
-  unsigned int	pcount;
   actionf_t	action;
   statenum_t	nextstate;
   long		misc1, misc2;
