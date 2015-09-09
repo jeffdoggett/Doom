@@ -1151,7 +1151,7 @@ state_t states[] =
 
 //-----------------------------------------------------------------------------
 
-mobjinfo_t mobjinfo[NUMMOBJTYPES] =
+mobjinfo_t mobjinfo[] =
 {
   {								// MT_PLAYER
     -1,								// doomednum
