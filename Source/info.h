@@ -240,6 +240,9 @@ typedef enum
   MT_SCEPTRE,	// killough 7/11/98: evil sceptre in beta version
   MT_BIBLE,	// killough 7/11/98: unholy bible in beta version
 
+  MT_MUSICSOURCE,
+  MT_GIBDTH,
+
   NUMMOBJTYPES  // Counter of how many there are
 } mobjtype_t;
 

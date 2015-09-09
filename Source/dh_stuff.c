@@ -449,6 +449,7 @@ static const codeptrs_t codeptr_frames [] =
   { "Scratch",		A_Scratch },
   { "PlaySound",	A_PlaySound },
   { "RandomJump",	A_RandomJump },
+  { "SkullPop",		A_SkullPop },
   { "LineEffect",	A_LineEffect }
 };
 

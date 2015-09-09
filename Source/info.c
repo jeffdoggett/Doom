@@ -1139,8 +1139,8 @@ state_t states[] =
   {SPR_NULL,1 | FF_FULLBRIGHT,8,NULL,S_EXPLODE2,0,0},// S_MUSHROOM
 
   {SPR_NULL,14,5,NULL,S_PLAY_GDIE2,0,0},		// S_PLAY_GDIE1
-  {SPR_NULL,15,5,NULL,S_PLAY_GDIE3,0,0},		// S_PLAY_GDIE2
-  {SPR_NULL,16,5,NULL,S_PLAY_GDIE4,0,0},		// S_PLAY_GDIE3
+  {SPR_NULL,15,5,A_SkullPop,S_PLAY_GDIE3,0,0},		// S_PLAY_GDIE2
+  {SPR_NULL,16,5,A_Fall,S_PLAY_GDIE4,0,0},		// S_PLAY_GDIE3
   {SPR_NULL,17,5,NULL,S_PLAY_GDIE5,0,0},		// S_PLAY_GDIE4
   {SPR_NULL,18,5,NULL,S_PLAY_GDIE6,0,0},		// S_PLAY_GDIE5
   {SPR_NULL,19,5,NULL,S_PLAY_GDIE7,0,0},		// S_PLAY_GDIE6
@@ -5325,6 +5325,63 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] =
     0,								// damage
     sfx_None,							// activesound
     MF_SPECIAL|MF_COUNTITEM,					// flags
+    0,								// flags2
+    S_NULL							// raisestate
+  },
+
+  {								// MT_MUSICSOURCE
+    14164,							// doomednum
+    S_TNT1,							// spawnstate
+    1000,							// spawnhealth
+    S_NULL,							// seestate
+    sfx_None,							// seesound
+    8,								// reactiontime
+    sfx_None,							// attacksound
+    S_NULL,							// painstate
+    0,								// painchance
+    sfx_None,							// painsound
+    S_NULL,							// meleestate
+    S_NULL,							// missilestate
+    S_NULL,							// deathstate
+    S_NULL,							// xdeathstate
+    sfx_None,							// deathsound
+    0,								// speed
+    16*FRACUNIT,						// radius
+    16*FRACUNIT,						// pickupradius
+    16*FRACUNIT,						// height
+    100,							// mass
+    0,								// damage
+    sfx_None,							// activesound
+    MF_NOBLOCKMAP,						// flags
+    0,								// flags2
+    S_NULL							// raisestate
+  },
+
+
+  {								// MT_GIBDTH
+    -1,								// doomednum
+    S_TNT1,							// spawnstate
+    1000,							// spawnhealth
+    S_NULL,							// seestate
+    sfx_None,							// seesound
+    8,								// reactiontime
+    sfx_None,							// attacksound
+    S_NULL,							// painstate
+    0,								// painchance
+    sfx_None,							// painsound
+    S_NULL,							// meleestate
+    S_NULL,							// missilestate
+    S_NULL,							// deathstate
+    S_NULL,							// xdeathstate
+    sfx_None,							// deathsound
+    0,								// speed
+    4*FRACUNIT,							// radius
+    4*FRACUNIT,							// pickupradius
+    4*FRACUNIT,							// height
+    100,							// mass
+    0,								// damage
+    sfx_None,							// activesound
+    MF_NOBLOCKMAP | MF_DROPOFF,					// flags
     0,								// flags2
     S_NULL							// raisestate
   }

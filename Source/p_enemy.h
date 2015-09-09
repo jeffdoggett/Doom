@@ -126,6 +126,7 @@ extern void A_Face (mobj_t* mo, pspdef_t *psp);
 extern void A_Scratch (mobj_t* mo, pspdef_t *psp);
 extern void A_PlaySound (mobj_t* mo, pspdef_t *psp);
 extern void A_RandomJump (mobj_t* mo, pspdef_t *psp);
+extern void A_SkullPop (mobj_t* mo, pspdef_t *psp);
 extern void A_LineEffect (mobj_t* mo, pspdef_t *psp);
 
 extern void P_Massacre (void);
