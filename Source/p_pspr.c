@@ -545,7 +545,7 @@ A_Raise (mobj_t* mo, pspdef_t* psp)
 // muzzle flash, rather than the pressing of the trigger.
 // The BFG delay caused this to be necessary.
 
-static void A_FireSomething (player_t* player, int adder)
+static void A_FireSomething (player_t* player, unsigned int adder)
 {
   fixed_t move;
 
@@ -931,7 +931,7 @@ A_FireCGun (mobj_t* mo, pspdef_t* psp)
   S_StartSound (mo, sfx_pistol);
   P_SetMobjState (mo, S_PLAY_ATK2);
   player->ammo[weaponinfo[player->readyweapon].ammo]--;
-  A_FireSomething (player, psp->state - &states[S_CHAIN1]);
+  A_FireSomething (player, (psp->state - &states[S_CHAIN1]) & 1);
   P_BulletSlope (mo);
   P_GunShot (mo, (boolean)(!player->refire));
 }
