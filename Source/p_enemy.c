@@ -1045,7 +1045,7 @@ void A_SkelMissile (mobj_t* actor, pspdef_t* psp)
     mo->tracer = actor->target;
 }
 
-int	TRACEANGLE = 0xc000000;
+#define TRACEANGLE 0xC000000
 
 void A_Tracer (mobj_t* actor, pspdef_t* psp)
 {
