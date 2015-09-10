@@ -298,7 +298,7 @@ boolean P_Move (mobj_t*	actor)
     int     speed;
 
     if (actor->movedir == DI_NODIR)
-        return false;
+	return false;
 
     speed = actor->info->speed;
 
@@ -307,55 +307,55 @@ boolean P_Move (mobj_t*	actor)
 
     if (!P_TryMove(actor, tryx, tryy))
     {
-        boolean good;
+	boolean good;
 
-        // open any specials
-        if ((actor->flags & MF_FLOAT) && floatok)
-        {
-            // must adjust height
-            if (actor->z < tmfloorz)
-                actor->z += FLOATSPEED;
-            else
-                actor->z -= FLOATSPEED;
+	// open any specials
+	if ((actor->flags & MF_FLOAT) && floatok)
+	{
+	    // must adjust height
+	    if (actor->z < tmfloorz)
+		actor->z += FLOATSPEED;
+	    else
+		actor->z -= FLOATSPEED;
 
-            actor->flags |= MF_INFLOAT;
-            return true;
-        }
+	    actor->flags |= MF_INFLOAT;
+	    return true;
+	}
 
-        if (!numspechit)
-            return false;
+	if (!numspechit)
+	    return false;
 
-        actor->movedir = DI_NODIR;
+	actor->movedir = DI_NODIR;
 
-        // if the special is not a door that can be opened, return false
-        //
-        // killough 8/9/98: this is what caused monsters to get stuck in
-        // doortracks, because it thought that the monster freed itself
-        // by opening a door, even if it was moving towards the doortrack,
-        // and not the door itself.
-        //
-        // killough 9/9/98: If a line blocking the monster is activated,
-        // return true 90% of the time. If a line blocking the monster is
-        // not activated, but some other line is, return false 90% of the
-        // time. A bit of randomness is needed to ensure it's free from
-        // lockups, but for most cases, it returns the correct result.
-        //
-        // Do NOT simply return false 1/4th of the time (causes monsters to
-        // back out when they shouldn't, and creates secondary stickiness).
+	// if the special is not a door that can be opened, return false
+	//
+	// killough 8/9/98: this is what caused monsters to get stuck in
+	// doortracks, because it thought that the monster freed itself
+	// by opening a door, even if it was moving towards the doortrack,
+	// and not the door itself.
+	//
+	// killough 9/9/98: If a line blocking the monster is activated,
+	// return true 90% of the time. If a line blocking the monster is
+	// not activated, but some other line is, return false 90% of the
+	// time. A bit of randomness is needed to ensure it's free from
+	// lockups, but for most cases, it returns the correct result.
+	//
+	// Do NOT simply return false 1/4th of the time (causes monsters to
+	// back out when they shouldn't, and creates secondary stickiness).
 
-        for (good = false; numspechit--;)
-            if (P_UseSpecialLine(actor, spechit[numspechit], 0))
-                good = (boolean)(good|(spechit[numspechit] == blockline ? 1 : 2));
+	for (good = false; numspechit--;)
+	    if (P_UseSpecialLine(actor, spechit[numspechit], 0))
+		good = (boolean)(good|(spechit[numspechit] == blockline ? 1 : 2));
 
-        return (boolean)(good && ((P_Random() >= 230) ^ (good & 1)));
+	return (boolean)(good && ((P_Random() >= 230) ^ (good & 1)));
     }
     else
     {
-        actor->flags &= ~MF_INFLOAT;
+	actor->flags &= ~MF_INFLOAT;
     }
 
     if (!(actor->flags & MF_FLOAT))
-        actor->z = actor->floorz;
+	actor->z = actor->floorz;
     return true;
 }
 
@@ -592,14 +592,14 @@ P_LookForPlayers
 static boolean P_LookForTargets (mobj_t *actor, boolean allaround)
 {
     if (P_LookForPlayers (actor, allaround))
-        return true;
+	return true;
     else
-        if (actor->lastenemy && actor->lastenemy->health > 0)
-        {
-             actor->target = actor->lastenemy;
-             actor->lastenemy = NULL;
-             return true;
-        }
+	if (actor->lastenemy && actor->lastenemy->health > 0)
+	{
+	     actor->target = actor->lastenemy;
+	     actor->lastenemy = NULL;
+	     return true;
+	}
     return false;
 }
 #endif
@@ -813,7 +813,7 @@ void A_FaceTarget (mobj_t* actor, pspdef_t* psp)
 
     if (actor->target->flags & MF_SHADOW)
     {
-        int t = P_Random();	/* remove dependence on order of evaluation */
+	int t = P_Random();	/* remove dependence on order of evaluation */
 	actor->angle += (t-P_Random())<<21;
     }
 }
@@ -861,8 +861,8 @@ void A_SPosAttack (mobj_t* actor, pspdef_t* psp)
 
     for (i=0 ; i<3 ; i++)
     {
-        int t;
-        t = P_Random();	/* remove dependence on order of evaluation */
+	int t;
+	t = P_Random();	/* remove dependence on order of evaluation */
 	angle = bangle + ((t-P_Random())<<20);
 	damage = ((P_Random()%5)+1)*3;
 	P_LineAttack (actor, angle, MISSILERANGE, slope, damage);
@@ -1265,15 +1265,15 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 
 		    if (P_SetMobjState (corpsehit, (statenum_t) info->raisestate))
 		    {
-	              // [BH] don't allow crushed monsters to be resurrected as "ghosts"
-	              if (allow_ghosts())
-	              {
-        	        corpsehit->height <<= 2;
-        	      }
-        	      else
-        	      {
-		        corpsehit->height = info->height;
-		        corpsehit->radius = info->radius;
+		      // [BH] don't allow crushed monsters to be resurrected as "ghosts"
+		      if (allow_ghosts())
+		      {
+			corpsehit->height <<= 2;
+		      }
+		      else
+		      {
+			corpsehit->height = info->height;
+			corpsehit->radius = info->radius;
 		      }
 		      corpsehit->flags  = info->flags;
 		      corpsehit->health = info->spawnhealth;
@@ -1281,9 +1281,9 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 #if 0
 		      corpsehit->lastenemy = NULL;
 #endif
-	              // [BH] remove one from killcount since monster is to be resurrected
+		      // [BH] remove one from killcount since monster is to be resurrected
 		      if ((corpsehit->flags & MF_COUNTKILL)
-	               && (actor->target->player->killcount))
+		       && (actor->target->player->killcount))
 			actor->target->player->killcount--;
 		    }
 		    return;
@@ -1694,8 +1694,8 @@ void A_SkullPop (mobj_t *actor, pspdef_t* psp)
     mo->angle = actor->angle;
     if (player)
     {
-        player->mo = mo;
-        player->damagecount = 32;
+	player->mo = mo;
+	player->damagecount = 32;
     }
 }
 
@@ -1913,16 +1913,16 @@ void A_BossDeath (mobj_t* mo, pspdef_t* psp)
 	    // JAD 01/12/98
 
     	    if (strncasecmp (F_CastName(MT_SPIDER), "THE ALIEN QUEEN",15) == 0)
-            {
-              if (mo->type != MT_SPIDER)
+	    {
+	      if (mo->type != MT_SPIDER)
 		return;
-            }
-            else
-            {
+	    }
+	    else
+	    {
 	      if (mo->type != MT_CYBORG)
 		return;
 	    }
-            break;
+	    break;
 
 	  case 3:
 	    if (gamemap != 8)
@@ -2221,12 +2221,12 @@ static mobj_t* A_NextBrainTarget (void)
     {
       if (found_so_far == braintargetted)	// This one the one that we want?
       {
-        braintargetted++;			// Yes.
-        return (m);
+	braintargetted++;			// Yes.
+	return (m);
       }
       found_so_far++;
       if (found_1 == NULL)		// Remember first one in case we wrap.
-        found_1 = m;
+	found_1 = m;
     }
   }
 
@@ -2402,19 +2402,19 @@ void A_Mushroom(mobj_t *actor, pspdef_t* psp)
 
     // Now launch mushroom cloud
     for (i = -n; i <= n; i += 8)
-        for (j = -n; j <= n; j += 8)
-        {
-            mobj_t target = *actor, *mo;
+	for (j = -n; j <= n; j += 8)
+	{
+	    mobj_t target = *actor, *mo;
 
-            target.x += i << FRACBITS;				// Aim in many directions from source
-            target.y += j << FRACBITS;
-            target.z += P_ApproxDistance(i, j) * misc1;		// Aim up fairly high
-            mo = P_SpawnMissile(actor, &target, MT_FATSHOT);	// Launch fireball
-            mo->momx = FixedMul(mo->momx, misc2);
-            mo->momy = FixedMul(mo->momy, misc2);		// Slow down a bit
-            mo->momz = FixedMul(mo->momz, misc2);
-            mo->flags &= ~MF_NOGRAVITY;				// Make debris fall under gravity
-        }
+	    target.x += i << FRACBITS;				// Aim in many directions from source
+	    target.y += j << FRACBITS;
+	    target.z += P_ApproxDistance(i, j) * misc1;		// Aim up fairly high
+	    mo = P_SpawnMissile(actor, &target, MT_FATSHOT);	// Launch fireball
+	    mo->momx = FixedMul(mo->momx, misc2);
+	    mo->momy = FixedMul(mo->momy, misc2);		// Slow down a bit
+	    mo->momz = FixedMul(mo->momz, misc2);
+	    mo->flags &= ~MF_NOGRAVITY;				// Make debris fall under gravity
+	}
 }
 
 //
@@ -2443,8 +2443,8 @@ void A_Face (mobj_t *mo, pspdef_t* psp)
 void A_Scratch (mobj_t *mo, pspdef_t* psp)
 {
     mo->target && (A_FaceTarget(mo,psp), P_CheckMeleeRange(mo)) ?
-        mo->state->misc2 ? S_StartSound(mo, (fixed_t)mo->state->misc2) : (void)0,
-        P_DamageMobj(mo->target, mo, mo, (fixed_t)mo->state->misc1) : (void)0;
+	mo->state->misc2 ? S_StartSound(mo, (fixed_t)mo->state->misc2) : (void)0,
+	P_DamageMobj(mo->target, mo, mo, (fixed_t)mo->state->misc1) : (void)0;
 }
 
 void A_PlaySound (mobj_t *mo, pspdef_t* psp)
@@ -2454,8 +2454,26 @@ void A_PlaySound (mobj_t *mo, pspdef_t* psp)
 
 void A_RandomJump (mobj_t *mo, pspdef_t* psp)
 {
-    if (P_Random() < mo->state->misc2)
-        P_SetMobjState(mo, (statenum_t)mo->state->misc1);
+  int position;
+  state_t * state;
+  player_t* player;
+
+  if ((psp)
+   && ((player = mo->player) != NULL))
+  {
+    state = psp->state;
+    if (P_Random() < state->misc2)
+    {
+      position = psp - &player->psprites[0];
+      P_SetPsprite (player, position, (statenum_t)state->misc1);
+    }
+  }
+  else
+  {
+    state = mo->state;
+    if (P_Random() < state->misc2)
+      P_SetMobjState (mo, (statenum_t)state->misc1);
+  }
 }
 
 //
