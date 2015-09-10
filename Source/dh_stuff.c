@@ -1681,7 +1681,7 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
 }
 
 /* ---------------------------------------------------------------------------- */
-
+#if 0
 static const codeptrs_t * get_action_function_from_ptr (actionf_v aname)
 {
   unsigned int p;
@@ -1698,7 +1698,7 @@ static const codeptrs_t * get_action_function_from_ptr (actionf_v aname)
 
   return (NULL);
 }
-
+#endif
 /* ---------------------------------------------------------------------------- */
 
 static const codeptrs_t * get_action_function_from_name (const char * name)
