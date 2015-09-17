@@ -946,7 +946,7 @@ int I_RegisterSong (void * vdata, unsigned int size)
     return (timplayer_handle);
   }
 
-  if (((music_available & MIDI_AVAILABLE) == 0)
+  if ((music_available & MIDI_AVAILABLE)
    && (((int*)data)[0]==0x1a53554d))
   {
     offset=*(data+6)+((*(data+7))<<8);
