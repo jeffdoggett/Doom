@@ -460,7 +460,7 @@ void I_UnRegisterSong(int handle)
 {
 }
 
-int I_RegisterSong(void* data)
+int I_RegisterSong(void* data, unsigned int size)
 {
   return 1;
 }

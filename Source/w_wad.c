@@ -179,10 +179,14 @@ void W_RemoveDuplicates (void)
       {
 	// printf ("Removed %s\n", lump_p2 -> name);
 	lump_p2 -> name [0] = 0;			// Duplicate found - remove it.
+#if 0
 	do						// And move to next wad
 	{
 	  lump_p2--;
 	} while ((lump_p2 >= lumpinfo) && (lump_p2 -> handle == (lump_p2 + 1) -> handle));
+#else
+	lump_p2--;
+#endif
       }
       else
       {
@@ -832,7 +836,7 @@ int W_CheckNumForName (const char* name)
     v2 = name8.x[1];
 
     /* Re-write, does binary rather than linear search */
-    pos = (numlumps+1) >> 1; step = (pos+1) >> 1; count = (pos << 1);
+    pos = (numlumps+1) >> 1; step = (pos+1) >> 1; count = (pos << 1) + 1;
     while (count != 0)
     {
 	int	    w1 = ((int*)lumpinfo[sortedlumps[pos]].name)[0];

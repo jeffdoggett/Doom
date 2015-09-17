@@ -111,9 +111,67 @@
 #define MIDI_ClockStamp		   0x404E9
 #define MIDI_Thru		   0x404EA
 
+#define QTM_Load		   0x47E40
+#define QTM_Start		   0x47E41
+#define QTM_Stop		   0x47E42
+#define QTM_Pause		   0x47E43
+#define QTM_Clear		   0x47E44
+#define QTM_Info		   0x47E45
+#define QTM_Pos		   	   0x47E46
+#define QTM_EffectControl	   0x47E47
+#define QTM_Volume		   0x47E48
+#define QTM_SetSampleSpeed	   0x47E49
+#define QTM_DMABuffer		   0x47E4A
+#define QTM_RemoveChannel	   0x47E4B
+#define QTM_RestoreChannel	   0x47E4C
+#define QTM_Stereo		   0x47E4D
+#define QTM_ReadSongLength	   0x47E4E
+#define QTM_ReadSequenceTable	   0x47E4F
+#define QTM_VUBarControl	   0x47E50
+#define QTM_ReadVULevels	   0x47E51
+#define QTM_ReadSampleTable	   0x47E52
+#define QTM_ReadSpeed		   0x47E53
+#define QTM_PlaySample		   0x47E54
+#define QTM_SongStatus		   0x47E55
+#define QTM_ReadPlayingTime	   0x47E56
+#define QTM_PlayRawSample	   0x47E57
+#define QTM_SoundControl	   0x47E58
+#define QTM_SWITableAddress	   0x47E59
+#define QTM_RegisterSample	   0x47E5A
+#define QTM_SetSpeed		   0x47E5B
+#define QTM_MusicVolume		   0x47E5C
+#define QTM_SampleVolume	   0x47E5D
+#define QTM_MusicOptions	   0x47E5E
+#define QTM_MusicInterrupt	   0x47E5F
+#define QTM_ReadChannelData	   0x47E60
+#define QTM_ReadNoteWord	   0x47E61
+
+
+#define TimPlayer_Version	   0x51380
+#define TimPlayer_Configure	   0x51381
+#define TimPlayer_SongLoad	   0x51382
+#define TimPlayer_SongUnload	   0x51383
+#define TimPlayer_SongNew	   0x51384
+#define TimPlayer_SongLoad2	   0x51385
+#define TimPlayer_SongDecompress   0x51386
+#define TimPlayer_SongPlay	   0x51388
+#define TimPlayer_SongPause	   0x51389
+#define TimPlayer_SongStop	   0x5138A
+#define TimPlayer_SongPosition	   0x5138B
+#define TimPlayer_SongVolume	   0x5138C
+#define TimPlayer_SongStatus	   0x5138D
+#define TimPlayer_SongConfigure	   0x5138E
+#define TimPlayer_SongInfo	   0x51390
+#define TimPlayer_SongTexts	   0x51391
+#define TimPlayer_SongInitialSettings	   0x51392
+#define TimPlayer_ChannelInitialSettings   0x51393
+
+
 
 #define MIN_SFX_CHAN		   1
 #define MAX_SFX_CHAN		   8
+
+/* ------------------------------------------------------------ */
 
 unsigned int current_play_id [MAX_SFX_CHAN + 1];
 static int prev_snd_config [6];
@@ -122,6 +180,25 @@ static int last_snd_channel = MIN_SFX_CHAN - 1;
 
 /* ------------------------------------------------------------ */
 
+/* Info about music playing */
+static unsigned int music_available = 0;/* true if MIDI initialised ok			*/
+static byte*	music_data=NULL;	/* Pointer to score if registered, else 0	*/
+static byte*	music_pos=NULL;		/* Current position if playing, else 0	 	*/
+static int	music_loop;		/* Loop flag if playing				*/
+static int 	music_time;		/* Current music time if playing		*/
+static int 	music_vel[16];		/* Previous velocity on midichannel		*/
+static int	music_pause=0;		/* Time that music was paused, or 0 if it isn't	*/
+static int 	music_midivol;		/* Main volume (-127..0)			*/
+static int	music_qtmvol;
+static int	music_timvol;
+static int	qtm_channels_swiped = 0;/* Number of sound channels used by qtm		*/
+static int	timplayer_handle = 0;
+
+#define MIDI_AVAILABLE	1
+#define QTM_PLAYING	2
+#define TIM_PLAYING	4
+
+/* ------------------------------------------------------------ */
 //
 // SFX API
 // Note: this was called by S_Init.
@@ -288,6 +365,7 @@ I_StartSound
   unsigned int channel;
   unsigned int cs_id;
   unsigned int qty;
+  unsigned int max_sfx_chan;
   _kernel_swi_regs regs;
 
   cs_id = -1;
@@ -308,11 +386,15 @@ I_StartSound
   /* Look for an unused sound channel. If there isn't one
   ** then just use the one after last_snd_channel */
 
+  max_sfx_chan = MAX_SFX_CHAN;
+  if (music_available & QTM_PLAYING)		// Qtm swipes 4 channels!
+    max_sfx_chan = MAX_SFX_CHAN - qtm_channels_swiped;
+
   channel = last_snd_channel + 1;
-  if (channel > MAX_SFX_CHAN)
+  if (channel > max_sfx_chan)
     channel = MIN_SFX_CHAN;
 
-  qty = (MAX_SFX_CHAN - MIN_SFX_CHAN) + 1;
+  qty = (max_sfx_chan - MIN_SFX_CHAN) + 1;
   do
   {
     regs.r[0] = channel;
@@ -321,7 +403,7 @@ I_StartSound
     if ((regs.r[1] == 0)
      || (cs_id == current_play_id [channel]))
       break;
-    if (++channel > MAX_SFX_CHAN)
+    if (++channel > max_sfx_chan)
       channel = MIN_SFX_CHAN;
   } while (--qty);			// At exit channel will have incremented
 					// back round to the start again.
@@ -509,7 +591,6 @@ void I_ShutdownSound(void)
   regs.r[4] = prev_snd_config [4];
   regs.r[5] = prev_snd_config [5];
   _kernel_swi (Sound_Configure, &regs, &regs);
-
 }
 
 /* ------------------------------------------------------------ */
@@ -636,40 +717,196 @@ static unsigned int Mus_TxCommand (unsigned int a, unsigned int b)
 
 /* ------------------------------------------------------------ */
 
-/* Info about music playing */
-boolean	music_ready=false;	/* true if MIDI initialised ok			*/
-byte*	music_data=NULL;	/* Pointer to score if registered, else 0	*/
-byte*	music_pos=NULL;		/* Current position if playing, else 0	 	*/
-int	music_loop;		/* Loop flag if playing				*/
-int 	music_time;		/* Current music time if playing		*/
-int 	music_vel[16];		/* Previous velocity on midichannel		*/
-int	music_pause=0;		/* Time that music was paused, or 0 if it isn't	*/
-int 	music_mainvol;		/* Main volume (-127..0)			*/
+static unsigned int Mus_QTM_load (byte * addr)
+{
+  _kernel_swi_regs regs;
+  _kernel_oserror * rc;
+
+  regs.r[0] = -1; //0;		// Must copy to QTM private memory otherwise crashes doom.
+  regs.r[1] = (int) addr;	// A competant programmer would find out why and fix it!
+  rc = _kernel_swi (QTM_Load, &regs, &regs);
+  if (rc)
+  {
+//  printf ("QTM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
+    return ((unsigned int) rc);
+  }
+
+  return (0);
+}
+
+static unsigned int Mus_QTM_start (void)
+{
+  _kernel_swi_regs regs;
+
+  if (_kernel_swi (QTM_Start, &regs, &regs))
+    return (1);
+
+  regs.r[0] = -1;
+  regs.r[1] = -1;
+  regs.r[2] = -1;
+  _kernel_swi (QTM_SoundControl, &regs, &regs);
+  // printf ("QTM_SoundControl %d %d %d\n", regs.r[0], regs.r[1], regs.r[2]);
+  qtm_channels_swiped = regs.r[0];
+  return (0);
+}
+
+static unsigned int Mus_QTM_stop (void)
+{
+  _kernel_swi_regs regs;
+
+  if (_kernel_swi (QTM_Stop, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_QTM_pause (void)
+{
+  _kernel_swi_regs regs;
+
+  if (_kernel_swi (QTM_Pause, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_QTM_clear (void)
+{
+  _kernel_swi_regs regs;
+
+  if (_kernel_swi (QTM_Clear, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_QTM_set_volume (unsigned int vol)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = vol;
+  if (_kernel_swi (QTM_Volume, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+/* ------------------------------------------------------------ */
+
+static unsigned int Mus_TIM_load (byte * addr, unsigned int size)
+{
+  _kernel_swi_regs regs;
+  _kernel_oserror * rc;
+
+  regs.r[0] = 0;
+  regs.r[1] = 0;
+  regs.r[2] = (int) addr;
+  regs.r[3] = size;
+  rc = _kernel_swi (TimPlayer_SongLoad, &regs, &regs);
+  if (rc)
+  {
+    // printf ("TIM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
+    return ((unsigned int) rc);
+  }
+
+  timplayer_handle = regs.r[0];
+  // printf ("Tim handle = %X\n", timplayer_handle);
+  return (0);
+}
+
+static unsigned int Mus_TIM_start (void)
+{
+  _kernel_swi_regs regs;
+
+
+  regs.r[0] = timplayer_handle;
+  if (_kernel_swi (TimPlayer_SongPlay, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_TIM_stop (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = timplayer_handle;
+  if (_kernel_swi (TimPlayer_SongStop, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_TIM_pause (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = timplayer_handle;
+  if (_kernel_swi (TimPlayer_SongPause, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_TIM_clear (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = timplayer_handle;
+  if (_kernel_swi (TimPlayer_SongUnload, &regs, &regs))
+    return (1);
+
+  return (0);
+}
+
+static unsigned int Mus_TIM_set_volume (unsigned int vol)
+{
+  _kernel_swi_regs regs;
+
+  if (music_available & TIM_PLAYING)
+  {
+    regs.r[0] = timplayer_handle;
+    regs.r[1] = vol;
+    if (_kernel_swi (TimPlayer_SongVolume, &regs, &regs))
+      return (1);
+  }
+  return (0);
+}
+
+/* ------------------------------------------------------------ */
 
 char midimap[16]={0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,9};
 
 /* This is called once at startup */
 void I_InitMusic(void)
 {
-  music_ready = false;
+  music_available = 0;
   music_pause = 0;
   music_data = NULL;
   music_pos = NULL;
 
   if (snd_AllowMusic == 0)
     return;
+
   if (music_pause==0)
   {
-    music_ready = (boolean) Mus_CheckAndInit();
-    if (!music_ready)
-      fprintf(stderr,"Could not initialise MIDI\n");
-    else
+    if (Mus_CheckAndInit ())
+    {
+      music_available |= MIDI_AVAILABLE;
       fprintf(stderr,"MIDI initialised\n");
+    }
+    else
+    {
+      fprintf(stderr,"Could not initialise MIDI\n");
+    }
   }
   else
-    I_ResumeSong(1);
+  {
+    I_ResumeSong (1);
+  }
 }
 
+/* ------------------------------------------------------------ */
 
 
 /* This will restore system resources to their state
@@ -677,7 +914,7 @@ void I_InitMusic(void)
  */
 void I_ReleaseMusic(void)
 {
-  if (!music_ready)
+  if (!music_available)
     return;
   I_PauseSong(1);
 }
@@ -686,18 +923,38 @@ void I_ReleaseMusic(void)
 /* Song has been loaded, and placed at 'data'.
    If music is ready, get ready to play.
    Return a dummy handle */
-int I_RegisterSong (void * vdata)
+int I_RegisterSong (void * vdata, unsigned int size)
 {
   byte * data;
   unsigned int offset;
 
-  if (!music_ready) return 0;
-  I_UnRegisterSong(1);
+  I_UnRegisterSong (1);
   data = (byte*) vdata;
-  if (((int*)data)[0]!=0x1a53554d) return 1;
-  offset=*(data+6)+((*(data+7))<<8);
-  music_data=data+offset;
-  return 1;
+
+  if (snd_AllowMusic == 0)
+    return (0);
+
+  if (Mus_QTM_load (data) == 0)		// Did QTM recognise it?
+  {
+    music_available |= QTM_PLAYING;
+    return (1);
+  }
+
+  if (Mus_TIM_load (data,size) == 0)	// Did TIM player recognise it?
+  {
+    music_available |= TIM_PLAYING;
+    return (timplayer_handle);
+  }
+
+  if (((music_available & MIDI_AVAILABLE) == 0)
+   && (((int*)data)[0]==0x1a53554d))
+  {
+    offset=*(data+6)+((*(data+7))<<8);
+    music_data=data+offset;
+    return 1;
+  }
+
+  return 0;
 }
 
 /* Keep scheduler buffer full */
@@ -719,9 +976,9 @@ void I_FillMusBuffer(int handle)
       case 1: /* NoteOn */
         par1=*music_pos++;
         if (par1 &128)
-          par2=(music_vel[ch]=*music_pos++)+music_mainvol;
+          par2=(music_vel[ch]=*music_pos++)+music_midivol;
         else
-          par2=music_vel[ch]+music_mainvol;
+          par2=music_vel[ch]+music_midivol;
         par1&=127;
         if (par2>0) free=Mus_TxCommand(0x90|ch|(par1<<8)|(par2<<16),music_time);
         break;
@@ -777,12 +1034,29 @@ void I_FillMusBuffer(int handle)
 }
 
 /* If a song is registered, start playing it */
-void I_PlaySong(int handle, int loop)
+void I_PlaySong (int handle, int loop)
 {
   int i;
 
-  if ((!music_ready)||(music_data==NULL)) return;
-  I_StopSong(handle);
+  // I_StopSong(handle);
+
+  if (music_available & QTM_PLAYING)
+  {
+    Mus_QTM_start ();
+    return;
+  }
+
+  if (music_available & TIM_PLAYING)
+  {
+    Mus_TIM_start ();
+    Mus_TIM_set_volume (music_timvol);
+    return;
+  }
+
+  if (((music_available & MIDI_AVAILABLE) == 0)
+   || (music_data == NULL))
+    return;
+
   music_loop=loop;
   music_pos=music_data;
   music_time=music_pause=0;
@@ -793,21 +1067,43 @@ void I_PlaySong(int handle, int loop)
 
 
 /* Is the song playing, even if paused? */
-int I_QrySongPlaying(int handle)
+int I_QrySongPlaying (int handle)
 {
-  return (music_pos!=NULL);
+  if ((music_available & (QTM_PLAYING|TIM_PLAYING))
+   || (music_pos != NULL))
+    return (1);
+
+  return (0);
 }
 
-void I_SetMusicVolume(int volume) /* 0..15 */
+void I_SetMusicVolume (int volume) /* 0..15 */
 {
-  music_mainvol=(volume-15)*127/15;
+  if (volume > 15) volume = 15;
+  music_midivol = (volume-15)*127/15;
+  music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-64 */
+  music_timvol  = volume << 4;	/* Convert volume 0-15 to 0-256 */
+  Mus_QTM_set_volume (music_qtmvol);
+  Mus_TIM_set_volume (music_timvol);
 }
 
 /* Pause song, be silent */
 void I_PauseSong (int handle)
 {
-  if ((!music_ready)||(music_pause!=0))
+  if (music_available & QTM_PLAYING)
+  {
+    Mus_QTM_pause ();
+    return;
+  }
+  if (music_available & TIM_PLAYING)
+  {
+    Mus_TIM_pause ();
+    return;
+  }
+
+  if (((music_available & MIDI_AVAILABLE) == 0)
+   || (music_pause != 0))
     return;				/* Already paused */
+
   music_pause=Mus_StartClock(0,0);	/* Stop clock and note time */
   Mus_StopSound();
 }
@@ -815,16 +1111,49 @@ void I_PauseSong (int handle)
 /* Resume song, obviously */
 void I_ResumeSong (int handle)
 {
-  if ((!music_ready)||
-     (music_pause==0)) return;		/* Wasn't paused */
+  if (music_available & QTM_PLAYING)
+  {
+    Mus_QTM_start ();
+    return;
+  }
+
+  if (music_available & TIM_PLAYING)
+  {
+    Mus_TIM_start ();
+    return;
+  }
+
+  if (((music_available & MIDI_AVAILABLE) == 0)
+   || (music_pause == 0))
+    return;				/* Wasn't paused */
+
   Mus_StartClock(100,music_pause);	/* Restart clock */
   music_pause=0;
 }
 
 /* Stop song and sounds */
-void I_StopSong(int handle)
+void I_StopSong (int handle)
 {
-  if (!music_ready) return;
+  if (music_available & QTM_PLAYING)
+  {
+    Mus_QTM_stop ();
+    Mus_QTM_clear ();
+    music_available &= ~QTM_PLAYING;
+    return;
+  }
+
+  if (music_available & TIM_PLAYING)
+  {
+    Mus_TIM_stop ();
+    Mus_TIM_clear ();
+    music_available &= ~TIM_PLAYING;
+    return;
+  }
+
+  if (((music_available & MIDI_AVAILABLE) == 0)
+   || (music_data == NULL))		/* Not registered */
+    return;
+
   Mus_ClearQueue();			/* Might be stopped already if not looping */
   Mus_StopSound();
   music_pos=NULL;
@@ -832,19 +1161,17 @@ void I_StopSong(int handle)
 }
 
 /* Stop and forget song */
-void I_UnRegisterSong(int handle)
+void I_UnRegisterSong (int handle)
 {
-  if (music_data==NULL) return;		/* Not registered */
-  I_StopSong(handle);
+  I_StopSong (handle);
   music_data=NULL;
 }
 
 /* This should kill playing music, and tidy up */
-void I_ShutdownMusic(void)
+void I_ShutdownMusic (void)
 {
-  if (!music_ready) return;
   I_UnRegisterSong(1);
-  music_ready=false;
+  music_available = 0;
 }
 
 /* ------------------------------------------------------------ */
