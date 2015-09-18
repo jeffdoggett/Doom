@@ -70,8 +70,8 @@ lumpinfo_t*		lumpinfo;
 int			numlumps;
 
 void**			lumpcache;
-int*			sortedlumps;
-int			duplicates_removed = 0;
+static int*		sortedlumps;
+static int		duplicates_removed = 0;
 
 /* ---------------------------------------------------------------------------- */
 
@@ -150,6 +150,22 @@ void W_QuicksortLumps (int from, int to)
 	}
     }
     while (stackitems >= 0);
+#if 0
+  {
+    unsigned int pos;
+    lumpinfo_t* lump_p;
+    char name [10];
+
+    pos = 0;
+    do
+    {
+      lump_p = &lumpinfo[sortedlumps[pos]];
+      strncpy (name, lump_p->name,8);
+      name [8] = 0;
+      printf ("pos %u is lump %u (%s)\n", pos, sortedlumps[pos], name);
+    } while (++pos < numlumps);
+  }
+#endif
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -521,9 +537,11 @@ void W_InitMultipleFiles (char** filenames)
     {
 	I_Error("Couldn't claim memory for sortedlumps!\n");
     }
-    for (i=0; i<numlumps; i++) sortedlumps[i] = i;
 
-    W_QuicksortLumps (0, numlumps-1);
+    for (i=0; i<numlumps; i++) sortedlumps[i] = i;
+    duplicates_removed = 0;
+
+    // W_QuicksortLumps (0, numlumps-1);
 }
 
 /* ---------------------------------------------------------------------------- */
