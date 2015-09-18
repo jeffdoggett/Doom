@@ -166,6 +166,7 @@ void W_RemoveDuplicates (void)
   lumpinfo_t* lump_p1;
   lumpinfo_t* lump_p2;
 
+  // printf ("W_RemoveDuplicates (%u)\n", numlumps);
   lump_p1 = lumpinfo;
   count_1 = numlumps - 1;
   do
@@ -180,8 +181,8 @@ void W_RemoveDuplicates (void)
       if ((w1 == ((int*)lump_p2 -> name)[0])
        && (w2 == ((int*)lump_p2 -> name)[1]))
       {
-	// printf ("Removed %s (%s)\n", lump_p1 -> name, lump_p2 -> name);
-	lump_p1 -> name [0] = 0;			// Duplicate found - remove it.
+	// printf ("Removed (%s)(%s) %X %X\n", lump_p1 -> name, lump_p2 -> name, lump_p1, lump_p2);
+	memset (lump_p1 -> name, 0, sizeof (lump_p1 -> name));	// Duplicate found - remove it.
 	break;
       }
       lump_p2++;
@@ -189,6 +190,7 @@ void W_RemoveDuplicates (void)
     lump_p1++;
   } while (--count_1);
 
+  // printf ("W_RemoveDuplicates done\n");
   duplicates_removed = 1;
 }
 
@@ -804,6 +806,7 @@ int W_CheckNumForName (const char* name)
     unsigned int p,cc;
     char *	ptr_d;
 
+    // printf ("W_CheckNumForName (%s) %d\n", name, duplicates_removed);
     if (duplicates_removed == 0)				// Cannot use this function until after the
     {								// duplicate stuff has been removed which doesn't
       return (W_CheckNumForNameLinear (name));			// happen until late in the startup.
@@ -834,6 +837,8 @@ int W_CheckNumForName (const char* name)
     {
 	int	    w1 = ((int*)lumpinfo[sortedlumps[pos]].name)[0];
 	int	    w2 = ((int*)lumpinfo[sortedlumps[pos]].name)[1];
+
+	// printf ("pos = %u, step = %u, count = %u (%X %X %X %X\n", pos, step, count, v1,v2,w1,w2);
 
 	if ((v1 == w1) && (v2 == w2))
 	    return sortedlumps[pos];
