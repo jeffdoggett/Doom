@@ -2262,11 +2262,8 @@ void D_DoomMain (void)
   // printf ("D_CheckNetGame: Checking network game status.\n");
   D_CheckNetGame ();
 
-  if (modifiedgame)
-  {
-    W_RemoveDuplicates ();
-    W_QuicksortLumps (0, numlumps-1);
-  }
+  W_RemoveDuplicates ();
+  W_QuicksortLumps (0, numlumps-1);
 
   /* We do these down here so that they can override a MAPINFO segment */
   p = 0;

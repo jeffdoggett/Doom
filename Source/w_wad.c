@@ -160,41 +160,34 @@ void W_QuicksortLumps (int from, int to)
 //
 void W_RemoveDuplicates (void)
 {
+  unsigned int count_1;
+  unsigned int count_2;
+  unsigned int w1,w2;
   lumpinfo_t* lump_p1;
   lumpinfo_t* lump_p2;
 
-  lump_p1 = lumpinfo + (numlumps - 1);
+  lump_p1 = lumpinfo;
+  count_1 = numlumps - 1;
   do
   {
-    lump_p2 = lump_p1;
+    w1 = ((int*)lump_p1 -> name)[0];
+    w2 = ((int*)lump_p1 -> name)[1];
+    lump_p2 = lump_p1 + 1;
+    count_2 = count_1;
+    // printf ("Doing %u of %u\n", count_2, numlumps);
     do
     {
-      lump_p2--;
-    } while ((lump_p2 >= lumpinfo) && (lump_p2 -> handle == lump_p1 -> handle));
-
-    while (lump_p2 >= lumpinfo)
-    {
-      if ((((int*)lump_p1 -> name)[0] == ((int*)lump_p2 -> name)[0])
-       && (((int*)lump_p1 -> name)[1] == ((int*)lump_p2 -> name)[1]))
+      if ((w1 == ((int*)lump_p2 -> name)[0])
+       && (w2 == ((int*)lump_p2 -> name)[1]))
       {
-	// printf ("Removed %s\n", lump_p2 -> name);
-	lump_p2 -> name [0] = 0;			// Duplicate found - remove it.
-#if 0
-	do						// And move to next wad
-	{
-	  lump_p2--;
-	} while ((lump_p2 >= lumpinfo) && (lump_p2 -> handle == (lump_p2 + 1) -> handle));
-#else
-	lump_p2--;
-#endif
+	// printf ("Removed %s (%s)\n", lump_p1 -> name, lump_p2 -> name);
+	lump_p1 -> name [0] = 0;			// Duplicate found - remove it.
+	break;
       }
-      else
-      {
-	lump_p2--;
-      }
-    }
-    lump_p1--;
-  } while ((lump_p1 > &lumpinfo[0]) && (lump_p1 -> handle != lumpinfo [0].handle));
+      lump_p2++;
+    } while (--count_2);
+    lump_p1++;
+  } while (--count_1);
 
   duplicates_removed = 1;
 }
@@ -836,7 +829,7 @@ int W_CheckNumForName (const char* name)
     v2 = name8.x[1];
 
     /* Re-write, does binary rather than linear search */
-    pos = (numlumps+1) >> 1; step = (pos+1) >> 1; count = (pos << 1) + 1;
+    pos = (numlumps+1) >> 1; step = (pos+1) >> 1; count = (pos << 1);
     while (count != 0)
     {
 	int	    w1 = ((int*)lumpinfo[sortedlumps[pos]].name)[0];
