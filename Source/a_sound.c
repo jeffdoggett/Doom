@@ -173,7 +173,7 @@
 
 /* ------------------------------------------------------------ */
 
-unsigned int current_play_id [MAX_SFX_CHAN + 1];
+static unsigned int current_play_id [MAX_SFX_CHAN + 1];
 static int prev_snd_config [6];
 static int prev_snd_voice [MAX_SFX_CHAN + 1];
 static int last_snd_channel = MIN_SFX_CHAN - 1;
@@ -193,6 +193,11 @@ static int	music_qtmvol;
 static int	music_timvol;
 static int	qtm_channels_swiped = 0;/* Number of sound channels used by qtm		*/
 static int	timplayer_handle = 0;
+int		timplayer_vol_tab [] =
+{
+  0x00,0x04,0x08,0x0C,0x10,0x14,0x18,0x1C,
+  0x20,0x24,0x28,0x2C,0x30,0x34,0x38,0x3C
+};
 
 #define MIDI_AVAILABLE	1
 #define QTM_PLAYING	2
@@ -1081,7 +1086,7 @@ void I_SetMusicVolume (int volume) /* 0..15 */
   if (volume > 15) volume = 15;
   music_midivol = (volume-15)*127/15;
   music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-64 */
-  music_timvol  = volume << 4;	/* Convert volume 0-15 to 0-256 */
+  music_timvol  = timplayer_vol_tab [volume];	/* Convert volume 0-15 to 0-256 */
   Mus_QTM_set_volume (music_qtmvol);
   Mus_TIM_set_volume (music_timvol);
 }

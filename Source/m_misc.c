@@ -33,7 +33,7 @@ static const char rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 char * screenshot_messages_orig [] =
 {
   "screen shot",
-  "DOOM00.pcx", 
+  "DOOM00.pcx",
   NULL
 };
 
@@ -203,6 +203,9 @@ char*		mousedev;
 extern char*	chat_macros[];
 
 //-----------------------------------------------------------------------------
+#ifdef __riscos
+extern int	timplayer_vol_tab [16];
+#endif
 
 typedef struct
 {
@@ -273,6 +276,26 @@ default_t	defaults[] =
 
   {"usegamma",&usegamma, 0},
   {"lightscaleshift",&lightScaleShift, (char *) LIGHTSCALESHIFT},
+
+#ifdef __riscos
+  {"timplayer_vol0", (int *) &timplayer_vol_tab[0],  (char *) 0x00},
+  {"timplayer_vol1", (int *) &timplayer_vol_tab[1],  (char *) 0x04},
+  {"timplayer_vol2", (int *) &timplayer_vol_tab[2],  (char *) 0x08},
+  {"timplayer_vol3", (int *) &timplayer_vol_tab[3],  (char *) 0x0C},
+  {"timplayer_vol4", (int *) &timplayer_vol_tab[4],  (char *) 0x10},
+  {"timplayer_vol5", (int *) &timplayer_vol_tab[5],  (char *) 0x14},
+  {"timplayer_vol6", (int *) &timplayer_vol_tab[6],  (char *) 0x18},
+  {"timplayer_vol7", (int *) &timplayer_vol_tab[7],  (char *) 0x1C},
+  {"timplayer_vol8", (int *) &timplayer_vol_tab[8],  (char *) 0x20},
+  {"timplayer_vol9", (int *) &timplayer_vol_tab[9],  (char *) 0x24},
+  {"timplayer_vol10", (int *) &timplayer_vol_tab[10],  (char *) 0x28},
+  {"timplayer_vol11", (int *) &timplayer_vol_tab[11],  (char *) 0x2C},
+  {"timplayer_vol12", (int *) &timplayer_vol_tab[12],  (char *) 0x30},
+  {"timplayer_vol13", (int *) &timplayer_vol_tab[13],  (char *) 0x34},
+  {"timplayer_vol14", (int *) &timplayer_vol_tab[14],  (char *) 0x38},
+  {"timplayer_vol15", (int *) &timplayer_vol_tab[15],  (char *) 0x3C},
+#endif
+
 
   {"chatmacro0", (int *) &chat_macros[0], HUSTR_CHATMACRO0 },
   {"chatmacro1", (int *) &chat_macros[1], HUSTR_CHATMACRO1 },
