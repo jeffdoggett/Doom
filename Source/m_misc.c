@@ -309,7 +309,7 @@ default_t	defaults[] =
   {"chatmacro9", (int *) &chat_macros[9], HUSTR_CHATMACRO9 }
 };
 
-int	numdefaults;
+#define	numdefaults	(ARRAY_SIZE(defaults))
 
 //-----------------------------------------------------------------------------
 
@@ -448,7 +448,6 @@ void M_LoadDefaults (void)
   char		buffer [1024];
 
   // set everything to base values
-  numdefaults = sizeof(defaults)/sizeof(defaults[0]);
   for (i=0 ; i<numdefaults ; i++)
       *defaults[i].location = (pint) defaults[i].defaultvalue;
 
