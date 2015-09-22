@@ -368,25 +368,9 @@ I_StartSound
   sfxinfo_t*	sfx;
   unsigned int length;
   unsigned int channel;
-  unsigned int cs_id;
   unsigned int qty;
   unsigned int max_sfx_chan;
   _kernel_swi_regs regs;
-
-  cs_id = -1;
-  sfx = &S_sfx[id];
-
-  // Chainsaw troubles.
-  // Play these sound effects only one at a time.
-  if ( id == sfx_sawup
-	 || id == sfx_sawidl
-	 || id == sfx_sawful
-	 || id == sfx_sawhit
-	 || id == sfx_stnmov
-	 || id == sfx_pistol )
-  {
-    cs_id = id;
-  }
 
   /* Look for an unused sound channel. If there isn't one
   ** then just use the one after last_snd_channel */
@@ -395,29 +379,45 @@ I_StartSound
   if (music_available & QTM_PLAYING)		// Qtm swipes 4 channels!
     max_sfx_chan = MAX_SFX_CHAN - qtm_channels_swiped;
 
-  channel = last_snd_channel + 1;
-  if (channel > max_sfx_chan)
-    channel = MIN_SFX_CHAN;
+  channel = ~0;
 
-  qty = (max_sfx_chan - MIN_SFX_CHAN) + 1;
-  do
+  // Chainsaw troubles.
+  // Play these sound effects only one at a time.
+  if ((id == sfx_sawup)
+   || (id == sfx_sawidl)
+   || (id == sfx_sawful)
+   || (id == sfx_sawhit)
+   || (id == sfx_stnmov)
+   || (id == sfx_pistol))
   {
-    regs.r[0] = channel;
-    _kernel_swi (DataVox_ReadAddress, &regs, &regs);
-    // printf ("Channel %u = %X\n", channel, regs.r[1]);
-    if ((regs.r[1] == 0)
-     || (cs_id == current_play_id [channel]))
-      break;
-    if (++channel > max_sfx_chan)
-      channel = MIN_SFX_CHAN;
-  } while (--qty);			// At exit channel will have incremented
-					// back round to the start again.
+    channel = MIN_SFX_CHAN;
+    while ((id != current_play_id [channel]) && (++channel <= max_sfx_chan));
+  }
 
-  // printf ("Playing sound %s\n", sfx->name);
-  // printf ("Using sound channel %d\n", channel);
+  if (channel > max_sfx_chan)
+  {
+    channel = last_snd_channel + 1;
+    if (channel > max_sfx_chan)
+      channel = MIN_SFX_CHAN;
+    qty = (max_sfx_chan - MIN_SFX_CHAN) + 1;
+    do
+    {
+      regs.r[0] = channel;
+      _kernel_swi (DataVox_ReadAddress, &regs, &regs);
+      // printf ("Channel %u = %X\n", channel, regs.r[1]);
+      if (regs.r[1] == 0)
+	break;
+      if (++channel > max_sfx_chan)
+	channel = MIN_SFX_CHAN;
+    } while (--qty);			// At exit channel will have incremented
+  }					// back round to the start again.
 
   last_snd_channel = channel;
   current_play_id [channel] = id;
+  sfx = &S_sfx[id];
+
+  // printf ("Playing sound %s\n", sfx->name);
+  // printf ("Using sound channel %d\n", channel);
 
   regs.r[0] = channel;
   length = W_LumpLength (sfx->lumpnum);
