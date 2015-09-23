@@ -30,6 +30,7 @@
 
 
 void S_InitSound (void);
+void S_ShutdownSound (void);
 
 //
 // Initializes sound stuff, including volume

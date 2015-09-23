@@ -79,8 +79,7 @@ void I_Init (void)
 void I_Quit (void)
 {
     D_QuitNetGame ();
-    I_ShutdownMusic();
-    I_ShutdownSound();
+    S_ShutdownSound();
     M_SaveDefaults ();
     I_ShutdownGraphics();
     exit(0);
@@ -140,8 +139,7 @@ void I_Error (char *error, ...)
 	G_CheckDemoStatus();
 
     D_QuitNetGame ();
-    I_ShutdownSound();
-    I_ShutdownMusic();
+    S_ShutdownSound();
     I_ShutdownGraphics();
 
     exit(-1);

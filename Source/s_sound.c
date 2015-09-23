@@ -167,6 +167,17 @@ void S_InitSound (void)
 }
 
 /* ------------------------------------------------------------ */
+
+void S_ShutdownSound (void)
+{
+  if (!nomusic)
+    I_ShutdownMusic();
+
+  if ((nosfx == false) || (nomusic == false))
+    I_ShutdownSound();
+}
+
+/* ------------------------------------------------------------ */
 //
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
