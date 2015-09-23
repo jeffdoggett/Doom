@@ -117,7 +117,8 @@ int			numChannels;
 
 static int		nextcleanup;
 
-
+static int		nomusic;
+static int		nosfx;
 
 //
 // Internals.
@@ -138,8 +139,34 @@ S_AdjustSoundParams
 
 void S_StopChannel(int cnum);
 
+/* ------------------------------------------------------------ */
 
+void S_InitSound (void)
+{
+  nomusic = !snd_AllowMusic;
+  nosfx = false;
 
+  if (M_CheckParm ("-nosound"))
+  {
+    nomusic = true;
+    nosfx = true;
+  }
+  else
+  {
+    if (M_CheckParm ("-nomusic"))
+      nomusic = true;
+    if (M_CheckParm ("-nosfx"))
+      nosfx = true;
+  }
+
+  if (!nomusic)
+    I_InitMusic ();
+
+  if ((nosfx == false) || (nomusic == false))
+    I_InitSound ();
+}
+
+/* ------------------------------------------------------------ */
 //
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
@@ -178,7 +205,7 @@ void S_Init
     S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
 }
 
-
+/* ------------------------------------------------------------ */
 
 static const unsigned int spmus[]=
 {
@@ -195,6 +222,7 @@ static const unsigned int spmus[]=
   mus_e1m9	// Tim		e4m9
 };
 
+/* ------------------------------------------------------------ */
 //
 // Per level startup code.
 // Kills playing sounds at start of level,
@@ -245,9 +273,7 @@ void S_Start(void)
   nextcleanup = 15;
 }
 
-
-
-
+/* ------------------------------------------------------------ */
 
 void
 S_StartSoundAtVolume
@@ -270,6 +296,9 @@ S_StartSoundAtVolume
   /* fprintf( stderr,
   	   "S_StartSoundAtVolume: playing sound %d (%s)\n",
   	   sfx_id, S_sfx[sfx_id].name );*/
+
+  if (nosfx)
+    return;
 
   // check for bogus sound #
   if (sfx_id < 1 || sfx_id > NUMSFX)
@@ -394,6 +423,8 @@ S_StartSoundAtVolume
 				       priority);
 }
 
+/* ------------------------------------------------------------ */
+
 void
 S_StartSound
 ( void*		origin,
@@ -465,8 +496,7 @@ S_StartSound
 
 }
 
-
-
+/* ------------------------------------------------------------ */
 
 void S_StopSound(void *origin)
 {
@@ -483,14 +513,7 @@ void S_StopSound(void *origin)
     }
 }
 
-
-
-
-
-
-
-
-
+/* ------------------------------------------------------------ */
 //
 // Stop and resume music, during game PAUSE.
 //
@@ -503,6 +526,8 @@ void S_PauseSound(void)
     }
 }
 
+/* ------------------------------------------------------------ */
+
 void S_ResumeSound(void)
 {
     if (mus_playing && mus_paused)
@@ -512,7 +537,7 @@ void S_ResumeSound(void)
     }
 }
 
-
+/* ------------------------------------------------------------ */
 //
 // Updates music & sounds
 //
@@ -619,6 +644,7 @@ void S_UpdateSounds(void* listener_p)
     }
 }
 
+/* ------------------------------------------------------------ */
 
 void S_SetMusicVolume(int volume)
 {
@@ -633,7 +659,7 @@ void S_SetMusicVolume(int volume)
     snd_MusicVolume = volume;
 }
 
-
+/* ------------------------------------------------------------ */
 
 void S_SetSfxVolume(int volume)
 {
@@ -645,6 +671,7 @@ void S_SetSfxVolume(int volume)
 
 }
 
+/* ------------------------------------------------------------ */
 //
 // Starts some music with the music id found in sounds.h.
 //
@@ -653,6 +680,8 @@ void S_StartMusic(int m_id)
     S_ChangeMusic(m_id, false);
 }
 
+/* ------------------------------------------------------------ */
+
 void
 S_ChangeMusic
 ( int			musicnum,
@@ -660,6 +689,9 @@ S_ChangeMusic
 {
   musicinfo_t*	music;
   char		namebuf[9];
+
+  if (nomusic)
+    return;
 
   if ( (musicnum <= mus_None)
    || (musicnum >= NUMMUSIC) )
@@ -698,6 +730,7 @@ S_ChangeMusic
   }
 }
 
+/* ------------------------------------------------------------ */
 
 void S_StopMusic(void)
 {
@@ -715,8 +748,7 @@ void S_StopMusic(void)
     }
 }
 
-
-
+/* ------------------------------------------------------------ */
 
 void S_StopChannel(int cnum)
 {
@@ -754,8 +786,7 @@ void S_StopChannel(int cnum)
     }
 }
 
-
-
+/* ------------------------------------------------------------ */
 //
 // Changes volume, stereo-separation, and pitch variables
 //  from the norm of a sound effect to be played.
@@ -838,9 +869,7 @@ S_AdjustSoundParams
     return (*vol > 0);
 }
 
-
-
-
+/* ------------------------------------------------------------ */
 //
 // S_getChannel :
 //   If none available, return -1.  Otherwise channel #.
@@ -895,6 +924,4 @@ S_getChannel
     return cnum;
 }
 
-
-
-
+/* ------------------------------------------------------------ */

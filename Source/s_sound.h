@@ -29,6 +29,7 @@
 #endif
 
 
+void S_InitSound (void);
 
 //
 // Initializes sound stuff, including volume

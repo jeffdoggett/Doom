@@ -21,6 +21,8 @@
 #include <kernel.h>
 #include <stdlib.h>
 
+// #define DEBUG_MUSIC
+
 #define DataVox_Type               0x44380
 #define DataVox_Timed              0x44381
 #define DataVox_Pitch              0x44382
@@ -606,8 +608,6 @@ I_InitSound(void)
   _kernel_swi_regs regs;
   unsigned int channel;
 
-  I_InitMusic ();
-
   regs.r[0] = MAX_SFX_CHAN;
   regs.r[1] = 208;
   regs.r[2] = 48;
@@ -730,13 +730,11 @@ static unsigned int Mus_QTM_load (byte * addr)
   regs.r[0] = -1; //0;		// Must copy to QTM private memory otherwise crashes doom.
   regs.r[1] = (int) addr;	// A competant programmer would find out why and fix it!
   rc = _kernel_swi (QTM_Load, &regs, &regs);
+#ifdef DEBUG_MUSIC
   if (rc)
-  {
-//  printf ("QTM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
-    return ((unsigned int) rc);
-  }
-
-  return (0);
+    printf ("QTM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
+#endif
+  return ((unsigned int) rc);
 }
 
 static unsigned int Mus_QTM_start (void)
@@ -750,7 +748,9 @@ static unsigned int Mus_QTM_start (void)
   regs.r[1] = -1;
   regs.r[2] = -1;
   _kernel_swi (QTM_SoundControl, &regs, &regs);
-  // printf ("QTM_SoundControl %d %d %d\n", regs.r[0], regs.r[1], regs.r[2]);
+#ifdef DEBUG_MUSIC
+  printf ("QTM_SoundControl %d %d %d\n", regs.r[0], regs.r[1], regs.r[2]);
+#endif
   qtm_channels_swiped = regs.r[0];
   return (0);
 }
@@ -759,30 +759,21 @@ static unsigned int Mus_QTM_stop (void)
 {
   _kernel_swi_regs regs;
 
-  if (_kernel_swi (QTM_Stop, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (QTM_Stop, &regs, &regs));
 }
 
 static unsigned int Mus_QTM_pause (void)
 {
   _kernel_swi_regs regs;
 
-  if (_kernel_swi (QTM_Pause, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (QTM_Pause, &regs, &regs));
 }
 
 static unsigned int Mus_QTM_clear (void)
 {
   _kernel_swi_regs regs;
 
-  if (_kernel_swi (QTM_Clear, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (QTM_Clear, &regs, &regs));
 }
 
 static unsigned int Mus_QTM_set_volume (unsigned int vol)
@@ -790,10 +781,7 @@ static unsigned int Mus_QTM_set_volume (unsigned int vol)
   _kernel_swi_regs regs;
 
   regs.r[0] = vol;
-  if (_kernel_swi (QTM_Volume, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (QTM_Volume, &regs, &regs));
 }
 
 /* ------------------------------------------------------------ */
@@ -810,25 +798,35 @@ static unsigned int Mus_TIM_load (byte * addr, unsigned int size)
   rc = _kernel_swi (TimPlayer_SongLoad, &regs, &regs);
   if (rc)
   {
-    // printf ("TIM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
-    return ((unsigned int) rc);
+#ifdef DEBUG_MUSIC
+    printf ("TIM Load:%s (%X,%s)\n", rc -> errmess, addr, addr);
+#endif
   }
-
-  timplayer_handle = regs.r[0];
-  // printf ("Tim handle = %X\n", timplayer_handle);
-  return (0);
+  else
+  {
+    timplayer_handle = regs.r[0];
+#ifdef DEBUG_MUSIC
+    printf ("Tim handle = %X\n", timplayer_handle);
+#endif
+  }
+  return ((unsigned int) rc);
 }
 
 static unsigned int Mus_TIM_start (void)
 {
   _kernel_swi_regs regs;
 
-
   regs.r[0] = timplayer_handle;
-  if (_kernel_swi (TimPlayer_SongPlay, &regs, &regs))
-    return (1);
+  return ((int)_kernel_swi (TimPlayer_SongPlay, &regs, &regs));
+}
 
-  return (0);
+static unsigned int Mus_TIM_loop (int loop)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 257;
+  regs.r[1] = !loop;
+  return ((int) _kernel_swi (TimPlayer_Configure, &regs, &regs));
 }
 
 static unsigned int Mus_TIM_stop (void)
@@ -836,10 +834,7 @@ static unsigned int Mus_TIM_stop (void)
   _kernel_swi_regs regs;
 
   regs.r[0] = timplayer_handle;
-  if (_kernel_swi (TimPlayer_SongStop, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (TimPlayer_SongStop, &regs, &regs));
 }
 
 static unsigned int Mus_TIM_pause (void)
@@ -847,10 +842,7 @@ static unsigned int Mus_TIM_pause (void)
   _kernel_swi_regs regs;
 
   regs.r[0] = timplayer_handle;
-  if (_kernel_swi (TimPlayer_SongPause, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (TimPlayer_SongPause, &regs, &regs));
 }
 
 static unsigned int Mus_TIM_clear (void)
@@ -858,10 +850,7 @@ static unsigned int Mus_TIM_clear (void)
   _kernel_swi_regs regs;
 
   regs.r[0] = timplayer_handle;
-  if (_kernel_swi (TimPlayer_SongUnload, &regs, &regs))
-    return (1);
-
-  return (0);
+  return ((int)_kernel_swi (TimPlayer_SongUnload, &regs, &regs));
 }
 
 static unsigned int Mus_TIM_set_volume (unsigned int vol)
@@ -872,8 +861,7 @@ static unsigned int Mus_TIM_set_volume (unsigned int vol)
   {
     regs.r[0] = timplayer_handle;
     regs.r[1] = vol;
-    if (_kernel_swi (TimPlayer_SongVolume, &regs, &regs))
-      return (1);
+    return ((int)_kernel_swi (TimPlayer_SongVolume, &regs, &regs));
   }
   return (0);
 }
@@ -889,9 +877,6 @@ void I_InitMusic(void)
   music_pause = 0;
   music_data = NULL;
   music_pos = NULL;
-
-  if (snd_AllowMusic == 0)
-    return;
 
   if (music_pause==0)
   {
@@ -935,9 +920,6 @@ int I_RegisterSong (void * vdata, unsigned int size)
 
   I_UnRegisterSong (1);
   data = (byte*) vdata;
-
-  if (snd_AllowMusic == 0)
-    return (0);
 
   if (Mus_QTM_load (data) == 0)		// Did QTM recognise it?
   {
@@ -1055,6 +1037,7 @@ void I_PlaySong (int handle, int loop)
   {
     Mus_TIM_start ();
     Mus_TIM_set_volume (music_timvol);
+    Mus_TIM_loop (loop);
     return;
   }
 

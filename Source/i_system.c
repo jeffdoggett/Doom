@@ -24,32 +24,7 @@
 static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #endif
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <stdarg.h>
-#include <sys/time.h>
-#ifdef __riscos
-#include "acorn.h"
-#else
-#include <unistd.h>
-#endif
-
-#include "doomdef.h"
-#include "m_misc.h"
-#include "i_video.h"
-#include "i_sound.h"
-
-#include "d_net.h"
-#include "g_game.h"
-
-#ifdef __GNUG__
-#pragma implementation "i_system.h"
-#endif
-#include "i_system.h"
-
+#include "includes.h"
 
 
 void
@@ -94,7 +69,7 @@ int  I_GetTime (void)
 //
 void I_Init (void)
 {
-    I_InitSound();
+    S_InitSound();
     //  I_InitGraphics();
 }
 
