@@ -272,7 +272,7 @@ void EV_TurnTagLightsOff (line_t* line)
     while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
     {
       sector = &sectors[secnum];
-      sector->lightlevel = P_FindMinSurroundingLight (sector, sector-> lightlevel);
+      sector->lightlevel = P_FindMinSurroundingLight (sector, sector->lightlevel);
     }
 }
 
@@ -293,9 +293,9 @@ void EV_LightTurnOn (line_t* line, int bright)
 	// for highest light level
 	// surrounding sector
 	if (!bright)
-	  sector-> lightlevel = P_FindMaxSurroundingLight (sector, bright);
+	  sector->lightlevel = P_FindMaxSurroundingLight (sector, bright);
 	else
-	  sector-> lightlevel = bright;
+	  sector->lightlevel = bright;
     }
 }
 
@@ -321,8 +321,8 @@ void P_AdjustDoorLight (line_t* line, fixed_t fraction)
     if (maxlight < minlight)			// Can this happen?!
       minlight = maxlight;
 
-    sector-> lightlevel = minlight+(FixedMul ((maxlight-minlight)<<FRACBITS, fraction)>>FRACBITS);
-    // printf ("fraction = %X, %u %u %u\n", fraction, minlight, maxlight, sector-> lightlevel);
+    sector->lightlevel = minlight+(FixedMul (maxlight-minlight, fraction));
+    // printf ("fraction = %X, %u %u %u\n", fraction, minlight, maxlight, sector->lightlevel);
   }
 }
 
