@@ -742,23 +742,46 @@ P_FindMinSurroundingLight
   int		max )
 {
   int		i;
-  int		min;
   line_t*	line;
   sector_t*	check;
 
-  min = max;
   for (i=0 ; i < sector->linecount ; i++)
   {
     line = sector->lines[i];
     check = getNextSector(line,sector);
 
-    if (!check)
-      continue;
-
-    if (check->lightlevel < min)
-      min = check->lightlevel;
+    if ((check)
+     && (check->lightlevel < max))
+      max = check->lightlevel;
   }
-  return min;
+
+  return (max);
+}
+
+/* ---------------------------------------------------------------------------- */
+//
+// Find maximum light from an adjacent sector
+//
+int
+P_FindMaxSurroundingLight
+( sector_t*	sector,
+  int		min )
+{
+  int		j;
+  sector_t*	temp;
+  line_t*	templine;
+
+  for (j = 0;j < sector->linecount; j++)
+  {
+    templine = sector->lines[j];
+    temp = getNextSector(templine,sector);
+
+    if ((temp)
+     && (temp->lightlevel > min))
+      min = temp->lightlevel;
+  }
+
+  return (min);
 }
 
 /* ---------------------------------------------------------------------------- */

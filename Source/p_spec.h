@@ -590,6 +590,11 @@ P_FindMinSurroundingLight
 ( sector_t*	sector,
   int		max );
 
+int
+P_FindMaxSurroundingLight
+( sector_t*	sector,
+  int		min );
+
 sector_t*
 getNextSector
 ( line_t*	line,
@@ -668,6 +673,7 @@ void	P_SpawnStrobeFlash (sector_t* sector, int fastOrSlow, int inSync, int Remov
 void    EV_StartLightStrobing(line_t* line);
 void    EV_TurnTagLightsOff(line_t* line);
 void	EV_LightTurnOn (line_t* line, int bright);
+void	P_AdjustDoorLight (line_t* line, fixed_t fraction);
 void    T_Glow(glow_t* g);
 void    P_SpawnGlowingLight(sector_t* sector);
 

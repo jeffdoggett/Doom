@@ -165,8 +165,10 @@ void T_VerticalDoor (vldoor_t* door)
 			  door->speed,
 			  door->sector->floorheight,
 			  false,1,door->direction);
-	if (res == pastdest)
+
+	switch (res)
 	{
+	  case pastdest:
 	    if ((line = door->line) != NULL)
 	      EV_TurnTagLightsOff (line);
 
@@ -198,9 +200,9 @@ void T_VerticalDoor (vldoor_t* door)
 	      default:
 		break;
 	    }
-	}
-	else if (res == crushed)
-	{
+	    break;
+
+	  case crushed:
 	    switch(door->type)
 	    {
 	      case blazeClose:
@@ -212,6 +214,19 @@ void T_VerticalDoor (vldoor_t* door)
 		T_Makedoorsound (door);
 		break;
 	    }
+	    break;
+
+	  default:
+	    if ((line = door->line) != NULL)
+	    {
+	      sector_t* sector;
+	      fixed_t fraction;
+	      sector = door->sector;
+	      fraction = FixedDiv (sector->ceilingheight - sector->floorheight,
+				door->topheight - sector->floorheight);
+	      P_AdjustDoorLight (line, fraction);
+	    }
+	    break;
 	}
 	break;
 
@@ -222,8 +237,9 @@ void T_VerticalDoor (vldoor_t* door)
 			  door->topheight,
 			  false,1,door->direction);
 
-	if (res == pastdest)
+	switch (res)
 	{
+	  case pastdest:
 	    if ((line = door->line) != NULL)
 	      EV_LightTurnOn (line, 0);
 
@@ -249,6 +265,19 @@ void T_VerticalDoor (vldoor_t* door)
 	      default:
 		break;
 	    }
+	    break;
+
+	  default:
+	    if ((line = door->line) != NULL)
+	    {
+	      sector_t* sector;
+	      fixed_t fraction;
+	      sector = door->sector;
+	      fraction = FixedDiv (sector->ceilingheight - sector->floorheight,
+				door->topheight - sector->floorheight);
+	      P_AdjustDoorLight (line, fraction);
+	    }
+	    break;
 	}
 	break;
     }

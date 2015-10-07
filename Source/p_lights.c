@@ -272,7 +272,7 @@ void EV_TurnTagLightsOff (line_t* line)
     while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
     {
       sector = &sectors[secnum];
-      sector->lightlevel = P_FindMinSurroundingLight (sector, sector->lightlevel);
+      sector->lightlevel = P_FindMinSurroundingLight (sector, sector-> lightlevel);
     }
 }
 
@@ -282,11 +282,8 @@ void EV_TurnTagLightsOff (line_t* line)
 //
 void EV_LightTurnOn (line_t* line, int bright)
 {
-    int		j;
     int		secnum;
     sector_t*	sector;
-    sector_t*	temp;
-    line_t*	templine;
 
     secnum = -1;
     while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
@@ -296,24 +293,38 @@ void EV_LightTurnOn (line_t* line, int bright)
 	// for highest light level
 	// surrounding sector
 	if (!bright)
-	{
-	    for (j = 0;j < sector->linecount; j++)
-	    {
-		templine = sector->lines[j];
-		temp = getNextSector(templine,sector);
-
-		if (!temp)
-		    continue;
-
-		if (temp->lightlevel > bright)
-		    bright = temp->lightlevel;
-	    }
-	}
-
-	sector-> lightlevel = bright;
+	  sector-> lightlevel = P_FindMaxSurroundingLight (sector, bright);
+	else
+	  sector-> lightlevel = bright;
     }
 }
 
+
+//
+// Set lighting level dependent on how far open the door is.
+//
+void P_AdjustDoorLight (line_t* line, fixed_t fraction)
+{
+  int		secnum;
+  int		minlight;
+  int		maxlight;
+  sector_t*	sector;
+
+  secnum = -1;
+  while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
+  {
+    sector = &sectors[secnum];
+
+    minlight = P_FindMinSurroundingLight (sector, 255);
+    maxlight = P_FindMaxSurroundingLight (sector, 0);
+
+    if (maxlight < minlight)			// Can this happen?!
+      minlight = maxlight;
+
+    sector-> lightlevel = minlight+(FixedMul ((maxlight-minlight)<<FRACBITS, fraction)>>FRACBITS);
+    // printf ("fraction = %X, %u %u %u\n", fraction, minlight, maxlight, sector-> lightlevel);
+  }
+}
 
 //
 // Spawn glowing light
