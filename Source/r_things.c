@@ -471,7 +471,8 @@ static int R_IncreaseVissprites (void)
 {
   vissprite_t*	new_vissprites;
 
-  if (qty_vissprites >= max_vissprites)
+  if ((max_vissprites)
+   && (qty_vissprites >= max_vissprites))
     return (0);
 
   new_vissprites = realloc (vissprites, (qty_vissprites+128) * sizeof (vissprite_t));
