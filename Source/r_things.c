@@ -78,7 +78,7 @@ typedef struct
 fixed_t 	pspritescale;
 fixed_t 	pspriteiscale;
 
-lighttable_t**	spritelights;
+static lighttable_t**	spritelights;
 
 // constant arrays
 //  used for psprite clipping and initializing clipping
@@ -95,9 +95,9 @@ dshort_t	screenheightarray[MAXSCREENWIDTH];
 spritedef_t*	sprites;
 unsigned int	numsprites;
 
-spriteframe_t	sprtemp[29];
-int		maxframe;
-char*		spritename;
+static spriteframe_t	sprtemp[29];
+static int		maxframe;
+static char*		spritename;
 
 extern int	numspritelumps;
 
@@ -105,7 +105,7 @@ extern int	numspritelumps;
 // R_InstallSpriteLump
 // Local function for R_InitSprites.
 //
-void
+static void
 R_InstallSpriteLump
 ( int		index,
   int		lump,
@@ -187,7 +187,7 @@ R_InstallSpriteLump
 //  letter/number appended.
 // The rotation character can be 0 to signify no rotations.
 //
-void R_InitSpriteDefs (char** namelist)
+static void R_InitSpriteDefs (char** namelist)
 {
     char**	check;
     int 	i;
@@ -428,10 +428,10 @@ void R_InitSpriteDefs (char** namelist)
 //
 // GAME FUNCTIONS
 //
-#define MAXVISSPRITES  	128
-static vissprite_t	vissprites[MAXVISSPRITES];
-static vissprite_t*	vissprite_p;
-
+//#define MAXVISSPRITES  	1024
+static vissprite_t*	vissprites;
+static unsigned int	num_vissprite;
+static unsigned int	qty_vissprites;
 
 //
 // R_InitSprites
@@ -447,6 +447,11 @@ void R_InitSprites (char** namelist)
     }
 
     R_InitSpriteDefs (namelist);
+
+    qty_vissprites = 128;			// Start low.
+    vissprites = malloc (qty_vissprites * sizeof (vissprite_t));
+    if (vissprites == NULL)
+      I_Error ("Failed to claim memory for vissprites\n");
 }
 
 
@@ -457,30 +462,49 @@ void R_InitSprites (char** namelist)
 //
 void R_ClearSprites (void)
 {
-    vissprite_p = vissprites;
+    num_vissprite = 0;
 }
 
+
+static int R_IncreaseVissprites (void)
+{
+  vissprite_t*	new_vissprites;
+
+#ifdef MAXVISSPRITES
+  if (qty_vissprites >= MAXVISSPRITES)
+    return (0);
+#endif
+
+  qty_vissprites += 128;
+  new_vissprites = realloc (vissprites, qty_vissprites * sizeof (vissprite_t));
+  if (new_vissprites == NULL)
+    return (0);
+
+  vissprites = new_vissprites;
+//printf ("qty_vissprites = %u\n", qty_vissprites);
+  return (1);
+}
 
 //
 // R_NewVisSprite
 //
 
-static vissprite_t* R_NewVisSprite (fixed_t distance)
+static vissprite_t* R_NewVisSprite (fixed_t distance, unsigned int mobjflags)
 {
   unsigned int count;
   vissprite_t* vis;
   vissprite_t* rc;
 
-  rc = vissprite_p;
-
-  if (rc > &vissprites[MAXVISSPRITES-1])
+  if ((num_vissprite >= qty_vissprites)
+   && (R_IncreaseVissprites () == 0))
   {
+    rc = NULL;
+
     /* Overwrite a visplane that is furthest away. */
     /* Note: distance is actually the scaling factor, */
     /* i.e. bigger = draw bigger, hence nearer. */
     vis = vissprites;
-    rc = NULL;
-    count = MAXVISSPRITES;
+    count = qty_vissprites;
     do
     {
       if (((vis->mobjflags & MF_SHOOTABLE) == 0)
@@ -491,10 +515,26 @@ static vissprite_t* R_NewVisSprite (fixed_t distance)
       }
       vis++;
     } while (--count);
+    if ((rc == NULL)			// Did we find a victim?
+     && (mobjflags & MF_SHOOTABLE))
+    {
+      vis = vissprites;			// No. Try harder.
+      count = qty_vissprites;
+      do
+      {
+	if (vis->distance < distance)
+	{
+	  rc = vis;
+	  distance = vis->distance;
+	}
+	vis++;
+      } while (--count);
+    }
   }
   else
   {
-    vissprite_p = rc + 1;
+    rc = &vissprites [num_vissprite];
+    num_vissprite++;
   }
 
   return (rc);
@@ -581,7 +621,7 @@ void R_DrawMaskedColumn (column_t* column)
 // R_DrawVisSprite
 //  mfloorclip and mceilingclip should also be set.
 //
-void
+static void
 R_DrawVisSprite
 ( vissprite_t*		vis,
   int			x1,
@@ -646,7 +686,7 @@ R_DrawVisSprite
 // Generates a vissprite for a thing
 //  if it might be visible.
 //
-void R_ProjectSprite (mobj_t* thing)
+static void R_ProjectSprite (mobj_t* thing)
 {
   int x1;
   int x2;
@@ -749,7 +789,7 @@ void R_ProjectSprite (mobj_t* thing)
     return;
 
   // store information in a vissprite
-  vis = R_NewVisSprite (distance << detailshift);
+  vis = R_NewVisSprite (distance << detailshift, thing->flags);
   if (vis == NULL)
     return;
 
@@ -857,7 +897,7 @@ void R_AddSprites(sector_t* sec, int lightlevel)
 //
 // R_DrawPSprite
 //
-void R_DrawPSprite (pspdef_t* psp)
+static void R_DrawPSprite (pspdef_t* psp)
 {
     fixed_t		tx;
     int 		x1;
@@ -965,7 +1005,7 @@ void R_DrawPSprite (pspdef_t* psp)
 //
 // R_DrawPlayerSprites
 //
-void R_DrawPlayerSprites (void)
+static void R_DrawPlayerSprites (void)
 {
     int 	i;
     int 	lightnum;
@@ -1001,40 +1041,44 @@ void R_DrawPlayerSprites (void)
 //
 // R_SortVisSprites
 //
-vissprite_t	vsprsortedhead;
+static vissprite_t	vsprsortedhead;
 
 
-void R_SortVisSprites (void)
+static void R_SortVisSprites (void)
 {
     int 		i;
     int 		count;
     vissprite_t*	ds;
     vissprite_t*	best;
+    vissprite_t*	vissprite_p;
     vissprite_t 	unsorted;
     fixed_t		bestdist;
 
-    count = vissprite_p - vissprites;
+    if (!num_vissprite)
+	return;
 
     unsorted.next = unsorted.prev = &unsorted;
 
-    if (!count)
-	return;
-
-    for (ds=vissprites ; ds<vissprite_p ; ds++)
+    ds = vissprites;
+    count = num_vissprite;
+    do
     {
-	ds->next = ds+1;
-	ds->prev = ds-1;
-    }
+      ds->next = ds+1;
+      ds->prev = ds-1;
+      ds++;
+    } while (--count);
 
     vissprites[0].prev = &unsorted;
     unsorted.next = &vissprites[0];
-    (vissprite_p-1)->next = &unsorted;
-    unsorted.prev = vissprite_p-1;
+
+    vissprite_p = &vissprites [num_vissprite-1];
+    vissprite_p->next = &unsorted;
+    unsorted.prev = vissprite_p;
 
     // pull the vissprites out by distance
     //best = 0; 	// shut up the compiler warning
     vsprsortedhead.next = vsprsortedhead.prev = &vsprsortedhead;
-    for (i=0 ; i<count ; i++)
+    for (i=0 ; i<num_vissprite ; i++)
     {
 	bestdist = MAXINT;
 	for (ds=unsorted.next ; ds!= &unsorted ; ds=ds->next)
@@ -1059,7 +1103,7 @@ void R_SortVisSprites (void)
 //
 // R_DrawSprite
 //
-void R_DrawSprite (vissprite_t* spr)
+static void R_DrawSprite (vissprite_t* spr)
 {
     drawseg_t*		ds;
     dshort_t		clipbot[MAXSCREENWIDTH];
@@ -1165,7 +1209,7 @@ void R_DrawMasked (void)
 
     R_SortVisSprites ();
 
-    if (vissprite_p > vissprites)
+    if (num_vissprite)
     {
 	// draw all vissprites back to front
 	for (spr = vsprsortedhead.next ;
