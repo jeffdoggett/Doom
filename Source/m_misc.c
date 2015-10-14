@@ -188,6 +188,8 @@ extern int	showMessages;
 // machine-independent sound params
 extern int	numChannels;
 
+extern unsigned int max_vissprites;
+
 // UNIX hack, to be removed.
 #ifdef NORMALUNIX
 #ifdef SNDSERV
@@ -209,8 +211,9 @@ extern int	timplayer_vol_tab [16];
 
 typedef struct
 {
-  char*	name;
-  int*	location;
+  char*		name;
+  int*		location;
+  int		type;
   char *	defaultvalue;
   int		scantranslate;		// PC scan code hack
   int		untranslated;		// lousy hack
@@ -218,95 +221,96 @@ typedef struct
 
 default_t	defaults[] =
 {
-  {"mouse_sensitivity",&mouseSensitivity, (char *) 5},
-  {"sfx_volume",&snd_SfxVolume, (char *) 8},
-  {"music_volume",&snd_MusicVolume, (char *) 8},
-  {"show_messages",&showMessages, (char *) 1},
+  {"mouse_sensitivity",&mouseSensitivity, sizeof(int), (char *) 5},
+  {"sfx_volume",&snd_SfxVolume, sizeof(int), (char *) 8},
+  {"music_volume",&snd_MusicVolume, sizeof(int), (char *) 8},
+  {"show_messages",&showMessages, sizeof(int), (char *) 1},
 
-  {"key_right",&key_right, (char *) KEY_RIGHTARROW},
-  {"key_left",&key_left, (char *) KEY_LEFTARROW},
-  {"key_up",&key_up, (char *) KEY_UPARROW},
-  {"key_down",&key_down, (char *) KEY_DOWNARROW},
-  {"key_strafeleft",&key_strafeleft, (char *) ','},
-  {"key_straferight",&key_straferight, (char *) '.'},
+  {"key_right",&key_right, sizeof(int), (char *) KEY_RIGHTARROW},
+  {"key_left",&key_left, sizeof(int), (char *) KEY_LEFTARROW},
+  {"key_up",&key_up, sizeof(int), (char *) KEY_UPARROW},
+  {"key_down",&key_down, sizeof(int), (char *) KEY_DOWNARROW},
+  {"key_strafeleft",&key_strafeleft, sizeof(int), (char *) ','},
+  {"key_straferight",&key_straferight, sizeof(int), (char *) '.'},
 
-  {"key_fire",&key_fire, (char *) KEY_RCTRL},
-  {"key_use",&key_use, (char *) ' '},
-  {"key_strafe",&key_strafe, (char *) KEY_RALT},
-  {"key_speed",&key_speed, (char *) KEY_RSHIFT},
+  {"key_fire",&key_fire, sizeof(int), (char *) KEY_RCTRL},
+  {"key_use",&key_use, sizeof(int), (char *) ' '},
+  {"key_strafe",&key_strafe, sizeof(int), (char *) KEY_RALT},
+  {"key_speed",&key_speed, sizeof(int), (char *) KEY_RSHIFT},
 
 // UNIX hack, to be removed.
 #ifdef NORMALUNIX
 #ifdef SNDSERV
-  {"sndserver", (int *) &sndserver_filename, "sndserver"},
+  {"sndserver", (int *) &sndserver_filename, 0, "sndserver"},
 #endif
 #endif
 
 
 #ifdef LINUX
-  {"mousedev", (int*)&mousedev, "/dev/ttyS0"},
-  {"mousetype", (int*)&mousetype, "microsoft"},
+  {"mousedev", (int*)&mousedev, 0, "/dev/ttyS0"},
+  {"mousetype", (int*)&mousetype, 0, "microsoft"},
 #endif
 
-  {"use_mouse",&usemouse, (char *) 1},
-  {"mouseb_fire",&mousebfire, (char *) 0},
-  {"mouseb_strafe",&mousebstrafe, (char *) 1},
-  {"mouseb_forward",&mousebforward, (char *) 2},
-  {"novert",&novert, (char *) 0},
+  {"use_mouse",&usemouse, sizeof(int), (char *) 1},
+  {"mouseb_fire",&mousebfire, sizeof(int), (char *) 0},
+  {"mouseb_strafe",&mousebstrafe, sizeof(int), (char *) 1},
+  {"mouseb_forward",&mousebforward, sizeof(int), (char *) 2},
+  {"novert",&novert, sizeof(int), (char *) 0},
 
 
-  {"use_joystick",&usejoystick, (char *) 0},
-  {"joyb_fire",&joybfire, (char *) 0},
-  {"joyb_strafe",&joybstrafe, (char *) 1},
-  {"joyb_use",&joybuse, (char *) 3},
-  {"joyb_speed",&joybspeed, (char *) 2},
+  {"use_joystick",&usejoystick, sizeof(int), (char *) 0},
+  {"joyb_fire",&joybfire, sizeof(int), (char *) 0},
+  {"joyb_strafe",&joybstrafe, sizeof(int), (char *) 1},
+  {"joyb_use",&joybuse, sizeof(int), (char *) 3},
+  {"joyb_speed",&joybspeed, sizeof(int), (char *) 2},
 
-  {"always_run",&always_run, (char *) 0},
+  {"always_run",&always_run, sizeof(int), (char *) 0},
 
-  {"screenblocks",&screenblocks, (char *) 10},
-  {"detaillevel",&detailLevel, (char *) 0},
-  {"stbar_scale",&stbar_scale, (char *) 1},
-  {"hutext_scale",&hutext_scale, (char *) 1},
-  {"weaponscale",&weaponscale, (char *) 1},
+  {"screenblocks",&screenblocks, sizeof(int), (char *) 10},
+  {"detaillevel",&detailLevel, sizeof(int), (char *) 0},
+  {"stbar_scale",&stbar_scale, sizeof(int), (char *) 1},
+  {"hutext_scale",&hutext_scale, sizeof(int), (char *) 1},
+  {"weaponscale",&weaponscale, sizeof(int), (char *) 1},
 
-  {"weaponrecoil",&weaponrecoil, (char *) 0},
+  {"weaponrecoil",&weaponrecoil, sizeof(int), (char *) 0},
 
-  {"snd_channels",&numChannels, (char *) 3},
-  {"play_music",&snd_AllowMusic, (char *) 1},
+  {"snd_channels",&numChannels, sizeof(int), (char *) 3},
+  {"play_music",&snd_AllowMusic, sizeof(int), (char *) 1},
 
-  {"usegamma",&usegamma, 0},
-  {"lightscaleshift",&lightScaleShift, (char *) LIGHTSCALESHIFT},
+  {"usegamma",&usegamma, sizeof(int), 0},
+  {"lightscaleshift",&lightScaleShift, sizeof(int), (char *) LIGHTSCALESHIFT},
 
 #ifdef __riscos
-  {"timplayer_vol0", (int *) &timplayer_vol_tab[0],  (char *) 0x00},
-  {"timplayer_vol1", (int *) &timplayer_vol_tab[1],  (char *) 0x04},
-  {"timplayer_vol2", (int *) &timplayer_vol_tab[2],  (char *) 0x08},
-  {"timplayer_vol3", (int *) &timplayer_vol_tab[3],  (char *) 0x0C},
-  {"timplayer_vol4", (int *) &timplayer_vol_tab[4],  (char *) 0x10},
-  {"timplayer_vol5", (int *) &timplayer_vol_tab[5],  (char *) 0x14},
-  {"timplayer_vol6", (int *) &timplayer_vol_tab[6],  (char *) 0x18},
-  {"timplayer_vol7", (int *) &timplayer_vol_tab[7],  (char *) 0x1C},
-  {"timplayer_vol8", (int *) &timplayer_vol_tab[8],  (char *) 0x20},
-  {"timplayer_vol9", (int *) &timplayer_vol_tab[9],  (char *) 0x24},
-  {"timplayer_vol10", (int *) &timplayer_vol_tab[10],  (char *) 0x28},
-  {"timplayer_vol11", (int *) &timplayer_vol_tab[11],  (char *) 0x2C},
-  {"timplayer_vol12", (int *) &timplayer_vol_tab[12],  (char *) 0x30},
-  {"timplayer_vol13", (int *) &timplayer_vol_tab[13],  (char *) 0x34},
-  {"timplayer_vol14", (int *) &timplayer_vol_tab[14],  (char *) 0x38},
-  {"timplayer_vol15", (int *) &timplayer_vol_tab[15],  (char *) 0x3C},
+  {"timplayer_vol0", (int *) &timplayer_vol_tab[0],  sizeof(int), (char *) 0x00},
+  {"timplayer_vol1", (int *) &timplayer_vol_tab[1],  sizeof(int), (char *) 0x04},
+  {"timplayer_vol2", (int *) &timplayer_vol_tab[2],  sizeof(int), (char *) 0x08},
+  {"timplayer_vol3", (int *) &timplayer_vol_tab[3],  sizeof(int), (char *) 0x0C},
+  {"timplayer_vol4", (int *) &timplayer_vol_tab[4],  sizeof(int), (char *) 0x10},
+  {"timplayer_vol5", (int *) &timplayer_vol_tab[5],  sizeof(int), (char *) 0x14},
+  {"timplayer_vol6", (int *) &timplayer_vol_tab[6],  sizeof(int), (char *) 0x18},
+  {"timplayer_vol7", (int *) &timplayer_vol_tab[7],  sizeof(int), (char *) 0x1C},
+  {"timplayer_vol8", (int *) &timplayer_vol_tab[8],  sizeof(int), (char *) 0x20},
+  {"timplayer_vol9", (int *) &timplayer_vol_tab[9],  sizeof(int), (char *) 0x24},
+  {"timplayer_vol10", (int *) &timplayer_vol_tab[10],  sizeof(int), (char *) 0x28},
+  {"timplayer_vol11", (int *) &timplayer_vol_tab[11],  sizeof(int), (char *) 0x2C},
+  {"timplayer_vol12", (int *) &timplayer_vol_tab[12],  sizeof(int), (char *) 0x30},
+  {"timplayer_vol13", (int *) &timplayer_vol_tab[13],  sizeof(int), (char *) 0x34},
+  {"timplayer_vol14", (int *) &timplayer_vol_tab[14],  sizeof(int), (char *) 0x38},
+  {"timplayer_vol15", (int *) &timplayer_vol_tab[15],  sizeof(int), (char *) 0x3C},
 #endif
 
+  {"max_vissprites", (int *) &max_vissprites,  sizeof(int), (char *) 0},
 
-  {"chatmacro0", (int *) &chat_macros[0], HUSTR_CHATMACRO0 },
-  {"chatmacro1", (int *) &chat_macros[1], HUSTR_CHATMACRO1 },
-  {"chatmacro2", (int *) &chat_macros[2], HUSTR_CHATMACRO2 },
-  {"chatmacro3", (int *) &chat_macros[3], HUSTR_CHATMACRO3 },
-  {"chatmacro4", (int *) &chat_macros[4], HUSTR_CHATMACRO4 },
-  {"chatmacro5", (int *) &chat_macros[5], HUSTR_CHATMACRO5 },
-  {"chatmacro6", (int *) &chat_macros[6], HUSTR_CHATMACRO6 },
-  {"chatmacro7", (int *) &chat_macros[7], HUSTR_CHATMACRO7 },
-  {"chatmacro8", (int *) &chat_macros[8], HUSTR_CHATMACRO8 },
-  {"chatmacro9", (int *) &chat_macros[9], HUSTR_CHATMACRO9 }
+  {"chatmacro0", (int *) &chat_macros[0], 0, HUSTR_CHATMACRO0 },
+  {"chatmacro1", (int *) &chat_macros[1], 0, HUSTR_CHATMACRO1 },
+  {"chatmacro2", (int *) &chat_macros[2], 0, HUSTR_CHATMACRO2 },
+  {"chatmacro3", (int *) &chat_macros[3], 0, HUSTR_CHATMACRO3 },
+  {"chatmacro4", (int *) &chat_macros[4], 0, HUSTR_CHATMACRO4 },
+  {"chatmacro5", (int *) &chat_macros[5], 0, HUSTR_CHATMACRO5 },
+  {"chatmacro6", (int *) &chat_macros[6], 0, HUSTR_CHATMACRO6 },
+  {"chatmacro7", (int *) &chat_macros[7], 0, HUSTR_CHATMACRO7 },
+  {"chatmacro8", (int *) &chat_macros[8], 0, HUSTR_CHATMACRO8 },
+  {"chatmacro9", (int *) &chat_macros[9], 0, HUSTR_CHATMACRO9 }
 };
 
 #define	numdefaults	(ARRAY_SIZE(defaults))
@@ -386,8 +390,7 @@ char * search_choices_path (char * buffer)
 //
 void M_SaveDefaults (void)
 {
-  int		i;
-  int		v;
+  int	i,v;
   FILE*	f;
   char*	defaultfile;
   char	buffer [1024];
@@ -410,17 +413,17 @@ void M_SaveDefaults (void)
   {
     for (i=0 ; i<numdefaults ; i++)
     {
-      v = (pint) defaults[i].defaultvalue;
-      if (v > -0xfff
-	  && v < 0xfff)
+      switch (defaults[i].type)
       {
-	v = *defaults[i].location;
-	fprintf (f,"%s\t\t%i\n",defaults[i].name,v);
-      }
-      else
-      {
-	fprintf (f,"%s\t\t\"%s\"\n",defaults[i].name,
+	case 0:
+	  fprintf (f,"%s\t\t\"%s\"\n",defaults[i].name,
 		 * (char **) (defaults[i].location));
+          break;
+
+	default: //case sizeof(int):
+	  v = *defaults[i].location;
+	  fprintf (f,"%s\t\t%i\n",defaults[i].name,v);
+          break;
       }
     }
 

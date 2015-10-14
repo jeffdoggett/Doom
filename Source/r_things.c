@@ -429,6 +429,7 @@ static void R_InitSpriteDefs (char** namelist)
 // GAME FUNCTIONS
 //
 //#define MAXVISSPRITES  	1024
+unsigned int		max_vissprites;
 static vissprite_t*	vissprites;
 static unsigned int	num_vissprite;
 static unsigned int	qty_vissprites;
@@ -470,17 +471,15 @@ static int R_IncreaseVissprites (void)
 {
   vissprite_t*	new_vissprites;
 
-#ifdef MAXVISSPRITES
-  if (qty_vissprites >= MAXVISSPRITES)
+  if (qty_vissprites >= max_vissprites)
     return (0);
-#endif
 
-  qty_vissprites += 128;
-  new_vissprites = realloc (vissprites, qty_vissprites * sizeof (vissprite_t));
+  new_vissprites = realloc (vissprites, (qty_vissprites+128) * sizeof (vissprite_t));
   if (new_vissprites == NULL)
     return (0);
 
   vissprites = new_vissprites;
+  qty_vissprites += 128;
 //printf ("qty_vissprites = %u\n", qty_vissprites);
   return (1);
 }
