@@ -26,24 +26,7 @@
 static const char rcsid[] = "$Id: r_things.c,v 1.5 1997/02/03 16:47:56 b1 Exp $";
 #endif
 
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifdef __riscos
-#include "acorn.h"
-#endif
-
-#include "doomdef.h"
-#include "m_swap.h"
-
-#include "i_system.h"
-#include "z_zone.h"
-#include "w_wad.h"
-
-#include "r_local.h"
-
-#include "doomstat.h"
+#include "includes.h"
 
 
 
@@ -429,10 +412,12 @@ static void R_InitSpriteDefs (char** namelist)
 // GAME FUNCTIONS
 //
 //#define MAXVISSPRITES  	1024
-unsigned int		max_vissprites;
 static vissprite_t*	vissprites;
+vissprite_t**		vissprites_xref;
+unsigned int		max_vissprites;
 static unsigned int	num_vissprite;
 static unsigned int	qty_vissprites;
+static boolean		showvisstats;
 
 //
 // R_InitSprites
@@ -449,27 +434,20 @@ void R_InitSprites (char** namelist)
 
     R_InitSpriteDefs (namelist);
 
-    qty_vissprites = 128;			// Start low.
-    vissprites = malloc (qty_vissprites * sizeof (vissprite_t));
-    if (vissprites == NULL)
-      I_Error ("Failed to claim memory for vissprites\n");
-}
-
-
-
-//
-// R_ClearSprites
-// Called at frame start.
-//
-void R_ClearSprites (void)
-{
     num_vissprite = 0;
+    qty_vissprites = 128;			// Start low.
+    if (((vissprites = malloc (qty_vissprites * sizeof (vissprite_t))) == NULL)
+     || ((vissprites_xref = malloc (qty_vissprites * sizeof (vissprite_t*))) == NULL))
+      I_Error ("Failed to claim memory for vissprites\n");
+    showvisstats = (boolean) M_CheckParm ("-showvissprites");
 }
+
 
 
 static int R_IncreaseVissprites (void)
 {
   vissprite_t*	new_vissprites;
+  vissprite_t**	new_vissprites_xref;
 
   if ((max_vissprites)
    && (qty_vissprites >= max_vissprites))
@@ -480,56 +458,128 @@ static int R_IncreaseVissprites (void)
     return (0);
 
   vissprites = new_vissprites;
+  
+  new_vissprites_xref = malloc ((qty_vissprites+128) * sizeof (vissprite_t*));
+  if (new_vissprites_xref == NULL)
+    return (0);
+
+  vissprites_xref = new_vissprites_xref;
+
   qty_vissprites += 128;
-//printf ("qty_vissprites = %u\n", qty_vissprites);
+  // printf ("qty_vissprites = %u\n", qty_vissprites);
   return (1);
 }
 
 //
+// R_ClearSprites
+// Called at frame start.
+//
+void R_ClearSprites (void)
+{
+  if (num_vissprite >= qty_vissprites)		// Did we overflow last time?
+   R_IncreaseVissprites ();
+
+  num_vissprite = 0;
+}
+
+
+//
 // R_NewVisSprite
 //
-
-static vissprite_t* R_NewVisSprite (fixed_t distance, unsigned int mobjflags)
+static vissprite_t* R_NewVisSprite (fixed_t distance)
 {
+  int pos;
+  unsigned int pos2;
+  unsigned int step;
   unsigned int count;
-  vissprite_t* vis;
   vissprite_t* rc;
+  vissprite_t* vis;
 
-  if ((num_vissprite >= qty_vissprites)
-   && (R_IncreaseVissprites () == 0))
+  switch (num_vissprite)
   {
-    rc = NULL;
+    case 0:			// 1st one?
+      rc = &vissprites [0];
+      vissprites_xref [0] = rc;
+      num_vissprite = 1;
+      return (rc);
 
-    /* Overwrite a visplane that is furthest away. */
-    /* Note: distance is actually the scaling factor, */
-    /* i.e. bigger = draw bigger, hence nearer. */
-    vis = vissprites;
-    count = qty_vissprites;
-    do
-    {
-      if (((vis->mobjflags & MF_SHOOTABLE) == 0)
-       && (vis->distance < distance))
+    case 1:
+      vis = &vissprites [0];
+      rc = &vissprites [1];
+      if (distance > vis->distance)
       {
-	rc = vis;
-	distance = vis->distance;
+	vissprites_xref [0] = rc;
+	vissprites_xref [1] = vis;
       }
-      vis++;
-    } while (--count);
-    if ((rc == NULL)			// Did we find a victim?
-     && (mobjflags & MF_SHOOTABLE))
-    {
-      vis = vissprites;			// No. Try harder.
-      count = qty_vissprites;
-      do
+      else
       {
-	if (vis->distance < distance)
-	{
-	  rc = vis;
-	  distance = vis->distance;
-	}
-	vis++;
-      } while (--count);
+	vissprites_xref [1] = rc;
+      }
+      num_vissprite = 2;
+      return (rc);
+  }
+
+  /* Do a binary search */
+  /* Possibly overwrite a visplane that is furthest away. */
+  /* Note: distance is actually the scaling factor, */
+  /* i.e. bigger = draw bigger, hence nearer. */
+
+  pos = (num_vissprite+1) >> 1;
+  step = (pos+1) >> 1;
+  count = (pos << 1);
+  do
+  {
+    fixed_t	    d1;
+    fixed_t	    d2;
+
+    vis = vissprites_xref [pos];
+    d1 = MAXINT;
+    d2 = vis->distance;
+
+    // printf ("pos = %u, step = %u, count = %u (%X %X)\n", pos, step, count, distance, d2);
+
+    if (distance >= d2)
+    {
+      if (pos == 0)
+	break;
+
+      vis = vissprites_xref [pos-1];
+      d1 = vis->distance;
+
+      if (distance <= d1)
+	break;
+    }    
+
+    if (distance > d1)
+    {
+      pos -= step;
+      if (pos < 0)
+	pos = 0;
     }
+    else
+    {
+      pos += step;
+      if (pos >= num_vissprite)
+	pos = num_vissprite-1;
+    }
+
+    step = (step+1) >> 1;
+    count >>= 1;
+
+    if (count == 0)
+    {
+      pos = num_vissprite;
+      break;
+    }
+  } while (1);
+
+
+  if (num_vissprite >= qty_vissprites)
+  {
+    if (pos >= num_vissprite)
+      return (NULL);
+    
+    rc = vissprites_xref [num_vissprite-1];
   }
   else
   {
@@ -537,6 +587,15 @@ static vissprite_t* R_NewVisSprite (fixed_t distance, unsigned int mobjflags)
     num_vissprite++;
   }
 
+  // printf ("Inserting at pos %u\n", pos);
+  pos2 = num_vissprite-1;
+  do
+  {
+    vissprites_xref [pos2] = vissprites_xref [pos2-1];
+    pos2--;
+  } while (pos2 > pos);
+
+  vissprites_xref [pos] = rc;
   return (rc);
 }
 
@@ -789,7 +848,7 @@ static void R_ProjectSprite (mobj_t* thing)
     return;
 
   // store information in a vissprite
-  vis = R_NewVisSprite (distance << detailshift, thing->flags);
+  vis = R_NewVisSprite (distance << detailshift);
   if (vis == NULL)
     return;
 
@@ -1039,68 +1098,6 @@ static void R_DrawPlayerSprites (void)
 
 
 //
-// R_SortVisSprites
-//
-static vissprite_t	vsprsortedhead;
-
-
-static void R_SortVisSprites (void)
-{
-    int 		i;
-    int 		count;
-    vissprite_t*	ds;
-    vissprite_t*	best;
-    vissprite_t*	vissprite_p;
-    vissprite_t 	unsorted;
-    fixed_t		bestdist;
-
-    if (!num_vissprite)
-	return;
-
-    unsorted.next = unsorted.prev = &unsorted;
-
-    ds = vissprites;
-    count = num_vissprite;
-    do
-    {
-      ds->next = ds+1;
-      ds->prev = ds-1;
-      ds++;
-    } while (--count);
-
-    vissprites[0].prev = &unsorted;
-    unsorted.next = &vissprites[0];
-
-    vissprite_p = &vissprites [num_vissprite-1];
-    vissprite_p->next = &unsorted;
-    unsorted.prev = vissprite_p;
-
-    // pull the vissprites out by distance
-    //best = 0; 	// shut up the compiler warning
-    vsprsortedhead.next = vsprsortedhead.prev = &vsprsortedhead;
-    for (i=0 ; i<num_vissprite ; i++)
-    {
-	bestdist = MAXINT;
-	for (ds=unsorted.next ; ds!= &unsorted ; ds=ds->next)
-	{
-	    if (ds->distance < bestdist)
-	    {
-		bestdist = ds->distance;
-		best = ds;
-	    }
-	}
-	best->next->prev = best->prev;
-	best->prev->next = best->next;
-	best->next = &vsprsortedhead;
-	best->prev = vsprsortedhead.prev;
-	vsprsortedhead.prev->next = best;
-	vsprsortedhead.prev = best;
-    }
-}
-
-
-
-//
 // R_DrawSprite
 //
 static void R_DrawSprite (vissprite_t* spr)
@@ -1204,21 +1201,30 @@ static void R_DrawSprite (vissprite_t* spr)
 //
 void R_DrawMasked (void)
 {
+    unsigned int	pos;
     vissprite_t*	spr;
     drawseg_t*		ds;
 
-    R_SortVisSprites ();
-
-    if (num_vissprite)
+    if ((pos = num_vissprite) != 0)
     {
-	// draw all vissprites back to front
-	for (spr = vsprsortedhead.next ;
-	     spr != &vsprsortedhead ;
-	     spr=spr->next)
-	{
+      if (showvisstats)
+      {
+#ifdef __riscos
+	extern void _kernel_oswrch (int);
+	_kernel_oswrch (31);
+	_kernel_oswrch (0);
+	_kernel_oswrch (0);
+#endif
+	printf ("VisSprites = %u/%u\n", pos, qty_vissprites);
+      }
 
-	    R_DrawSprite (spr);
-	}
+      // draw all vissprites back to front
+      do
+      {
+	pos--;
+	spr = vissprites_xref [pos];
+	R_DrawSprite (spr);
+      } while (pos);
     }
 
     // render any remaining masked mid textures
