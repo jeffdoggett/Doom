@@ -413,7 +413,7 @@ static void R_InitSpriteDefs (char** namelist)
 //
 //#define MAXVISSPRITES  	1024
 static vissprite_t*	vissprites;
-vissprite_t**		vissprites_xref;
+static vissprite_t**	vissprites_xref;
 unsigned int		max_vissprites;
 static unsigned int	num_vissprite;
 static unsigned int	qty_vissprites;
