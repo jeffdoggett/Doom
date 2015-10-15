@@ -459,7 +459,7 @@ static int R_IncreaseVissprites (void)
 
   vissprites = new_vissprites;
   
-  new_vissprites_xref = malloc ((qty_vissprites+128) * sizeof (vissprite_t*));
+  new_vissprites_xref = realloc (vissprites_xref, (qty_vissprites+128) * sizeof (vissprite_t*));
   if (new_vissprites_xref == NULL)
     return (0);
 
