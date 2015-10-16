@@ -1106,9 +1106,21 @@ void I_InitGraphics (void)
   if (!X_display)
   {
     if (displayname)
+    {
       I_Error("Could not open display [%s]", displayname);
+    }
     else
-      I_Error("Could not open display (DISPLAY=[%s])", getenv("DISPLAY"));
+    {
+      displayname = getenv ("DISPLAY");
+      if (displayname)
+      {
+	I_Error("Could not open display (DISPLAY=[%s])", displayname);
+      }
+      else
+      {
+	I_Error("Could not open display");
+      }      
+    }
   }
 
   // use the default visual
