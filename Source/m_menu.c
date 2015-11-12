@@ -2253,6 +2253,7 @@ void M_Init (void)
 {
   unsigned int menu_pos;
   unsigned int episode;
+  unsigned int lump1,lump2;
   menuitem_t * m_ptr;
 
   currentMenu = &MainDef;
@@ -2284,28 +2285,36 @@ void M_Init (void)
       ReadDef1.y = 165;
       ReadMenu1[0].routine = M_FinishReadThis;
 
-#if 0
-      episode = 0;
-      m_ptr = &EpisodeMenu[0];
-      do
+      if (EpiDef.numitems)
       {
-	if ((W_CheckNumForName (m_ptr->name) == -1)
-	 && (episode_names [episode] == NULL))
-	  break;
-	m_ptr++;
-      } while (++episode < ARRAY_SIZE (EpisodeMenu));
+	episode = 0;
+	m_ptr = &EpisodeMenu[0];
+	do
+	{
+	  /* If the episode maps are in a pwad and the episode_names[] has */
+	  /* been provided but not an M_EPIx lump then destroy the lump. */
+	  if ((episode_names[episode] != NULL)
+	   && ((lump1 = W_CheckNumForName (m_ptr -> name)) != -1)
+	   && ((lump2 = G_MapLump (255, G_Access_MapStartTab (episode_num [episode]) -> start_map)) != -1)
+	   && (lumpinfo[lump1].handle == lumpinfo[0].handle)
+	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
+	  {
+//	    printf ("Destroyed menu lump %u for map %u\n", episode, G_Access_MapStartTab (episode_num [episode]) -> start_map);
+	    m_ptr -> name [0] = '-';
+	  }
+	  m_ptr++;
+	} while (++episode < EpiDef.numitems);
 
-      EpiDef.numitems = episode;
-#else
-      episode = EpiDef.numitems;
-#endif
-      while (episode > 4)
-      {
-	if (EpiDef.y > 30)
-	  EpiDef.y -= 4;
-	episode--;
+//      episode = EpiDef.numitems;	// Done by the loop!
+
+	while (episode > 4)
+	{
+	  if (EpiDef.y > 30)
+	    EpiDef.y -= 4;
+	  episode--;
+	}
+	EpiDef.x = 16;		// Bodged for Valiant.wad, must do properly!
       }
-      EpiDef.x = 16;		// Bodged for Valiant.wad, must do properly!
       break;
 
     case shareware:
@@ -2328,8 +2337,6 @@ void M_Init (void)
 	//printf ("Checking episode %u\n", episode);
 	if (M_EpisodePresent (m_ptr -> name, episode))
 	{
-	  unsigned int lump1,lump2;
-
 	  episode_num [menu_pos++] = episode;
 
 	  /* If the episode maps are in a pwad and the episode_names[] has */

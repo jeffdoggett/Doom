@@ -5,11 +5,11 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 
 #ifdef NORMALUNIX
 #include <unistd.h>
-#include <sys/types.h>
 #include <fcntl.h>
 #endif
 #ifdef __riscos
