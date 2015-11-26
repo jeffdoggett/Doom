@@ -1406,9 +1406,12 @@ static mobjtype_t G_SprNum (spritenum_t sprite)
 
   do
   {
-    st = &states[ptr->spawnstate];
-    if (st->sprite == sprite)
-      return ((mobjtype_t)count);
+    if (ptr->flags & MF_SPECIAL)
+    {
+      st = &states[ptr->spawnstate];
+      if (st->sprite == sprite)
+	return ((mobjtype_t)count);
+    }
     ptr++;
   } while (++count < NUMMOBJTYPES);
 
@@ -1470,6 +1473,9 @@ static void G_DropAllKit (player_t* player)
 
   if (player->cards[it_blueskull])
     G_SpawnObject (x, y, SPR_BSKU);
+
+  if (player->backpack)
+    G_SpawnObject (x, y, SPR_BPAK);
 }
 
 /* -------------------------------------------------------------------------------------------- */
