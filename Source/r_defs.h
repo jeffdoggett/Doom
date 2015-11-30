@@ -23,6 +23,7 @@
 #ifndef __R_DEFS__
 #define __R_DEFS__
 
+#include <sys/types.h>
 
 // Screenwidth.
 #include "doomdef.h"
@@ -301,7 +302,6 @@ extern msecnode_t *headsecnode;
 
 #endif
 
-#define LONG_LINE_FIX
 //
 // The LineSeg.
 //
@@ -322,10 +322,7 @@ typedef struct
     // backsector is NULL for one sided lines
     sector_t*	frontsector;
     sector_t*	backsector;
-
-#ifdef LONG_LINE_FIX
-    fixed_t	length;
-#endif
+    int64_t	length;
 } seg_t;
 
 

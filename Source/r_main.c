@@ -281,116 +281,100 @@ R_PointOnSegSide
 
 //
 // R_PointToAngle
-// To get a global angle from cartesian coordinates,
-//  the coordinates are flipped until they are in
-//  the first octant of the coordinate system, then
-//  the y (<=x) is scaled and divided by x to get a
-//  tangent (slope) value which is looked up in the
-//  tantoangle[] table.
+// To get a global angle from Cartesian coordinates,
+// the coordinates are flipped until they are in the first octant of
+// the coordinate system, then the y (<=x) is scaled and divided by x
+// to get a tangent (slope) value which is looked up in the
+// tantoangle[] table.
 
-//
-
-
-
-
-angle_t
-R_PointToAngle
-( fixed_t	x,
-  fixed_t	y )
+angle_t R_PointToAngleSlope(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
 {
-    x -= viewx;
-    y -= viewy;
+    angle_t rc;
+    double at;
 
-    if ( (!x) && (!y) )
-	return 0;
+    x -= x1;
+    y -= y1;
 
-    if (x>= 0)
+    if (!x && !y)
+        return 0;
+
+    if (x > MAXINT / 4 || x < -MAXINT / 4 || y > MAXINT / 4 || y < -MAXINT / 4)
     {
-	// x >=0
-	if (y>= 0)
-	{
-	    // y>= 0
+        at = atan2(y, x) * ANG180 / M_PI;
+        if (at < 0)			// Major bug in RiscOS here, barfs when
+        {				// the number is negative!
+          at = -at;
+          rc = (angle_t) at;
+          rc = -rc;
+        }
+        else
+        {
+          rc = (angle_t) at;
+        }
+        return (rc);
+    }
 
-	    if (x>y)
-	    {
-		// octant 0
-		return tantoangle[ SlopeDiv(y,x)];
-	    }
-	    else
-	    {
-		// octant 1
-		return ANG90-1-tantoangle[ SlopeDiv(x,y)];
-	    }
-	}
-	else
-	{
-	    // y<0
-	    y = -y;
-
-	    if (x>y)
-	    {
-		// octant 8
-		return -tantoangle[SlopeDiv(y,x)];
-	    }
-	    else
-	    {
-		// octant 7
-		return ANG270+tantoangle[ SlopeDiv(x,y)];
-	    }
-	}
+    if (x >= 0)
+    {
+        if (y >= 0)
+            return (x > y ? tantoangle[SlopeDiv(y, x)] :
+                ANG90 - 1 - tantoangle[SlopeDiv(x, y)]);
+        else
+        {
+            y = -y;
+            return (x > y ? -(int)tantoangle[SlopeDiv(y, x)] :
+                ANG270 + tantoangle[SlopeDiv(x, y)]);
+        }
     }
     else
     {
-	// x<0
-	x = -x;
-
-	if (y>= 0)
-	{
-	    // y>= 0
-	    if (x>y)
-	    {
-		// octant 3
-		return ANG180-1-tantoangle[ SlopeDiv(y,x)];
-	    }
-	    else
-	    {
-		// octant 2
-		return ANG90+ tantoangle[ SlopeDiv(x,y)];
-	    }
-	}
-	else
-	{
-	    // y<0
-	    y = -y;
-
-	    if (x>y)
-	    {
-		// octant 4
-		return ANG180+tantoangle[ SlopeDiv(y,x)];
-	    }
-	    else
-	    {
-		 // octant 5
-		return ANG270-1-tantoangle[ SlopeDiv(x,y)];
-	    }
-	}
+        x = -x;
+        if (y >= 0)
+            return (x > y ? ANG180 - 1 - tantoangle[SlopeDiv(y, x)] :
+                ANG90 + tantoangle[SlopeDiv(x, y)]);
+        else
+        {
+            y = -y;
+            return (x > y ? ANG180 + tantoangle[SlopeDiv(y, x)] :
+                ANG270 - 1 - tantoangle[SlopeDiv(x, y)]);
+        }
     }
-    return 0;
 }
 
-
-angle_t
-R_PointToAngle2
-( fixed_t	x1,
-  fixed_t	y1,
-  fixed_t	x2,
-  fixed_t	y2 )
+// Point of view (viewx, viewy) to point (x1, y1) angle.
+angle_t R_PointToAngle(fixed_t x, fixed_t y)
 {
-    viewx = x1;
-    viewy = y1;
-
-    return R_PointToAngle (x2, y2);
+    return R_PointToAngleSlope(viewx, viewy, x, y);
 }
+
+angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
+{
+    return R_PointToAngleSlope(x1, y1, x, y);
+}
+
+// Point of view (viewx, viewy) to point (x1, y1) angle.
+angle_t R_PointToAngleEx(fixed_t x, fixed_t y)
+{
+    return R_PointToAngleEx2(viewx, viewy, x, y);
+}
+
+angle_t R_PointToAngleEx2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
+{
+    // [crispy] fix overflows for very long distances
+    int64_t     y_viewy = (int64_t)y - y1;
+    int64_t     x_viewx = (int64_t)x - x1;
+
+    // [crispy] the worst that could happen is e.g. MININT-MAXINT = 2*MININT
+    if (x_viewx < MININT || x_viewx > MAXINT || y_viewy < MININT || y_viewy > MAXINT)
+    {
+        // [crispy] preserving the angle by halving the distance in both directions
+        x = (int)(x_viewx / 2 + x1);
+        y = (int)(y_viewy / 2 + y1);
+    }
+
+    return R_PointToAngleSlope(x1, y1, x, y);
+}
+
 
 
 fixed_t

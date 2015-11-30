@@ -421,8 +421,8 @@ static void R_AddLine (seg_t*	line)
     curline = line;
 
     // OPTIMIZE: quickly reject orthogonal back sides.
-    angle1 = R_GetVertexViewAngle (line->v1);
-    angle2 = R_GetVertexViewAngle (line->v2);
+    angle1 = R_PointToAngleEx (line->v1->x, line->v1->y);
+    angle2 = R_PointToAngleEx (line->v2->x, line->v2->y);
 
     // Clip to view edges.
     // OPTIMIZE: make constant out of 2*clipangle (FIELDOFVIEW).

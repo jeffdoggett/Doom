@@ -157,16 +157,15 @@ static pint R_IncreaseVisplanes (void)
 }
 
 // Test: Herian2.wad Level 23 exit room
-pint R_IncreaseOpenings (void)
+pint R_IncreaseOpenings (size_t need)
 {
   pint 		offset;
   pint		qty_used;
   dshort_t*	new_openings;
   drawseg_t	*ds;		// jff 8/9/98 needed for fix from ZDoom
 
-  qty_used = lastopening - openings;
-  MAXOPENINGS += 10000;
-  // printf ("MAXOPENINGS = %u\n", MAXOPENINGS);
+  MAXOPENINGS = need;
+//printf ("MAXOPENINGS = %u\n", MAXOPENINGS);
   new_openings = realloc (openings, MAXOPENINGS * sizeof (openings[0]));
   if (new_openings == NULL)
     I_Error ("R_IncreaseOpenings: no more room");
@@ -196,6 +195,7 @@ pint R_IncreaseOpenings (void)
     }
   }
 
+  qty_used = lastopening - openings;
   openings = new_openings;
   lastopening = openings + qty_used;
   //memset (lastvisplane, 0, 128 * sizeof (openings[0]));
