@@ -801,6 +801,10 @@ boolean P_MonsterCanOperate (unsigned int special, triggered_e trigtype)
 #endif
   else if (special >= GenCeilingBase)
   {
+    // CeilingModel is "Allow Monsters" if CeilingChange is 0
+    if (((special & CeilingChange) == 0)
+     && (special & CeilingModel))
+      return (true);
   }
   else if (special >= GenDoorBase)
   {
