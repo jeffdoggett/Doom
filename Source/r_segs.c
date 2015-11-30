@@ -545,6 +545,7 @@ void R_RenderSegLoop (void)
 void R_StoreWallRange(int start, int stop)
 {
     unsigned int	pos;
+    unsigned int	tex;
     int			timesofar;
     int64_t     dx, dy, dx1, dy1, len;
 
@@ -630,7 +631,9 @@ void R_StoreWallRange(int start, int stop)
     if (!backsector)
     {
 	// single sided line
-	midtexture = texturetranslation[sidedef->midtexture];
+	tex = sidedef->midtexture;
+	if (tex >= numtextures) tex = 0;
+	midtexture = texturetranslation[tex];
 //      midtexheight = textureheight[midtexture] >> FRACBITS;
 //      midtexfullbright = texturefullbright[midtexture];
 
@@ -759,7 +762,9 @@ void R_StoreWallRange(int start, int stop)
 	  int toptexheight;
 
 	    // top texture
-	    toptexture = texturetranslation[sidedef->toptexture];
+	    tex = sidedef->toptexture;
+	    if (tex >= numtextures) tex = 0;
+	    toptexture = texturetranslation[tex];
 	    toptexheight = textureheight[toptexture] >> FRACBITS;
 //	    toptexfullbright = texturefullbright[toptexture];
 
@@ -784,7 +789,9 @@ void R_StoreWallRange(int start, int stop)
 	if (worldlow > worldbottom)
 	{
 	    // bottom texture
-	    bottomtexture = texturetranslation[sidedef->bottomtexture];
+	    tex = sidedef->bottomtexture;
+	    if (tex >= numtextures) tex = 0;
+	    bottomtexture = texturetranslation[tex];
 //	    bottomtexheight = textureheight[bottomtexture] >> FRACBITS;
 //	    bottomtexfullbright = texturefullbright[bottomtexture];
 
@@ -908,7 +915,7 @@ void R_StoreWallRange(int start, int stop)
 	if (floorplane)     // killough 4/11/98: add NULL ptr checks
 	    floorplane = R_CheckPlane(floorplane, rw_x, rw_stopx - 1);
 	else
-	    markfloor = 0;
+	    markfloor = false;
     }
 
     R_RenderSegLoop();
