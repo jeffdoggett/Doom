@@ -50,7 +50,7 @@ char * got_messages_orig [] =
   GOTCELL, GOTCELLBOX, GOTSHELLS, GOTSHELLBOX,
   GOTBACKPACK, GOTBFG9000, GOTCHAINGUN, GOTCHAINSAW,
   GOTLAUNCHER, GOTPLASMA, GOTSHOTGUN, GOTSHOTGUN2,
-  GOTNSHELLS,					// Extra text, not DEHACKable
+  GOTNSHELLS, GOT1SHELL,				// Extra text, not DEHACKable
   NULL
 };
 
@@ -67,7 +67,7 @@ typedef enum
   P_GOTCELL, P_GOTCELLBOX, P_GOTSHELLS, P_GOTSHELLBOX,
   P_GOTBACKPACK, P_GOTBFG9000, P_GOTCHAINGUN, P_GOTCHAINSAW,
   P_GOTLAUNCHER, P_GOTPLASMA, P_GOTSHOTGUN, P_GOTSHOTGUN2,
-  P_GOTNSHELLS
+  P_GOTNSHELLS, P_GOT1SHELL
 } got_kit_texts_t;
 
 /* ------------------------------------------------------- */
@@ -699,9 +699,16 @@ P_TouchSpecialThing
 
       msg = got_messages [P_GOTSHELLS];
       if (msg == got_messages_orig [P_GOTSHELLS])
-        player->message = HU_printf (got_messages [P_GOTNSHELLS], qtyammogiven);
+      {
+	if (qtyammogiven == 1)
+	  player->message = got_messages [P_GOT1SHELL];
+	else
+	  player->message = HU_printf (got_messages [P_GOTNSHELLS], qtyammogiven);
+      }
       else
+      {
 	player->message = msg;
+      }
       break;
 
     case SPR_SBOX:
@@ -1076,7 +1083,7 @@ P_KillMobj
       if ((mo->flags & MF_COUNTKILL)
        && (target->flags2 & MF2_MASSACRE))
       {
-        mo->flags2 |= MF2_MASSACRE;		// Infinite recursion hell here!!
+	mo->flags2 |= MF2_MASSACRE;		// Infinite recursion hell here!!
 	P_DamageMobj (mo, NULL, NULL, mo -> health);
       }
     }

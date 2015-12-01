@@ -109,6 +109,7 @@
 #define GOTCELLBOX	"Picked up an energy cell pack."
 #define GOTSHELLS	"Picked up 4 shotgun shells."
 #define GOTNSHELLS	"Picked up %u shotgun shells."
+#define GOT1SHELL	"Picked up a shotgun shell."
 #define GOTSHELLBOX	"Picked up a box of shotgun shells."
 #define GOTBACKPACK	"Picked up a backpack full of ammo!"
 
