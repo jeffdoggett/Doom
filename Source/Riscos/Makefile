@@ -27,7 +27,7 @@ HDRS=		acorn.h am_map.h dh_stuff.h doomdata.h doomdef.h doomstat.h doomtype.h ds
 
 OBJS=		acorn.o alloca.o am_map.o a_sound.o a_video.o dh_stuff.o doomdef.o doomstat.o \
 		d_items.o d_main.o d_net.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o info.o i_main.o \
-		i_net.o i_system.o maths64.o m_argv.o m_bbox.o m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o \
+		i_net.o i_system.o m_argv.o m_bbox.o m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o \
 		m_swap.o p_ceilng.o p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o \
 		p_mobj.o p_plats.o p_pspr.o p_saveg.o p_setup.o p_sight.o p_spec.o p_switch.o p_telept.o \
 		p_tick.o p_user.o r_bsp.o r_data.o r_draw.o r_main.o r_plane.o r_segs.o r_sky.o r_things.o \

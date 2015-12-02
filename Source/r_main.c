@@ -296,48 +296,48 @@ angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
     y -= y1;
 
     if (!x && !y)
-        return 0;
+	return 0;
 
     if (x > MAXINT / 4 || x < -MAXINT / 4 || y > MAXINT / 4 || y < -MAXINT / 4)
     {
-        at = atan2(y, x) * ANG180 / M_PI;
-        if (at < 0)			// Major bug in RiscOS here, barfs when
-        {				// the number is negative!
-          at = -at;
-          rc = (angle_t) at;
-          rc = -rc;
-        }
-        else
-        {
-          rc = (angle_t) at;
-        }
-        return (rc);
+	at = atan2(y, x) * ANG180 / M_PI;
+	if (at < 0)			// Major bug in RiscOS here, barfs when
+	{				// the number is negative!
+	  at = -at;
+	  rc = (angle_t) at;
+	  rc = -rc;
+	}
+	else
+	{
+	  rc = (angle_t) at;
+	}
+	return (rc);
     }
 
     if (x >= 0)
     {
-        if (y >= 0)
-            return (x > y ? tantoangle[SlopeDiv(y, x)] :
-                ANG90 - 1 - tantoangle[SlopeDiv(x, y)]);
-        else
-        {
-            y = -y;
-            return (x > y ? -(int)tantoangle[SlopeDiv(y, x)] :
-                ANG270 + tantoangle[SlopeDiv(x, y)]);
-        }
+	if (y >= 0)
+	    return (x > y ? tantoangle[SlopeDiv(y, x)] :
+		ANG90 - 1 - tantoangle[SlopeDiv(x, y)]);
+	else
+	{
+	    y = -y;
+	    return (x > y ? -(int)tantoangle[SlopeDiv(y, x)] :
+		ANG270 + tantoangle[SlopeDiv(x, y)]);
+	}
     }
     else
     {
-        x = -x;
-        if (y >= 0)
-            return (x > y ? ANG180 - 1 - tantoangle[SlopeDiv(y, x)] :
-                ANG90 + tantoangle[SlopeDiv(x, y)]);
-        else
-        {
-            y = -y;
-            return (x > y ? ANG180 + tantoangle[SlopeDiv(y, x)] :
-                ANG270 - 1 - tantoangle[SlopeDiv(x, y)]);
-        }
+	x = -x;
+	if (y >= 0)
+	    return (x > y ? ANG180 - 1 - tantoangle[SlopeDiv(y, x)] :
+		ANG90 + tantoangle[SlopeDiv(x, y)]);
+	else
+	{
+	    y = -y;
+	    return (x > y ? ANG180 + tantoangle[SlopeDiv(y, x)] :
+		ANG270 - 1 - tantoangle[SlopeDiv(x, y)]);
+	}
     }
 }
 
@@ -362,9 +362,9 @@ angle_t R_PointToAngleEx2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
     // [crispy] the worst that could happen is e.g. MININT-MAXINT = 2*MININT
     if (x_viewx < MININT || x_viewx > MAXINT || y_viewy < MININT || y_viewy > MAXINT)
     {
-        // [crispy] preserving the angle by halving the distance in both directions
-        x = (int)(x_viewx / 2 + x1);
-        y = (int)(y_viewy / 2 + y1);
+	// [crispy] preserving the angle by halving the distance in both directions
+	x = (int)(x_viewx / 2 + x1);
+	y = (int)(y_viewy / 2 + y1);
     }
 
     return R_PointToAngle2(x1, y1, x, y);
@@ -587,13 +587,13 @@ void R_InitLightTables (void)
 	    {
 	      level = level / 6;
 	      if (level > 31)
-	        level = 31;
+		level = 31;
 	    }
 	    else
 	    {
 	      if (level >= NUMCOLORMAPS)
-	        level = NUMCOLORMAPS-1;
-            }
+		level = NUMCOLORMAPS-1;
+	    }
 	    zlight[i][j] = colormaps + level*256;
 	}
     }
@@ -637,11 +637,11 @@ void R_ExecuteSetViewSize (void)
     {
       sbarscale = 1 << FRACBITS;
       if (stbar_scale > 1)
-        sbarscale = (FRACUNIT*SCREENWIDTH)/320;
+	sbarscale = (FRACUNIT*SCREENWIDTH)/320;
 
       hutextscale = 1 << FRACBITS;
       if (hutext_scale > 1)
-        hutextscale = (FRACUNIT*SCREENWIDTH)/320;
+	hutextscale = (FRACUNIT*SCREENWIDTH)/320;
 
       ST_createWidgets ();
       HU_createWidgets (1);
@@ -756,12 +756,12 @@ void R_ExecuteSetViewSize (void)
 	    {
 	      level = level / 6;
 	      if (level > 31)
-	        level = 31;
+		level = 31;
 	    }
 	    else
 	    {
 	      if (level >= NUMCOLORMAPS)
-	        level = NUMCOLORMAPS-1;
+		level = NUMCOLORMAPS-1;
 	    }
 	    scalelight[i][j] = colormaps + level*256;
 	}
