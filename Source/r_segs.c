@@ -547,7 +547,7 @@ void R_StoreWallRange(int start, int stop)
     unsigned int	pos;
     unsigned int	tex;
     int			timesofar;
-    int64_t     dx, dy, dx1, dy1, len;
+    int64_t     dx, dy, dx1, dy1;
 
     pos = (unsigned int) (ds_p - drawsegs);
 
@@ -587,8 +587,7 @@ void R_StoreWallRange(int start, int stop)
     dy = ((int64_t)curline->v2->y - curline->v1->y) >> 1;
     dx1 = ((int64_t)viewx - curline->v1->x) >> 1;
     dy1 = ((int64_t)viewy - curline->v1->y) >> 1;
-    len = curline->length >> 1;
-    rw_distance = (fixed_t)((dy * dx1 - dx * dy1) / len) << 1;
+    rw_distance = (fixed_t)((dy * dx1 - dx * dy1) / curline->length) << 1;
 
     ds_p->x1 = rw_x = start;
     ds_p->x2 = stop;
@@ -827,7 +826,7 @@ void R_StoreWallRange(int start, int stop)
 
     if (segtextured)
     {
-	rw_offset = (fixed_t)(((dx * dx1 + dy * dy1) / len) << 1) + sidedef->textureoffset
+	rw_offset = (fixed_t)(((dx * dx1 + dy * dy1) / curline->length) << 1) + sidedef->textureoffset
 	    + curline->offset;
 
 	rw_centerangle = ANG90 + viewangle - rw_normalangle;

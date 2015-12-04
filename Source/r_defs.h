@@ -322,7 +322,7 @@ typedef struct
     // backsector is NULL for one sided lines
     sector_t*	frontsector;
     sector_t*	backsector;
-    int64_t	length;
+    uint32_t	length;
 } seg_t;
 
 
