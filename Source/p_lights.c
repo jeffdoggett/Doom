@@ -419,7 +419,7 @@ static /*unsigned int*/ void P_SpawnLightChaseR (sector_t* sector, unsigned int 
 	case 23:
 	case 24:
 	  if (other->lightingdata == NULL)
-	    other->lightingdata = (void*)((pint)next_level);
+	    other->lightingdata = (void*)((uintptr_t)next_level);
       }
     }
   }
@@ -428,7 +428,7 @@ static /*unsigned int*/ void P_SpawnLightChaseR (sector_t* sector, unsigned int 
   {
     other = getNextSector(sector->lines[i],sector);
     if ((other)
-     && (other -> lightingdata == ((void*) ((pint)(level+1)))))
+     && (other -> lightingdata == ((void*) ((uintptr_t)(level+1)))))
     {
       this_mode = other -> special;
       switch (this_mode & 31)

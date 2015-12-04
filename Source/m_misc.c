@@ -452,7 +452,7 @@ void M_LoadDefaults (void)
 
   // set everything to base values
   for (i=0 ; i<numdefaults ; i++)
-      *defaults[i].location = (pint) defaults[i].defaultvalue;
+      *defaults[i].location = (uintptr_t) defaults[i].defaultvalue;
 
   defaultfile = get_doomrc_filename (buffer);
 

@@ -127,10 +127,10 @@ void R_InitPlanes (void)
   showrplanestats = (boolean) M_CheckParm ("-showrplanes");
 }
 
-static pint R_IncreaseVisplanes (void)
+static uintptr_t R_IncreaseVisplanes (void)
 {
-  pint 		offset;
-  pint 		qty_used;
+  uintptr_t 	offset;
+  uintptr_t 	qty_used;
   visplane_t*	new_visplanes;
 
   qty_used = lastvisplane - visplanes;
@@ -140,7 +140,7 @@ static pint R_IncreaseVisplanes (void)
   if (new_visplanes == NULL)
     I_Error ("R_IncreaseVisplanes: no more room");
 
-  offset = (pint) new_visplanes - (pint) visplanes;
+  offset = (uintptr_t) new_visplanes - (uintptr_t) visplanes;
   visplanes = new_visplanes;
   lastvisplane = visplanes + qty_used;
   memset (lastvisplane, 0, 128 * sizeof (visplane_t));
@@ -148,19 +148,19 @@ static pint R_IncreaseVisplanes (void)
   /* Need to move the global variable pointers while we are here */
 
   if (floorplane)
-    floorplane = (visplane_t*)((pint) floorplane + offset);
+    floorplane = (visplane_t*)((uintptr_t) floorplane + offset);
 
   if (ceilingplane)
-    ceilingplane = (visplane_t*)((pint) ceilingplane + offset);
+    ceilingplane = (visplane_t*)((uintptr_t) ceilingplane + offset);
 
   return (offset);
 }
 
 // Test: Herian2.wad Level 23 exit room
-pint R_IncreaseOpenings (size_t need)
+uintptr_t R_IncreaseOpenings (size_t need)
 {
-  pint 		offset;
-  pint		qty_used;
+  uintptr_t 	offset;
+  uintptr_t	qty_used;
   dshort_t*	new_openings;
   drawseg_t	*ds;		// jff 8/9/98 needed for fix from ZDoom
 
@@ -170,7 +170,7 @@ pint R_IncreaseOpenings (size_t need)
   if (new_openings == NULL)
     I_Error ("R_IncreaseOpenings: no more room");
 
-  offset = (pint) new_openings - (pint) openings;
+  offset = (uintptr_t) new_openings - (uintptr_t) openings;
   // printf ("old = %X, new = %X, offset = %X\n", openings, new_openings, offset);
 
   // jff 8/9/98 borrowed fix for openings from ZDOOM1.14
@@ -181,17 +181,17 @@ pint R_IncreaseOpenings (size_t need)
     if (ds->maskedtexturecol + ds->x1 >= openings
      && ds->maskedtexturecol + ds->x1 <= lastopening)
     {
-      ds->maskedtexturecol = (dshort_t*) ((pint) ds->maskedtexturecol + offset);
+      ds->maskedtexturecol = (dshort_t*) ((uintptr_t) ds->maskedtexturecol + offset);
     }
     if (ds->sprtopclip + ds->x1 >= openings
      && ds->sprtopclip + ds->x1 <= lastopening)
     {
-      ds->sprtopclip = (dshort_t*) ((pint) ds->sprtopclip + offset);
+      ds->sprtopclip = (dshort_t*) ((uintptr_t) ds->sprtopclip + offset);
     }
     if (ds->sprbottomclip + ds->x1 >= openings
      && ds->sprbottomclip + ds->x1 <= lastopening)
     {
-      ds->sprbottomclip = (dshort_t*) ((pint) ds->sprbottomclip + offset);
+      ds->sprbottomclip = (dshort_t*) ((uintptr_t) ds->sprbottomclip + offset);
     }
   }
 
@@ -322,7 +322,7 @@ R_FindPlane
   fixed_t	yoffs)
 {
     int x;
-    pint offset;
+    uintptr_t offset;
     visplane_t*	check;
 
     if ((picnum == skyflatnum) || (picnum & PL_SKYFLAT))
@@ -346,7 +346,7 @@ R_FindPlane
     if (lastvisplane - visplanes >= (MAXVISPLANES-1))
     {
       offset = R_IncreaseVisplanes ();
-      check = (visplane_t*)((pint) check + offset);
+      check = (visplane_t*)((uintptr_t) check + offset);
     }
 
     lastvisplane++;
@@ -381,7 +381,7 @@ R_CheckPlane
     int		unionl;
     int		unionh;
     int		x;
-    pint	offset;
+    uintptr_t	offset;
 
     if (start < pl->minx)
     {
@@ -419,7 +419,7 @@ R_CheckPlane
       if (lastvisplane - visplanes >= (MAXVISPLANES-1))
       {
 	offset = R_IncreaseVisplanes ();
-	pl = (visplane_t*)((pint) pl + offset);
+	pl = (visplane_t*)((uintptr_t) pl + offset);
       }
 
       // make a new visplane

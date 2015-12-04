@@ -76,11 +76,6 @@ typedef unsigned short dushort_t;
 #define M_PI	3.14159265358979323846
 #endif
 
-#ifdef _64_BIT_PTRS
-typedef unsigned long long pint;
-#else
-typedef unsigned int pint;
-#endif
 
 #ifdef BOOM
 #define BOOMSTATEMENT(stmt) stmt

@@ -834,7 +834,7 @@ void grabsharedmemory(int size)
   image->data = X_shminfo.shmaddr = shmat(id, 0, 0);
 
   fprintf (stderr, "shared memory id=%d, addr=0x%lx\n", id,
-		(pint) (image->data));
+		(uintptr_t) (image->data));
 }
 
 /***************************************************************************/

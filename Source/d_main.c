@@ -2306,7 +2306,7 @@ void D_DoomMain (void)
       // for statistics driver
       extern  void*	statcopy;
 
-      statcopy = (void*)((pint)atoi(myargv[p+1]));
+      statcopy = (void*)((uintptr_t)atoi(myargv[p+1]));
 #ifdef NORMALUNIX
       printf ("External statistics registered.\n");
 #endif

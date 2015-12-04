@@ -670,7 +670,7 @@ byte *R_GetColumn (int tex, int col, boolean opaque)
 
 static const char mask_ffffffff[] = { 255,255,255,255,255,255,255,255 };
 
-static unsigned int R_merge_pnames (pint * patchlookup)
+static unsigned int R_merge_pnames (uintptr_t * patchlookup)
 {
   int lump;
   unsigned int pl_pos;
@@ -701,7 +701,7 @@ static unsigned int R_merge_pnames (pint * patchlookup)
 	if (patchlookup)
 	{
 	  patchlookup[pl_pos++] = qty_this_lump;
-	  patchlookup[pl_pos++] = (pint)lumpinfo[lump].handle;
+	  patchlookup[pl_pos++] = (uintptr_t)lumpinfo[lump].handle;
 	  name_p = names + 4;
 	  do
 	  {
@@ -721,7 +721,7 @@ static unsigned int R_merge_pnames (pint * patchlookup)
 /* ------------------------------------------------------------------------------------------------ */
 
 static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
-			unsigned int maxoff, unsigned int nummappatches, pint *patchlookup)
+			unsigned int maxoff, unsigned int nummappatches, uintptr_t *patchlookup)
 {
   int k,p;
   unsigned int j;
@@ -841,15 +841,15 @@ static unsigned int R_read_textures (unsigned int* maptex, unsigned int pos,
    this may not always be possible!
 */
 
-static pint * R_find_matching_pnames (FILE * handle, pint *patchlookup)
+static uintptr_t * R_find_matching_pnames (FILE * handle, uintptr_t *patchlookup)
 {
-  pint * pl;
+  uintptr_t * pl;
 
   pl = patchlookup;
 
   while (pl [0])
   {
-    if (pl [1] == (pint)handle)
+    if (pl [1] == (uintptr_t)handle)
       return (pl);
 
     pl = pl + pl [0] + 2;
@@ -860,7 +860,7 @@ static pint * R_find_matching_pnames (FILE * handle, pint *patchlookup)
 
 /* ------------------------------------------------------------------------------------------------ */
 
-static unsigned int R_merge_textures (char * name, unsigned int total, pint *patchlookup)
+static unsigned int R_merge_textures (char * name, unsigned int total, uintptr_t *patchlookup)
 {
   int lump;
   unsigned int maxoff;
@@ -906,7 +906,7 @@ static unsigned int R_merge_textures (char * name, unsigned int total, pint *pat
 static void R_InitTextures (void)
 {
   unsigned int i,j;
-  pint*	patchlookup;
+  uintptr_t*	patchlookup;
   unsigned int	nummappatches;
 
   // Load the patch names from pnames.lmp.
@@ -1343,7 +1343,7 @@ void R_InitColormaps (int lump)
       // Load in the light tables,
       colourmaps_a = Z_Malloc (colourmap_size, PU_STATIC, 0);
       // 256 byte align tables.
-      colormaps = (byte *)( ((pint)colourmaps_a + 255)&~0xff);
+      colormaps = (byte *)( ((uintptr_t)colourmaps_a + 255)&~0xff);
     }
     W_ReadLump (lump,colormaps);
   }

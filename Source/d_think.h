@@ -47,7 +47,7 @@ typedef union
   actionf_v	acv;
   actionf_p1	acp1;
   actionf_p2	acp2;
-  pint		aci;
+  uintptr_t	aci;
 } actionf_t;
 
 

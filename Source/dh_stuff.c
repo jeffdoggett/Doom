@@ -4002,7 +4002,7 @@ static void show_boss_action (unsigned int bossnum, bossdeath_t * bd_ptr)
 		bd_ptr -> map,
 		monsters,
 		bd_ptr -> tag,
-		(pint)bd_ptr -> func,
+		(uintptr_t)bd_ptr -> func,
 		bd_ptr -> action);
     bd_ptr++;
   } while (bd_ptr -> func);

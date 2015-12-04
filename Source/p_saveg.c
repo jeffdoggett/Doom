@@ -30,7 +30,7 @@ static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 // Pads save_p to a 4-byte boundary
 //  so that the load/save works on SGI&Gecko.
 //#define PADSAVEP()	save_p += (4 - ((int) save_p & 3)) & 3
-#define PADSAVEP()	save_p = (byte*)(((pint)save_p + 3) & ~3)
+#define PADSAVEP()	save_p = (byte*)(((uintptr_t)save_p + 3) & ~3)
 
 /* True when the file being loaded appears to have been saved on a
    machine with the opposite endian-ness (e.g. HP-UX PA-RISC -> ARM)
@@ -728,7 +728,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->health = p_load_32 (save_32_p); save_32_p++;
   mobj->movedir = p_load_32 (save_32_p); save_32_p++;
   mobj->movecount = p_load_32 (save_32_p); save_32_p++;
-  mobj->target = (mobj_t*) ((pint) p_load_32 (save_32_p)); save_32_p++;
+  mobj->target = (mobj_t*) ((uintptr_t) p_load_32 (save_32_p)); save_32_p++;
   mobj->reactiontime = p_load_32 (save_32_p); save_32_p++;
   mobj->threshold = p_load_32 (save_32_p); save_32_p++;
 
@@ -751,7 +751,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   /* p_load_16 (save_p); */ save_p += 2;
   save_32_p = (unsigned int *) save_p;
 
-  mobj->tracer = (mobj_t*) ((pint) p_load_32 (save_32_p)); save_32_p++;
+  mobj->tracer = (mobj_t*) ((uintptr_t) p_load_32 (save_32_p)); save_32_p++;
 
   P_SetThingPosition (mobj);
   mobj->info = &mobjinfo[mobj->type];

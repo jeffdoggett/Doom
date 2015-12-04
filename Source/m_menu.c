@@ -2354,7 +2354,7 @@ void M_Init (void)
 	}
 	else
 	{
-	  pint size;
+	  uintptr_t size;
 	  menuitem_t * top;
 	  top = &EpisodeMenu[(ARRAY_SIZE (EpisodeMenu))-1];
 	  size = (unsigned char *) top - (unsigned char *) m_ptr;
