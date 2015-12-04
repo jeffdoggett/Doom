@@ -29,23 +29,8 @@ static const char rcsid[] = "$Id: r_main.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #endif
 
 
-
-#include <stdlib.h>
+#include "includes.h"
 #include <math.h>
-
-
-#include "doomdef.h"
-#include "doomstat.h"
-#include "d_net.h"
-#include "m_argv.h"
-#include "m_bbox.h"
-#include "r_local.h"
-#include "r_sky.h"
-#include "st_stuff.h"
-#include "dh_stuff.h"
-#include "hu_stuff.h"
-#include "am_map.h"
-
 
 
 
