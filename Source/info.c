@@ -1401,7 +1401,7 @@ state_t states[] =
   { SPR_PLS2,	0 | FF_FULLBRIGHT,  4,	NULL,		S_PLS2BALL2,	 0,	0 }, // S_PLS2BALL
   { SPR_PLS2,	1 | FF_FULLBRIGHT,  4,	NULL,		S_PLS2BALL,	 0,	0 }, // S_PLS2BALL2
   { SPR_PLS2,	2 | FF_FULLBRIGHT,  6,	NULL,		S_PLS2BALLX2,	 0,	0 }, // S_PLS2BALLX1
-  { SPR_PLS2,	3 | FF_FULLBRIGHT,  6,	NULL,		S_PLS2BALLX2,	 0,	0 }, // S_PLS2BALLX2
+  { SPR_PLS2,	3 | FF_FULLBRIGHT,  6,	NULL,		S_PLS2BALLX3,	 0,	0 }, // S_PLS2BALLX2
   { SPR_PLS2,	4 | FF_FULLBRIGHT,  6,	NULL,		S_NULL, 	 0,	0 }, // S_PLS2BALLX3
 
   // killough 7/11/98: beta bonus items
@@ -1435,8 +1435,8 @@ state_t states[] =
   { SPR_MISL,	1 | FF_FULLBRIGHT,  8,	A_Mushroom,	S_EXPLODE2,	 0,	0 }, // S_MUSHROOM
 
   { SPR_PLAY,  14,		    5,	NULL,		S_PLAY_GDIE2,	 0,	0 }, // S_PLAY_GDIE1
-  { SPR_PLAY,  15,		    5,	NULL,		S_PLAY_GDIE3,	 0,	0 }, // S_PLAY_GDIE2
-  { SPR_PLAY,  16,		    5,	NULL,		S_PLAY_GDIE4,	 0,	0 }, // S_PLAY_GDIE3
+  { SPR_PLAY,  15,		    5,	A_SkullPop,	S_PLAY_GDIE3,	 0,	0 }, // S_PLAY_GDIE2
+  { SPR_PLAY,  16,		    5,	A_Fall,		S_PLAY_GDIE4,	 0,	0 }, // S_PLAY_GDIE3
   { SPR_PLAY,  17,		    5,	NULL,		S_PLAY_GDIE5,	 0,	0 }, // S_PLAY_GDIE4
   { SPR_PLAY,  18,		    5,	NULL,		S_PLAY_GDIE6,	 0,	0 }, // S_PLAY_GDIE5
   { SPR_PLAY,  19,		    5,	NULL,		S_PLAY_GDIE7,	 0,	0 }, // S_PLAY_GDIE6
