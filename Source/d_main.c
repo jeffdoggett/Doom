@@ -171,6 +171,9 @@ extern char * special_effects_messages_orig [];
 extern char * music_names_copy [];
 extern char * sound_names_copy [];
 
+/* Pointers from dh_stuff.c */
+extern actionf_t states_ptr_copy [NUMSTATES];
+
 /* ----------------------------------------------------------- */
 
 //
@@ -311,11 +314,14 @@ static void init_a_text_block (char ** dest, char ** src)
 
 static void init_text_messages (void)
 {
+  unsigned int count;
   char * name;
   char ** c_ptr;
   castinfo_t * ptr_s;
   musicinfo_t * m_ptr;
   sfxinfo_t * s_ptr;
+  actionf_t * a_ptr;
+  state_t * i_ptr;
 
   init_a_text_block (sprnames, sprnames_orig);
   init_a_text_block (dmain_messages, dmain_messages_orig);
@@ -367,6 +373,17 @@ static void init_text_messages (void)
     s_ptr++;
     *c_ptr++ = name;
   } while (name);
+
+
+
+  a_ptr = states_ptr_copy;
+  i_ptr = states;
+  count = NUMSTATES;
+  do
+  {
+    *a_ptr++ = i_ptr -> action;
+    i_ptr++;
+  } while (--count);
 }
 
 /* ----------------------------------------------------------- */
