@@ -383,6 +383,7 @@ void R_RenderSegLoop (void)
     int			bottom;
 
     //texturecolumn = 0;				// shut up compiler warning
+    dc_ylim = 127;
 
     for ( ; rw_x < rw_stopx ; rw_x++)
     {

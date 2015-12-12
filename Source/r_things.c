@@ -458,7 +458,7 @@ static int R_IncreaseVissprites (void)
     return (0);
 
   vissprites = new_vissprites;
-  
+
   new_vissprites_xref = realloc (vissprites_xref, (qty_vissprites+128) * sizeof (vissprite_t*));
   if (new_vissprites_xref == NULL)
     return (0);
@@ -548,7 +548,7 @@ static vissprite_t* R_NewVisSprite (fixed_t distance)
 
       if (distance <= d1)
 	break;
-    }    
+    }
 
     if (distance > d1)
     {
@@ -578,7 +578,7 @@ static vissprite_t* R_NewVisSprite (fixed_t distance)
   {
     if (pos >= num_vissprite)
       return (NULL);
-    
+
     rc = vissprites_xref [num_vissprite-1];
   }
   else
@@ -651,6 +651,8 @@ void R_DrawMaskedColumn (column_t* column)
 	    dc_yh = mfloorclip[dc_x]-1;
 	if (dc_yl <= mceilingclip[dc_x])
 	    dc_yl = mceilingclip[dc_x]+1;
+
+	dc_ylim = ~0;
 
 	if (dc_yl <= dc_yh)
 	{

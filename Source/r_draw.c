@@ -74,6 +74,7 @@ lighttable_t*		dc_colormap;
 int			dc_x;
 int			dc_yl;
 int			dc_yh;
+int			dc_ylim;
 fixed_t			dc_iscale;
 fixed_t			dc_texturemid;
 
@@ -131,7 +132,7 @@ void R_DrawColumn (void)
 	{
 	  // Re-map color indices from wall texture column
 	  //  using a lighting/special effects LUT.
-	  *dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+	  *dest = dc_colormap[dc_source[(frac>>FRACBITS)&dc_ylim]];
 	}
 
 	dest += SCREENWIDTH;
@@ -236,7 +237,7 @@ void R_DrawColumnLow (void)
     do
     {
 	// Hack. Does not work corretly.
-	*dest2 = *dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+	*dest2 = *dest = dc_colormap[dc_source[(frac>>FRACBITS)&dc_ylim]];
 	dest += SCREENWIDTH;
 	dest2 += SCREENWIDTH;
 	frac += fracstep;
