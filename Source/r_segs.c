@@ -647,7 +647,7 @@ void R_StoreWallRange(int start, int stop)
 	else
 	    // top of texture at top
 	    rw_midtexturemid = worldtop + sidedef->rowoffset;
-
+#if 0
 	{
 	    // killough 3/27/98: reduce offset
 	    fixed_t     h = textureheight[midtexture];
@@ -655,7 +655,7 @@ void R_StoreWallRange(int start, int stop)
 	    if (h & (h - FRACUNIT))
 		rw_midtexturemid %= h;
 	}
-
+#endif
 	ds_p->silhouette = SIL_BOTH;
 	ds_p->sprtopclip = screenheightarray;
 	ds_p->sprbottomclip = negonearray;
@@ -759,13 +759,11 @@ void R_StoreWallRange(int start, int stop)
 
 	if (worldhigh < worldtop)
 	{
-	  int toptexheight;
-
 	    // top texture
 	    tex = sidedef->toptexture;
 	    if (tex >= numtextures) tex = 0;
 	    toptexture = texturetranslation[tex];
-	    toptexheight = textureheight[toptexture] >> FRACBITS;
+//	    toptexheight = textureheight[toptexture] >> FRACBITS;
 //	    toptexfullbright = texturefullbright[toptexture];
 
 	    if (linedef->flags & ML_DONTPEGTOP)
@@ -773,10 +771,10 @@ void R_StoreWallRange(int start, int stop)
 		rw_toptexturemid = worldtop;
 	    else
 		// bottom of texture
-		rw_toptexturemid = backsector->ceilingheight + toptexheight - viewz;
+		rw_toptexturemid = backsector->ceilingheight + textureheight[toptexture] - viewz;
 
 	    rw_toptexturemid += sidedef->rowoffset;
-
+#if 0
 	    // killough 3/27/98: reduce offset
 	    {
 		fixed_t     h = textureheight[toptexture];
@@ -784,6 +782,7 @@ void R_StoreWallRange(int start, int stop)
 		if (h & (h - FRACUNIT))
 		    rw_toptexturemid %= h;
 	    }
+#endif
 	}
 
 	if (worldlow > worldbottom)
@@ -802,7 +801,7 @@ void R_StoreWallRange(int start, int stop)
 		rw_bottomtexturemid = worldlow;
 
 	    rw_bottomtexturemid += sidedef->rowoffset;
-
+#if 0
 	    // killough 3/27/98: reduce offset
 	    {
 		fixed_t     h = textureheight[bottomtexture];
@@ -810,6 +809,7 @@ void R_StoreWallRange(int start, int stop)
 		if (h & (h - FRACUNIT))
 		    rw_bottomtexturemid %= h;
 	    }
+#endif
 	}
 
 	// allocate space for masked texture tables
