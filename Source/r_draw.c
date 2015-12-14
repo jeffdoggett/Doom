@@ -119,15 +119,12 @@ void R_DrawColumn (void)
     // Determine scaling,
     //  which is the only mapping to be done.
     fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;
+    frac = (unsigned) (dc_texturemid + (dc_yl-centery)*fracstep) % (unsigned) dc_ylim;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     do
     {
-	if ((unsigned) frac >= (unsigned) dc_ylim)
-	  frac -= dc_ylim;
-
 	if (dest > scrnlimit)
 	  break;
 
@@ -140,6 +137,10 @@ void R_DrawColumn (void)
 
 	dest += SCREENWIDTH;
 	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
     } while (--count);
 }
 
@@ -235,18 +236,18 @@ void R_DrawColumnLow (void)
     dest2 = dest + 1;
 
     fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;
+    frac = (unsigned) (dc_texturemid + (dc_yl-centery)*fracstep) % (unsigned) dc_ylim;
 
     do
     {
-	if ((unsigned) frac >= (unsigned) dc_ylim)
-	  frac -= dc_ylim;
-
 	// Hack. Does not work corretly.
 	*dest2 = *dest = dc_colormap[dc_source[frac>>FRACBITS]];
 	dest += SCREENWIDTH;
 	dest2 += SCREENWIDTH;
 	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
 
     } while (--count);
 }
@@ -441,13 +442,11 @@ void R_DrawTranslatedColumn (void)
     // Looks familiar.
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl-centery)*fracstep;
+    frac = (unsigned) frac % (unsigned) dc_ylim;
 
     // Here we do an additional index re-mapping.
     do
     {
-	if ((unsigned) frac >= (unsigned) dc_ylim)
-	  frac -= dc_ylim;
-
 	if (dest > scrnlimit)
 	  break;
 
@@ -462,6 +461,10 @@ void R_DrawTranslatedColumn (void)
 	}
 	dest += SCREENWIDTH;
 	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
     } while (--count);
 }
 
