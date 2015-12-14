@@ -383,7 +383,6 @@ void R_RenderSegLoop (void)
     int			bottom;
 
     //texturecolumn = 0;				// shut up compiler warning
-    dc_ylim = 127;
 
     for ( ; rw_x < rw_stopx ; rw_x++)
     {
@@ -453,6 +452,7 @@ void R_RenderSegLoop (void)
 	    dc_yh = yh;
 	    dc_texturemid = rw_midtexturemid;
 	    dc_source = R_GetColumn(midtexture,texturecolumn,true);
+	    dc_ylim = textureheight[midtexture];
 	    colfunc ();
 	    ceilingclip[rw_x] = viewheight;
 	    floorclip[rw_x] = -1;
@@ -475,6 +475,7 @@ void R_RenderSegLoop (void)
 		    dc_yh = mid;
 		    dc_texturemid = rw_toptexturemid;
 		    dc_source = R_GetColumn(toptexture,texturecolumn,true);
+		    dc_ylim = textureheight[toptexture];
 		    colfunc ();
 		    ceilingclip[rw_x] = mid;
 		}
@@ -504,6 +505,7 @@ void R_RenderSegLoop (void)
 		    dc_yh = yh;
 		    dc_texturemid = rw_bottomtexturemid;
 		    dc_source = R_GetColumn(bottomtexture,texturecolumn,true);
+		    dc_ylim = textureheight[bottomtexture];
 		    colfunc ();
 		    floorclip[rw_x] = mid;
 		}

@@ -569,7 +569,9 @@ void R_DrawPlanes (void)
 	      texnum = skytexture;
 	      flip = 0;
 	    }
-	    dc_ylim = 127;
+
+	    dc_ylim = textureheight[texnum];
+
 	    for (x=pl->minx ; x <= pl->maxx ; x++)
 	    {
 		dc_yl = pl->top[x];

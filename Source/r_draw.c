@@ -125,6 +125,9 @@ void R_DrawColumn (void)
     //  e.g. a DDA-lile scaling.
     do
     {
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
 	if (dest > scrnlimit)
 	  break;
 
@@ -132,7 +135,7 @@ void R_DrawColumn (void)
 	{
 	  // Re-map color indices from wall texture column
 	  //  using a lighting/special effects LUT.
-	  *dest = dc_colormap[dc_source[(frac>>FRACBITS)&dc_ylim]];
+	  *dest = dc_colormap[dc_source[frac>>FRACBITS]];
 	}
 
 	dest += SCREENWIDTH;
@@ -236,8 +239,11 @@ void R_DrawColumnLow (void)
 
     do
     {
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
 	// Hack. Does not work corretly.
-	*dest2 = *dest = dc_colormap[dc_source[(frac>>FRACBITS)&dc_ylim]];
+	*dest2 = *dest = dc_colormap[dc_source[frac>>FRACBITS]];
 	dest += SCREENWIDTH;
 	dest2 += SCREENWIDTH;
 	frac += fracstep;
@@ -439,6 +445,9 @@ void R_DrawTranslatedColumn (void)
     // Here we do an additional index re-mapping.
     do
     {
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
 	if (dest > scrnlimit)
 	  break;
 
