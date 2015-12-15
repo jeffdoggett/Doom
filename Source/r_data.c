@@ -130,13 +130,11 @@ R_DrawColumnInCache
 
     while ((td = patch->topdelta) != 0xff)
     {
-#if 0
 	if (td < (topdelta+(lastlength-1)))		// Bodge for oversize patches
 	{
 	  topdelta += td;
 	}
 	else
-#endif
 	{
 	  topdelta = td;
 	}
