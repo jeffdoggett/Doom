@@ -319,7 +319,8 @@ static void R_GenerateComposite (int texnum)
 	if (x2 > texture->width)
 	    x2 = texture->width;
 	for (x = x1; x < x2 ; x++)
-	    if (collump[x] == -1)		// Column has multiple patches?
+            // [crispy] generate composites for single-patched textures as well
+	    // if (collump[x] == -1)		// Column has multiple patches?
 		// killough 1/25/98, 4/9/98: Fix medusa bug.
 		R_DrawColumnInCache((column_t *)((byte *)realpatch + LONG(cofs[x])),
 				    block + colofs[x], patch->originy,
@@ -650,7 +651,7 @@ byte *R_GetColumn (int tex, int col, boolean opaque)
   lump = texturecolumnlump[tex][col];
 
   // [crispy] single-patched mid-textures on two-sided walls
-  if (lump > 0) // && !opaque)
+  if ((lump > 0) && (!opaque))
   {
     patch = W_CacheLumpNum (lump, PU_CACHE);
     ofs = texturecolumnofs2[tex][col];
