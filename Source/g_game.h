@@ -39,24 +39,25 @@ typedef enum
 //
 typedef struct
 {
-  unsigned char  normal_exit_to_episode;
-  unsigned char  normal_exit_to_map;
-  unsigned char  secret_exit_to_episode;
-  unsigned char  secret_exit_to_map;
-  unsigned char  this_is_a_secret_level;
-  unsigned char  reset_kit_etc_on_entering;
-  unsigned char  intermission_text;
-  unsigned char	 cluster;
-  unsigned char	 nointermission;
-  unsigned char  allow_monster_telefrags;
-  unsigned char  par_time_5;			// Par time divided by 5
-  unsigned char	 time_sucks;			// Par time for sucks in minutes
-  char *	 mapname;
-  char *	 sky;
-  char *	 titlepatch;
-  char *	 enterpic;
-  char *	 exitpic;
-  char *	 bordertexture;
+  unsigned char normal_exit_to_episode;
+  unsigned char normal_exit_to_map;
+  unsigned char secret_exit_to_episode;
+  unsigned char secret_exit_to_map;
+  unsigned char this_is_a_secret_level;
+  unsigned char reset_kit_etc_on_entering;
+  unsigned char intermission_text;
+  unsigned char	cluster;
+  unsigned char	nointermission;
+  unsigned char allow_monster_telefrags;
+  unsigned char par_time_5;			// Par time divided by 5
+  unsigned char	time_sucks;			// Par time for sucks in minutes
+  fixed_t	skydelta;
+  char *	mapname;
+  char *	sky;
+  char *	titlepatch;
+  char *	enterpic;
+  char *	exitpic;
+  char *	bordertexture;
 } map_dests_t;
 
 typedef struct

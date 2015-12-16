@@ -91,7 +91,6 @@ fixed_t			yslope[MAXSCREENHEIGHT];
 fixed_t			distscale[MAXSCREENWIDTH];
 fixed_t			basexscale;
 fixed_t			baseyscale;
-fixed_t			skyiscale;
 
 fixed_t			cachedheight[MAXSCREENHEIGHT];
 fixed_t			cacheddistance[MAXSCREENHEIGHT];
@@ -473,158 +472,132 @@ static void R_MakeSpans (visplane_t *pl)
 // R_DrawPlanes
 // At the end of each frame.
 //
-
-void R_DrawPlanes (void)
+void R_DrawPlanes(void)
 {
-    visplane_t*		pl;
-    int			light;
-    int			i,x;
-    int			flip;
-    int			angle;
-    int			vangle;
-    int			texnum;
+  int i;
+  visplane_t *pl;
 
-#ifdef RANGECHECK
-    if (ds_p - drawsegs > MAXDRAWSEGS)
-	I_Error ("R_DrawPlanes: drawsegs overflow (%i)",
-		 ds_p - drawsegs);
-
-    if (lastvisplane - visplanes > MAXVISPLANES)
-	I_Error ("R_DrawPlanes: visplane overflow (%i)",
-		 lastvisplane - visplanes);
-
-    if (lastopening - openings > MAXOPENINGS)
-	I_Error ("R_DrawPlanes: opening overflow (%i)",
-		 lastopening - openings);
-
-
-    if (showrplanestats)
+  for (pl = visplanes ; pl < lastvisplane ; pl++)
+  {
+    if (pl->minx <= pl->maxx)
     {
-#ifdef __riscos
-      extern void _kernel_oswrch (int);
-      _kernel_oswrch (31);
-      _kernel_oswrch (0);
-      _kernel_oswrch (0);
-#endif
-      printf ("Drawsegs = %u/%u, Visplanes = %u/%u, Openings = %u/%u\n",
-		ds_p - drawsegs, MAXDRAWSEGS,
-		lastvisplane - visplanes, MAXVISPLANES,
-		lastopening - openings, MAXOPENINGS);
-#endif
+      int picnum = pl->picnum;
+
+      // sky flat
+      if (picnum == skyflatnum || (picnum & PL_SKYFLAT))
+      {
+	int	 x;
+	int	 texture;
+	int	 offset;
+	angle_t an, flip;
+
+	// killough 10/98: allow skies to come from sidedefs.
+	// Allows scrolling and/or animated skies, as well as
+	// arbitrary multiple skies per level without having
+	// to use info lumps.
+	an = viewangle;
+
+	if (picnum & PL_SKYFLAT)
+	{
+	  // Sky Linedef
+	  const line_t *l = &lines[picnum & ~PL_SKYFLAT];
+
+	  // Sky transferred from first sidedef
+	  const side_t *s = *l->sidenum + sides;
+
+	  // Texture comes from upper texture of reference sidedef
+	  texture = texturetranslation[s->toptexture];
+
+	  // Horizontal offset is turned into an angle offset,
+	  // to allow sky rotation as well as careful positioning.
+	  // However, the offset is scaled very small, so that it
+	  // allows a long-period of sky rotation.
+	  an += s->textureoffset;
+
+	  // Vertical offset allows careful sky positioning.
+	  dc_texturemid = s->rowoffset - 28 * FRACUNIT;
+
+	  // We sometimes flip the picture horizontally.
+	  //
+	  // DOOM always flipped the picture, so we make it optional,
+	  // to make it easier to use the new feature, while to still
+	  // allow old sky textures to be used.
+	  flip = l->special==272 ? 0u : ~0u;
+	}
+	else	// Normal DOOM sky, only one allowed per level
+	{
+	  dc_texturemid = skytexturemid;	// Default y-offset
+	  texture = skytexture;			// Default texture
+	  flip = 0;				// DOOM flips it
+	}
+
+	// Sky is always drawn full bright,
+	//  i.e. colormaps[0] is used.
+	// Because of this hack, sky is not affected
+	//  by INVUL inverse mapping.
+	dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
+
+	dc_ylim = textureheight[texture];
+	dc_iscale = skyiscale;
+
+	offset = skycolumnoffset >> FRACBITS;
+
+	for (x = pl->minx; x <= pl->maxx; x++)
+	{
+	    dc_yl = pl->top[x];
+	    dc_yh = pl->bottom[x];
+
+	    if (dc_yl <= dc_yh)
+	    {
+		dc_x = x;
+		dc_source = R_GetColumn(texture, (((an + xtoviewangle[x]) ^ flip)
+		    >> ANGLETOSKYSHIFT) + offset, false);
+		colfunc();
+	    }
+	}
+      }
+      else
+      {
+	 // regular flat
+	 int light;
+
+	 if ((unsigned)picnum >= (unsigned)numflats)
+	 {
+	   // Emergency fix up - Eternal.wad Level 29. JAD 7/12/98
+	   // Added (unsigned) for Freedoom2 Level 19. JAD 1/03/14
+	   i = R_CheckFlatNumForName ("FLOOR5_3");
+	   if (i == -1)
+	     i = 1;
+	 }
+	 else
+	 {
+	   i = flatlumps [flattranslation [picnum]];
+	 }
+
+	 ds_source = W_CacheLumpNum (i, PU_STATIC);
+
+	 xoffs = pl->xoffs;
+	 yoffs = pl->yoffs;
+	 planeheight = abs(pl->height-viewz);
+	 light = (pl->lightlevel >> LIGHTSEGSHIFT)+extralight;
+
+	 if (light >= LIGHTLEVELS)
+	     light = LIGHTLEVELS-1;
+
+	 if (light < 0)
+	     light = 0;
+
+	 planezlight = zlight[light];
+
+	 pl->top[pl->maxx+1] = 0xFFFF;
+	 pl->top[pl->minx-1] = 0xFFFF;
+
+	 R_MakeSpans (pl);
+
+	 Z_ChangeTag (ds_source, PU_CACHE);
+      }
     }
-
-    for (pl = visplanes ; pl < lastvisplane ; pl++)
-    {
-	if (pl->minx > pl->maxx)
-	    continue;
-
-	x = pl->picnum;
-
-	// sky flat
-	if ((x == skyflatnum) || (x & PL_SKYFLAT))
-	{
-	    dc_iscale = skyiscale;
-	    // Sky is allways drawn full bright,
-	    //  i.e. colormaps[0] is used.
-	    // Because of this hack, sky is not affected
-	    //  by INVUL inverse mapping.
-		  // BRAD: So I fix it....
-	    // See http://doom.wikia.com/wiki/Invulnerability_colormap_bug
-	    //dc_colormap = colormaps;
-	    dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
-	    vangle = viewangle;
-	    if (x & PL_SKYFLAT)
-	    {
-	      // Sky Linedef
-	      const line_t *l = &lines[x & ~PL_SKYFLAT];
-
-	      // Sky transferred from first sidedef
-	      const side_t *s = *l->sidenum + sides;
-
-	      // Texture comes from upper texture of reference sidedef
-	      texnum = texturetranslation[s->toptexture];
-
-	      // Horizontal offset is turned into an angle offset,
-	      // to allow sky rotation as well as careful positioning.
-	      // However, the offset is scaled very small, so that it
-	      // allows a long-period of sky rotation.
-
-	      vangle += s->textureoffset;
-
-	      // Vertical offset allows careful sky positioning.
-
-	      dc_texturemid = s->rowoffset - 28*FRACUNIT;
-
-	      // We sometimes flip the picture horizontally.
-	      //
-	      // Doom always flipped the picture, so we make it optional,
-	      // to make it easier to use the new feature, while to still
-	      // allow old sky textures to be used.
-
-	      flip = l->special==272 ? 0u : ~0u;
-	    }
-	    else
-	    {
-	      dc_texturemid = skytexturemid;
-	      texnum = skytexture;
-	      flip = 0;
-	    }
-
-	    dc_ylim = textureheight[texnum];
-
-	    for (x=pl->minx ; x <= pl->maxx ; x++)
-	    {
-		dc_yl = pl->top[x];
-		dc_yh = pl->bottom[x];
-
-		if (dc_yl <= dc_yh)
-		{
-		    angle = ((vangle + xtoviewangle[x])^flip)>>ANGLETOSKYSHIFT;
-		    dc_x = x;
-		    dc_source = R_GetColumn(texnum, angle, false);
-		    colfunc ();
-		}
-	    }
-	    continue;
-	}
-
-	// regular flat
-
-	if ((unsigned)x >= (unsigned)numflats)
-	{
-	   // Emergency fix up - Eternal.wad Level 29.  JAD 7/12/98
-	   // Added (unsigned) for Freedoom2 Level 19.	JAD 1/03/14
-	  i = R_CheckFlatNumForName ("FLOOR5_3");
-	  if (i == -1)
-	    i = 1;
-	}
-	else
-	{
-	  i = flatlumps [flattranslation [x]];
-	}
-
-	ds_source = W_CacheLumpNum (i, PU_STATIC);
-
-	xoffs = pl->xoffs;
-	yoffs = pl->yoffs;
-	planeheight = abs(pl->height-viewz);
-	light = (pl->lightlevel >> LIGHTSEGSHIFT)+extralight;
-
-	if (light >= LIGHTLEVELS)
-	    light = LIGHTLEVELS-1;
-
-	if (light < 0)
-	    light = 0;
-
-	planezlight = zlight[light];
-
-	pl->top[pl->maxx+1] = 0xFFFF;
-	pl->top[pl->minx-1] = 0xFFFF;
-
-	R_MakeSpans (pl);
-
-	Z_ChangeTag (ds_source, PU_CACHE);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

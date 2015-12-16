@@ -48,7 +48,6 @@ int			validcount = 1;
 lighttable_t*		fixedcolormap;
 int			lightScaleShift;
 extern lighttable_t**	walllights;
-extern fixed_t		skyiscale;
 
 int			centerx;
 int			centery;

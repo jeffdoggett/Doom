@@ -2775,7 +2775,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     {
       counter1 = atoi (ttext);
       if (counter1 <= 9)
-        return (&startup_messages [counter1]);
+	return (&startup_messages [counter1]);
     }
     return (NULL);
   }
@@ -4195,15 +4195,32 @@ static char * replace_titletext (char * ptr, unsigned int episode, unsigned int 
 static char * replace_map_text (char ** dest, char * ptr)
 {
   unsigned int j;
+  char * rc;
   char * newtext;
 
   if (*ptr == '=') ptr++;
   while (*ptr == ' ') ptr++;
   if (*ptr == '\"') ptr++;
+
+  rc = ptr;
+
   j = dh_inchar (ptr, ' ');
-  if (j) ptr [j-1] = 0;
+  if (j)
+  {
+    ptr [j-1] = 0;
+    rc = ptr + j;
+  }
+
   j = dh_inchar (ptr, '"');
-  if (j) ptr [j-1] = 0;
+  if (j)
+  {
+    ptr [j-1] = 0;
+    if ((ptr + j) > rc)
+      rc = ptr + j;
+  }
+
+  if (rc == ptr)
+    rc = ptr + strlen (ptr);
 
   if (strcasecmp (ptr, *dest))
   {
@@ -4215,7 +4232,7 @@ static char * replace_map_text (char ** dest, char * ptr)
     }
   }
 
-  return (ptr);
+  return (rc);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4629,32 +4646,58 @@ void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "sky1 ", 5) == 0)
     {
+      fixed_t skydelta;
+
+      skydelta = 0;
+
+      if (doing_default)
+	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+
+      ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+
+      /* Wiki says a comma separates the args, but most wads */
+      /* seem to use a space. Also Voe.wad has '0' instead of '0.0'. */
+
+      while (((cc = *ptr) == ' ') || (cc == ','))
+	ptr++;
+
+      if (*ptr)
+      {
+	double skd;
+	skd = atof (ptr);
+	/* Move left = positive value, right = negative */
+	/* So, yes, it is backwards! */
+	skydelta = (fixed_t) (-skd * FRACUNIT);
+//	printf ("Sky delta = '%s' %f (%X)\n", ptr, skd, skydelta);
+      }
+
       if (doing_default)
       {
-        mdest_ptr = G_Access_MapInfoTab_E (255, 0);
-        ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
-        newtext = mdest_ptr -> sky;
-        i = 1;
-        do
-        {
-          mdest_ptr = G_Access_MapInfoTab_E (255, i);
-          mdest_ptr -> sky = newtext;
-        } while (++i < 100);
-        i = 0;
-        do
-        {
-          j = 0;
-          do
-          {
-            mdest_ptr = G_Access_MapInfoTab_E (i, j);
-            mdest_ptr -> sky = newtext;
-          } while (++j < 10);
-        } while (++i < 10);
+	newtext = mdest_ptr -> sky;
+	i = 1;
+	do
+	{
+	  mdest_ptr = G_Access_MapInfoTab_E (255, i);
+	  mdest_ptr -> skydelta = skydelta;
+	  mdest_ptr -> sky = newtext;
+	} while (++i < 100);
+	i = 0;
+	do
+	{
+	  j = 0;
+	  do
+	  {
+	    mdest_ptr = G_Access_MapInfoTab_E (i, j);
+	    mdest_ptr -> skydelta = skydelta;
+	    mdest_ptr -> sky = newtext;
+	  } while (++j < 10);
+	} while (++i < 10);
       }
       else
       {
-        mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-        ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+	mdest_ptr -> skydelta = skydelta;
       }
     }
     else if (strncasecmp (ptr, "map07special", 12) == 0)
@@ -4949,7 +4992,7 @@ void Parse_Mapinfo (char * ptr, char * top)
 	cp = F_Create_ClusterDef (intertext);
 	if (cp)
 	{
-          l = strlen (ptr);
+	  l = strlen (ptr);
 	  newtext = malloc (l+1);
 	  if (newtext)
 	  {

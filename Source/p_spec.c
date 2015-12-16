@@ -2190,6 +2190,8 @@ void P_UpdateSpecials (void)
 	flattranslation[i] = pic;
     }
   }
+
+  skycolumnoffset += skyscrolldelta;
 }
 
 /* ---------------------------------------------------------------------------- */
