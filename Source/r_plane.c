@@ -477,6 +477,34 @@ void R_DrawPlanes(void)
   int i;
   visplane_t *pl;
 
+#ifdef RANGECHECK
+  if (ds_p > &drawsegs[MAXDRAWSEGS-1])
+      I_Error ("R_DrawPlanes: drawsegs overflow (%i)",
+	       ds_p - drawsegs);
+
+  if (lastvisplane > &visplanes[MAXVISPLANES-1])
+      I_Error ("R_DrawPlanes: visplane overflow (%i)",
+	       lastvisplane - visplanes);
+
+  if (lastopening > &openings[MAXOPENINGS-1])
+      I_Error ("R_DrawPlanes: opening overflow (%i)",
+	       lastopening - openings);
+#endif
+
+  if (showrplanestats)
+  {
+#ifdef __riscos
+    extern void _kernel_oswrch (int);
+    _kernel_oswrch (31);
+    _kernel_oswrch (0);
+    _kernel_oswrch (0);
+#endif
+    printf ("Drawsegs = %u/%u, Visplanes = %u/%u, Openings = %u/%u\n",
+		ds_p - drawsegs, MAXDRAWSEGS,
+		lastvisplane - visplanes, MAXVISPLANES,
+		lastopening - openings, MAXOPENINGS);
+  }
+
   for (pl = visplanes ; pl < lastvisplane ; pl++)
   {
     if (pl->minx <= pl->maxx)
