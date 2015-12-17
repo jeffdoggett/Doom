@@ -410,7 +410,7 @@ R_CheckPlane
 	intrh = stop;
     }
 
-    for (x = intrl; (x <= intrh) && (pl->top[++x] == PMARKER); );
+    for (x = intrl; (x <= intrh) && (pl->top[x+1] == PMARKER); ++x);
 
     // [crispy] fix HOM if ceilingplane and floorplane are the same
     // visplane (e.g. both skies)
