@@ -276,115 +276,95 @@ sector_t *R_FakeFlat(sector_t *sec, sector_t *tempsec,
 		    int *floorlightlevel, int *ceilinglightlevel,
 		    boolean back)
 {
-  if (floorlightlevel)
-#if 1
-    *floorlightlevel = sec->floorlightsec == -1 ?
-      sec->lightlevel : sectors[sec->floorlightsec].lightlevel;
-#else
-      *floorlightlevel = sec->lightlevel;
-#endif
-  if (ceilinglightlevel)
-#if 1
-    *ceilinglightlevel = sec->ceilinglightsec == -1 ? /* killough 4/11/98 */
-      sec->lightlevel : sectors[sec->ceilinglightsec].lightlevel;
-#else
-    *ceilinglightlevel = sec->lightlevel;
-#endif
+    if (floorlightlevel)
+	*floorlightlevel = (sec->floorlightsec == -1 ? sec->lightlevel :
+	    sectors[sec->floorlightsec].lightlevel);
 
-  if (sec->heightsec != -1)
-  {
-      const sector_t *s = &sectors[sec->heightsec];
-      int heightsec = viewplayer->mo->subsector->sector->heightsec;
-      int underwater = heightsec!=-1 && viewz<=sectors[heightsec].floorheight;
+    if (ceilinglightlevel)
+	*ceilinglightlevel = (sec->ceilinglightsec == -1 ? sec->lightlevel :
+	    sectors[sec->ceilinglightsec].lightlevel);
 
-      /* Replace sector being drawn, with a copy to be hacked */
-      *tempsec = *sec;
+    if (sec->heightsec != -1)
+    {
+	const sector_t	*s = &sectors[sec->heightsec];
+	int		heightsec = viewplayer->mo->subsector->sector->heightsec;
+	int		underwater = (heightsec != -1 && viewz <= sectors[heightsec].floorheight);
 
-      /* Replace floor and ceiling height with other sector's heights. */
-      tempsec->floorheight   = s->floorheight;
-      tempsec->ceilingheight = s->ceilingheight;
+	// Replace sector being drawn, with a copy to be hacked
+	*tempsec = *sec;
 
-      if ((underwater && (tempsec->  floorheight = sec->floorheight,
-			 tempsec->ceilingheight = s->floorheight-1,
-			 !back)) || viewz <= s->floorheight)
-      {		   /* head-below-floor hack */
-	 tempsec->floorpic    = s->floorpic;
-	 tempsec->floor_xoffs = s->floor_xoffs;
-	 tempsec->floor_yoffs = s->floor_yoffs;
+	// Replace floor and ceiling height with other sector's heights.
+	tempsec->floorheight = s->floorheight;
+	tempsec->ceilingheight = s->ceilingheight;
 
-	 if (underwater)
-	 {
-	   if (s->ceilingpic == skyflatnum)
-	   {
-	       tempsec->floorheight   = tempsec->ceilingheight+1;
-	       tempsec->ceilingpic    = tempsec->floorpic;
-	       tempsec->ceiling_xoffs = tempsec->floor_xoffs;
-	       tempsec->ceiling_yoffs = tempsec->floor_yoffs;
-	   }
-	   else
-	   {
-	       tempsec->ceilingpic    = s->ceilingpic;
-	       tempsec->ceiling_xoffs = s->ceiling_xoffs;
-	       tempsec->ceiling_yoffs = s->ceiling_yoffs;
-	   }
-	 }
-	 tempsec->lightlevel  = s->lightlevel;
+	// killough 11/98: prevent sudden light changes from non-water sectors:
+	if (underwater && (tempsec->floorheight = sec->floorheight,
+	    tempsec->ceilingheight = s->floorheight - 1, !back))
+	{
+	    // head-below-floor hack
+	    tempsec->floorpic = s->floorpic;
+	    tempsec->floor_xoffs = s->floor_xoffs;
+	    tempsec->floor_yoffs = s->floor_yoffs;
 
-	 if (floorlightlevel)
-#if 1
-	   *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
-	   sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
-#else
-	   *floorlightlevel = s->lightlevel;
-#endif
+	    if (underwater)
+	    {
+		if (s->ceilingpic == skyflatnum)
+		{
+		    tempsec->floorheight = tempsec->ceilingheight + 1;
+		    tempsec->ceilingpic = tempsec->floorpic;
+		    tempsec->ceiling_xoffs = tempsec->floor_xoffs;
+		    tempsec->ceiling_yoffs = tempsec->floor_yoffs;
+		}
+		else
+		{
+		    tempsec->ceilingpic = s->ceilingpic;
+		    tempsec->ceiling_xoffs = s->ceiling_xoffs;
+		    tempsec->ceiling_yoffs = s->ceiling_yoffs;
+		}
+	    }
 
-	 if (ceilinglightlevel)
-#if 1
-	   *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
-	   sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
-#else
-	   *ceilinglightlevel = s->lightlevel;
-#endif
-      }
-      else
-       if (heightsec != -1 && viewz >= sectors[heightsec].ceilingheight &&
-	   sec->ceilingheight > s->ceilingheight)
-       {   /* Above-ceiling hack */
-	   tempsec->ceilingheight = s->ceilingheight;
-	   tempsec->floorheight   = s->ceilingheight + 1;
+	    tempsec->lightlevel = s->lightlevel;
 
-	   tempsec->floorpic    = tempsec->ceilingpic    = s->ceilingpic;
-	   tempsec->floor_xoffs = tempsec->ceiling_xoffs = s->ceiling_xoffs;
-	   tempsec->floor_yoffs = tempsec->ceiling_yoffs = s->ceiling_yoffs;
+	    if (floorlightlevel)
+		*floorlightlevel = (s->floorlightsec == -1 ? s->lightlevel :
+		    sectors[s->floorlightsec].lightlevel);	// killough 3/16/98
 
-	   if (s->floorpic != skyflatnum)
-	   {
-	       tempsec->ceilingheight = sec->ceilingheight;
-	       tempsec->floorpic      = s->floorpic;
-	       tempsec->floor_xoffs   = s->floor_xoffs;
-	       tempsec->floor_yoffs   = s->floor_yoffs;
-	   }
+	    if (ceilinglightlevel)
+		*ceilinglightlevel = (s->ceilinglightsec == -1 ? s->lightlevel :
+		    sectors[s->ceilinglightsec].lightlevel);	// killough 4/11/98
+	}
+	else if (heightsec != -1 && viewz >= sectors[heightsec].ceilingheight
+	    && sec->ceilingheight > s->ceilingheight)
+	{
+	    // Above-ceiling hack
+	    tempsec->ceilingheight = s->ceilingheight;
+	    tempsec->floorheight = s->ceilingheight + 1;
 
-	   tempsec->lightlevel  = s->lightlevel;
+	    tempsec->floorpic = tempsec->ceilingpic = s->ceilingpic;
+	    tempsec->floor_xoffs = tempsec->ceiling_xoffs = s->ceiling_xoffs;
+	    tempsec->floor_yoffs = tempsec->ceiling_yoffs = s->ceiling_yoffs;
 
-	   if (floorlightlevel)
-#if 1
-	     *floorlightlevel = s->floorlightsec == -1 ? s->lightlevel :
-	     sectors[s->floorlightsec].lightlevel; /* killough 3/16/98 */
-#else
-	   *floorlightlevel = s->lightlevel;
-#endif
-	   if (ceilinglightlevel)
-#if 1
-	     *ceilinglightlevel = s->ceilinglightsec == -1 ? s->lightlevel :
-	     sectors[s->ceilinglightsec].lightlevel; /* killough 4/11/98 */
-#else
-	     *ceilinglightlevel = s->lightlevel;
-#endif
-      }
-      sec = tempsec;	      /* Use other sector */
-  }
-  return sec;
+	    if (s->floorpic != skyflatnum)
+	    {
+		tempsec->ceilingheight = sec->ceilingheight;
+		tempsec->floorpic = s->floorpic;
+		tempsec->floor_xoffs = s->floor_xoffs;
+		tempsec->floor_yoffs = s->floor_yoffs;
+	    }
+
+	    tempsec->lightlevel = s->lightlevel;
+
+	    if (floorlightlevel)
+		*floorlightlevel = (s->floorlightsec == -1 ? s->lightlevel :
+		    sectors[s->floorlightsec].lightlevel);	// killough 3/16/98
+
+	    if (ceilinglightlevel)
+		*ceilinglightlevel = (s->ceilinglightsec == -1 ? s->lightlevel :
+		    sectors[s->ceilinglightsec].lightlevel);	// killough 4/11/98
+	}
+	sec = tempsec;	// Use other sector
+    }
+    return sec;
 }
 
 /* ---------------------------------------------------------------------------- */
