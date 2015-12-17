@@ -540,17 +540,11 @@ typedef struct
   int			minx;
   int			maxx;
 
-  // leave pads for [minx-1]/[maxx+1]
-
-  dushort_t		pad1;
   // Here lies the rub for all
-  //  dynamic resize/change of resolution.
-  dushort_t		top[MAXSCREENWIDTH];
-  dushort_t		pad2;
-  dushort_t		pad3;
-  // See above.
-  dushort_t		bottom[MAXSCREENWIDTH];
-  dushort_t		pad4;
+  // dynamic resize/change of resolution.
+  // leave pads for [minx-1]/[maxx+1]
+  dushort_t		top[MAXSCREENWIDTH+2];
+  dushort_t		bottom[MAXSCREENWIDTH+2];
   fixed_t		xoffs;
   fixed_t		yoffs;
 } visplane_t;

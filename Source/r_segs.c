@@ -401,10 +401,11 @@ void R_RenderSegLoop (void)
 	    if (bottom >= floorclip[rw_x])
 		bottom = floorclip[rw_x]-1;
 
-	    if (top <= bottom)
+	    if ((top <= bottom)
+	     && (ceilingplane))		// killough 4/11/98: add NULL ptr checks
 	    {
-		ceilingplane->top[rw_x] = top;
-		ceilingplane->bottom[rw_x] = bottom;
+		ceilingplane->top[rw_x+1] = top;
+		ceilingplane->bottom[rw_x+1] = bottom;
 	    }
 	}
 
@@ -419,10 +420,11 @@ void R_RenderSegLoop (void)
 	    bottom = floorclip[rw_x]-1;
 	    if (top <= ceilingclip[rw_x])
 		top = ceilingclip[rw_x]+1;
-	    if (top <= bottom)
+	    if ((top <= bottom)
+	     && (floorplane))		// killough 4/11/98: add NULL ptr checks
 	    {
-		floorplane->top[rw_x] = top;
-		floorplane->bottom[rw_x] = bottom;
+		floorplane->top[rw_x+1] = top;
+		floorplane->bottom[rw_x+1] = bottom;
 	    }
 	}
 

@@ -78,8 +78,8 @@ dshort_t		ceilingclip[MAXSCREENWIDTH];
 // spanstart holds the start of a plane span
 // initialized to 0 at start
 //
-int			spanstart[MAXSCREENHEIGHT];
-int			spanstop[MAXSCREENHEIGHT];
+static int		spanstart[MAXSCREENHEIGHT];
+static int		spanstop[MAXSCREENHEIGHT];
 
 //
 // texture mapping
@@ -103,6 +103,9 @@ fixed_t			yoffs;
 extern int numflats;
 extern int * flatlumps;
 
+#define PMARKER	0xFFFF
+
+//-----------------------------------------------------------------------------
 //
 // R_InitPlanes
 // Only at game startup.
@@ -125,6 +128,8 @@ void R_InitPlanes (void)
 
   showrplanestats = (boolean) M_CheckParm ("-showrplanes");
 }
+
+//-----------------------------------------------------------------------------
 
 static uintptr_t R_IncreaseVisplanes (void)
 {
@@ -155,6 +160,7 @@ static uintptr_t R_IncreaseVisplanes (void)
   return (offset);
 }
 
+//-----------------------------------------------------------------------------
 // Test: Herian2.wad Level 23 exit room
 uintptr_t R_IncreaseOpenings (size_t need)
 {
@@ -201,6 +207,7 @@ uintptr_t R_IncreaseOpenings (size_t need)
   return (offset);
 }
 
+//-----------------------------------------------------------------------------
 //
 // R_MapPlane
 //
@@ -231,8 +238,9 @@ R_MapPlane
 	|| x2>=viewwidth
 	|| (unsigned)y>viewheight)
     {
-	I_Error ("R_MapPlane: %i, %i at %i\n",x1,x2,y);
-	//return;
+	//I_Error ("R_MapPlane: %i, %i at %i\n",x1,x2,y);
+	printf ("R_MapPlane: %i, %i at %i\n",x1,x2,y);
+	return;
     }
 #endif
 
@@ -276,6 +284,7 @@ R_MapPlane
 }
 
 
+//-----------------------------------------------------------------------------
 //
 // R_ClearPlanes
 // At begining of frame.
@@ -306,9 +315,7 @@ void R_ClearPlanes (void)
     baseyscale = -FixedDiv (finesine[angle],centerxfrac);
 }
 
-
-
-
+//-----------------------------------------------------------------------------
 //
 // R_FindPlane
 //
@@ -360,12 +367,12 @@ R_FindPlane
 
     // memset (check->top,0xff,sizeof(check->top));
     for (x = 0; x < ARRAY_SIZE(check->top); x++)
-      check->top[x] = 0xFFFF;
+      check->top[x] = PMARKER;
 
     return check;
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // R_CheckPlane
 //
@@ -404,7 +411,7 @@ R_CheckPlane
 	intrh = stop;
     }
 
-    for (x = intrl; (x <= intrh) && (pl->top[x] == 0xFFFF); x++);
+    for (x = intrl; (x <= intrh) && (pl->top[++x] == PMARKER); );
 
     // [crispy] fix HOM if ceilingplane and floorplane are the same
     // visplane (e.g. both skies)
@@ -415,6 +422,8 @@ R_CheckPlane
     }
     else
     {
+      visplane_t * new_pl;
+
       if (lastvisplane >= &visplanes[MAXVISPLANES])
       {
 	offset = R_IncreaseVisplanes ();
@@ -422,25 +431,25 @@ R_CheckPlane
       }
 
       // make a new visplane
-      lastvisplane->height = pl->height;
-      lastvisplane->picnum = pl->picnum;
-      lastvisplane->lightlevel = pl->lightlevel;
-      lastvisplane->xoffs = pl->xoffs;
-      lastvisplane->yoffs = pl->yoffs;
-
-      pl = lastvisplane++;
+      new_pl = lastvisplane++;
+      new_pl->height = pl->height;
+      new_pl->picnum = pl->picnum;
+      new_pl->lightlevel = pl->lightlevel;
+      new_pl->xoffs = pl->xoffs;
+      new_pl->yoffs = pl->yoffs;
+      pl = new_pl;
       pl->minx = start;
       pl->maxx = stop;
 
       // memset (pl->top,0xff,sizeof(pl->top));
       for (x = 0; x < ARRAY_SIZE(pl->top); x++)
-	pl->top[x] = 0xFFFF;
+	pl->top[x] = PMARKER;
     }
 
     return (pl);
 }
 
-
+//-----------------------------------------------------------------------------
 //
 // R_MakeSpans
 //
@@ -450,10 +459,10 @@ static void R_MakeSpans (visplane_t *pl)
 
   for (x = pl->minx; x <= pl->maxx + 1; ++x)
   {
-    unsigned short  t1 = pl->top[x - 1];
-    unsigned short  b1 = pl->bottom[x - 1];
-    unsigned short  t2 = pl->top[x];
-    unsigned short  b2 = pl->bottom[x];
+    dushort_t  t1 = pl->top[x];
+    dushort_t  b1 = pl->bottom[x];
+    dushort_t  t2 = pl->top[x+1];
+    dushort_t  b2 = pl->bottom[x+1];
 
     for (; t1 < t2 && t1 <= b1; ++t1)
       R_MapPlane(t1, spanstart[t1], x - 1);
@@ -466,8 +475,7 @@ static void R_MakeSpans (visplane_t *pl)
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
 //
 // R_DrawPlanes
 // At the end of each frame.
@@ -572,8 +580,8 @@ void R_DrawPlanes(void)
 
 	for (x = pl->minx; x <= pl->maxx; x++)
 	{
-	    dc_yl = pl->top[x];
-	    dc_yh = pl->bottom[x];
+	    dc_yl = pl->top[x+1];
+	    dc_yh = pl->bottom[x+1];
 
 	    if (dc_yl <= dc_yh)
 	    {
@@ -617,8 +625,8 @@ void R_DrawPlanes(void)
 
 	 planezlight = zlight[light];
 
-	 pl->top[pl->maxx+1] = 0xFFFF;
-	 pl->top[pl->minx-1] = 0xFFFF;
+	 pl->top[pl->maxx+2] = PMARKER;
+	 pl->top[pl->minx+0] = PMARKER;
 
 	 R_MakeSpans (pl);
 
