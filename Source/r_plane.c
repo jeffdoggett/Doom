@@ -342,7 +342,7 @@ R_FindPlane
 	}
     }
 
-    if (lastvisplane - visplanes >= (MAXVISPLANES-1))
+    if (lastvisplane >= &visplanes[MAXVISPLANES])
     {
       offset = R_IncreaseVisplanes ();
       check = (visplane_t*)((uintptr_t) check + offset);
@@ -415,7 +415,7 @@ R_CheckPlane
     }
     else
     {
-      if (lastvisplane - visplanes >= (MAXVISPLANES-1))
+      if (lastvisplane >= &visplanes[MAXVISPLANES])
       {
 	offset = R_IncreaseVisplanes ();
 	pl = (visplane_t*)((uintptr_t) pl + offset);
@@ -478,15 +478,15 @@ void R_DrawPlanes(void)
   visplane_t *pl;
 
 #ifdef RANGECHECK
-  if (ds_p > &drawsegs[MAXDRAWSEGS-1])
+  if (ds_p > &drawsegs[MAXDRAWSEGS])
       I_Error ("R_DrawPlanes: drawsegs overflow (%i)",
 	       ds_p - drawsegs);
 
-  if (lastvisplane > &visplanes[MAXVISPLANES-1])
+  if (lastvisplane > &visplanes[MAXVISPLANES])
       I_Error ("R_DrawPlanes: visplane overflow (%i)",
 	       lastvisplane - visplanes);
 
-  if (lastopening > &openings[MAXOPENINGS-1])
+  if (lastopening > &openings[MAXOPENINGS])
       I_Error ("R_DrawPlanes: opening overflow (%i)",
 	       lastopening - openings);
 #endif
