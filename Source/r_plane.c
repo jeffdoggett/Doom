@@ -79,7 +79,6 @@ dshort_t		ceilingclip[MAXSCREENWIDTH];
 // initialized to 0 at start
 //
 static int		spanstart[MAXSCREENHEIGHT];
-static int		spanstop[MAXSCREENHEIGHT];
 
 //
 // texture mapping
