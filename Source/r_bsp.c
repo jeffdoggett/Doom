@@ -499,129 +499,95 @@ static void R_AddLine (seg_t*	line)
 //
 static const int checkcoord[12][4] =
 {
-    {3,0,2,1},
-    {3,0,2,0},
-    {3,1,2,0},
-    {0},
-    {2,0,2,1},
-    {0,0,0,0},
-    {3,1,3,0},
-    {0},
-    {2,0,3,1},
-    {2,1,3,1},
-    {2,1,3,0}
+    { 3, 0, 2, 1 },
+    { 3, 0, 2, 0 },
+    { 3, 1, 2, 0 },
+    { 0 },
+    { 2, 0, 2, 1 },
+    { 0, 0, 0, 0 },
+    { 3, 1, 3, 0 },
+    { 0 },
+    { 2, 0, 3, 1 },
+    { 2, 1, 3, 1 },
+    { 2, 1, 3, 0 }
 };
 
-
-static boolean R_CheckBBox (fixed_t* bspcoord)
+static boolean R_CheckBBox(const fixed_t *bspcoord)
 {
-    int			boxx;
-    int			boxy;
-    int			boxpos;
+    int		boxpos;
+    const int	*check;
 
-    fixed_t		x1;
-    fixed_t		y1;
-    fixed_t		x2;
-    fixed_t		y2;
+    angle_t	angle1;
+    angle_t	angle2;
 
-    angle_t		angle1;
-    angle_t		angle2;
-    angle_t		span;
-    angle_t		tspan;
+    cliprange_t	*start;
 
-    cliprange_t*	start;
-
-    int			sx1;
-    int			sx2;
+    int		sx1;
+    int		sx2;
 
     // Find the corners of the box
     // that define the edges from current viewpoint.
-    if (viewx <= bspcoord[BOXLEFT])
-	boxx = 0;
-    else if (viewx < bspcoord[BOXRIGHT])
-	boxx = 1;
-    else
-	boxx = 2;
+    boxpos = (viewx <= bspcoord[BOXLEFT] ? 0 : viewx < bspcoord[BOXRIGHT ] ? 1 : 2) +
+	     (viewy >= bspcoord[BOXTOP ] ? 0 : viewy > bspcoord[BOXBOTTOM] ? 4 : 8);
 
-    if (viewy >= bspcoord[BOXTOP])
-	boxy = 0;
-    else if (viewy > bspcoord[BOXBOTTOM])
-	boxy = 1;
-    else
-	boxy = 2;
-
-    boxpos = (boxy<<2)+boxx;
     if (boxpos == 5)
 	return true;
 
-    x1 = bspcoord[checkcoord[boxpos][0]];
-    y1 = bspcoord[checkcoord[boxpos][1]];
-    x2 = bspcoord[checkcoord[boxpos][2]];
-    y2 = bspcoord[checkcoord[boxpos][3]];
+    check = checkcoord[boxpos];
 
     // check clip list for an open space
-    angle1 = R_PointToAngle (x1, y1) - viewangle;
-    angle2 = R_PointToAngle (x2, y2) - viewangle;
+    angle1 = R_PointToAngle(bspcoord[check[0]], bspcoord[check[1]]) - viewangle;
+    angle2 = R_PointToAngle(bspcoord[check[2]], bspcoord[check[3]]) - viewangle;
 
-    span = angle1 - angle2;
-
-    // Sitting on a line?
-    if (span >= ANG180)
-	return true;
-
-    tspan = angle1 + clipangle;
-
-    if (tspan > 2*clipangle)
+    // cph - replaced old code, which was unclear and badly commented
+    // Much more efficient code now
+    if ((signed int)angle1 < (signed int)angle2)
     {
-	tspan -= 2*clipangle;
-
-	// Totally off the left edge?
-	if (tspan >= span)
-	    return false;
-
-	angle1 = clipangle;
-    }
-    tspan = clipangle - angle2;
-    if (tspan > 2*clipangle)
-    {
-	tspan -= 2*clipangle;
-
-	// Totally off the left edge?
-	if (tspan >= span)
-	    return false;
-
-	angle2 = -clipangle;
+	// Either angle1 or angle2 is behind us, so it doesn't matter if we
+	// change it to the correct sign
+	if (angle1 >= ANG180 && angle1 < ANG270)
+	    angle1 = MAXINT;	   // which is ANG180 - 1
+	else
+	    angle2 = MININT;
     }
 
+    if ((signed int)angle2 >= (signed int)clipangle)
+	return false;				// Both off left edge
+    if ((signed int)angle1 <= -(signed int)clipangle)
+	return false;				// Both off right edge
+    if ((signed int)angle1 >= (signed int)clipangle)
+	angle1 = clipangle;			// Clip at left edge
+    if ((signed int)angle2 <= -(signed int)clipangle)
+	angle2 = 0 - clipangle;			// Clip at right edge
 
     // Find the first clippost
     //  that touches the source post
     //  (adjacent pixels are touching).
-    angle1 = (angle1+ANG90)>>ANGLETOFINESHIFT;
-    angle2 = (angle2+ANG90)>>ANGLETOFINESHIFT;
+    angle1 = (angle1 + ANG90) >> ANGLETOFINESHIFT;
+    angle2 = (angle2 + ANG90) >> ANGLETOFINESHIFT;
     sx1 = viewangletox[angle1];
     sx2 = viewangletox[angle2];
 
-    // Does not cross a pixel.
-    if (sx1 == sx2)
-	return false;
-    sx2--;
+    // SoM: To account for the rounding error of the old BSP system, I needed to
+    // make adjustments.
+    // SoM: Moved this to before the "does not cross a pixel" check to fix
+    // another slime trail
+    if (sx1 > 0)
+	sx1--;
+    if (sx2 < viewwidth - 1)
+	sx2++;
+
+    // SoM: Removed the "does not cross a pixel" test
 
     start = solidsegs;
     while (start->last < sx2)
-	start++;
+	++start;
 
-    if (sx1 >= start->first
-	&& sx2 <= start->last)
-    {
-	// The clippost contains the new span.
-	return false;
-    }
+    if (sx1 >= start->first && sx2 <= start->last)
+	return false;			// The clippost contains the new span.
 
     return true;
 }
-
-
 
 /* ---------------------------------------------------------------------------- */
 //
