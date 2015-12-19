@@ -129,6 +129,37 @@ void R_InitPlanes (void)
 }
 
 //-----------------------------------------------------------------------------
+//
+// R_ClearPlanes
+// At begining of frame.
+//
+void R_ClearPlanes (void)
+{
+    int		i;
+    angle_t	angle;
+
+    // opening / clipping determination
+    for (i=0 ; i<viewwidth ; i++)
+    {
+	floorclip[i] = viewheight;
+	ceilingclip[i] = -1;
+    }
+
+    lastvisplane = visplanes;
+    lastopening = openings;
+
+    // texture calculation
+    memset (cachedheight, 0, sizeof(cachedheight));
+
+    // left to right mapping
+    angle = (viewangle-ANG90)>>ANGLETOFINESHIFT;
+
+    // scale will be unit scale at SCREENWIDTH/2 distance
+    basexscale = FixedDiv (finecosine[angle],centerxfrac);
+    baseyscale = -FixedDiv (finesine[angle],centerxfrac);
+}
+
+//-----------------------------------------------------------------------------
 
 static uintptr_t R_IncreaseVisplanes (void)
 {
@@ -285,37 +316,6 @@ R_MapPlane
 
 //-----------------------------------------------------------------------------
 //
-// R_ClearPlanes
-// At begining of frame.
-//
-void R_ClearPlanes (void)
-{
-    int		i;
-    angle_t	angle;
-
-    // opening / clipping determination
-    for (i=0 ; i<viewwidth ; i++)
-    {
-	floorclip[i] = viewheight;
-	ceilingclip[i] = -1;
-    }
-
-    lastvisplane = visplanes;
-    lastopening = openings;
-
-    // texture calculation
-    memset (cachedheight, 0, sizeof(cachedheight));
-
-    // left to right mapping
-    angle = (viewangle-ANG90)>>ANGLETOFINESHIFT;
-
-    // scale will be unit scale at SCREENWIDTH/2 distance
-    basexscale = FixedDiv (finecosine[angle],centerxfrac);
-    baseyscale = -FixedDiv (finesine[angle],centerxfrac);
-}
-
-//-----------------------------------------------------------------------------
-//
 // R_FindPlane
 //
 visplane_t*
@@ -332,7 +332,7 @@ R_FindPlane
 
     if ((picnum == skyflatnum) || (picnum & PL_SKYFLAT))
     {
-	height = 0;			// all skys map together
+	height = 0;			// all skies map together
 	lightlevel = 0;
     }
 
