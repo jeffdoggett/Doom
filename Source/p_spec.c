@@ -2208,6 +2208,7 @@ void P_UpdateSpecials (void)
 // Parses command line parameters.
 void P_SpawnSpecials (void)
 {
+  line_t*	line;
   sector_t*	sector;
   int		i;
 
@@ -2234,8 +2235,7 @@ void P_SpawnSpecials (void)
     P_MakeSuitPerm ();
 
   //	Init special SECTORs.
-  sector = sectors;
-  for (i=0 ; i<numsectors ; i++, sector++)
+  for (sector=sectors,i=0 ; i<numsectors ; i++, sector++)
   {
     if (sector->special & SECRET_MASK)
     {
@@ -2331,17 +2331,17 @@ void P_SpawnSpecials (void)
     //P_SpawnFriction();
     //P_SpawnPushers();
 
-    for (i=0; i<numlines; i++)
+    for (line=lines,i=0; i<numlines; i++,line++)
     {
-      switch (lines[i].special)
+      switch (line->special)
       {
 	int s, sec;
 
 	/* killough 3/7/98: */
 	/* support for drawn heights coming from different sector */
 	case 242:
-	  sec = sides[*lines[i].sidenum].sector-sectors;
-	  for (s = -1; (s = P_FindSectorFromLineTag(lines+i,s)) >= 0;)
+	  sec = sides[*line->sidenum].sector-sectors;
+	  for (s = -1; (s = P_FindSectorFromLineTag(line,s)) >= 0;)
 	    sectors[s].heightsec = sec;
 	  break;
 
@@ -2349,16 +2349,16 @@ void P_SpawnSpecials (void)
 	/* floor lighting independently (e.g. lava) */
 
 	case 213:
-	  sec = sides[*lines[i].sidenum].sector-sectors;
-	  for (s = -1; (s = P_FindSectorFromLineTag(lines+i,s)) >= 0;)
+	  sec = sides[*line->sidenum].sector-sectors;
+	  for (s = -1; (s = P_FindSectorFromLineTag(line,s)) >= 0;)
 	    sectors[s].floorlightsec = sec;
 	  break;
 
 	/* killough 4/11/98: Add support for setting */
 	/* ceiling lighting independently */
 	case 261:
-	  sec = sides[*lines[i].sidenum].sector-sectors;
-	  for (s = -1; (s = P_FindSectorFromLineTag(lines+i,s)) >= 0;)
+	  sec = sides[*line->sidenum].sector-sectors;
+	  for (s = -1; (s = P_FindSectorFromLineTag(line,s)) >= 0;)
 	    sectors[s].ceilinglightsec = sec;
 	  break;
 
@@ -2373,8 +2373,18 @@ void P_SpawnSpecials (void)
 
       case 271:   // Regular sky
       case 272:   // Same, only flipped
-	for (s = -1; (s = P_FindSectorFromLineTag(lines+i,s)) >= 0;)
+        /* Valiant.wad uses tag 0 to get everything! */
+        /* So we cannot use my hacked version of P_FindSectorFromLineTag */
+#if 0
+	for (s = -1; (s = P_FindSectorFromLineTag(line,s)) >= 0;)
 	  sectors[s].sky = i | PL_SKYFLAT;
+#else
+	for (sector=sectors,s=0 ; s<numsectors ; s++, sector++)
+        {
+          if (line->tag == sector->tag)
+	    sector->sky = i | PL_SKYFLAT;
+        }
+#endif
 	break;
       }
     }
