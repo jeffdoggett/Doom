@@ -91,10 +91,6 @@ fixed_t			distscale[MAXSCREENWIDTH];
 fixed_t			basexscale;
 fixed_t			baseyscale;
 
-fixed_t			cachedheight[MAXSCREENHEIGHT];
-fixed_t			cacheddistance[MAXSCREENHEIGHT];
-fixed_t			cachedxstep[MAXSCREENHEIGHT];
-fixed_t			cachedystep[MAXSCREENHEIGHT];
 fixed_t			xoffs;
 fixed_t			yoffs;
 
@@ -147,9 +143,6 @@ void R_ClearPlanes (void)
 
     lastvisplane = visplanes;
     lastopening = openings;
-
-    // texture calculation
-    memset (cachedheight, 0, sizeof(cachedheight));
 
     // left to right mapping
     angle = (viewangle-ANG90)>>ANGLETOFINESHIFT;
@@ -251,16 +244,14 @@ uintptr_t R_IncreaseOpenings (size_t need)
 //
 // BASIC PRIMITIVE
 //
-void
-R_MapPlane
-( int		y,
-  int		x1,
-  int		x2 )
+static void R_MapPlane (int y, int x1, int x2)
 {
-    angle_t	angle;
-    fixed_t	distance;
-    fixed_t	length;
+    fixed_t     distance;
+    int         dx, dy;
     unsigned	index;
+
+    if (y == centery)
+        return;
 
 #ifdef RANGECHECK
     if (x2 < x1
@@ -274,24 +265,15 @@ R_MapPlane
     }
 #endif
 
-    if (planeheight != cachedheight[y])
-    {
-	cachedheight[y] = planeheight;
-	distance = cacheddistance[y] = FixedMul (planeheight, yslope[y]);
-	ds_xstep = cachedxstep[y] = FixedMul (distance,basexscale);
-	ds_ystep = cachedystep[y] = FixedMul (distance,baseyscale);
-    }
-    else
-    {
-	distance = cacheddistance[y];
-	ds_xstep = cachedxstep[y];
-	ds_ystep = cachedystep[y];
-    }
+    distance = FixedMul(planeheight, yslope[y]);
 
-    length = FixedMul (distance,distscale[x1]);
-    angle = (viewangle + xtoviewangle[x1])>>ANGLETOFINESHIFT;
-    ds_xfrac = viewx + FixedMul(finecosine[angle], length) + xoffs;
-    ds_yfrac = -viewy - FixedMul(finesine[angle], length) + yoffs;
+    dx = x1 - centerx;
+    dy = ABS(centery - y);
+    ds_xstep = FixedMul(viewsin, planeheight) / dy;
+    ds_ystep = FixedMul(viewcos, planeheight) / dy;
+
+    ds_xfrac = viewx + xoffs + FixedMul(viewcos, distance) + dx * ds_xstep;
+    ds_yfrac = -viewy + yoffs - FixedMul(viewsin, distance) + dx * ds_ystep;
 
     if (fixedcolormap)
 	ds_colormap = fixedcolormap;
@@ -309,10 +291,8 @@ R_MapPlane
     ds_x1 = x1;
     ds_x2 = x2;
 
-    // high or low detail
-    spanfunc ();
+    spanfunc();
 }
-
 
 //-----------------------------------------------------------------------------
 //

@@ -53,7 +53,6 @@ extern fixed_t		distscale[MAXSCREENWIDTH];
 void R_InitPlanes (void);
 void R_ClearPlanes (void);
 uintptr_t R_IncreaseOpenings (size_t);
-void R_MapPlane (int y, int x1, int x2);
 void R_DrawPlanes (void);
 visplane_t* R_FindPlane (fixed_t height, int picnum, int lightlevel, fixed_t xoffs, fixed_t yoffs);
 visplane_t* R_CheckPlane (visplane_t* pl, int start, int stop);
