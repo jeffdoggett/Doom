@@ -354,7 +354,7 @@ R_RenderMaskedSegRange
 	}
 	spryscale += rw_scalestep;
     }
-
+    curline = NULL;
 }
 
 
@@ -405,6 +405,9 @@ void R_RenderSegLoop (void)
 		ceilingplane->top[rw_x+1] = top;
 		ceilingplane->bottom[rw_x+1] = bottom;
 	    }
+
+	    // SoM: this should be set here to prevent overdraw
+	    ceilingclip[rw_x] = bottom;
 	}
 
 	yh = bottomfrac>>heightbits;
@@ -424,6 +427,9 @@ void R_RenderSegLoop (void)
 		floorplane->top[rw_x+1] = top;
 		floorplane->bottom[rw_x+1] = bottom;
 	    }
+
+            // SoM: This should be set here to prevent overdraw
+            floorclip[rw_x] = top;
 	}
 
 	// texturecolumn and lighting are independent of wall tiers
