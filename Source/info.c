@@ -5448,7 +5448,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   // For use with wind and current effects
@@ -5477,7 +5478,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   // Marine's best friend :)					// killough 7/19/98
@@ -5506,7 +5508,8 @@ mobjinfo_t mobjinfo[] =
     sfx_dgact,							// activesound
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
-    S_DOGS_RAISE1						// raisestate
+    S_DOGS_RAISE1,						// raisestate
+    FRACUNIT							// scale
   },
 
   // killough 7/11/98: this is the first of two plasma fireballs in the beta
@@ -5535,7 +5538,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   // killough 7/11/98: this is the second of two plasma fireballs in the beta
@@ -5564,7 +5568,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   // killough 7/11/98: this is the evil sceptre in the beta version
@@ -5593,7 +5598,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   // killough 7/11/98: this is the unholy bible in the beta version
@@ -5622,7 +5628,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   },
 
   {								// MT_MUSICSOURCE
@@ -5650,7 +5657,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT,							// scale
   },
 
 
@@ -5679,7 +5687,8 @@ mobjinfo_t mobjinfo[] =
     sfx_None,							// activesound
     MF_NOBLOCKMAP | MF_DROPOFF, 				// flags
     0,								// flags2
-    S_NULL							// raisestate
+    S_NULL,							// raisestate
+    FRACUNIT							// scale
   }
 };
 
