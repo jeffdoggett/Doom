@@ -3880,6 +3880,7 @@ static void show_boss_action (unsigned int bossnum, bossdeath_t * bd_ptr)
 
 static void show_map_dests (map_dests_t * map_ptr)
 {
+  double skydelta;
   char * sky;
   char * titlepatch;
 
@@ -3892,7 +3893,11 @@ static void show_map_dests (map_dests_t * map_ptr)
   if (titlepatch == NULL)
     titlepatch = "";
 
-  printf ("%u %2u %u %2u %u %u %u %2u %u %3u '%s' '%s' '%s' '%s' '%s' '%s'\n",
+  skydelta = 0;
+  if (map_ptr -> skydelta)
+    skydelta = -(((double)map_ptr -> skydelta) / FRACUNIT);
+
+  printf ("%u %2u %u %2u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
 	map_ptr -> normal_exit_to_map,
 	map_ptr -> secret_exit_to_episode,
@@ -3903,6 +3908,8 @@ static void show_map_dests (map_dests_t * map_ptr)
 	map_ptr -> cluster,
 	map_ptr -> allow_monster_telefrags,
 	map_ptr -> par_time_5 * 5,			// Par time divided by 5
+	map_ptr -> time_sucks,
+	skydelta,
 	map_ptr -> mapname,
 	sky, titlepatch,
 	map_ptr -> enterpic,
