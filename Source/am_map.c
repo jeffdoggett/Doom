@@ -1896,7 +1896,7 @@ AM_drawThingsDifferently (void)
 
       if (t->info)
       {
-	if (t->info->flags & MF_COUNTKILL)
+	if (t->info->flags & (MF_SHOOTABLE|MF_COUNTKILL))
 	{
 	  if (t->health > 0)
 	  {
