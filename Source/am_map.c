@@ -1895,208 +1895,228 @@ AM_drawThingsDifferently (void)
       int angle = 0;
 
       if (t->info)
-      switch (t -> sprite)	// These are identified by sprite number in p_inter.c
       {
-	// Weapons
-	case SPR_BFUG:
-	case SPR_MGUN:
-	case SPR_CSAW:
-	case SPR_LAUN:
-	case SPR_PLAS:
-	case SPR_SHOT:
-	case SPR_SGN2:
-	  break;
-
-	// Ammunition
-	case SPR_CLIP:
-	case SPR_AMMO:
-	case SPR_ROCK:
-	case SPR_BROK:
-	case SPR_CELL:
-	case SPR_CELP:
-	case SPR_SHEL:
-	case SPR_SBOX:
-	case SPR_BPAK:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.ammo;
-	    shape = &pentacle_shape;
-	  }
-	  break;
-
-	// Health, armour
-	case SPR_ARM1:
-	case SPR_ARM2:
-	case SPR_BON1:
-	case SPR_BON2:
-	case SPR_STIM:
-	case SPR_MEDI:
-	case SPR_BEXP:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.bonus;
-	    shape = &pentacle_shape;
-	  }
-	  break;
-
-	// Special objects
-	case SPR_SOUL:
-	case SPR_MEGA:
-	case SPR_PINV:
-	case SPR_PSTR:
-	case SPR_PINS:
-	case SPR_SUIT:
-	case SPR_PMAP:
-	case SPR_PVIS:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.special;
-	    shape = &pentacle_shape;
-	  }
-	  break;
-
-	// Key cards
-	case SPR_BKEY:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.bkey;
-	    shape = &key_shape;
-	  }
-	  break;
-
-	case SPR_YKEY:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.ykey;
-	    shape = &key_shape;
-	  }
-	  break;
-
-	case SPR_RKEY:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.rkey;
-	    shape = &key_shape;
-	  }
-	  break;
-
-	// Skull keys
-	case SPR_BSKU:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.bkey;
-	    shape = &skullkey_shape;
-	  }
-	  break;
-
-	case SPR_YSKU:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.ykey;
-	    shape = &skullkey_shape;
-	  }
-	  break;
-
-	case SPR_RSKU:
-	  if (t->info->flags & MF_SPECIAL)
-	  {
-	    colour = mapcolour.rkey;
-	    shape = &skullkey_shape;
-	  }
-	  break;
-
-      default:				// Not known by its sprite
-	switch (t->info->doomednum)
+	if (t->info->flags & MF_COUNTKILL)
 	{
-	  // Monsters
-	  case 7: case 9: case 16: case 58: case 64: case 65: case 66:
-	  case 67: case 68: case 69: case 71: case 84: case 3001: case 3002:
-	  case 3003: case 3004: case 3005: case 3006:
-	  // Boss brain, Commander Keen
-	  case 88: case 72:
-	    if (t->health > 0)
-	    {
-	      colour = mapcolour.monster;
-	      angle = t->angle;
-	    }
-	    else
-	    {
-	      colour = mapcolour.dead;
-	      shape = &hexagon_shape;
-	    }
-	    break;
-#if 0
-	  // Weapons
-	  case 82: case 2001: case 2002: case 2003: case 2004: case 2005:
-	  case 2006: case 2035:
-	    break;
-	  // Ammunition
-	  case 8: case 17: case 2007: case 2008: case 2010: case 2046:
-	  case 2047: case 2048: case 2049:
-	    colour = mapcolour.ammo;
-	    shape = &pentacle_shape;
-	    break;
-	  // Health, armour
-	  case 2011: case 2012: case 2014: case 2015: case 2018: case 2019:
-	    colour = mapcolour.bonus;
-	    shape = &pentacle_shape;
-	    break;
-	  // Special objects
-	  case 83: case 2013: case 2022: case 2023: case 2024: case 2025:
-	  case 2026: case 2045:
-	    colour = mapcolour.special;
-	    shape = &pentacle_shape;
-	    break;
-	  // Key cards
-	  case 5 : colour = mapcolour.bkey; shape = &key_shape; break;
-	  case 6 : colour = mapcolour.ykey; shape = &key_shape; break;
-	  case 13: colour = mapcolour.rkey; shape = &key_shape; break;
-	  // Skull keys
-	  case 40: colour = mapcolour.bkey; shape = &skullkey_shape; break;
-	  case 39: colour = mapcolour.ykey; shape = &skullkey_shape; break;
-	  case 38: colour = mapcolour.rkey; shape = &skullkey_shape; break;
-#endif
-	  // Pillars
-	  case 30: case 31: case 32: case 33: case 36: case 37:
-	    colour = mapcolour.pillar;
-	    shape = &hexagon_shape;
-	    break;
-	  // Trees
-	  case 41: case 43: case 47: case 48: case 54:
-	    colour = mapcolour.tree;
-	    shape = &hexagon_shape;
-	    break;
-	  // Lighting
-	  case 34: case 35: case 44: case 45: case 46: case 55: case 56:
-	  case 57: case 70: case 85: case 86: case 2028:
-	    colour = mapcolour.light;
-	    shape = &hexagon_shape;
-	    break;
-	  // Bodies
-	  case 25: case 26: case 49: case 50: case 51: case 52: case 53:
-	  case 59: case 60: case 61: case 62: case 63: case 73: case 74:
-	  case 75: case 76: case 77: case 78:
-	    colour = mapcolour.body;
-	    shape = &hexagon_shape;
-	    break;
-	  // Dead players & monsters
-	  case 10: case 12: case 15: case 18: case 19: case 20: case 21:
-	  case 22: case 23:
+	  if (t->health > 0)
+	  {
+	    colour = mapcolour.monster;
+	    angle = t->angle;
+	  }
+	  else
+	  {
 	    colour = mapcolour.dead;
 	    shape = &hexagon_shape;
-	    break;
-	  // Blood
-	  case 24: case 79: case 80: case 81:
-	    colour = mapcolour.blood;
-	    shape = &hexagon_shape;
-	    break;
-	  // Skulls
-	  case 27: case 28: case 29: case 42:
-	    colour = mapcolour.skull;
-	    shape = &hexagon_shape;
-	    break;
-	  default:
-	    angle = t->angle;
+	  }
+	}
+	else
+	{
+	  switch (t -> sprite)	// These are identified by sprite number in p_inter.c
+	  {
+	    // Weapons
+	    case SPR_BFUG:
+	    case SPR_MGUN:
+	    case SPR_CSAW:
+	    case SPR_LAUN:
+	    case SPR_PLAS:
+	    case SPR_SHOT:
+	    case SPR_SGN2:
+	      break;
+
+	    // Ammunition
+	    case SPR_CLIP:
+	    case SPR_AMMO:
+	    case SPR_ROCK:
+	    case SPR_BROK:
+	    case SPR_CELL:
+	    case SPR_CELP:
+	    case SPR_SHEL:
+	    case SPR_SBOX:
+	    case SPR_BPAK:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.ammo;
+		shape = &pentacle_shape;
+	      }
+	      break;
+
+	    // Health, armour
+	    case SPR_ARM1:
+	    case SPR_ARM2:
+	    case SPR_BON1:
+	    case SPR_BON2:
+	    case SPR_STIM:
+	    case SPR_MEDI:
+	    case SPR_BEXP:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.bonus;
+		shape = &pentacle_shape;
+	      }
+	      break;
+
+	    // Special objects
+	    case SPR_SOUL:
+	    case SPR_MEGA:
+	    case SPR_PINV:
+	    case SPR_PSTR:
+	    case SPR_PINS:
+	    case SPR_SUIT:
+	    case SPR_PMAP:
+	    case SPR_PVIS:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.special;
+		shape = &pentacle_shape;
+	      }
+	      break;
+
+	    // Key cards
+	    case SPR_BKEY:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.bkey;
+		shape = &key_shape;
+	      }
+	      break;
+
+	    case SPR_YKEY:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.ykey;
+		shape = &key_shape;
+	      }
+	      break;
+
+	    case SPR_RKEY:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.rkey;
+		shape = &key_shape;
+	      }
+	      break;
+
+	    // Skull keys
+	    case SPR_BSKU:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.bkey;
+		shape = &skullkey_shape;
+	      }
+	      break;
+
+	    case SPR_YSKU:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.ykey;
+		shape = &skullkey_shape;
+	      }
+	      break;
+
+	    case SPR_RSKU:
+	      if (t->info->flags & MF_SPECIAL)
+	      {
+		colour = mapcolour.rkey;
+		shape = &skullkey_shape;
+	      }
+	      break;
+
+	  default:				// Not known by its sprite
+	    switch (t->info->doomednum)
+	    {
+#if 0
+	      // Monsters
+	      case 7: case 9: case 16: case 58: case 64: case 65: case 66:
+	      case 67: case 68: case 69: case 71: case 84: case 3001: case 3002:
+	      case 3003: case 3004: case 3005: case 3006:
+	      // Boss brain, Commander Keen
+	      case 88: case 72:
+	      case 888:
+		if (t->health > 0)
+		{
+		  colour = mapcolour.monster;
+		  angle = t->angle;
+		}
+		else
+		{
+		  colour = mapcolour.dead;
+		  shape = &hexagon_shape;
+		}
+		break;
+
+	      // Weapons
+	      case 82: case 2001: case 2002: case 2003: case 2004: case 2005:
+	      case 2006: case 2035:
+		break;
+	      // Ammunition
+	      case 8: case 17: case 2007: case 2008: case 2010: case 2046:
+	      case 2047: case 2048: case 2049:
+		colour = mapcolour.ammo;
+		shape = &pentacle_shape;
+		break;
+	      // Health, armour
+	      case 2011: case 2012: case 2014: case 2015: case 2018: case 2019:
+		colour = mapcolour.bonus;
+		shape = &pentacle_shape;
+		break;
+	      // Special objects
+	      case 83: case 2013: case 2022: case 2023: case 2024: case 2025:
+	      case 2026: case 2045:
+		colour = mapcolour.special;
+		shape = &pentacle_shape;
+		break;
+	      // Key cards
+	      case 5 : colour = mapcolour.bkey; shape = &key_shape; break;
+	      case 6 : colour = mapcolour.ykey; shape = &key_shape; break;
+	      case 13: colour = mapcolour.rkey; shape = &key_shape; break;
+	      // Skull keys
+	      case 40: colour = mapcolour.bkey; shape = &skullkey_shape; break;
+	      case 39: colour = mapcolour.ykey; shape = &skullkey_shape; break;
+	      case 38: colour = mapcolour.rkey; shape = &skullkey_shape; break;
+#endif
+	      // Pillars
+	      case 30: case 31: case 32: case 33: case 36: case 37:
+		colour = mapcolour.pillar;
+		shape = &hexagon_shape;
+		break;
+	      // Trees
+	      case 41: case 43: case 47: case 48: case 54:
+		colour = mapcolour.tree;
+		shape = &hexagon_shape;
+		break;
+	      // Lighting
+	      case 34: case 35: case 44: case 45: case 46: case 55: case 56:
+	      case 57: case 70: case 85: case 86: case 2028:
+		colour = mapcolour.light;
+		shape = &hexagon_shape;
+		break;
+	      // Bodies
+	      case 25: case 26: case 49: case 50: case 51: case 52: case 53:
+	      case 59: case 60: case 61: case 62: case 63: case 73: case 74:
+	      case 75: case 76: case 77: case 78:
+		colour = mapcolour.body;
+		shape = &hexagon_shape;
+		break;
+	      // Dead players & monsters
+	      case 10: case 12: case 15: case 18: case 19: case 20: case 21:
+	      case 22: case 23:
+		colour = mapcolour.dead;
+		shape = &hexagon_shape;
+		break;
+	      // Blood
+	      case 24: case 79: case 80: case 81:
+		colour = mapcolour.blood;
+		shape = &hexagon_shape;
+		break;
+	      // Skulls
+	      case 27: case 28: case 29: case 42:
+		colour = mapcolour.skull;
+		shape = &hexagon_shape;
+		break;
+	      default:
+		angle = t->angle;
+	    }
+	  }
 	}
       }
       AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
