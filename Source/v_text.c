@@ -2280,6 +2280,8 @@ unsigned int V_drawMenuText (int x, int y, const char *str)
       j = (V_drawMenuchar (x, y, cc - '!') - 2) - gen_kern (cc, *str, m_kern);
     }
     x += j;
+    if (x > 320)
+      return (0);
   } while (cc);
 
   return (red_charset [0][1]);

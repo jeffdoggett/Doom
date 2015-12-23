@@ -2092,6 +2092,7 @@ void M_Drawer (void)
   int		x;
   int		y;
   int		i;
+  int		len;
   int		lump;
   unsigned int	max,episode;
   char*		start;
@@ -2156,13 +2157,25 @@ void M_Drawer (void)
 	    }
 	    else
 	    {
-	      V_drawMenuText (x, y, episode_names [episode]);
+	      if ((V_drawMenuText (x, y, episode_names [episode]) == 0)	// Did it fit?
+	       && (x))
+		currentMenu->x = --x;
 	    }
 	  }
 	}
 	else
 	{
-	  V_DrawPatchScaled (x,y,0,W_CacheLumpNum (lump,PU_CACHE));
+	  patch = W_CacheLumpNum (lump,PU_CACHE);
+	  len = SHORT(patch->width) + x;
+	  if ((len >= 320)			// Will it fit?
+	   && (x > 0))
+	  {
+	    x -= (len - (320-1));
+	    if (x < 0)
+	      x = 0;
+	    currentMenu->x = x;
+	  }
+	  V_DrawPatchScaled (x,y,0,patch);
 	}
       }
       y += LINEHEIGHT;
@@ -2313,7 +2326,27 @@ void M_Init (void)
 	    EpiDef.y -= 4;
 	  episode--;
 	}
-	EpiDef.x = 16;		// Bodged for Valiant.wad, must do properly!
+
+	/* Now check for oversize episode patches (e.g. Valiant.wad) */
+	episode = 0;
+	m_ptr = &EpisodeMenu[0];
+	do
+	{
+	  int lump = W_CheckNumForName (m_ptr -> name);
+	  if (lump != -1)
+	  {
+	    patch_t* patch = W_CacheLumpNum (lump,PU_CACHE);
+	    int len = SHORT(patch->width) + EpiDef.x;
+	    if (len >= 320)			// Will it fit?
+	    {
+	      int x = EpiDef.x - (len - (320-1));
+	      if (x < 0)
+		x = 0;
+	      EpiDef.x = x;
+	    }
+	  }
+	  m_ptr++;
+	} while ((EpiDef.x) && (++episode < EpiDef.numitems));
       }
       break;
 
