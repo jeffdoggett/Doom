@@ -1038,70 +1038,80 @@ void G_Ticker (void)
       G_DoReborn (i);
   } while (++i < MAXPLAYERS);
 
-  if (newgametimer)
-  {
-    switch (--newgametimer)
-    {
-      case 1:
-	M_DrawDisc ();
-	break;
-
-      case 0:
-	gameaction = ga_newgame;
-    }
-  }
+  if ((newgametimer)
+   && (--newgametimer == 0))
+    gameaction = ga_newgame;
 
   if ((gamecompletedtimer)
    && (--gamecompletedtimer == 0))
     gameaction = ga_completed;
 
   // do things to change the game state
-  while (gameaction != ga_nothing)
-  {
+  // while (gameaction != ga_nothing)		// JAD - Removed loop as it makes sequencing easier
+  {						// because the screen will get updated between tics.
       switch (gameaction)
       {
 	case ga_loadlevel:
 	  G_DoLoadLevel ();
 	  break;
+
 	case ga_newgame:
-	  G_DoNewGame ();
+	  M_DrawDisc ();
+	  gameaction = ga_newgame2;
 	  break;
+
+	case ga_newgame2:
+	  if (M_ScreenUpdated ())
+	    G_DoNewGame ();
+	  break;
+
 	case ga_newgamelater:
 	  if ((newgametimer == 0) && (gamecompletedtimer == 0))
 	    newgametimer = 40;
 	  gameaction = ga_nothing;
 	  break;
+
 	case ga_loadgame:
 	  G_DoLoadGame ();
 	  break;
+
 	case ga_savegame:
 	  G_DoSaveGame ();
 	  break;
+
 	case ga_playdemo:
 	  G_DoPlayDemo ();
 	  break;
+
 	case ga_completed:
 	  G_DoCompleted ();
 	  break;
+
 	case ga_completedlater:
 	  if ((newgametimer == 0) && (gamecompletedtimer == 0))
 	    gamecompletedtimer = 10;
 	  gameaction = ga_nothing;
 	  break;
+
 	case ga_victory:
 	  if (!demoplayback)
 	    M_SetNextEpiSel (gameepisode);
 	  F_StartFinale (1);
 	  break;
+
 	case ga_worlddone:
-	  G_DoWorldDone ();
+	  if (M_ScreenUpdated ())
+	    G_DoWorldDone ();
 	  break;
+
 	case ga_screenshot:
 	  M_ScreenShot ();
 	  gameaction = ga_nothing;
 	  break;
+
 	case ga_nothing:
 	  break;
+
 	default:			// Just in case
 	  gameaction = ga_nothing;
       }
@@ -1732,6 +1742,12 @@ void G_WorldDone (void)
 
   if (gameaction == ga_worlddone)
     M_DrawDisc ();
+}
+
+void G_WorldDone2 (void)
+{
+  gameaction = ga_worlddone;
+  M_DrawDisc ();
 }
 
 /* -------------------------------------------------------------------------------------------- */

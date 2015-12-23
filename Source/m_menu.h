@@ -61,6 +61,7 @@ unsigned int M_GetNextEpi (unsigned int map);
 void M_SetNextEpiSel (unsigned int episode);
 void M_DrawDisc (void);
 void M_RemoveDisc (void);
+int M_ScreenUpdated (void);
 
 #endif
 //-----------------------------------------------------------------------------

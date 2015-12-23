@@ -491,7 +491,7 @@ void F_Ticker (void)
 	if (G_MapLump (255, map_ptr -> normal_exit_to_map) == -1)
 	  F_StartCast ();
 	else
-	  gameaction = ga_worlddone;
+	  G_WorldDone2 ();
       }
     }
 
@@ -519,7 +519,7 @@ void F_Ticker (void)
       return;
     }
 
-    
+
     if ((finalecount > fc)
      && ((WI_checkForAccelerate ())
       || (finalecount > (fc + TEXTWAIT))))

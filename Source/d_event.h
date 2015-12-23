@@ -55,6 +55,7 @@ typedef enum
     ga_nothing,
     ga_loadlevel,
     ga_newgame,
+    ga_newgame2,
     ga_newgamelater,
     ga_loadgame,
     ga_savegame,

@@ -599,7 +599,7 @@ static void M_DrawDiscIcon (void)
   stdisc = (patch_t *) W_CacheLumpName0 ("STDISK", PU_CACHE);
   if (stdisc)
   {
-    x = (320 - HU_MSGX) - SHORT(stdisc->width);
+    x = ((320-2) - HU_MSGX) - SHORT(stdisc->width);
     y = HU_MSGY;
     V_DrawPatchScaled (x, y, 0, stdisc);
   }
@@ -621,6 +621,13 @@ void M_DrawDisc (void)
 void M_RemoveDisc (void)
 {
   stdisctimer = 0;
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+int M_ScreenUpdated (void)
+{
+  return (stdisctimer != 10);
 }
 
 /* -------------------------------------------------------------------------------------------- */
