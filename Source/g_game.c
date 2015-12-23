@@ -79,7 +79,7 @@ skill_t		gameskill;
 boolean		respawnmonsters;
 int		gameepisode;
 int		gamemap;
-int		newgametimer = 0;
+static int	newgametimer = 0;
 int		gamecompletedtimer = 0;
 
 boolean		paused;
@@ -915,6 +915,7 @@ void G_DoLoadLevel (void)
   sendpause = sendsave = paused = false;
   memset (mousearray, 0, sizeof(mousearray));
   memset (joyarray, 0, sizeof(joyarray));
+  M_RemoveDisc ();
 }
 
 
@@ -1037,9 +1038,18 @@ void G_Ticker (void)
       G_DoReborn (i);
   } while (++i < MAXPLAYERS);
 
-  if ((newgametimer)
-   && (--newgametimer == 0))
-    gameaction = ga_newgame;
+  if (newgametimer)
+  {
+    switch (--newgametimer)
+    {
+      case 1:
+        M_DrawDisc ();
+	break;
+
+      case 0:
+	gameaction = ga_newgame;
+    }
+  }
 
   if ((gamecompletedtimer)
    && (--gamecompletedtimer == 0))
@@ -1066,7 +1076,6 @@ void G_Ticker (void)
 	  break;
 	case ga_savegame:
 	  G_DoSaveGame ();
-	  HU_EndSave ();
 	  break;
 	case ga_playdemo:
 	  G_DoPlayDemo ();
@@ -1718,10 +1727,11 @@ void G_WorldDone (void)
   if (secretexit)
       players[consoleplayer].didsecret = true;
 
-  if ( gamemode == commercial )
-  {
+  if (gamemode == commercial)
       F_StartFinale (0);
-  }
+
+  if (gameaction == ga_worlddone)
+    M_DrawDisc ();
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -1814,6 +1824,7 @@ void G_DoLoadGame (void)
 
   // draw the pattern into the back screen
   R_FillBackScreen ();
+  M_RemoveDisc ();
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -1830,7 +1841,6 @@ char*	description )
   savegameslot = slot;
   strcpy (savedescription, description);
   sendsave = true;
-  HU_StartSave ();
 }
 
 /* -------------------------------------------------------------------------------------------- */

@@ -84,7 +84,6 @@ unsigned char player_genders[] =
 char			chat_char; // remove later.
 static player_t*	plr;
 patch_t*		hu_font[HU_FONTSIZE];
-static patch_t*		stdisc = NULL;
 static hu_textline_t	w_title;
 boolean			chat_on;
 static hu_itext_t	w_chat;
@@ -782,32 +781,6 @@ void HU_parse_map_name_file (char * wadname, boolean do_it)
 
 /* -------------------------------------------------------------------------------------------- */
 
-void HU_StartSave (void)
-{
-  stdisc = (patch_t *) W_CacheLumpName0 ("STDISK", PU_CACHE);
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
-void HU_EndSave (void)
-{
-  stdisc = NULL;
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
-static void HU_DrawDisc (void)
-{
-  int x;
-  int y;
-
-  x = (320 - HU_MSGX) - SHORT(stdisc->width);
-  y = HU_MSGY;
-  V_DrawPatchScaled (x, y, 0, stdisc);
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
 void HU_Init(void)
 {
 
@@ -941,9 +914,6 @@ void HU_Drawer(void)
     HUlib_drawIText(&w_chat);
     if (automapactive)
 	HUlib_drawTextLine(&w_title, false);
-
-    if (stdisc)
-      HU_DrawDisc ();
 }
 
 /* -------------------------------------------------------------------------------------------- */

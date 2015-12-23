@@ -199,8 +199,7 @@ static char		savegamestrings[10][SAVESTRINGSIZE];
 static char		tempstring[160];
 
 extern int		setblocks;
-extern int		newgametimer;
-extern int		gamecompletedtimer;
+static int		stdisctimer = 0;
 
 //
 // MENU TYPEDEFS
@@ -589,7 +588,42 @@ static menu_t  SaveDef =
     0
 };
 
-/* ----------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------------------------- */
+
+static void M_DrawDiscIcon (void)
+{
+  int x;
+  int y;
+  patch_t * stdisc;
+
+  stdisc = (patch_t *) W_CacheLumpName0 ("STDISK", PU_CACHE);
+  if (stdisc)
+  {
+    x = (320 - HU_MSGX) - SHORT(stdisc->width);
+    y = HU_MSGY;
+    V_DrawPatchScaled (x, y, 0, stdisc);
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+void M_DrawDisc (void)
+{
+  if (M_CheckParm("-noshowdiscicon") == 0)
+  {
+    stdisctimer = 10;
+    M_DrawDiscIcon ();
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+void M_RemoveDisc (void)
+{
+  stdisctimer = 0;
+}
+
+/* -------------------------------------------------------------------------------------------- */
 /*
    Sets the episode short cut key from the MAPINFO.
    Gets called before we reorganise the menu, so
@@ -773,6 +807,7 @@ void M_LoadSelect(int choice)
     G_GetSaveGameName (name, choice);
     G_LoadGame (name);
     M_ClearMenus ();
+    M_DrawDisc ();
 }
 
 /* ----------------------------------------------------------------------- */
@@ -821,6 +856,7 @@ void M_DoSave(int slot)
 {
     G_SaveGame (slot,savegamestrings[slot]);
     M_ClearMenus ();
+    M_DrawDisc ();
 
     // PICK QUICKSAVE SLOT YET?
     if (quickSaveSlot == -2)
@@ -1127,6 +1163,7 @@ void M_VerifyNightmare(int ch)
   {
     M_DeferedInitNew (nightmare, epi);
     M_ClearMenus ();
+    M_DrawDisc ();
   }
 }
 
@@ -1142,6 +1179,7 @@ void M_ChooseSkill(int choice)
 
     M_DeferedInitNew (choice, epi);
     M_ClearMenus ();
+    M_DrawDisc ();
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2063,18 +2101,12 @@ boolean M_Responder (event_t* ev)
     return false;
 }
 
-
-
 /* ----------------------------------------------------------------------- */
 //
 // M_StartControlPanel
 //
 void M_StartControlPanel (void)
 {
-  // intro might call this repeatedly
-  if (menuactive || newgametimer || gamecompletedtimer)
-      return;
-
   menuactive = true;
   M_SetupNextMenu (&MainDef);	// JDC
 }
@@ -2126,76 +2158,82 @@ void M_Drawer (void)
     return;
   }
 
-  if (!menuactive)
-    return;
-
-  if (currentMenu->routine)
-    currentMenu->routine();		// call Draw routine
-
-  // DRAW MENU
-  x = currentMenu->x;
-  y = currentMenu->y;
-  max = currentMenu->numitems;
-
-  if (max)				// Just in case!
+  if (menuactive)
   {
-    m_ptr = currentMenu->menuitems;
-    do
+    if (currentMenu->routine)
+      currentMenu->routine();		// call Draw routine
+
+    // DRAW MENU
+    x = currentMenu->x;
+    y = currentMenu->y;
+    max = currentMenu->numitems;
+
+    if (max)				// Just in case!
     {
-      if (m_ptr -> name [0])
+      m_ptr = currentMenu->menuitems;
+      do
       {
-	lump = W_CheckNumForName (m_ptr -> name);
-	if (lump == -1)
+	if (m_ptr -> name [0])
 	{
-	  if (currentMenu == &EpiDef)
+	  lump = W_CheckNumForName (m_ptr -> name);
+	  if (lump == -1)
 	  {
-	    episode = episode_num [(currentMenu->numitems - max)];
-	    if (episode_names [episode] == NULL)
+	    if (currentMenu == &EpiDef)
 	    {
-	      sprintf (string, "Episode %u", episode);
-	      V_drawMenuText (x, y, string);
-	    }
-	    else
-	    {
-	      if ((V_drawMenuText (x, y, episode_names [episode]) == 0)	// Did it fit?
-	       && (x))
-		currentMenu->x = --x;
+	      episode = episode_num [(currentMenu->numitems - max)];
+	      if (episode_names [episode] == NULL)
+	      {
+		sprintf (string, "Episode %u", episode);
+		V_drawMenuText (x, y, string);
+	      }
+	      else
+	      {
+		if ((V_drawMenuText (x, y, episode_names [episode]) == 0)	// Did it fit?
+		 && (x))
+		  currentMenu->x = --x;
+	      }
 	    }
 	  }
-	}
-	else
-	{
-	  patch = W_CacheLumpNum (lump,PU_CACHE);
-	  len = SHORT(patch->width) + x;
-	  if ((len >= 320)			// Will it fit?
-	   && (x > 0))
+	  else
 	  {
-	    x -= (len - (320-1));
-	    if (x < 0)
-	      x = 0;
-	    currentMenu->x = x;
+	    patch = W_CacheLumpNum (lump,PU_CACHE);
+	    len = SHORT(patch->width) + x;
+	    if ((len >= 320)			// Will it fit?
+	     && (x > 0))
+	    {
+	      x -= (len - (320-1));
+	      if (x < 0)
+		x = 0;
+	      currentMenu->x = x;
+	    }
+	    V_DrawPatchScaled (x,y,0,patch);
 	  }
-	  V_DrawPatchScaled (x,y,0,patch);
 	}
-      }
-      y += LINEHEIGHT;
-      m_ptr++;
-    } while (--max);
-  }
+	y += LINEHEIGHT;
+	m_ptr++;
+      } while (--max);
+    }
 
 
     // DRAW SKULL
-  if (currentMenu->numitems > 1)
+    if (currentMenu->numitems > 1)
+    {
+      patch = W_CacheLumpName(skullName[whichSkull],PU_CACHE);
+      i = (SHORT(patch->width)) - SKULLXOFF;
+      if (i < 0) i = 0;
+      x -= i;
+      if (x < 0) x = 0;
+      i = SHORT(patch->leftoffset);
+      if ((x - i) < 0)
+	x = i;
+      V_DrawPatchScaled(x, currentMenu->y - 5 + (itemOn*LINEHEIGHT), 0, patch);
+    }
+  }
+
+  if (stdisctimer)
   {
-    patch = W_CacheLumpName(skullName[whichSkull],PU_CACHE);
-    i = (SHORT(patch->width)) - SKULLXOFF;
-    if (i < 0) i = 0;
-    x -= i;
-    if (x < 0) x = 0;
-    i = SHORT(patch->leftoffset);
-    if ((x - i) < 0)
-      x = i;
-    V_DrawPatchScaled(x, currentMenu->y - 5 + (itemOn*LINEHEIGHT), 0, patch);
+    stdisctimer--;
+    M_DrawDiscIcon ();
   }
 }
 
@@ -2294,23 +2332,6 @@ static void M_SetEpisodeMenuPos (void)
     }
     m_ptr++;
   } while ((EpiDef.x) && (++episode < EpiDef.numitems));
-
-  if (M_CheckParm("-showepisodetable"))
-  {
-    // DEBUG !!
-    char * str;
-    m_ptr = &EpisodeMenu[0];
-    episode = 0;
-    do
-    {
-      printf ("Menu entry %u is %s -> episode %u", episode, m_ptr -> name, episode_num [episode]);
-      str = episode_names[episode_num [episode]];
-      if (str != NULL)
-	printf (" (%s)", str);
-      putchar ('\n');
-      m_ptr++;
-    } while (++episode < EpiDef.numitems);
-  }
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2373,7 +2394,7 @@ void M_Init (void)
 	  m_ptr++;
 	} while (++episode < EpiDef.numitems);
 
-        M_SetEpisodeMenuPos ();
+	M_SetEpisodeMenuPos ();
       }
       break;
 
@@ -2425,6 +2446,23 @@ void M_Init (void)
 
       EpiDef.numitems = menu_pos;
       M_SetEpisodeMenuPos ();
+
+      if (M_CheckParm("-showepisodetable"))
+      {
+	// DEBUG !!
+	char * str;
+	m_ptr = &EpisodeMenu[0];
+	menu_pos = 0;
+	do
+	{
+	  printf ("Menu entry %u is %s -> episode %u", menu_pos, m_ptr -> name, episode_num [menu_pos]);
+	  str = episode_names[episode_num [menu_pos]];
+	  if (str != NULL)
+	    printf (" (%s)", str);
+	  putchar ('\n');
+	  m_ptr++;
+	} while (++menu_pos < EpiDef.numitems);
+      }
       break;
 
     default:
