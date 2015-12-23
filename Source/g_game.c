@@ -1043,7 +1043,7 @@ void G_Ticker (void)
     switch (--newgametimer)
     {
       case 1:
-        M_DrawDisc ();
+	M_DrawDisc ();
 	break;
 
       case 0:
@@ -2722,11 +2722,11 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	      }
 	      else if (strncasecmp (a_line+6, "ORIGSCREENWIDTH ", 16) == 0)
 	      {
-	        ORIGSCREENWIDTH = atoi (a_line+6+16);
+		ORIGSCREENWIDTH = atoi (a_line+6+16);
 	      }
 	      else if (strncasecmp (a_line+6, "ORIGSCREENHEIGHT ", 17) == 0)
 	      {
-	        ORIGSCREENHEIGHT = atoi (a_line+6+17);
+		ORIGSCREENHEIGHT = atoi (a_line+6+17);
 	      }
 	      else
 	      {
@@ -3237,11 +3237,11 @@ void G_Patch_Map (void)
       }
       else
       {
-        if ((pp [0] != 'E')
-         || (pp [2] != 'M')
-         || (pp [4] != ' ')
-         || ((pp [1] - '0') != gameepisode)
-         || ((pp [3] - '0') != gamemap))
+	if ((pp [0] != 'E')
+	 || (pp [2] != 'M')
+	 || (pp [4] != ' ')
+	 || ((pp [1] - '0') != gameepisode)
+	 || ((pp [3] - '0') != gamemap))
 	  continue;
 	pp += 4;
       }
@@ -3303,13 +3303,13 @@ void G_Patch_Map (void)
       {
 	while (*pp && (*pp != ' ')) pp++;
 	while (*pp == ' ') pp++;
-        index = 0;
-        line = &lines [0];
-        do
-        {
-          if ((line -> special >= GenLockedBase)
-           && (line -> special < GenCeilingBase))
-          {
+	index = 0;
+	line = &lines [0];
+	do
+	{
+	  if ((line -> special >= GenLockedBase)
+	   && (line -> special < GenCeilingBase))
+	  {
 	    if (strncasecmp (pp, "TAG", 3) == 0)
 	    {
 //	      printf ("Line %u Tag set to %u from %u\n", index, patch, line->tag);
@@ -3319,9 +3319,9 @@ void G_Patch_Map (void)
 	    {
 	      line -> special = patch;
 	    }
-          }
-          line++;
-        } while (++index < numlines);
+	  }
+	  line++;
+	} while (++index < numlines);
       }
 
 
