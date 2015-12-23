@@ -283,23 +283,20 @@ boolean PIT_CheckThing (mobj_t* thing)
     fixed_t	newdist;
     fixed_t	olddist;
     fixed_t	blockdist;
-    boolean	solid;
+    int		flags;
     int		damage;
     int		tradius;
 
-    if (!(thing->flags & (MF_SOLID|MF_SPECIAL|MF_MISSILE|MF_SHOOTABLE) ))
-	return true;
+    flags = thing->flags;
 
-    // [BH] don't hit if either thing is a corpse, which may still be solid if
-    // they are still going through their death sequence.
-    if ((thing->flags & MF_CORPSE) || (tmthing->flags & MF_CORPSE))
+    if (!(flags & (MF_SOLID|MF_SPECIAL|MF_MISSILE|MF_SHOOTABLE) ))
 	return true;
 
     /* We've changed all of the MF_SPECIAL stuff to their */
     /* actual radius rather than all being 20*FRACUNIT but */
     /* we want the original size back again when picking up. */
 
-//  if (thing->flags & MF_SPECIAL)
+//  if (flags & MF_SPECIAL)
       tradius = thing->info->pickupradius;
 //  else
 //    tradius = thing->radius;
@@ -317,12 +314,12 @@ boolean PIT_CheckThing (mobj_t* thing)
     if (thing == tmthing)
 	return true;
 
-    if (thing->flags & MF_MISSILE)
+    if (flags & MF_MISSILE)
     {
       if (!tmthing->player)
 	P_ExplodeMissile (thing);
 
-      if (!(thing->flags & (MF_SOLID|MF_SPECIAL|MF_SHOOTABLE) ))
+      if (!(flags & (MF_SOLID|MF_SPECIAL|MF_SHOOTABLE) ))
 	return (true);
     }
 
@@ -380,10 +377,10 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    }
 	}
 
-	if (! (thing->flags & MF_SHOOTABLE) )
+	if (! (flags & MF_SHOOTABLE) )
 	{
 	    // didn't do any damage
-	    return (boolean)!(thing->flags & MF_SOLID);
+	    return (boolean)!(flags & MF_SOLID);
 	}
 
 	// damage / explode
@@ -395,16 +392,20 @@ boolean PIT_CheckThing (mobj_t* thing)
     }
 
     // check for special pickup
-    if (thing->flags & MF_SPECIAL)
+    if (flags & MF_SPECIAL)
     {
-	solid = (boolean) (thing->flags&MF_SOLID);
-	if (tmflags&MF_PICKUP)
+	if (tmflags & MF_PICKUP)
 	{
 	    // can remove thing
 	    P_TouchSpecialThing (thing, tmthing);
 	}
-	return (boolean)!solid;
+	return (boolean)!(flags & MF_SOLID);
     }
+
+    // [BH] don't hit if either thing is a corpse, which may still be solid if
+    // they are still going through their death sequence.
+    if ((flags & MF_CORPSE) || (tmthing->flags & MF_CORPSE))
+	return true;
 
     // check if things are stuck and allow move if it makes them further apart
 
@@ -423,7 +424,7 @@ boolean PIT_CheckThing (mobj_t* thing)
     // ones, by allowing the moving thing (tmthing) to move if it's non-solid,
     // despite another solid thing being in the way.
     // killough 4/11/98: Treat no-clipping things as not blocking
-    return (boolean)!((thing->flags & MF_SOLID) && !(thing->flags & MF_NOCLIP)
+    return (boolean)!((flags & MF_SOLID) && !(flags & MF_NOCLIP)
 		&& (tmthing->flags & MF_SOLID));
 }
 
