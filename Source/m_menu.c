@@ -2332,6 +2332,23 @@ static void M_SetEpisodeMenuPos (void)
     }
     m_ptr++;
   } while ((EpiDef.x) && (++episode < EpiDef.numitems));
+
+  if (M_CheckParm("-showepisodetable"))
+  {
+    // DEBUG !!
+    char * str;
+    m_ptr = &EpisodeMenu[0];
+    episode = 0;
+    do
+    {
+      printf ("Menu entry %u is %s -> episode %u", episode, m_ptr -> name, episode_num [episode]);
+      str = episode_names[episode_num [episode]];
+      if (str != NULL)
+	printf (" (%s)", str);
+      putchar ('\n');
+      m_ptr++;
+    } while (++episode < EpiDef.numitems);
+  }
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2446,23 +2463,6 @@ void M_Init (void)
 
       EpiDef.numitems = menu_pos;
       M_SetEpisodeMenuPos ();
-
-      if (M_CheckParm("-showepisodetable"))
-      {
-	// DEBUG !!
-	char * str;
-	m_ptr = &EpisodeMenu[0];
-	menu_pos = 0;
-	do
-	{
-	  printf ("Menu entry %u is %s -> episode %u", menu_pos, m_ptr -> name, episode_num [menu_pos]);
-	  str = episode_names[episode_num [menu_pos]];
-	  if (str != NULL)
-	    printf (" (%s)", str);
-	  putchar ('\n');
-	  m_ptr++;
-	} while (++menu_pos < EpiDef.numitems);
-      }
       break;
 
     default:
