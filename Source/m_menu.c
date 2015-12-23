@@ -2259,6 +2259,44 @@ static int M_EpisodePresent (const char * name, unsigned int episode)
 }
 
 /* ----------------------------------------------------------------------- */
+
+static void M_SetEpisodeMenuPos (void)
+{
+  unsigned int episode;
+  menuitem_t * m_ptr;
+
+  episode = EpiDef.numitems;
+
+  while (episode > 4)
+  {
+    if (EpiDef.y > 30)
+      EpiDef.y -= 4;
+    episode--;
+  }
+
+  /* Now check for oversize episode patches (e.g. Valiant.wad) */
+  episode = 0;
+  m_ptr = &EpisodeMenu[0];
+  do
+  {
+    int lump = W_CheckNumForName (m_ptr -> name);
+    if (lump != -1)
+    {
+      patch_t* patch = W_CacheLumpNum (lump,PU_CACHE);
+      int len = SHORT(patch->width) + EpiDef.x;
+      if (len >= 320)			// Will it fit?
+      {
+	int x = EpiDef.x - (len - (320-1));
+	if (x < 0)
+	  x = 0;
+	EpiDef.x = x;
+      }
+    }
+    m_ptr++;
+  } while ((EpiDef.x) && (++episode < EpiDef.numitems));
+}
+
+/* ----------------------------------------------------------------------- */
 //
 // M_Init
 //
@@ -2298,8 +2336,8 @@ void M_Init (void)
       ReadDef1.y = 165;
       ReadMenu1[0].routine = M_FinishReadThis;
 
-      if (EpiDef.numitems)
-      {
+      if (EpiDef.numitems)			// Has the MAPINFO reader created
+      {						// an episode menu?
 	episode = 0;
 	m_ptr = &EpisodeMenu[0];
 	do
@@ -2318,35 +2356,7 @@ void M_Init (void)
 	  m_ptr++;
 	} while (++episode < EpiDef.numitems);
 
-//      episode = EpiDef.numitems;	// Done by the loop!
-
-	while (episode > 4)
-	{
-	  if (EpiDef.y > 30)
-	    EpiDef.y -= 4;
-	  episode--;
-	}
-
-	/* Now check for oversize episode patches (e.g. Valiant.wad) */
-	episode = 0;
-	m_ptr = &EpisodeMenu[0];
-	do
-	{
-	  int lump = W_CheckNumForName (m_ptr -> name);
-	  if (lump != -1)
-	  {
-	    patch_t* patch = W_CacheLumpNum (lump,PU_CACHE);
-	    int len = SHORT(patch->width) + EpiDef.x;
-	    if (len >= 320)			// Will it fit?
-	    {
-	      int x = EpiDef.x - (len - (320-1));
-	      if (x < 0)
-		x = 0;
-	      EpiDef.x = x;
-	    }
-	  }
-	  m_ptr++;
-	} while ((EpiDef.x) && (++episode < EpiDef.numitems));
+        M_SetEpisodeMenuPos ();
       }
       break;
 
@@ -2397,12 +2407,7 @@ void M_Init (void)
       } while (++episode < ARRAY_SIZE (EpisodeMenu));
 
       EpiDef.numitems = menu_pos;
-      while (menu_pos > 4)
-      {
-	if (EpiDef.y > 30)
-	  EpiDef.y -= 4;
-	menu_pos--;
-      }
+      M_SetEpisodeMenuPos ();
 
       if (M_CheckParm("-showepisodetable"))
       {
