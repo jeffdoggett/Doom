@@ -1489,12 +1489,15 @@ boolean PIT_RadiusAttack (mobj_t* thing)
     dx = ABS(thing->x - bombspot->x);
     dy = ABS(thing->y - bombspot->y);
 
-    dist = MAX(dx, dy);
+    dist = ((dx > dy) ? dx : dy);
     dist -= thing->radius;
 
     if (thing->type == MT_BOSSBRAIN)
     {
-	dist = MAX (0, dist >> FRACBITS);
+	if (dist < 0)
+	  dist = 0;
+	else
+	  dist >>= FRACBITS;
 
 	if (dist >= bombdamage)
 	    return (true);	// out of range
@@ -1502,9 +1505,14 @@ boolean PIT_RadiusAttack (mobj_t* thing)
     else
     {
 	dz = ABS (thing->z + (thing->height >> 1) - bombspot->z);
-	dist = (dist > dz ? dist : dz);
 
-	dist = MAX (0, dist >> FRACBITS);
+	if (dz > dist)
+	  dist = dz;
+
+	if (dist < 0)
+	  dist = 0;
+	else
+	  dist >>= FRACBITS;
 
 	if (dist >= bombdamage)
 	    return (true);	// out of range

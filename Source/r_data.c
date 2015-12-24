@@ -246,7 +246,7 @@ static void R_GenerateLookup (int texnum)
 {
   texture_t	*texture = textures[texnum];
   byte		*patchcount = Z_Calloc(texture->width, PU_STATIC, (void**)&patchcount);
-  byte	*	postcount = Z_Calloc(texture->width, PU_STATIC, (void**)&postcount);
+  byte		*postcount = Z_Calloc(texture->width, PU_STATIC, (void**)&postcount);
   texpatch_t	*patch;
   int		x;
   int		i;
@@ -273,7 +273,7 @@ static void R_GenerateLookup (int texnum)
       int	x1 = patch->originx;
       int	x2 = MIN(x1 + SHORT(realpatch->width), texture->width);
 
-      x = MAX(0, x1);
+      x = ((x1 < 0) ? 0 : x1);
 
       for (; x < x2; x++)
       {
@@ -307,7 +307,8 @@ static void R_GenerateLookup (int texnum)
 	  int		x2 = MIN(x1 + SHORT(realpatch->width), texture->width);
 	  const int	*cofs = realpatch->columnofs - x1;
 
-	  x1 = MAX(0, x1);
+	  if (x1 < 0)
+	    x1 = 0;
 
 	  for (x = x1; x < x2; ++x)
 	      if (patchcount[x] > 1)	// Only multipatched columns
