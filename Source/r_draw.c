@@ -84,6 +84,32 @@ byte*			dc_source;
 // just for profiling
 int			dccount;
 
+/* ------------------------------------------------------------------------------------------------ */
+
+#define get_frac()	\
+    frac = dc_texturemid + (dc_yl-centery)*fracstep;			\
+    if ((unsigned) frac >= (unsigned) dc_ylim)				\
+    {									\
+      fixed_t mask;							\
+									\
+      mask = dc_ylim - 1;						\
+      if ((dc_ylim & mask) == 0)	/* Power of 2 height? */	\
+      {									\
+        frac &= mask;			/* Yes. Can just mask off. */	\
+      }									\
+      else if (frac < 0)						\
+      {									\
+	frac = -frac;							\
+	frac = (unsigned) frac % (unsigned) dc_ylim;			\
+	frac = dc_ylim - frac;						\
+      }									\
+      else								\
+      {									\
+	frac = (unsigned) frac % (unsigned) dc_ylim;			\
+      }									\
+    }
+
+/* ------------------------------------------------------------------------------------------------ */
 //
 // A column is a vertical slice/span from a wall texture that,
 //  given the DOOM style restrictions on the view orientation,
@@ -119,20 +145,7 @@ void R_DrawColumn (void)
     // Determine scaling,
     //  which is the only mapping to be done.
     fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;
-    if ((unsigned) frac >= (unsigned) dc_ylim)
-    {
-      if (frac < 0)
-      {
-	frac = -frac;
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-	frac = dc_ylim - frac;
-      }
-      else
-      {
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-      }
-    }
+    get_frac();
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
@@ -157,8 +170,7 @@ void R_DrawColumn (void)
     } while (--count);
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 // UNUSED.
 // Loop unrolled.
 #if 0
@@ -217,6 +229,7 @@ void R_DrawColumn (void)
 }
 #endif
 
+/* ------------------------------------------------------------------------------------------------ */
 
 void R_DrawColumnLow (void)
 {
@@ -249,20 +262,7 @@ void R_DrawColumnLow (void)
     dest2 = dest + 1;
 
     fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;
-    if ((unsigned) frac >= (unsigned) dc_ylim)
-    {
-      if (frac < 0)
-      {
-	frac = -frac;
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-	frac = dc_ylim - frac;
-      }
-      else
-      {
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-      }
-    }
+    get_frac();
 
     do
     {
@@ -279,6 +279,7 @@ void R_DrawColumnLow (void)
 }
 
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // Spectre/Invisibility.
 //
@@ -298,6 +299,7 @@ int fuzzoffset [] =
 int fuzzpos = 0;
 
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // Framebuffer postprocessing.
 // Creates a fuzzy image by copying pixels
@@ -404,8 +406,7 @@ void R_DrawFuzzColumn (void)
     fuzzpos = fp;
 }
 
-
-
+/* ------------------------------------------------------------------------------------------------ */
 
 //
 // R_DrawTranslatedColumn
@@ -467,20 +468,7 @@ void R_DrawTranslatedColumn (void)
 
     // Looks familiar.
     fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;
-    if ((unsigned) frac >= (unsigned) dc_ylim)
-    {
-      if (frac < 0)
-      {
-	frac = -frac;
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-	frac = dc_ylim - frac;
-      }
-      else
-      {
-	frac = (unsigned) frac % (unsigned) dc_ylim;
-      }
-    }
+    get_frac();
 
     // Here we do an additional index re-mapping.
     do
@@ -506,9 +494,7 @@ void R_DrawTranslatedColumn (void)
     } while (--count);
 }
 
-
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitTranslationTables
 // Creates the translation tables to map
@@ -542,9 +528,7 @@ void R_InitTranslationTables (void)
     }
 }
 
-
-
-
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawSpan
 // With DOOM style restrictions on view orientation,
@@ -623,7 +607,7 @@ void R_DrawSpan (void)
 }
 
 
-
+/* ------------------------------------------------------------------------------------------------ */
 // UNUSED.
 // Loop unrolled by 4.
 #if 0
@@ -697,6 +681,7 @@ void R_DrawSpan (void)
 #endif
 
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // Again..
 //
@@ -745,6 +730,7 @@ void R_DrawSpanLow (void)
     } while (--count);
 }
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitBuffer
 // Creates lookup tables that avoid
@@ -777,6 +763,7 @@ R_InitBuffer
 }
 
 
+/* ------------------------------------------------------------------------------------------------ */
 // If we're at full screen size then we need to clear the screen memory at either
 // side of the status bar which has just appeared.
 
@@ -800,6 +787,7 @@ void R_ClearSbarSides (void)
   }
 }
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_FillBackScreen
 // Fills the back screen with a pattern
@@ -899,6 +887,7 @@ void R_FillBackScreen (void)
 }
 
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // Copy a screen buffer.
 //
@@ -916,6 +905,7 @@ R_VideoErase
 }
 
 
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawViewBorder
 // Draws the border around the view
@@ -964,4 +954,4 @@ void R_DrawViewBorder (void)
     V_MarkRect (0,0,SCREENWIDTH, SCREENHEIGHT-sbarheight);
 }
 
-
+/* ------------------------------------------------------------------------------------------------ */
