@@ -121,7 +121,18 @@ void R_DrawColumn (void)
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl-centery)*fracstep;
     if ((unsigned) frac >= (unsigned) dc_ylim)
-      frac = (unsigned) frac % (unsigned) dc_ylim;
+    {
+      if (frac < 0)
+      {
+	frac = -frac;
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+	frac = dc_ylim - frac;
+      }
+      else
+      {
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+      }
+    }
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
@@ -240,7 +251,18 @@ void R_DrawColumnLow (void)
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl-centery)*fracstep;
     if ((unsigned) frac >= (unsigned) dc_ylim)
-      frac = (unsigned) frac % (unsigned) dc_ylim;
+    {
+      if (frac < 0)
+      {
+	frac = -frac;
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+	frac = dc_ylim - frac;
+      }
+      else
+      {
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+      }
+    }
 
     do
     {
@@ -447,7 +469,18 @@ void R_DrawTranslatedColumn (void)
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl-centery)*fracstep;
     if ((unsigned) frac >= (unsigned) dc_ylim)
-      frac = (unsigned) frac % (unsigned) dc_ylim;
+    {
+      if (frac < 0)
+      {
+	frac = -frac;
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+	frac = dc_ylim - frac;
+      }
+      else
+      {
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+      }
+    }
 
     // Here we do an additional index re-mapping.
     do
