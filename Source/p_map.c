@@ -1415,7 +1415,7 @@ boolean	PTR_UseTraverse (intercept_t* in)
 	  return (false);
       }
       // not a special line, but keep checking
-      // PTR_UseAnyway (line);
+      PTR_UseAnyway (line);		// Test: HellBound.wad, map 16, red key tower
       return (true);
   }
 
