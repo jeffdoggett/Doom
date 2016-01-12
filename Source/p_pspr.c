@@ -1027,6 +1027,12 @@ void P_SetupPsprites (player_t* player)
 }
 
 //-----------------------------------------------------------------------------
+typedef struct
+{
+  state_t*	state;
+  int		tics;
+} pspcdef_t;
+
 //
 // P_MovePsprites
 // Called every tic by player thinking routine.
@@ -1034,25 +1040,43 @@ void P_SetupPsprites (player_t* player)
 void P_MovePsprites (player_t* player)
 {
     int		i;
+    int		tics;
     pspdef_t*	psp;
+    pspcdef_t*	cpsp;
     state_t*	state;
+    pspcdef_t	pspcopy [NUMPSPRITES-1];
 
-    psp = &player->psprites[0];
-    for (i=0 ; i<NUMPSPRITES ; i++, psp++)
+    /* We need to avoid the case where the first call to P_SetPsprite */
+    /* changes the flash sprite and then we immediatly decrement the tic. */
+    /* On BlackOps.wad the tic is set to 1 and it is cleared before we */
+    /* can see it. */
+
+    psp = &player->psprites[1];
+    cpsp = pspcopy;
+    for (i=1 ; i<NUMPSPRITES ; i++, psp++, cpsp++)
     {
-	// a null state means not active
-	if ( (state = psp->state) != NULL)
-	{
-	    // drop tic count and possibly change state
+      cpsp->state = psp->state;
+      cpsp->tics  = psp->tics;
+    }
 
-	    // a -1 tic count never changes
-	    if (psp->tics != -1)
-	    {
-		psp->tics--;
-		if (!psp->tics)
-		    P_SetPsprite (player, i, state->nextstate);
-	    }
-	}
+    psp = player->psprites;
+
+    if (((state = psp->state) != NULL)	// a null state means not active
+     && ((tics = psp->tics) != -1)	// a -1 tic count never changes
+     && ((psp->tics = --tics) == 0))	// drop tic count and possibly change state
+      P_SetPsprite (player, 0, state->nextstate);
+
+    cpsp = pspcopy;
+    psp++;
+
+    for (i=1 ; i<NUMPSPRITES ; i++, psp++, cpsp++)
+    {
+	if (((state = psp->state) != NULL)
+	 && ((tics = psp->tics) != -1)
+	 && ((tics > 2)
+	  || ((state == cpsp->state) && (tics == cpsp->tics)))
+	 && ((psp->tics = --tics) == 0))
+	  P_SetPsprite (player, i, state->nextstate);
     }
 
     player->psprites[ps_flash].sx = player->psprites[ps_weapon].sx;
