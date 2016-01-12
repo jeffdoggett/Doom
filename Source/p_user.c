@@ -54,10 +54,13 @@ P_Thrust
   angle_t	angle,
   fixed_t	move )
 {
+  mobj_t   *	mo;
+
+  mo = player->mo;
   angle >>= ANGLETOFINESHIFT;
 
-  player->mo->momx += FixedMul(move,finecosine[angle]);
-  player->mo->momy += FixedMul(move,finesine[angle]);
+  mo->momx += FixedMul(move,finecosine[angle]);
+  mo->momy += FixedMul(move,finesine[angle]);
 }
 
 
@@ -71,6 +74,9 @@ void P_CalcHeight (player_t* player)
 {
   int		angle;
   fixed_t	bob;
+  mobj_t   *	mo;
+
+  mo = player->mo;
 
   // Regular movement bobbing
   // (needs to be calculated for gun swing
@@ -79,7 +85,7 @@ void P_CalcHeight (player_t* player)
   // Note: a LUT allows for effects
   //  like a ramp with low health.
 
-  if ((player->mo->flags & MF_SLIDE)	// No bob if we are riding a conveyor
+  if ((mo->flags & MF_SLIDE)		// No bob if we are riding a conveyor
    && (player->cmd.forwardmove == 0)
    && (player->cmd.sidemove == 0))
   {
@@ -88,8 +94,8 @@ void P_CalcHeight (player_t* player)
   else
   {
     bob =
-	FixedMul (player->mo->momx, player->mo->momx)
-	+ FixedMul (player->mo->momy,player->mo->momy);
+	FixedMul (mo->momx, mo->momx)
+	+ FixedMul (mo->momy,mo->momy);
 
     bob >>= 2;
 
@@ -101,12 +107,12 @@ void P_CalcHeight (player_t* player)
 
   if ((player->cheats & CF_NOMOMENTUM) || !onground)
   {
-    player->viewz = player->mo->z + VIEWHEIGHT;
+    player->viewz = mo->z + VIEWHEIGHT;
 
-    if (player->viewz > player->mo->ceilingz-4*FRACUNIT)
-      player->viewz = player->mo->ceilingz-4*FRACUNIT;
+    if (player->viewz > mo->ceilingz-4*FRACUNIT)
+      player->viewz = mo->ceilingz-4*FRACUNIT;
 
-    player->viewz = player->mo->z + player->viewheight;
+    player->viewz = mo->z + player->viewheight;
     return;
   }
 
@@ -139,10 +145,10 @@ void P_CalcHeight (player_t* player)
 	player->deltaviewheight = 1;
     }
   }
-  player->viewz = player->mo->z + player->viewheight + bob;
+  player->viewz = mo->z + player->viewheight + bob;
 
-  if (player->viewz > player->mo->ceilingz-4*FRACUNIT)
-    player->viewz = player->mo->ceilingz-4*FRACUNIT;
+  if (player->viewz > mo->ceilingz-4*FRACUNIT)
+    player->viewz = mo->ceilingz-4*FRACUNIT;
 }
 
 
@@ -200,6 +206,7 @@ void P_DeathThink (player_t* player)
 {
   angle_t		angle;
   angle_t		delta;
+  mobj_t*		mo;
 
   P_MovePsprites (player);
 
@@ -211,31 +218,34 @@ void P_DeathThink (player_t* player)
     player->viewheight = 6*FRACUNIT;
 
   player->deltaviewheight = 0;
-  onground = (boolean) (player->mo->z <= player->mo->floorz);
+
+  mo = player->mo;
+
+  onground = (boolean) (mo->z <= mo->floorz);
   P_CalcHeight (player);
 
-  if (player->attacker && player->attacker != player->mo)
+  if (player->attacker && player->attacker != mo)
   {
-    angle = R_PointToAngle2 (player->mo->x,
-			     player->mo->y,
+    angle = R_PointToAngle2 (mo->x,
+			     mo->y,
 			     player->attacker->x,
 			     player->attacker->y);
 
-    delta = angle - player->mo->angle;
+    delta = angle - mo->angle;
 
     if (delta < ANG5 || delta > (unsigned)-ANG5)
     {
       // Looking at killer,
       //  so fade damage flash down.
-      player->mo->angle = angle;
+      mo->angle = angle;
 
       if (player->damagecount)
 	player->damagecount--;
     }
     else if (delta < ANG180)
-      player->mo->angle += ANG5;
+      mo->angle += ANG5;
     else
-      player->mo->angle -= ANG5;
+      mo->angle -= ANG5;
   }
   else if (player->damagecount)
     player->damagecount--;
@@ -252,23 +262,26 @@ void P_DeathThink (player_t* player)
 //
 void P_PlayerThink (player_t* player)
 {
+  mobj_t*	mo;
   ticcmd_t*	cmd;
   weapontype_t	newweapon;
 
+  mo = player->mo;
+
   // fixme: do this in the cheat code
   if (player->cheats & CF_NOCLIP)
-    player->mo->flags |= MF_NOCLIP;
+    mo->flags |= MF_NOCLIP;
   else
-    player->mo->flags &= ~MF_NOCLIP;
+    mo->flags &= ~MF_NOCLIP;
 
   // chain saw run forward
   cmd = &player->cmd;
-  if (player->mo->flags & MF_JUSTATTACKED)
+  if (mo->flags & MF_JUSTATTACKED)
   {
     cmd->angleturn = 0;
     cmd->forwardmove = 0xc800/512;
     cmd->sidemove = 0;
-    player->mo->flags &= ~MF_JUSTATTACKED;
+    mo->flags &= ~MF_JUSTATTACKED;
   }
 
 
@@ -281,14 +294,14 @@ void P_PlayerThink (player_t* player)
   // Move around.
   // Reactiontime is used to prevent movement
   //  for a bit after a teleport.
-  if (player->mo->reactiontime)
-    player->mo->reactiontime--;
+  if (mo->reactiontime)
+    mo->reactiontime--;
   else
     P_MovePlayer (player);
 
   P_CalcHeight (player);
 
-  if (player->mo->subsector->sector->special)
+  if (mo->subsector->sector->special)
     P_PlayerInSpecialSector (player);
 
   // Check for weapon change.
@@ -365,7 +378,7 @@ void P_PlayerThink (player_t* player)
 
   if ((player->powers[pw_invisibility])
    && (--player->powers[pw_invisibility] == 0))
-    player->mo->flags &= ~MF_SHADOW;
+    mo->flags &= ~MF_SHADOW;
 
   if (player->powers[pw_infrared])
     player->powers[pw_infrared]--;
