@@ -200,10 +200,10 @@ typedef enum
     // Hmm ???.
     MF_TRANSSHIFT	= 26,
 
-    MF_BOUNCES		= 0x10000000,
+//  MF_TOUCHY = 0x10000000,	// killough 11/98: dies when solids touch it
+    MF_BOUNCES = 0x20000000,	// killough 7/11/98: for beta BFG fireballs
+    MF_FRIEND = 0x40000000	// killough 7/18/98: friendly monsters
 
-    // Monster does not attack, but follows us.
-    MF_FRIENDLY		= 0x20000000
 } mobjflag_t;
 
 typedef enum

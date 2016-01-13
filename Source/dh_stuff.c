@@ -743,7 +743,7 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "NOTDMATCH",	MF_NOTDMATCH},
   { "TRANSLATION",	MF_TRANSLATION},
   { "BOUNCES",		MF_BOUNCES},
-  { "FRIENDLY",		MF_FRIENDLY}
+  { "FRIEND",		MF_FRIEND}
 };
 
 /* ---------------------------------------------------------------------------- */

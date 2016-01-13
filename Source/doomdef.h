@@ -156,10 +156,13 @@ typedef enum
 
 // Deaf monsters/do not react to sound.
 #define	MTF_AMBUSH		8
-#define MTF_NETGAME             16
-#define MTF_DEATHMATCH		32
-#define MTF_COOP		64
-#define MTF_FRIENDLY		128
+
+// killough 11/98
+#define MTF_NOTSINGLE		16
+#define MTF_NOTDM		32
+#define MTF_NOTCOOP		64
+#define MTF_FRIEND		128
+
 
 typedef enum
 {

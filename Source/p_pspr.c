@@ -561,7 +561,9 @@ void A_Punch (mobj_t* mo, pspdef_t* psp)
     angle = mo->angle;
     t = P_Random();	/* remove dependence on order of evaluation */
     angle += (t-P_Random())<<18;
-    slope = P_AimLineAttack (mo, angle, MELEERANGE);
+    slope = P_AimLineAttack (mo, angle, MELEERANGE, MF_FRIEND);
+    if (!linetarget)
+      slope = P_AimLineAttack(mo, angle, MELEERANGE, 0);
     P_LineAttack (mo, angle, MELEERANGE, slope, damage);
 
     // turn to face target
@@ -592,7 +594,9 @@ void A_Saw (mobj_t* mo, pspdef_t* psp)
     angle += (t-P_Random())<<18;
 
     // use meleerange + 1 se the puff doesn't skip the flash
-    slope = P_AimLineAttack (mo, angle, MELEERANGE+1);
+    slope = P_AimLineAttack (mo, angle, MELEERANGE+1, MF_FRIEND);
+    if (!linetarget)
+      slope = P_AimLineAttack(mo, angle, MELEERANGE+1, 0);
     P_LineAttack (mo, angle, MELEERANGE+1, slope, damage);
 
     if (!linetarget)
@@ -686,15 +690,15 @@ void A_FireOldBFG (mobj_t* mo, pspdef_t* psp)
 //  if (autoaim)
     {
       // killough 8/2/98: make autoaiming prefer enemies
-      int mask = 1;	// MF_FRIEND
+      int mask = MF_FRIEND;
       fixed_t slope;
       do
       {
-	slope = P_AimLineAttack(mo, an, 16*64*FRACUNIT);
+	slope = P_AimLineAttack(mo, an, 16*64*FRACUNIT, mask);
 	if (!linetarget)
-	  slope = P_AimLineAttack(mo, an += 1<<26, 16*64*FRACUNIT);
+	  slope = P_AimLineAttack(mo, an += 1<<26, 16*64*FRACUNIT, mask);
 	if (!linetarget)
-	  slope = P_AimLineAttack(mo, an -= 2<<26, 16*64*FRACUNIT);
+	  slope = P_AimLineAttack(mo, an -= 2<<26, 16*64*FRACUNIT, mask);
 	if (!linetarget)
 	  slope = 0, an = mo->angle;
       } while (mask && (mask=0, !linetarget));	// killough 8/2/98
@@ -743,25 +747,26 @@ void A_FirePlasma (mobj_t* mo, pspdef_t* psp)
 
 static fixed_t P_BulletSlope (mobj_t* mo)
 {
-    angle_t	an;
-    fixed_t	bulletslope;
+  int		mask;
+  angle_t	an;
+  fixed_t	bulletslope;
 
-    // see which target is to be aimed at
-    an = mo->angle;
-    bulletslope = P_AimLineAttack (mo, an, 16*64*FRACUNIT);
+  // see which target is to be aimed at
+  an = mo->angle;
 
+  // killough 8/2/98: make autoaiming prefer enemies
+  mask = MF_FRIEND;
+
+  do
+  {
+    bulletslope = P_AimLineAttack(mo, an, 16*64*FRACUNIT, mask);
     if (!linetarget)
-    {
-	an += 1<<26;
-	bulletslope = P_AimLineAttack (mo, an, 16*64*FRACUNIT);
-	if (!linetarget)
-	{
-	    an -= 2<<26;
-	    bulletslope = P_AimLineAttack (mo, an, 16*64*FRACUNIT);
-	}
-    }
+      bulletslope = P_AimLineAttack(mo, an += 1<<26, 16*64*FRACUNIT, mask);
+    if (!linetarget)
+      bulletslope = P_AimLineAttack(mo, an -= 2<<26, 16*64*FRACUNIT, mask);
+  } while (mask && (mask=0, !linetarget));	// killough 8/2/98
 
-    return (bulletslope);
+  return (bulletslope);
 }
 
 //-----------------------------------------------------------------------------
@@ -937,7 +942,9 @@ void A_BFGSpray (mobj_t* mo, pspdef_t* psp)
 
 	// mo->target is the originator (player)
 	//  of the missile
-	P_AimLineAttack (mo->target, an, 16*64*FRACUNIT);
+	P_AimLineAttack (mo->target, an, 16*64*FRACUNIT, MF_FRIEND);
+	if (!linetarget)
+	  P_AimLineAttack(mo->target, an, 16*64*FRACUNIT, 0);
 
 	if (!linetarget)
 	    continue;

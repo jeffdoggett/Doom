@@ -1029,6 +1029,8 @@ void P_SlideMove (mobj_t* mo)
 mobj_t*		linetarget;	// who got hit (or NULL)
 mobj_t*		shootthing;
 
+static int aim_flags_mask; // killough 8/2/98: for more intelligent autoaiming
+
 // Height if not aiming up or down
 // ???: use slope for monsters?
 fixed_t		shootz;
@@ -1049,7 +1051,7 @@ static fixed_t  bottomslope;
 // PTR_AimTraverse
 // Sets linetaget and aimslope when a target is aimed at.
 //
-boolean
+static boolean
 PTR_AimTraverse (intercept_t* in)
 {
     line_t*	li;
@@ -1103,6 +1105,11 @@ PTR_AimTraverse (intercept_t* in)
 
     if (!(th->flags&MF_SHOOTABLE))
 	return true;			// corpse or something
+
+    // killough 7/19/98, 8/2/98:
+    // friends don't aim at friends (except players), at least not first
+    if (th->flags & shootthing->flags & aim_flags_mask && !th->player)
+      return true;
 
     // check angles to see if the thing can be aimed at
     dist = FixedMul (attackrange, in->frac);
@@ -1261,7 +1268,8 @@ fixed_t
 P_AimLineAttack
 ( mobj_t*	t1,
   angle_t	angle,
-  fixed_t	distance )
+  fixed_t	distance,
+  int		mask)
 {
     fixed_t	x2;
     fixed_t	y2;
@@ -1279,6 +1287,9 @@ P_AimLineAttack
 
     attackrange = distance;
     linetarget = NULL;
+
+    // killough 8/2/98: prevent friends from aiming at friends
+    aim_flags_mask = mask;
 
     P_PathTraverse ( t1->x, t1->y,
 		     x2, y2,

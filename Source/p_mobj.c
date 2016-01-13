@@ -505,8 +505,8 @@ P_NightmareRespawn (mobj_t* mobj)
     if (mthing->options & MTF_AMBUSH)
 	mo->flags |= MF_AMBUSH;
 
-    if (mthing->options & MTF_FRIENDLY)
-	mo->flags |= MF_FRIENDLY;
+    if (mthing->options & MTF_FRIEND)
+	mo->flags |= MF_FRIEND;
 
     mo->reactiontime = 18;
 
@@ -895,14 +895,14 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     }
 
     // check for apropriate skill level
-    if (!netgame && (mthing->options & MTF_NETGAME) )
+    if (!netgame && (mthing->options & MTF_NOTSINGLE))
     {
       if ((gamemode == commercial)		// TNT MAP 31 has a yellow
        && (gamemission == pack_tnt)		// key that is marked as multi
        && (gamemap == 31)			// player erroniously
        && (mthing -> type == 6))
       {
-	mthing->options &= ~MTF_NETGAME;
+	mthing->options &= ~MTF_NOTSINGLE;
 	//printf ("Yellow key rescued! %X, %X\n",mthing->x, mthing->y);
       }
       else
@@ -976,8 +976,8 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     if (mthing->options & MTF_AMBUSH)
 	mobj->flags |= MF_AMBUSH;
 
-    if (mthing->options & MTF_FRIENDLY)
-	mobj->flags |= MF_FRIENDLY;
+    if (mthing->options & MTF_FRIEND)
+	mobj->flags |= MF_FRIEND;
 
     return (0);
 }
@@ -1126,54 +1126,47 @@ P_SpawnPlayerMissile
 ( mobj_t*	source,
   mobjtype_t	type )
 {
-    mobj_t*	th;
-    angle_t	an;
+  mobj_t *th;
+  fixed_t x, y, z, slope = 0;
 
-    fixed_t	x;
-    fixed_t	y;
-    fixed_t	z;
-    fixed_t	slope;
+  // see which target is to be aimed at
 
-    // see which target is to be aimed at
-    an = source->angle;
-    slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+  angle_t an = source->angle;
 
-    if (!linetarget)
+  // killough 7/19/98: autoaiming was not in original beta
+  {
+    // killough 8/2/98: prefer autoaiming at enemies
+    int mask = MF_FRIEND;
+    do
     {
-	an += 1<<26;
-	slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+      slope = P_AimLineAttack(source, an, 16*64*FRACUNIT, mask);
+      if (!linetarget)
+	slope = P_AimLineAttack(source, an += 1<<26, 16*64*FRACUNIT, mask);
+      if (!linetarget)
+	slope = P_AimLineAttack(source, an -= 2<<26, 16*64*FRACUNIT, mask);
+      if (!linetarget)
+	an = source->angle, slope = 0;
+    } while (mask && (mask=0, !linetarget));	// killough 8/2/98
+  }
 
-	if (!linetarget)
-	{
-	    an -= 2<<26;
-	    slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
-	}
+  x = source->x;
+  y = source->y;
+  z = source->z + 4*8*FRACUNIT;
 
-	if (!linetarget)
-	{
-	    an = source->angle;
-	    slope = 0;
-	}
-    }
+  th = P_SpawnMobj (x,y,z, type);
 
-    x = source->x;
-    y = source->y;
-    z = source->z + 4*8*FRACUNIT;
+  if (th->info->seesound)
+      S_StartSound (th, th->info->seesound);
 
-    th = P_SpawnMobj (x,y,z, type);
+  th->target = source;
+  th->angle = an;
+  th->momx = FixedMul( th->info->speed,
+		       finecosine[an>>ANGLETOFINESHIFT]);
+  th->momy = FixedMul( th->info->speed,
+		       finesine[an>>ANGLETOFINESHIFT]);
+  th->momz = FixedMul( th->info->speed, slope);
 
-    if (th->info->seesound)
-	S_StartSound (th, th->info->seesound);
-
-    th->target = source;
-    th->angle = an;
-    th->momx = FixedMul( th->info->speed,
-			 finecosine[an>>ANGLETOFINESHIFT]);
-    th->momy = FixedMul( th->info->speed,
-			 finesine[an>>ANGLETOFINESHIFT]);
-    th->momz = FixedMul( th->info->speed, slope);
-
-    P_CheckMissileSpawn (th);
+  P_CheckMissileSpawn (th);
 }
 
 /* -------------------------------------------------------------------------------------------- */

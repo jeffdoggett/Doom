@@ -224,7 +224,8 @@ fixed_t
 P_AimLineAttack
 ( mobj_t*	t1,
   angle_t	angle,
-  fixed_t	distance );
+  fixed_t	distance,
+  int		mask);
 
 void
 P_LineAttack
