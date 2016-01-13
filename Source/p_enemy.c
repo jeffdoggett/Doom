@@ -2454,7 +2454,6 @@ void A_PlaySound (mobj_t *mo, pspdef_t* psp)
 
 void A_RandomJump (mobj_t *mo, pspdef_t* psp)
 {
-  int position;
   state_t * state;
   player_t* player;
 
