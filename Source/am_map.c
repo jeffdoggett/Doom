@@ -87,6 +87,7 @@ static const unsigned char colour_init_tab [] =
   191,123,75,		// plyr_2
   255,0,0,		// plyr_3
   0,0,11,		// plyr_invis
+  207,0,207,		// friends of player
   243,115,23,		// monster
   0,0,255,		// ammo
   79,0,0,		// body
@@ -126,6 +127,7 @@ typedef struct
   unsigned char sngl;
   unsigned char plyr[4];
   unsigned char plyr_invis;
+  unsigned char frnd;
   unsigned char monster;
   unsigned char ammo;
   unsigned char body;
@@ -178,6 +180,7 @@ static const default_doom_colours_t default_doom_colours [] =
   {"plyr_2", 64},
   {"plyr_3", 176},
   {"plyr_invis", 246},
+  {"frnd", 252},
   {"monster", 216},
   {"ammo", 200},
   {"body", 190},
@@ -1759,7 +1762,8 @@ static void AM_drawPlayers(void)
 static void
 AM_drawThings (void)
 {
-  int	   i;
+  int		i;
+  int		colour;
   mobj_t*       t;
   sector_t*     sector;
 
@@ -1772,9 +1776,12 @@ AM_drawThings (void)
     {
       do
       {
+	colour = mapcolour.sprt;
+	if (t->flags & MF_FRIEND && !t->player)
+	  colour = mapcolour.frnd;
 	AM_drawLineCharacter
 		(thintriangle_guy, NUMTHINTRIANGLEGUYLINES,
-		 16<<FRACBITS, t->angle, mapcolour.sprt, t->x, t->y);
+		 16<<FRACBITS, t->angle, colour, t->x, t->y);
 	t = t->snext;
       } while (t);
     }
@@ -1901,6 +1908,8 @@ AM_drawThingsDifferently (void)
 	  if (t->health > 0)
 	  {
 	    colour = mapcolour.monster;
+	    if (t->flags & MF_FRIEND && !t->player)
+	      colour = mapcolour.frnd;
 	    angle = t->angle;
 	  }
 	  else

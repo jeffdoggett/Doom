@@ -234,7 +234,9 @@ boolean PIT_CheckLine (line_t* ld)
 	if ( ld->flags & ML_BLOCKING )
 	    return false;	// explicitly blocking everything
 
-	if ( !tmthing->player && (ld->flags & ML_BLOCKMONSTERS))
+        // killough 8/9/98: monster-blockers don't affect friends
+        if (!(tmthing->flags & MF_FRIEND || tmthing->player)
+	  && ld->flags & ML_BLOCKMONSTERS)
 	    return false;	// block monsters only
     }
 

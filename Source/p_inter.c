@@ -119,6 +119,9 @@ unsigned int Green_Armour_Class = 1;
 unsigned int Blue_Armour_Class = 2;
 boolean Give_Max_Damage = false;
 
+extern boolean Monsters_Infight1;
+extern boolean Monsters_Infight2;
+
 //
 // GET STUFF
 //
@@ -1073,7 +1076,8 @@ P_KillMobj
 
       mo = P_SpawnMobj (target -> x, target -> y, dropheight, p -> mt_spawn);
 
-      mo->flags |= MF_DROPPED;	// special versions of items
+      // special versions of items
+      mo->flags = ((mo->flags & ~MF_FRIEND) | (target->flags & MF_FRIEND)) | MF_DROPPED;
       flags |= mo->flags;
 
       /* If we are in massacre mode then immediately kill the new */
@@ -1101,13 +1105,14 @@ P_KillMobj
     if (source && source->player)
     {
       // count for intermission
-      if (target->flags & MF_COUNTKILL)
+      // killough 7/20/98: don't count friends
+      if ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
 	  source->player->killcount++;
 
       if (target->player)
 	  source->player->frags[target->player-players]++;
     }
-    else if (!netgame && (target->flags & MF_COUNTKILL) )
+    else if (!netgame && ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL))
     {
       // count all monster deaths,
       // even those caused by other monsters
@@ -1225,6 +1230,7 @@ P_DamageMobj
   fixed_t	thrust;
   int		temp;
   int		damagecount;
+  boolean	justhit;          // killough 11/98
 
   if (gamecompletedtimer)
     return;
@@ -1342,17 +1348,18 @@ P_DamageMobj
   }
 
   // do the damage
-  target->health -= damage;
-  if (target->health <= 0)
+  if ((target->health -= damage) <= 0)
   {
       P_KillMobj (target, inflictor, source);
       return;
   }
 
+  justhit = false;
+
   if ( (P_Random () < target->info->painchance)
        && !(target->flags&MF_SKULLFLY) )
   {
-      target->flags |= MF_JUSTHIT;	// fight back!
+      justhit = true;
 
       if (P_SetMobjState (target, (statenum_t)target->info->painstate) == false)
 	return;
@@ -1360,25 +1367,37 @@ P_DamageMobj
 
   target->reactiontime = 0;		// we're awake now...
 
-  if ( (!target->threshold || target->type == MT_VILE)
-       && source && source != target
-       && source->type != MT_VILE)
-  {
+  // killough 9/9/98: cleaned up, made more consistent:
+
+  if (source && source != target && source->type != MT_VILE &&
+      (!target->threshold || target->type == MT_VILE) &&
+      ((source->flags ^ target->flags) & MF_FRIEND ||
+       Monsters_Infight1 || Monsters_Infight2))
+    {
       // if not intent on another player, chase after this one
       //
       // killough 2/15/98: remember last enemy, to prevent
+      // sleeping early; 2/21/98: Place priority on players
       // killough 9/9/98: cleaned up, made more consistent:
 #if 0
       if (!target->lastenemy || target->lastenemy->health <= 0 ||
-	  target->target != source) // remember last enemy - killough
-	  target->lastenemy = target->target;
+	  (demo_version < 203 ? !target->lastenemy->player :
+	   !((target->flags ^ target->lastenemy->flags) & MF_FRIEND) &&
+	   target->target != source)) // remember last enemy - killough
+	P_SetTarget(&target->lastenemy, target->target);
 #endif
-      target->target = source;       // killough 11/98
+
+      target->target = source;		// killough 11/98
       target->threshold = BASETHRESHOLD;
       if (target->state == &states[target->info->spawnstate]
-      && target->info->seestate != S_NULL)
-	  P_SetMobjState (target, (statenum_t)target->info->seestate);
-  }
+          && target->info->seestate != S_NULL)
+        P_SetMobjState (target, (statenum_t) target->info->seestate);
+    }
+
+  // killough 11/98: Don't attack a friend, unless hit by that friend.
+  if (justhit && (target->target == source || !target->target ||
+		  !(target->flags & target->target->flags & MF_FRIEND)))
+    target->flags |= MF_JUSTHIT;	// fight back!
 }
 
 //-----------------------------------------------------------------------------
@@ -1397,7 +1416,7 @@ void P_Massacre (void)
     {
       mobj = (mobj_t *) th;
       if ((mobj->player == 0)
-       && (mobj->flags & MF_SHOOTABLE))
+       && ((mobj->flags & (MF_SHOOTABLE|MF_FRIEND)) == MF_SHOOTABLE))
       {
 	mobj->flags2 |= MF2_MASSACRE;
 	P_DamageMobj (mobj, NULL, NULL, mobj -> health);

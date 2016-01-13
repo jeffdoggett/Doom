@@ -505,8 +505,8 @@ P_NightmareRespawn (mobj_t* mobj)
     if (mthing->options & MTF_AMBUSH)
 	mo->flags |= MF_AMBUSH;
 
-    if (mthing->options & MTF_FRIEND)
-	mo->flags |= MF_FRIEND;
+    // killough 11/98: transfer friendliness from deceased
+    mo->flags = (mo->flags & ~MF_FRIEND) | (mobj->flags & MF_FRIEND);
 
     mo->reactiontime = 18;
 
@@ -637,6 +637,10 @@ P_SpawnMobj
     mobj->radius = info->radius;
     mobj->height = info->height;
     mobj->flags  = info->flags;
+
+    if (type == MT_PLAYER)         // Players
+      mobj->flags |= MF_FRIEND;    // are always friends.
+
     mobj->flags2 = info->flags2;
     mobj->health = info->spawnhealth;
 
@@ -966,8 +970,11 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 
     if (mobj->tics > 0)
 	mobj->tics = 1 + (P_Random () % mobj->tics);
-    if (mobj->flags & MF_COUNTKILL)
+
+    // killough 7/20/98: exclude friends
+    if ((mobj->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
 	totalkills++;
+
     if (mobj->flags & MF_COUNTITEM)
 	totalitems++;
 

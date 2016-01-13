@@ -168,6 +168,24 @@ P_RecursiveSound
 }
 
 
+//
+// P_IsVisible
+//
+// killough 9/9/98: whether a target is visible to a monster
+//
+
+static boolean P_IsVisible (mobj_t *actor, mobj_t *mo, boolean allaround)
+{
+  if (!allaround)
+    {
+      angle_t an = R_PointToAngle2(actor->x, actor->y,
+				   mo->x, mo->y) - actor->angle;
+      if (an > ANG90 && an < ANG270 &&
+	  P_ApproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
+	return false;
+    }
+  return P_CheckSight(actor, mo);
+}
 
 //
 // P_NoiseAlert
@@ -199,6 +217,10 @@ boolean P_CheckMeleeRange (mobj_t*	actor)
   if (pl == NULL)
     return false;
 
+  // killough 7/18/98: friendly monsters don't attack other friends
+  if (actor->flags & pl->flags & MF_FRIEND)
+    return false;
+
   dist = P_ApproxDistance (pl->x-actor->x, pl->y-actor->y);
 
   if (dist >= MELEERANGE-20*FRACUNIT+pl->info->radius)
@@ -212,6 +234,24 @@ boolean P_CheckMeleeRange (mobj_t*	actor)
     return false;
 
   return true;
+}
+
+//
+// P_HitFriend()
+//
+// killough 12/98
+// This function tries to prevent shooting at friends
+
+static boolean P_HitFriend(mobj_t *actor)
+{
+  return (boolean) (actor->target &&
+    (P_AimLineAttack(actor,
+		     R_PointToAngle2(actor->x, actor->y,
+				     actor->target->x, actor->target->y),
+		     P_ApproxDistance(actor->x-actor->target->x,
+				     actor->y-actor->target->y), 0),
+     linetarget) && linetarget != actor->target &&
+    !((linetarget->flags ^ actor->flags) & MF_FRIEND));
 }
 
 //
@@ -231,6 +271,11 @@ boolean P_CheckMissileRange (mobj_t* actor)
 	actor->flags &= ~MF_JUSTHIT;
 	return true;
     }
+
+    // killough 7/18/98: friendly monsters don't attack other friendly
+    // monsters or players (except when attacked, and then only once)
+    if (actor->flags & actor->target->flags & MF_FRIEND)
+      return false;
 
     if (actor->reactiontime)
 	return false;	// do not attack yet
@@ -274,6 +319,9 @@ boolean P_CheckMissileRange (mobj_t* actor)
 
     if (P_Random () < dist)
 	return false;
+
+    if (actor->flags & MF_FRIEND && P_HitFriend(actor))
+      return false;
 
     return true;
 }
@@ -534,8 +582,42 @@ P_LookForPlayers
 
 //  sector = actor->subsector->sector;
 
+    if (actor->flags & MF_FRIEND)
+    {  // killough 9/9/98: friendly monsters go about players differently
+      int anyone;
+
+#if 0
+      if (!allaround) // If you want friendly monsters not to awaken unprovoked
+	return false;
+#endif
+
+      // Go back to a player, no matter whether it's visible or not
+      for (anyone=0; anyone<=1; anyone++)
+	for (c=0; c<MAXPLAYERS; c++)
+	  if (playeringame[c] && players[c].playerstate==PST_LIVE &&
+	      (anyone || P_IsVisible(actor, players[c].mo, allaround)))
+	    {
+	      actor->target = players[c].mo;
+
+	      // killough 12/98:
+	      // get out of refiring loop, to avoid hitting player accidentally
+
+	      if (actor->info->missilestate)
+		{
+		  P_SetMobjState (actor, (statenum_t) actor->info->seestate);
+		  actor->flags &= ~MF_JUSTHIT;
+		}
+
+	      return true;
+	    }
+
+      return false;
+    }
+
+
     c = 0;
-    stop = (actor->lastlook-1)&3;
+    // Change mask of 3 to (MAXPLAYERS-1) -- killough 2/15/98:
+    stop = (actor->lastlook-1)&(MAXPLAYERS-1);
 
     for ( ; ; actor->lastlook = (actor->lastlook+1)&3 )
     {
@@ -896,32 +978,42 @@ void A_CPosRefire (mobj_t* actor, pspdef_t* psp)
     // keep firing unless target got out of sight
     A_FaceTarget (actor,psp);
 
-    if (P_Random () < 40)
-	return;
+  // killough 12/98: Stop firing if a friend has gotten in the way
+  if (actor->flags & MF_FRIEND && P_HitFriend(actor))
+    goto stop;
 
-    if (!actor->target
-	|| actor->target->health <= 0
-	|| !P_CheckSight (actor, actor->target) )
-    {
-	P_SetMobjState (actor, (statenum_t) actor->info->seestate);
-    }
+  // killough 11/98: prevent refiring on friends continuously
+  if (P_Random () < 40)
+  {
+    if (actor->target && actor->flags & actor->target->flags & MF_FRIEND)
+      goto stop;
+    else
+      return;
+  }
+
+  if (!actor->target || actor->target->health <= 0
+      || !P_CheckSight(actor, actor->target))
+    stop: P_SetMobjState(actor, (statenum_t) actor->info->seestate);
 }
 
 
 void A_SpidRefire (mobj_t* actor, pspdef_t* psp)
 {
-    // keep firing unless target got out of sight
-    A_FaceTarget (actor,psp);
+  // keep firing unless target got out of sight
+  A_FaceTarget (actor,psp);
 
-    if (P_Random () < 10)
-	return;
+  // killough 12/98: Stop firing if a friend has gotten in the way
+  if (actor->flags & MF_FRIEND && P_HitFriend(actor))
+    goto stop;
 
-    if (!actor->target
-	|| actor->target->health <= 0
-	|| !P_CheckSight (actor, actor->target) )
-    {
-	P_SetMobjState (actor, (statenum_t) actor->info->seestate);
-    }
+  if (P_Random () < 10)
+    return;
+
+  // killough 11/98: prevent refiring on friends continuously
+  if (!actor->target || actor->target->health <= 0
+      || actor->flags & actor->target->flags & MF_FRIEND
+      || !P_CheckSight(actor, actor->target))
+    stop: P_SetMobjState(actor, (statenum_t) actor->info->seestate);
 }
 
 void A_BspiAttack (mobj_t *actor, pspdef_t* psp)
@@ -1275,7 +1367,12 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 			corpsehit->height = info->height;
 			corpsehit->radius = info->radius;
 		      }
-		      corpsehit->flags  = info->flags;
+
+		      // killough 7/18/98:
+		      // friendliness is transferred from AV to raised corpse
+		      corpsehit->flags =
+			(info->flags & ~MF_FRIEND) | (actor->flags & MF_FRIEND);
+
 		      corpsehit->health = info->spawnhealth;
 		      corpsehit->target = NULL;
 #if 0
@@ -1585,6 +1682,9 @@ A_PainShootSkull
     z = actor->z + 8*FRACUNIT;
 
     newmobj = P_SpawnMobj (x , y, z, MT_SKULL);
+
+    // killough 7/20/98: PEs shoot lost souls with the same friendliness
+    newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (actor->flags & MF_FRIEND);
 
     // Check for movements.
     if (!P_TryMove (newmobj, newmobj->x, newmobj->y))
@@ -2258,6 +2358,10 @@ void A_BrainSpit (mobj_t* mo, pspdef_t* psp)
     // spawn brain missile
     newmobj = P_SpawnMissile (mo, targ, MT_SPAWNSHOT);
     newmobj->target = targ;
+
+    // killough 7/18/98: brain friendliness is transferred
+    newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (mo->flags & MF_FRIEND);
+
     dist = P_ApproxDistance (targ->x - (mo->x + mo->momx), targ->y - (mo->y + mo->momy));
 
     // Use the reactiontime to hold the distance
@@ -2326,6 +2430,9 @@ void A_SpawnFly (mobj_t* mo, pspdef_t* psp)
 	  type = MT_BRUISER;
 
       newmobj = P_SpawnMobj (targ->x, targ->y, targ->z, type);
+
+      // killough 7/18/98: brain friendliness is transferred
+      newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (mo->flags & MF_FRIEND);
 
       if ((P_LookForPlayers (newmobj, true) == 0)
        || (P_SetMobjState (newmobj, (statenum_t) newmobj->info->seestate)))
@@ -2426,8 +2533,13 @@ void A_Mushroom(mobj_t *actor, pspdef_t* psp)
 //
 void A_Spawn (mobj_t *mo, pspdef_t* psp)
 {
+  mobj_t *newmobj;
+
   if (mo->state->misc1)
-    P_SpawnMobj(mo->x, mo->y, (fixed_t)(mo->state->misc2 << FRACBITS) + mo->z, (mobjtype_t)(mo->state->misc1 - 1));
+  {
+    newmobj = P_SpawnMobj(mo->x, mo->y, (fixed_t)(mo->state->misc2 << FRACBITS) + mo->z, (mobjtype_t)(mo->state->misc1 - 1));
+    newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (mo->flags & MF_FRIEND);
+  }
 }
 
 void A_Turn (mobj_t *mo, pspdef_t* psp)
