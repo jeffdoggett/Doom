@@ -2463,10 +2463,7 @@ void A_RandomJump (mobj_t *mo, pspdef_t* psp)
   {
     state = psp->state;
     if (P_Random() < state->misc2)
-    {
-      position = psp - &player->psprites[0];
-      P_SetPsprite (player, position, (statenum_t)state->misc1);
-    }
+      P_SetPsprite (player, psp, (statenum_t)state->misc1);
   }
   else
   {
