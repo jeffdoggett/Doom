@@ -200,7 +200,10 @@ typedef enum
     // Hmm ???.
     MF_TRANSSHIFT	= 26,
 
-    MF_BOUNCES		= 0x10000000
+    MF_BOUNCES		= 0x10000000,
+
+    // Monster does not attack, but follows us.
+    MF_FRIENDLY		= 0x20000000
 } mobjflag_t;
 
 typedef enum

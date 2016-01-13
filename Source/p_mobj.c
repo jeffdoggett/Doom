@@ -505,6 +505,9 @@ P_NightmareRespawn (mobj_t* mobj)
     if (mthing->options & MTF_AMBUSH)
 	mo->flags |= MF_AMBUSH;
 
+    if (mthing->options & MTF_FRIENDLY)
+	mo->flags |= MF_FRIENDLY;
+
     mo->reactiontime = 18;
 
     // remove the old monster,
@@ -892,14 +895,14 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     }
 
     // check for apropriate skill level
-    if (!netgame && (mthing->options & 16) )
+    if (!netgame && (mthing->options & MTF_NETGAME) )
     {
       if ((gamemode == commercial)		// TNT MAP 31 has a yellow
        && (gamemission == pack_tnt)		// key that is marked as multi
        && (gamemap == 31)			// player erroniously
        && (mthing -> type == 6))
       {
-	mthing->options &= ~16;
+	mthing->options &= ~MTF_NETGAME;
 	//printf ("Yellow key rescued! %X, %X\n",mthing->x, mthing->y);
       }
       else
@@ -969,8 +972,12 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	totalitems++;
 
     mobj->angle = ANG45 * (mthing->angle/45);
+
     if (mthing->options & MTF_AMBUSH)
 	mobj->flags |= MF_AMBUSH;
+
+    if (mthing->options & MTF_FRIENDLY)
+	mobj->flags |= MF_FRIENDLY;
 
     return (0);
 }
