@@ -85,7 +85,9 @@ dirtype_t diags[] =
 
 //-----------------------------------------------------------------------------
 
-mobj_t*		soundtarget;
+static mobj_t* soundtarget;
+static mobj_t* current_actor;
+static boolean current_allaround;
 
 //-----------------------------------------------------------------------------
 /*
@@ -562,6 +564,41 @@ void P_NewChaseDir (mobj_t*	actor)
 }
 
 
+//
+// PIT_FindTarget
+//
+// killough 9/5/98
+//
+// Finds monster targets for other monsters
+//
+
+static boolean PIT_FindTarget (mobj_t *mo)
+{
+  mobj_t *actor = current_actor;
+
+  if (!((mo->flags ^ actor->flags) & MF_FRIEND &&        // Invalid target
+	mo->health > 0 && (mo->flags & MF_COUNTKILL || mo->type == MT_SKULL)))
+    return true;
+
+  // If the monster is already engaged in a one-on-one attack
+  // with a healthy friend, don't attack around 60% the time
+  {
+    const mobj_t *targ = mo->target;
+    if (targ && targ->target == mo &&
+	P_Random () > 100 &&
+	(targ->flags ^ mo->flags) & MF_FRIEND &&
+	targ->health*2 >= targ->info->spawnhealth)
+      return true;
+  }
+
+  if (!P_IsVisible (actor, mo, current_allaround))
+    return true;
+
+//P_SetTarget(&actor->lastenemy, actor->target);	// Remember previous target
+  actor->target = mo;					// Found target
+  return false;
+}
+
 
 //
 // P_LookForPlayers
@@ -668,24 +705,108 @@ P_LookForPlayers
     return false;
 }
 
-#if 1
-#define P_LookForTargets(a,b) P_LookForPlayers(a,b)
-#else
-static boolean P_LookForTargets (mobj_t *actor, boolean allaround)
-{
-    if (P_LookForPlayers (actor, allaround))
-	return true;
-    else
-	if (actor->lastenemy && actor->lastenemy->health > 0)
-	{
-	     actor->target = actor->lastenemy;
-	     actor->lastenemy = NULL;
-	     return true;
-	}
-    return false;
-}
-#endif
 
+
+
+//
+// Friendly monsters, by Lee Killough 7/18/98
+//
+// Friendly monsters go after other monsters first, but
+// also return to owner if they cannot find any targets.
+// A marine's best friend :)  killough 7/18/98, 9/98
+//
+
+static boolean P_LookForMonsters (mobj_t *actor, boolean allaround)
+{
+#if 0
+  // TODO: Won't actually work properly until I add support for this!
+  thinker_t *cap, *th;
+
+  if (demo_compatibility)
+    return false;
+
+  if (actor->lastenemy && actor->lastenemy->health > 0 && monsters_remember &&
+      !(actor->lastenemy->flags & actor->flags & MF_FRIEND)) // not friends
+    {
+      P_SetTarget(&actor->target, actor->lastenemy);
+      P_SetTarget(&actor->lastenemy, NULL);
+      return true;
+    }
+
+  if (demo_version < 203)  // Old demos do not support monster-seeking bots
+    return false;
+
+  // Search the threaded list corresponding to this object's potential targets
+  cap = &thinkerclasscap[actor->flags & MF_FRIEND ? th_enemies : th_friends];
+
+  // Search for new enemy
+
+  if (cap->cnext != cap)        // Empty list? bail out early
+#endif
+    {
+      int x = (actor->x - bmaporgx)>>MAPBLOCKSHIFT;
+      int y = (actor->y - bmaporgy)>>MAPBLOCKSHIFT;
+      int d;
+
+      current_actor = actor;
+      current_allaround = allaround;
+
+      // Search first in the immediate vicinity.
+
+      if (!P_BlockThingsIterator(x, y, PIT_FindTarget))
+	return true;
+
+      for (d=1; d<5; d++)
+	{
+	  int i = 1 - d;
+	  do
+	    if (!P_BlockThingsIterator(x+i, y-d, PIT_FindTarget) ||
+		!P_BlockThingsIterator(x+i, y+d, PIT_FindTarget))
+	      return true;
+	  while (++i < d);
+	  do
+	    if (!P_BlockThingsIterator(x-d, y+i, PIT_FindTarget) ||
+		!P_BlockThingsIterator(x+d, y+i, PIT_FindTarget))
+	      return true;
+	  while (--i + d >= 0);
+	}
+#if 0
+      {   // Random number of monsters, to prevent patterns from forming
+	int n = (P_Random () & 31) + 15;
+
+	for (th = cap->cnext; th != cap; th = th->cnext)
+	  if (--n < 0)
+	    {
+	      // Only a subset of the monsters were searched. Move all of
+	      // the ones which were searched so far, to the end of the list.
+
+	      (cap->cnext->cprev = cap->cprev)->cnext = cap->cnext;
+	      (cap->cprev = th->cprev)->cnext = cap;
+	      (th->cprev = cap)->cnext = th;
+	      break;
+	   }
+	  else
+	    if (!PIT_FindTarget((mobj_t *) th))   // If target sighted
+	      return true;
+      }
+#endif
+    }
+
+  return false;  // No monster found
+}
+
+//
+// P_LookForTargets
+//
+// killough 9/5/98: look for targets to go after, depending on kind of monster
+//
+
+static boolean P_LookForTargets(mobj_t *actor, boolean allaround)
+{
+  return (boolean) (actor->flags & MF_FRIEND ?
+    P_LookForMonsters(actor, allaround) || P_LookForPlayers (actor, allaround):
+    P_LookForPlayers (actor, allaround) || P_LookForMonsters(actor, allaround));
+}
 
 
 //
@@ -721,10 +842,8 @@ void A_Look (mobj_t* actor, pspdef_t* psp)
     }
 
 
-    if (!P_LookForPlayers (actor, false) )
+    if (!P_LookForTargets (actor, false) )
 	return;
-  //if (!P_LookForTargets(actor, false))
-  //  return;
 
     // go into chase state
   seeyou:
@@ -858,7 +977,7 @@ void A_Chase (mobj_t* actor, pspdef_t* psp)
 	&& !actor->threshold
 	&& !P_CheckSight (actor, actor->target) )
     {
-	if (P_LookForPlayers(actor,true))
+	if (P_LookForTargets(actor,true))
 	    return;	// got a new target
     }
 
