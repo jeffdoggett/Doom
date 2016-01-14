@@ -1450,7 +1450,7 @@ static void write_all_frames (FILE * fout)
     {
       counter++;
     }
-    fprintf (fout, "%s = %d\n", dehack_frames[3], counter);
+    fprintf (fout, "%s = %d (A_%s)\n", dehack_frames[3], counter, codeptr_frames[counter].name);
 
     fprintf (fout, "%s = %d\n", dehack_frames[4], (int) ptr -> nextstate);
     fprintf (fout, "%s = %d\n", dehack_frames[5], (int) ptr -> misc1);
