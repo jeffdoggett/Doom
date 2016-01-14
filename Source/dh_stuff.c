@@ -754,7 +754,7 @@ static const bit_names_t dehack_thing_bit_names [] =
 actionf_t states_ptr_copy [NUMSTATES];
 
 /* ---------------------------------------------------------------------------- */
-
+//#define CREATE_DEHACK_FILE
 #ifdef CREATE_DEHACK_FILE
 static const char * const thing_names [] =
 {
@@ -1169,15 +1169,19 @@ static void dh_remove_americanisms (char * s1)
 static void write_all_things (FILE * fout)
 {
   int thing_no;
+  const char * name;
   mobjinfo_t * ptr;
 
   ptr = &mobjinfo[0];
-
-
   thing_no = 0;
   do
   {
-    fprintf (fout, "%s %d (%s)\n", dehack_patches[1], thing_no+1, thing_names[thing_no]);
+    if (thing_no >= ARRAY_SIZE(thing_names))
+      name = "Unknown";
+    else
+      name = thing_names[thing_no];
+
+    fprintf (fout, "%s %d (%s)\n", dehack_patches[1], thing_no+1, name);
 
     fprintf (fout, "%s = %d\n", dehack_things [0], ptr -> doomednum);
     fprintf (fout, "%s = %d\n", dehack_things [1], ptr -> spawnstate);
@@ -1214,68 +1218,87 @@ static void write_all_things (FILE * fout)
 
 /* ---------------------------------------------------------------------------- */
 
-static int find_thing_bitname (char * str)
+static const char * find_thing_bitname (unsigned int * result, const char * str)
 {
   char cc;
+  unsigned int rc;
   unsigned int len;
   unsigned int count;
   const bit_names_t * ptr;
   char buf [40];
 
+  /* Note: Trisen.wad has -2147416560 here! */
+
+  rc = 0;
   len = 0;
+
+  cc = *str;
+  if (cc == '-')
+  {
+    buf [len++] = cc;
+    str++;
+  }
+
   do
   {
-    cc = str [len];
-    if (!isalpha(cc))
+    cc = *str;
+    if (!isalnum(cc))
       cc = 0;
+    else
+      str++;
     buf [len++] = cc;
   } while (cc);
 
-  ptr = dehack_thing_bit_names;
-  count = ARRAY_SIZE (dehack_thing_bit_names);
-  do
+  if (!isalpha(buf[0]))			// Symbolic bits?
   {
-    if (strcasecmp (ptr->name, buf) == 0)
-      return (ptr -> value);
-    ptr++;
-  } while (--count);
+    rc = strtol (buf,NULL,0);		// No.
+  }
+  else
+  {
+    ptr = dehack_thing_bit_names;
+    count = ARRAY_SIZE (dehack_thing_bit_names);
+    do
+    {
+      if (strcasecmp (ptr->name, buf) == 0)
+      {
+	rc = ptr -> value;
+	break;
+      }
+      ptr++;
+      if (--count == 0)
+      {
+	if (M_CheckParm ("-showunknown"))
+	  fprintf (stderr, "DeHackEd:Failed to match bitname (%s)\n", buf);
+	break;
+      }
+    } while (1);
+  }
 
-  return (0);
+  *result = rc;
+  return (str);
 }
 
 /* ---------------------------------------------------------------------------- */
 
-static char * next_bits_arg (char * ptr)
+static void decode_things_bits (unsigned int * params, const char * string1)
 {
-  while (isalpha(*ptr))
-    ptr++;
-
-  while (*ptr == ' ')
-    ptr++;
-
-  return (ptr);
-}
-
-/* ---------------------------------------------------------------------------- */
-
-static void decode_things_bits (unsigned int * params, char * string1)
-{
-  unsigned int flag;
   char operator;
+  unsigned int flag;
 
   params [0] = 0;
   operator = '|';
 
   do
   {
-    flag = find_thing_bitname (string1);
+    string1 = find_thing_bitname (&flag, string1);
     switch (operator)
     {
       case '|': params [0] |= flag; break;
       case '+': params [0] += flag; break;
       case '&': params [0] &= flag; break;
     }
-    string1 = next_bits_arg (string1);
+    while (*string1 == ' ')
+      string1++;
     if (*string1 == 0)
       break;
     operator = *string1++;
@@ -1423,7 +1446,7 @@ static void write_all_frames (FILE * fout)
     fprintf (fout, "%s = %d\n", dehack_frames[2], (int) ptr -> tics);
 
     counter = 0;
-    while (action_ptrs[counter].acv != ptr -> action.acv)
+    while (codeptr_frames[counter].pointer.acv != ptr -> action.acv)
     {
       counter++;
     }
@@ -1438,7 +1461,6 @@ static void write_all_frames (FILE * fout)
   } while (frame_no < NUMSTATES);
 }
 #endif
-
 /* ---------------------------------------------------------------------------- */
 
 static void dh_write_to_frame (unsigned int number, unsigned int record, unsigned int value)
@@ -3267,8 +3289,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  if (counter2)
 		  {
 		    string1 = next_arg (a_line+counter2);
-		    if (string1[0] >= 'A')		// and symbolic bits?
-		      decode_things_bits (params, string1);
+		    decode_things_bits (params, string1);
 		  }
 		  break;
 
@@ -3485,7 +3506,11 @@ void DH_parse_hacker_file (const char * filename)
   }
 
 #ifdef CREATE_DEHACK_FILE
+#ifdef __riscos
   fin = fopen ("<DeHack$Dir>.Resources.DeHack/Deh", "w");
+#else
+  fin = fopen ("DeHack.Deh", "w");
+#endif
   if (fin)
   {
     fprintf (fin, "Patch File for DeHackEd v3.0\n");
@@ -3503,6 +3528,7 @@ void DH_parse_hacker_file (const char * filename)
     write_all_miscs (fin);
     write_all_texts (fin);
     fclose (fin);
+    printf ("Wrote DeHack file\n");
   }
 #endif
 }
