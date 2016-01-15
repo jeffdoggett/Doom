@@ -1251,7 +1251,7 @@ static const char * find_thing_bitname (unsigned int * result, const char * str)
 
   if (!isalpha(buf[0]))			// Symbolic bits?
   {
-    rc = strtol (buf,NULL,0);		// No.
+    rc = (unsigned int) strtol (buf,NULL,0);// No.
   }
   else
   {
