@@ -870,10 +870,13 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     fixed_t		x;
     fixed_t		y;
     fixed_t		z;
+    unsigned int	type;
 
+
+    type = mthing->type;
 
     // count deathmatch start positions
-    if (mthing->type == 11)
+    if (type == 11)
     {
 	dmstart = Z_Malloc (sizeof(dmstart_t),PU_LEVEL,0);
 	memcpy (&dmstart->dmstart, mthing, sizeof(*mthing));
@@ -885,13 +888,11 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     }
 
     // check for players specially
-    // There's a type 0 mapthing in 1KillTng/WAD that crashes
-    // doom here. Trap it out.
-    if ((mthing->type >= 1)
-     && (mthing->type <= 4))
+    if ((type >= 1)
+     && (type <= 4))
     {
 	// save spots for respawning in network games
-	playerstarts[mthing->type-1] = *mthing;
+	playerstarts[type-1] = *mthing;
 	if (!deathmatch)
 	    P_SpawnPlayer (mthing);
 
@@ -926,23 +927,23 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	return (0);
 
     // find which type to spawn
-
-    i = -1;
+    i = 0;
     ptr = mobjinfo;
-    ptr--;
     do
     {
+      if (ptr -> doomednum == type)
+	break;
+
+      ptr++;
       if (++i >= NUMMOBJTYPES)
       {
 	if (M_CheckParm ("-showunknown"))
 	  printf ("P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
-		 mthing->type,
-		 mthing->x, mthing->y);
+		type, mthing->x, mthing->y);
 	mthing->options &= ~31;
 	return (0);
       }
-      ptr++;
-    } while (mthing->type != ptr -> doomednum);
+    } while (1);
 
     // don't spawn keycards and players in deathmatch
     if (deathmatch && (ptr -> flags & MF_NOTDMATCH))
@@ -977,14 +978,14 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     if (mthing->options & MTF_FRIEND)
 	mobj->flags |= MF_FRIEND;
 
+    mobj->angle = ANG45 * (mthing->angle/45);
+
     // killough 7/20/98: exclude friends
     if ((mobj->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
 	totalkills++;
 
     if (mobj->flags & MF_COUNTITEM)
 	totalitems++;
-
-    mobj->angle = ANG45 * (mthing->angle/45);
 
     return (0);
 }
