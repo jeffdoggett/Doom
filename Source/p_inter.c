@@ -1252,7 +1252,11 @@ P_DamageMobj
     if (gameskill == sk_baby)
       damage >>= 1;		// take half damage in trainer mode
   }
-  else if ((Give_Max_Damage) && (damage < target->health))
+  else if ((Give_Max_Damage)
+	&& (source)
+	&& ((source->player) || (source->flags & MF_FRIEND))
+	&& ((target->flags & MF_FRIEND) == 0)
+	&& (damage < target->health))
   {
     damage = target->health;
   }

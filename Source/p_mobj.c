@@ -971,6 +971,12 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     if (mobj->tics > 0)
 	mobj->tics = 1 + (P_Random () % mobj->tics);
 
+    if (mthing->options & MTF_AMBUSH)
+	mobj->flags |= MF_AMBUSH;
+
+    if (mthing->options & MTF_FRIEND)
+	mobj->flags |= MF_FRIEND;
+
     // killough 7/20/98: exclude friends
     if ((mobj->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
 	totalkills++;
@@ -979,12 +985,6 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	totalitems++;
 
     mobj->angle = ANG45 * (mthing->angle/45);
-
-    if (mthing->options & MTF_AMBUSH)
-	mobj->flags |= MF_AMBUSH;
-
-    if (mthing->options & MTF_FRIEND)
-	mobj->flags |= MF_FRIEND;
 
     return (0);
 }
