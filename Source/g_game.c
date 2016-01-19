@@ -2404,7 +2404,7 @@ boolean G_CheckDemoStatus (void)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static const char * const cast_mtconv [] =
+static const char * const cast_mtconv [NUMMOBJTYPES+1] =
 {
   "PLAYER", "POSSESSED", "SHOTGUY", "VILE", "FIRE",
   "UNDEAD", "TRACER", "SMOKE", "FATSO", "FATSHOT",
@@ -2430,13 +2430,14 @@ static const char * const cast_mtconv [] =
   "MISC67", "MISC68", "MISC69", "MISC70", "MISC71", "MISC72",
   "MISC73", "MISC74", "MISC75", "MISC76", "MISC77", "MISC78",
   "MISC79", "MISC80", "MISC81", "MISC82", "MISC83", "MISC84",
-  "MISC85", "MISC86",
+  "MISC85", "MISC86", "MT_PUSH", "MT_PULL", "MT_DOGS", "MT_PLASMA1",
+  "MT_PLASMA2", "MT_SCEPTRE", "MT_BIBLE", "MT_MUSICSOURCE","MT_GIBDTH",
   NULL
 };
 
 /* -------------------------------------------------------------------------------------------- */
 
-static const char * const thing_names [] =
+const char * const thing_names [NUMMOBJTYPES+1] =
 {
   "Player","Trooper","Sargeant","Archvile","Archvile Attack","Revenant",
   "Revenant Fireball","Fireball Trail","Mancubus","Mancubus Fireball",
@@ -2466,9 +2467,10 @@ static const char * const thing_names [] =
   "Twitching Body","Large Tree","Flaming Barrel","Hanging Body 1","Hanging Body 2",
   "Hanging Body 3","Hanging Body 4","Hanging Body 5","Hanging Body 6","Pool Of Blood 1",
   "Pool Of Blood 2","Brains",
+  "Wind Push", "Wind Pull", "Dog", "Plasma 1",
+  "Plasma 2", "Sceptre", "Bible", "Musicsource","Gibdeath",
   NULL
 };
-
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -2971,6 +2973,12 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
     }
     drop_info_p = drop_info_p -> next;
   }
+
+  i = 0;
+  do
+  {
+    printf ("Thing %u (%s) (%s)\n", i, cast_mtconv[i], thing_names[i]);
+  } while (++i < NUMMOBJTYPES);
 #endif
 }
 
