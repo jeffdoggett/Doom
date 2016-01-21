@@ -866,7 +866,6 @@ P_CrossSpecialLine
       case MT_HEADSHOT:
       case MT_BRUISERSHOT:
 	return (false);
-	break;
 
       default: break;
     }

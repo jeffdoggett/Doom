@@ -409,7 +409,6 @@ P_UseSpecialLine
 
 	  default:
 	    return false;
-	    break;
 	}
     }
 

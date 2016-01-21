@@ -447,9 +447,9 @@ fixed_t		hutextscale = 1 << FRACBITS;
 
 unsigned int God_Mode_Health = 100;
 unsigned int IDFA_Armour = 200;
-unsigned int IDFA_Armour_Class = 2;
 unsigned int IDKFA_Armour = 200;
-unsigned int IDKFA_Armour_Class = 2;
+armour_class_t IDFA_Armour_Class = BLUEARMOUR;
+armour_class_t IDKFA_Armour_Class = BLUEARMOUR;
 
 // Massive bunches of cheat shit
 //  to keep it from being easy to figure them out.
@@ -781,15 +781,13 @@ ST_Responder (event_t* ev)
           {
             case 'e':
 	      G_ExitLevel ();
-	      return false;
+	      break;
 
 	    case 's':
 	      G_SecretExitLevel ();
-
-	    default:
-	      return false;
+	      break;
 	  }
-          break;
+          return (false);
 
         case 'n':
           switch (buf[1])
@@ -1363,7 +1361,7 @@ void ST_loadGraphics(void)
 	arms[i][1] = shortnum[i+2];
     }
 
-    // face backgrounds for different color players
+    // face backgrounds for different colour players
     sprintf(namebuf, "STFB%d", consoleplayer);
     faceback = (patch_t *) W_CacheLumpName(namebuf, PU_STATIC);
 
@@ -1552,7 +1550,7 @@ void ST_createWidgets(void)
 		       &st_faceindex,
 		       &st_statusbaron);
 
-    // armour percentage - should be colored later
+    // armour percentage - should be coloured later
     STlib_initPercent(&w_armour,
 		      DX(ST_ARMOURX),
 		      DY(ST_ARMOURY),

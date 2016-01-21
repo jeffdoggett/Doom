@@ -94,9 +94,9 @@ extern unsigned char	cheat_mypos_seq[];
 /* Variables from st_stuff.c */
 extern unsigned int God_Mode_Health;
 extern unsigned int IDFA_Armour;
-extern unsigned int IDFA_Armour_Class;
 extern unsigned int IDKFA_Armour;
-extern unsigned int IDKFA_Armour_Class;
+extern armour_class_t IDFA_Armour_Class;
+extern armour_class_t IDKFA_Armour_Class;
 
 /* Strings from p_spec.c */
 extern char * special_effects_messages [];
@@ -117,8 +117,8 @@ extern unsigned int Max_Armour;
 extern unsigned int Max_Soulsphere_Health;
 extern unsigned int Soulsphere_Health;
 extern unsigned int Megasphere_Health;
-extern unsigned int Green_Armour_Class;
-extern unsigned int Blue_Armour_Class;
+extern armour_class_t Green_Armour_Class;
+extern armour_class_t Blue_Armour_Class;
 extern int	maxammo[];
 extern int	clipammo[];
 
@@ -1864,12 +1864,12 @@ static void dh_write_to_misc (unsigned int number, unsigned int record, unsigned
 
     case 5:	//	"Green Armor Class",
     case 6:	//	"Green Armour Class",
-      Green_Armour_Class = value;
+      Green_Armour_Class = (armour_class_t) value;
       break;
 
     case 7:	//	"Blue Armor Class",
     case 8:	//	"Blue Armour Class",
-      Blue_Armour_Class = value;
+      Blue_Armour_Class = (armour_class_t) value;
       break;
 
     case 9:	//	"Max Soulsphere",
@@ -1895,7 +1895,7 @@ static void dh_write_to_misc (unsigned int number, unsigned int record, unsigned
 
     case 15:	//	"IDFA Armor Class",
     case 16:	//	"IDFA Armour Class",
-      IDFA_Armour_Class = value;
+      IDFA_Armour_Class = (armour_class_t) value;
       break;
 
     case 17:	//	"IDKFA Armor",
@@ -1905,7 +1905,7 @@ static void dh_write_to_misc (unsigned int number, unsigned int record, unsigned
 
     case 19:	//	"IDKFA Armor Class",
     case 20:	//	"IDKFA Armour Class",
-      IDKFA_Armour_Class = value;
+      IDKFA_Armour_Class = (armour_class_t) value;
       break;
 
     case 21:	//	"BFG Cells/Shot",

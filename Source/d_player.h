@@ -76,6 +76,15 @@ typedef enum
 
 } cheat_t;
 
+//
+// Armour classes
+//
+typedef enum
+{
+  NOARMOUR = 0,
+  GREENARMOUR = 1,
+  BLUEARMOUR = 2
+} armour_class_t;
 
 //
 // Extended player object info: player_t
@@ -102,7 +111,7 @@ typedef struct player_s
     int			health;
     int			armourpoints;
     // Armour type is 0-2.
-    int			armourtype;
+    armour_class_t	armourtype;
 
     // Power ups. invinc and invis are tic counters.
     int			powers[NUMPOWERS];

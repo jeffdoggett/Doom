@@ -641,7 +641,7 @@ void I_ReadScreen (byte* scr)
 // Palette stuff.
 //
 
-static Init_Colour_Map (void)
+static void Init_Colour_Map (void)
 {
   unsigned int i;
 

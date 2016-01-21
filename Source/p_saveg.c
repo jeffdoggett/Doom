@@ -227,7 +227,7 @@ static byte * P_ArchivePlayer (byte * save_p, player_t * ply)
   p_save_32 (ply -> bob);
   p_save_32 (ply -> health);
   p_save_32 (ply -> armourpoints);
-  p_save_32 (ply -> armourtype);
+  p_save_32 ((unsigned int) ply -> armourtype);
 
   i = 0;
   do
@@ -336,7 +336,7 @@ static byte * P_UnArchivePlayer (player_t * ply, byte * save_p)
   ply -> bob = p_load_32 (save_32_p); save_32_p++;
   ply -> health = p_load_32 (save_32_p); save_32_p++;
   ply -> armourpoints = p_load_32 (save_32_p); save_32_p++;
-  ply -> armourtype = p_load_32 (save_32_p); save_32_p++;
+  ply -> armourtype = (armour_class_t) p_load_32 (save_32_p); save_32_p++;
 
   i = 0;
   do
@@ -462,7 +462,7 @@ byte * P_UnArchivePlayers (byte * save_p)
     if ((wrong_endian == false)
      && ((ply -> health	> 0xFF0000)
       || (ply -> armourpoints	> 0xFF0000)
-      || (ply -> armourtype	> 0xFF0000)
+      || ((unsigned int) ply -> armourtype > 0xFF0000)
       || (ply -> killcount	> 0xFF0000)
       || (ply -> itemcount	> 0xFF0000)
       || (ply -> secretcount	> 0xFF0000)))

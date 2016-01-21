@@ -115,8 +115,8 @@ unsigned int Max_Armour = 200;
 unsigned int Max_Soulsphere_Health = 200;
 unsigned int Soulsphere_Health = 100;
 unsigned int Megasphere_Health = 200;
-unsigned int Green_Armour_Class = 1;
-unsigned int Blue_Armour_Class = 2;
+armour_class_t Green_Armour_Class = GREENARMOUR;
+armour_class_t Blue_Armour_Class = BLUEARMOUR;
 boolean Give_Max_Damage = false;
 
 extern boolean Monsters_Infight1;
@@ -317,8 +317,8 @@ P_GiveBody
 //
 static boolean
 P_GiveArmour
-( player_t*	player,
-  int		armourtype )
+( player_t*	 player,
+  armour_class_t armourtype )
 {
   int		hits;
 
@@ -500,8 +500,8 @@ P_TouchSpecialThing
       player->armourpoints++;		// can go over 100%
       if (player->armourpoints > Max_Armour)
 	  player->armourpoints = Max_Armour;
-      if (!player->armourtype)
-	  player->armourtype = 1;
+      if (player->armourtype == NOARMOUR)
+	  player->armourtype = GREENARMOUR;
       player->message = got_messages [P_GOTARMBONUS];
       break;
 
@@ -523,7 +523,7 @@ P_TouchSpecialThing
 	if (gamemode != commercial)
 	  return;
 
-	mega_given = P_GiveArmour (player, 2);
+	mega_given = P_GiveArmour (player, BLUEARMOUR);
 
 	if (player->health < Megasphere_Health)
 	{
@@ -1315,9 +1315,9 @@ P_DamageMobj
 	  return;
       }
 
-      if (player->armourtype)
+      if (player->armourtype != NOARMOUR)
       {
-	  if (player->armourtype == 1)
+	  if (player->armourtype == GREENARMOUR)
 	      saved = damage/3;
 	  else
 	      saved = damage/2;
@@ -1326,7 +1326,7 @@ P_DamageMobj
 	  {
 	      // armour is used up
 	      saved = player->armourpoints;
-	      player->armourtype = 0;
+	      player->armourtype = NOARMOUR;
 	  }
 	  player->armourpoints -= saved;
 	  damage -= saved;
