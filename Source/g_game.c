@@ -48,6 +48,8 @@ extern boolean dh_changing_pwad;
 extern char * finale_backdrops [];
 extern clusterdefs_t * finale_clusterdefs;
 
+extern unsigned int mtf_mask;
+
 /* -------------------------------------------------------------------------------------------- */
 
 #define SAVESTRINGSIZE	24
@@ -62,6 +64,7 @@ void	G_InitNew (skill_t skill, int episode, int map);
 void	G_DoReborn (int playernum);
 //void	G_InitPlayer (int player);
 #define G_InitPlayer(p) G_PlayerReborn(p)
+static void G_ResetPlayer (int player, int flags);
 
 void	G_DoLoadLevel (void);
 void	G_DoNewGame (void);
@@ -894,9 +897,7 @@ void G_DoLoadLevel (void)
       players[i].playerstate = PST_REBORN;
 
     memset (players[i].frags,0,sizeof(players[i].frags));
-
-    if (map_info_p -> reset_kit_etc_on_entering)
-      G_InitPlayer (i);
+    G_ResetPlayer (i, map_info_p -> reset_kit_etc_on_entering);
   } while (++i < MAXPLAYERS);
 
 #ifdef USE_BOOM_P_ChangeSector
@@ -1307,6 +1308,43 @@ void G_PlayerReborn (int player)
 
   for (i=0 ; i<NUMAMMO ; i++)
       p->maxammo[i] = maxammo[i];
+}
+
+/* -------------------------------------------------------------------------------------------- */
+//
+// G_ResetPlayer
+// Resets player inventory at start of level.
+//
+static void G_ResetPlayer (int player, int flags)
+{
+  int		i;
+  player_t*	p;
+
+  if (flags & 1)				// reset health?
+  {
+    p = &players[player];
+    p->health = Initial_Health;
+  }
+
+  if (flags & 2)				// reset inventory?
+  {
+    p = &players[player];
+
+    memset (p->weaponowned, 0, sizeof(p->weaponowned));
+    memset (p->ammo, 0, sizeof(p->ammo));
+
+    p->backpack = false;
+    p->armourpoints = 0;
+    p->armourtype = NOARMOUR;
+
+    p->readyweapon = p->pendingweapon = wp_pistol;
+    p->weaponowned[wp_fist] = true;
+    p->weaponowned[wp_pistol] = true;
+    p->ammo[am_clip] = Initial_Bullets;
+
+    for (i=0 ; i<NUMAMMO ; i++)
+      p->maxammo[i] = maxammo[i];
+  }
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -2746,6 +2784,10 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	      {
 		ORIGSCREENHEIGHT = atoi (a_line+6+17);
 	      }
+	      else if (strncasecmp (a_line+6, "MTF_MASK ", 9) == 0)
+	      {
+		mtf_mask = atoi (a_line+6+9);
+	      }
 	      else
 	      {
 		map_patch_t * ptr;
@@ -2835,7 +2877,10 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 
 	    case 'R':
 	    case 'r':
-	      map_info_p -> reset_kit_etc_on_entering = 1;
+	      if (isdigit(a_line [pos+1]))
+	        map_info_p -> reset_kit_etc_on_entering = atoi (&a_line [pos+1]);
+	      else
+	        map_info_p -> reset_kit_etc_on_entering = 3;
 	      break;
 
 	    case '0':

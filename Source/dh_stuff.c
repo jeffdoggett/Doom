@@ -4605,12 +4605,12 @@ void Parse_Mapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "resethealth", 11) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      mdest_ptr -> reset_kit_etc_on_entering = 1;
+      mdest_ptr -> reset_kit_etc_on_entering |= 1;
     }
     else if (strncasecmp (ptr, "resetinventory", 14) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      mdest_ptr -> reset_kit_etc_on_entering = 1;
+      mdest_ptr -> reset_kit_etc_on_entering |= 2;
     }
     else if (strncasecmp (ptr, "allowmonstertelefrags", 21) == 0)
     {

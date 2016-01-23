@@ -33,6 +33,8 @@ extern void G_PlayerReborn (int player);
 extern void P_DelSeclist (msecnode_t *node);
 #endif
 
+unsigned int mtf_mask = ~0;
+
 /* -------------------------------------------------------------------------------------------- */
 /*
    Experimental code to read the speed from the mobjinfo table
@@ -871,6 +873,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     fixed_t		y;
     fixed_t		z;
     unsigned int	type;
+    unsigned int	options;
 
 
     type = mthing->type;
@@ -899,15 +902,20 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	return (0);
     }
 
+    // Problems in the wolfenstein original.wad & sod.wad
+    // All of the baddies have an options value of 0x47E7
+    // which makes them all friendly!
+    options = mthing->options & mtf_mask;
+
     // check for apropriate skill level
-    if (!netgame && (mthing->options & MTF_NOTSINGLE))
+    if (!netgame && (options & MTF_NOTSINGLE))
     {
       if ((gamemode == commercial)		// TNT MAP 31 has a yellow
        && (gamemission == pack_tnt)		// key that is marked as multi
        && (gamemap == 31)			// player erroniously
        && (mthing -> type == 6))
       {
-	mthing->options &= ~MTF_NOTSINGLE;
+	options &= ~MTF_NOTSINGLE;
 	//printf ("Yellow key rescued! %X, %X\n",mthing->x, mthing->y);
       }
       else
@@ -923,7 +931,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     else
 	bit = 1<<(gameskill-1);
 
-    if (!(mthing->options & bit) )
+    if (!(options & bit) )
 	return (0);
 
     // find which type to spawn
@@ -972,11 +980,14 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     if (mobj->tics > 0)
 	mobj->tics = 1 + (P_Random () % mobj->tics);
 
-    if (mthing->options & MTF_AMBUSH)
+    if (options & MTF_AMBUSH)
 	mobj->flags |= MF_AMBUSH;
 
-    if (mthing->options & MTF_FRIEND)
+    if (options & MTF_FRIEND)
+    {
+//	printf ("Object %u is a friend %X (%X)\n", type, options, mthing->options);
 	mobj->flags |= MF_FRIEND;
+    }
 
     mobj->angle = ANG45 * (mthing->angle/45);
 
