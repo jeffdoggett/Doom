@@ -902,10 +902,13 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	return (0);
     }
 
-    // Problems in the wolfenstein original.wad & sod.wad
-    // All of the baddies have an options value of 0x47E7
+    // Problems in many of the wolfenstein wads.
+    // Some of the baddies have an options value of (e.g.) 0x47E7
     // which makes them all friendly!
     options = mthing->options & mtf_mask;
+    if ((options > MTF_MAX)
+     && (M_CheckParm ("-showunknown")))
+      printf ("Extra bits in options (%X)\n", options);
 
     // check for apropriate skill level
     if (!netgame && (options & MTF_NOTSINGLE))
@@ -984,10 +987,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	mobj->flags |= MF_AMBUSH;
 
     if (options & MTF_FRIEND)
-    {
-//	printf ("Object %u is a friend %X (%X)\n", type, options, mthing->options);
 	mobj->flags |= MF_FRIEND;
-    }
 
     mobj->angle = ANG45 * (mthing->angle/45);
 
