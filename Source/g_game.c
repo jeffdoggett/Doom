@@ -64,7 +64,7 @@ void	G_InitNew (skill_t skill, int episode, int map);
 void	G_DoReborn (int playernum);
 //void	G_InitPlayer (int player);
 #define G_InitPlayer(p) G_PlayerReborn(p)
-static void G_ResetPlayer (int player, int flags);
+static void G_ResetPlayer (player_t* p, int flags);
 
 void	G_DoLoadLevel (void);
 void	G_DoNewGame (void);
@@ -830,6 +830,7 @@ extern  gamestate_t     wipegamestate;
 void G_DoLoadLevel (void)
 {
   int i;
+  player_t*	p;
   map_dests_t * map_info_p;
 
   if (!demoplayback)
@@ -891,13 +892,15 @@ void G_DoLoadLevel (void)
   gamestate = GS_LEVEL;
 
   i = 0;
+  p = &players[0];
   do
   {
-    if (playeringame[i] && players[i].playerstate == PST_DEAD)
-      players[i].playerstate = PST_REBORN;
+    if (playeringame[i] && p->playerstate == PST_DEAD)
+      p->playerstate = PST_REBORN;
 
-    memset (players[i].frags,0,sizeof(players[i].frags));
-    G_ResetPlayer (i, map_info_p -> reset_kit_etc_on_entering);
+    memset (p->frags,0,sizeof(p->frags));
+    G_ResetPlayer (p, map_info_p -> reset_kit_etc_on_entering);
+    p++;
   } while (++i < MAXPLAYERS);
 
 #ifdef USE_BOOM_P_ChangeSector
@@ -1315,21 +1318,17 @@ void G_PlayerReborn (int player)
 // G_ResetPlayer
 // Resets player inventory at start of level.
 //
-static void G_ResetPlayer (int player, int flags)
+static void G_ResetPlayer (player_t* p, int flags)
 {
   int		i;
-  player_t*	p;
 
   if (flags & 1)				// reset health?
   {
-    p = &players[player];
     p->health = Initial_Health;
   }
 
   if (flags & 2)				// reset inventory?
   {
-    p = &players[player];
-
     memset (p->weaponowned, 0, sizeof(p->weaponowned));
     memset (p->ammo, 0, sizeof(p->ammo));
 
