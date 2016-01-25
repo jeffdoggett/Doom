@@ -33,7 +33,7 @@ extern void G_PlayerReborn (int player);
 extern void P_DelSeclist (msecnode_t *node);
 #endif
 
-unsigned int mtf_mask = ~0;
+unsigned int mtf_mask = 0;
 
 /* -------------------------------------------------------------------------------------------- */
 /*
@@ -902,13 +902,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	return (0);
     }
 
-    // Problems in many of the wolfenstein wads.
-    // Some of the baddies have an options value of (e.g.) 0x47E7
-    // which makes them all friendly!
-    options = mthing->options & mtf_mask;
-    if ((options > MTF_MAX)
-     && (M_CheckParm ("-showunknown")))
-      printf ("Extra bits in options (%X)\n", options);
+    options = mthing->options;
 
     // check for apropriate skill level
     if (!netgame && (options & MTF_NOTSINGLE))
@@ -987,7 +981,21 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	mobj->flags |= MF_AMBUSH;
 
     if (options & MTF_FRIEND)
+    {
+      /* Many maps seem to use extra bits in the options */
+      /* word for apparently undefined purposes. */
+      /* For now assume that the MTF_FRIEND is valid if */
+      /* there are no bits set in the upper byte. */
+      if (mtf_mask)				// Default changed?
+      {
+	if (mtf_mask & MTF_FRIEND)
+	  mobj->flags |= MF_FRIEND;
+      }
+      else if (options < 0x100)
+      {
 	mobj->flags |= MF_FRIEND;
+      }
+    }
 
     mobj->angle = ANG45 * (mthing->angle/45);
 

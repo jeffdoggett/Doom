@@ -162,7 +162,6 @@ typedef enum
 #define MTF_NOTDM		32
 #define MTF_NOTCOOP		64
 #define MTF_FRIEND		128
-#define MTF_MAX			255
 
 
 typedef enum
