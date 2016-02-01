@@ -2806,7 +2806,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
       case 'C':
 	if ((counter1 >= '1')
-	 && (counter1 <= '6'))
+	 && (counter1 <= '9'))
 	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+c1text]);
@@ -2815,7 +2815,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
       case 'P':
 	if ((counter1 >= '1')
-	 && (counter1 <= '6'))
+	 && (counter1 <= '9'))
 	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+p1text]);
@@ -2824,7 +2824,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
       case 'T':
 	if ((counter1 >= '1')
-	 && (counter1 <= '6'))
+	 && (counter1 <= '9'))
 	{
 	  finale_message_changed = (boolean)((int)finale_message_changed|(int)Changing);
 	  return (&finale_messages[counter1-'1'+t1text]);
@@ -4113,9 +4113,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
       if ((episode != 255) && (map != 255))
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	/* Fix for DTWID-LE */
-	if (mdest_ptr -> cluster == 0)
-	  mdest_ptr -> cluster = intertext;
+	mdest_ptr -> cluster = intertext;
       }
       if (doexit)
 	cp->exittext = newtext;
@@ -4584,18 +4582,6 @@ void Parse_Mapinfo (char * ptr, char * top)
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> nointermission = 1;
     }
-    else if (strncasecmp (ptr, "cluster ", 8) == 0)
-    {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      /* We set the intertext variable here because DTWID-LE uses */
-      /* "cluster" instead of "clusterdef". */
-      /* We avoid corrupting the "mdest_ptr -> cluster" later in */
-      /* the function "set_enter_exit_text" by ensuring that it is */
-      /* zero first in that function. */
-      intertext = read_int (ptr+8);
-      mdest_ptr -> cluster = intertext;
-      //printf ("Map %u %u is in cluster %u\n", episode, map, mdest_ptr -> cluster);
-    }
     else if (strncasecmp (ptr, "par ", 4) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
@@ -4835,6 +4821,23 @@ void Parse_Mapinfo (char * ptr, char * top)
       }
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr++;
     }
+    else if (strncasecmp (ptr, "cluster ", 8) == 0)
+    {
+      ptr += 8;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '=')			// If the = sign is missing then it's a clusterdef
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	mdest_ptr -> cluster = read_int (ptr+1);
+      }
+      else
+      {
+	intertext = read_int (ptr);
+	episode = 255;
+	map = 255;
+	textislump = 0;
+      }
+    }
     else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
     {
       intertext = read_int (ptr + 11);
@@ -4842,7 +4845,7 @@ void Parse_Mapinfo (char * ptr, char * top)
       map = 255;
       textislump = 0;
     }
-    else if (strncasecmp (ptr, "entertextislump", 9) == 0)
+    else if (strncasecmp (ptr, "entertextislump", 15) == 0)
     {
       textislump |= 1;
     }
@@ -4900,7 +4903,7 @@ void Parse_Mapinfo (char * ptr, char * top)
        }
      }
     }
-    else if (strncasecmp (ptr, "exittextislump", 9) == 0)
+    else if (strncasecmp (ptr, "exittextislump", 14) == 0)
     {
       textislump |= 2;
     }
@@ -4968,11 +4971,27 @@ void Parse_Mapinfo (char * ptr, char * top)
       if (j) ptr [j-1] = 0;
       j = dh_inchar (ptr, '"');
       if (j) ptr [j-1] = 0;
-      l = strlen (ptr);
-      newtext = malloc (l+1);
+
+      if (*ptr == '$')
+      {
+	char ** source;
+	ptr++;
+	source = DH_Find_language_text (ptr, false);
+	if (source)
+	  newtext = *source;
+	else
+	  newtext = NULL;
+      }
+      else
+      {
+	l = strlen (ptr);
+	newtext = malloc (l+1);
+	if (newtext)
+	  strcpy (newtext, ptr);
+      }
+
       if (newtext)
       {
-	strcpy (newtext, ptr);
 	if (intertext != -1)
 	{
 	  cp = F_Create_ClusterDef (intertext);
@@ -5053,7 +5072,18 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
   {
     while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
 
-    if (strncasecmp (ptr, "levelname", 9) == 0)
+    // In CodLev.wad this says: [level info]
+    // In rf_1024.wad this says: [Map27] etc.
+
+    if ((*ptr == '[')
+     && ((strncasecmp (ptr+1, "map", 3) == 0)
+      || ((ptr[1] == 'E') && (ptr [3] == 'M'))))
+    {
+      ptr = read_map_num (&episode, &map, ptr+1);
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      intertext = -1;
+    }
+    else if (strncasecmp (ptr, "levelname", 9) == 0)
     {
       ptr += 9;
       while (*ptr == ' ') ptr++;
@@ -5133,6 +5163,54 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
 	mdest_ptr -> secret_exit_to_map = j;
       }
     }
+    else if (strncasecmp (ptr, "skyname", 7) == 0)
+    {
+      ptr += 7;
+      while (*ptr == ' ') ptr++;
+      while (*ptr == '=') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '\"')
+      {
+	ptr++;
+	l = dh_inchar (ptr, '"');
+	if (l) ptr[l-1] = 0;
+      }
+      l = strlen (ptr);
+      newtext = malloc (l+1);
+      if (newtext)
+      {
+	strcpy (newtext, ptr);
+	mdest_ptr -> sky = newtext;
+      }
+    }
+    else if (strncasecmp (ptr, "partime", 7) == 0)
+    {
+      while (((cc = *ptr) < '0') || (cc > '9')) ptr++;
+      j = atoi (ptr);
+      j = (j + 4) / 5;
+      if (j > 255) j = 255;
+      mdest_ptr -> par_time_5 = j;
+    }
+    else if (strncasecmp (ptr, "levelpic", 8) == 0)
+    {
+      ptr += 8;
+      while (*ptr == ' ') ptr++;
+      while (*ptr == '=') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '\"')
+      {
+	ptr++;
+	l = dh_inchar (ptr, '"');
+	if (l) ptr[l-1] = 0;
+      }
+      l = strlen (ptr);
+      newtext = malloc (l+1);
+      if (newtext)
+      {
+	strcpy (newtext, ptr);
+	mdest_ptr -> titlepatch = newtext;
+      }
+    }
     else if (strncasecmp (ptr, "endofgame = true", 16) == 0)
     {
       mdest_ptr -> normal_exit_to_map = 255;
@@ -5145,6 +5223,7 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
       else
 	intertext = (episode*10)+map;
 
+      mdest_ptr -> cluster = intertext;
       ptr = set_enter_exit_text (ptr+9, 1, intertext, episode, map);
     }
     else if (strncasecmp (ptr, "inter-backdrop", 14) == 0)
@@ -5197,6 +5276,7 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
 void Load_Mapinfo (void)
 {
   int lump;
+  int foundmapinfo;
   unsigned int episode;
   unsigned int map;
   unsigned int length;
@@ -5207,19 +5287,29 @@ void Load_Mapinfo (void)
 
   // DTWID-LE requires both MAPINFO & ZMAPINFO, whereas D2TWID requires only one....
 
+  foundmapinfo = 0;
+
   lump = 0;
   do
   {
     if ((strncasecmp (lumpinfo[lump].name, "MAPINFO", 8) == 0)
      || (strncasecmp (lumpinfo[lump].name, "ZMAPINFO", 8) == 0))
     {
+      foundmapinfo = 1;
       dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-      ptr = W_CacheLumpNum (lump, PU_STATIC);
-      top = ptr + W_LumpLength (lump);
-      Parse_Mapinfo (ptr, top);
-      Z_Free (ptr);
+      ptr = malloc (W_LumpLength (lump) + 4); 	// Allow extra because some mapinfos lack a trailing CR/LF
+      if (ptr)
+      {
+	W_ReadLump (lump, ptr);
+	top = ptr + W_LumpLength (lump);
+	*top++ = '\n';
+	Parse_Mapinfo (ptr, top);
+	free (ptr);
+      }
     }
   } while (++lump < numlumps);
+
+  // CodLev.wad has individual mapinfos.
 
   map = 0;
   do
@@ -5232,11 +5322,17 @@ void Load_Mapinfo (void)
       length = W_LumpLength (lump);
       if (length)
       {
+	foundmapinfo = 1;
 	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-	ptr = W_CacheLumpNum (lump, PU_STATIC);
-	top = ptr + length;
-	Parse_IndivMapinfo (ptr, top, 255, map);
-	Z_Free (ptr);
+	ptr = malloc (W_LumpLength (lump) + 4);
+	if (ptr)
+	{
+	  W_ReadLump (lump, ptr);
+	  top = ptr + W_LumpLength (lump);
+	  *top++ = '\n';
+	  Parse_IndivMapinfo (ptr, top, 255, map);
+	  free (ptr);
+	}
       }
     }
   } while (++map < 100);
@@ -5255,15 +5351,43 @@ void Load_Mapinfo (void)
 	length = W_LumpLength (lump);
 	if (length)
 	{
+	  foundmapinfo = 1;
 	  dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-	  ptr = W_CacheLumpNum (lump, PU_STATIC);
-	  top = ptr + length;
-	  Parse_IndivMapinfo (ptr, top, episode, map);
-	  Z_Free (ptr);
+	  ptr = malloc (W_LumpLength (lump) + 4);
+	  if (ptr)
+	  {
+	    W_ReadLump (lump, ptr);
+	    top = ptr + W_LumpLength (lump);
+	    *top++ = '\n';
+	    Parse_IndivMapinfo (ptr, top, episode, map);
+	    free (ptr);
+	  }
 	}
       }
     } while (++map < 10);
   } while (++episode < 10);
+
+  // The EMAPINFO appears to be a poor mans version of the others.
+  if (foundmapinfo == 0)
+  {
+    lump = 0;
+    do
+    {
+      if (strncasecmp (lumpinfo[lump].name, "EMAPINFO", 8) == 0)	// e.g. rf_1024.wad
+      {
+	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	ptr = malloc (W_LumpLength (lump) + 4);
+	if (ptr)
+	{
+	  W_ReadLump (lump, ptr);
+	  top = ptr + W_LumpLength (lump);
+	  *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
+	  Parse_IndivMapinfo (ptr, top, 255, 0);
+	  free (ptr);
+	}
+      }
+    } while (++lump < numlumps);
+  }
 
   // DH_DetectPwads ();
 }

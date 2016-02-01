@@ -61,18 +61,27 @@ typedef enum
   c4text,
   c5text,
   c6text,
+  c7text,
+  c8text,
+  c9text,
   p1text,
   p2text,
   p3text,
   p4text,
   p5text,
   p6text,
+  p7text,
+  p8text,
+  p9text,
   t1text,
   t2text,
   t3text,
   t4text,
   t5text,
-  t6text
+  t6text,
+  t7text,
+  t8text,
+  t9text
 } finale_texts_t;
 
 typedef enum

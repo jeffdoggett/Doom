@@ -556,6 +556,9 @@
 "SUPER SECRET LEVEL!  YOU'D BETTER\n"\
 "BLAZE THROUGH THIS ONE!\n"
 
+#define C7TEXT ""
+#define C8TEXT ""
+#define C9TEXT ""
 
 // after map 06
 
@@ -630,6 +633,9 @@
 "level we had ready for ya?  Now you know.\n"\
 "No one gets out alive."
 
+#define P7TEXT ""
+#define P8TEXT ""
+#define P9TEXT ""
 
 #define T1TEXT \
 "You've fought your way out of the infested\n"\
@@ -702,6 +708,9 @@
 "As you step off the transport, you hear\n"\
 "the stomp of a cyberdemon's iron shoe."
 
+#define T7TEXT ""
+#define T8TEXT ""
+#define T9TEXT ""
 
 
 //

@@ -62,6 +62,9 @@ char * finale_messages_orig [] =
 	C4TEXT,
 	C5TEXT,
 	C6TEXT,
+	C7TEXT,
+	C8TEXT,
+	C9TEXT,
 
 	P1TEXT,
 	P2TEXT,
@@ -69,6 +72,9 @@ char * finale_messages_orig [] =
 	P4TEXT,
 	P5TEXT,
 	P6TEXT,
+	P7TEXT,
+	P8TEXT,
+	P9TEXT,
 
 	T1TEXT,
 	T2TEXT,
@@ -76,6 +82,9 @@ char * finale_messages_orig [] =
 	T4TEXT,
 	T5TEXT,
 	T6TEXT,
+	T7TEXT,
+	T8TEXT,
+	T9TEXT,
 	NULL
 };
 
@@ -191,10 +200,13 @@ static void F_DetermineIntermissionTexts (void)
    && (W_SameWadfile (0, G_MapLump (gameepisode, gamemap)) == 0))
     return;
 
-  if (finale_clusterdefs_head)
-  {
-    map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
+  map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
+  cluster = map_info_p -> cluster;
+  cp = F_Access_ClusterDef (cluster);
 
+  if ((cp)
+   || (cluster))
+  {
     if (secretexit)
     {
       i = map_info_p -> secret_exit_to_episode;
@@ -205,8 +217,6 @@ static void F_DetermineIntermissionTexts (void)
       i = map_info_p -> normal_exit_to_episode;
       j = map_info_p -> normal_exit_to_map;
     }
-
-    cluster = map_info_p -> cluster;
 
     if (G_MapLump (i, j) == -1)
     {
@@ -219,7 +229,6 @@ static void F_DetermineIntermissionTexts (void)
 	return;
     }
 
-    cp = F_Access_ClusterDef (cluster);
     if (cp)
     {
       finaletext = cp -> exittext;
@@ -321,7 +330,6 @@ static void F_DetermineIntermissionTexts (void)
 	  switch (secretexit)
 	  {
 	    case 0:		/* Not a secret exit */
-	      map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
 	      switch (map_info_p -> intermission_text)
 	      {
 		case 0:
@@ -355,6 +363,21 @@ static void F_DetermineIntermissionTexts (void)
 		case 6:
 		  finaleflat = finale_backdrops [BG_RROCK19];
 		  finaletextnum = text_base+5;
+		  break;
+
+		case 7:
+		  finaleflat = finale_backdrops [BG_F_SKY1];
+		  finaletextnum = text_base+6;
+		  break;
+
+		case 8:
+		  finaleflat = finale_backdrops [BG_F_SKY1];
+		  finaletextnum = text_base+7;
+		  break;
+
+		case 9:
+		  finaleflat = finale_backdrops [BG_F_SKY1];
+		  finaletextnum = text_base+8;
 		  break;
 
 		default:
