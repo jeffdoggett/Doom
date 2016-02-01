@@ -741,14 +741,21 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "COUNTITEM",	MF_COUNTITEM},
   { "SKULLFLY",		MF_SKULLFLY},
   { "NOTDMATCH",	MF_NOTDMATCH},
-  { "TRANSLATION",	0x04000000	/*MF_TRANSLATION*/},
-  { "UNUSED1",		0x08000000	/*MF_TRANSLATION*/},
-  { "UNUSED2",		0x10000000},
-  { "UNUSED3",		0x20000000},
-  { "UNUSED4",		0x40000000},
-  { "BOUNCES",		MF_BOUNCES},
-  { "FRIEND",		MF_FRIEND},
-  { "TRANSLUCENT",	0x80000000}
+
+  // killough 10/98: TRANSLATION consists of 2 bits, not 1:
+  { "TRANSLATION",	0x04000000},	// for BOOM bug-compatibility
+  { "TRANSLATION1",	0x04000000},	// use translation table for colour (players)
+  { "TRANSLATION2",	0x08000000},	// use translation table for colour (players)
+
+  { "UNUSED1",		0x08000000},	// unused bit # 1 -- For BOOM bug-compatibility
+  { "UNUSED2",		0x10000000},	// unused bit # 2 -- For BOOM compatibility
+  { "UNUSED3",		0x20000000},	// unused bit # 3 -- For BOOM compatibility
+  { "UNUSED4",		0x40000000},	// unused bit # 4 -- For BOOM compatibility
+
+  { "TOUCHY",		MF_TOUCHY},	// dies on contact with solid objects (MBF)
+  { "BOUNCES",		MF_BOUNCES},	// bounces off floors, ceilings and maybe walls
+  { "FRIEND",		MF_FRIEND},	// a friend of the player(s) (MBF)
+  { "TRANSLUCENT",	MF_TRANSLUCENT}	// apply translucency to sprite (BOOM)
 };
 
 /* ---------------------------------------------------------------------------- */

@@ -30,9 +30,10 @@ static const char rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 #include "includes.h"
 
+/* ------------------------------------------------------------------------------------------------ */
 // ?
-#define MAXWIDTH			1120
-#define MAXHEIGHT			832
+#define MAXWIDTH		1120
+#define MAXHEIGHT		832
 
 // status bar height at bottom of screen
 #define SBARHEIGHT		32
@@ -66,6 +67,130 @@ extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
 
 
+/* ------------------------------------------------------------------------------------------------ */
+
+#define ADDITIVE	-1
+
+#define R		1
+#define W		2
+#define G		4
+#define B		8
+#define X		16
+
+static const byte general [256] =
+{
+    0,X,0,0,R|B,0,0,0,0,0,0,0,0,0,0,0,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+    R,R,R,R,R,R,R,R,R,R,R,R,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,X,X,X,R,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,G,G,G,G,G,G,G,G,G,G,G,G,G,G,G,G,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+    R,R,R,R,R,R,R,R,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,R,R,R,R,R,R,R,R,R,R,R,R,R,
+    R,R,R,R|B,R|B,R,R,R,R,R,R,X,X,X,X,0,0,0,0,B,B,B,B,B,B,B,B,R,R,0,0,0,0,0,0
+};
+
+#define ALL		0
+#define REDS		R
+#define WHITES		W
+#define GREENS		G
+#define BLUES		B
+#define EXTRAS		X
+
+static byte *tinttab;
+
+/* ------------------------------------------------------------------------------------------------ */
+
+static byte *GenerateTintTable (byte *palette, int percent, const byte * filter, int colours)
+{
+    byte *result = Z_Malloc (65536, PU_STATIC, NULL);
+    int	 foreground, background;
+
+    for (foreground = 0; foreground < 256; ++foreground)
+    {
+	if ((filter[foreground] & colours) || colours == ALL)
+	{
+	    for (background = 0; background < 256; ++background)
+	    {
+		byte    *colour1 = palette + background * 3;
+		byte    *colour2 = palette + foreground * 3;
+		int     r, g, b;
+
+		if (percent == ADDITIVE)
+		{
+		    if ((filter[background] & BLUES) && !(filter[foreground] & WHITES))
+		    {
+			r = ((int)colour1[0] * 25 + (int)colour2[0] * 75) / 100;
+			g = ((int)colour1[1] * 25 + (int)colour2[1] * 75) / 100;
+			b = ((int)colour1[2] * 25 + (int)colour2[2] * 75) / 100;
+		    }
+		    else
+		    {
+			r = MIN(colour1[0] + colour2[0], 255);
+			g = MIN(colour1[1] + colour2[1], 255);
+			b = MIN(colour1[2] + colour2[2], 255);
+		    }
+		}
+		else
+		{
+		    r = ((int)colour1[0] * percent + (int)colour2[0] * (100 - percent)) / 100;
+		    g = ((int)colour1[1] * percent + (int)colour2[1] * (100 - percent)) / 100;
+		    b = ((int)colour1[2] * percent + (int)colour2[2] * (100 - percent)) / 100;
+		}
+		*(result + (background << 8) + foreground) = AM_load_colour (r, g, b, palette);
+	    }
+	}
+	else
+	    for (background = 0; background < 256; ++background)
+		*(result + (background << 8) + foreground) = foreground;
+    }
+
+    return result;
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+
+static void R_InitTintTables (void)
+{
+  byte * palette;
+
+  palette = W_CacheLumpName("PLAYPAL", PU_STATIC);
+  tinttab = GenerateTintTable (palette, ADDITIVE, general, ALL);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+//
+// R_InitTranslationTables
+// Creates the translation tables to map
+//  the green color ramp to grey, brown, red.
+// Assumes a given structure of the PLAYPAL.
+// Could be read from a lump instead.
+//
+void R_InitTranslationTables (void)
+{
+    int		i;
+
+    translationtables = Z_Malloc (256*3, PU_STATIC, NULL);
+
+    // translate just the 16 green colours
+    for (i=0 ; i<256 ; i++)
+    {
+	if (i >= 0x70 && i<= 0x7f)
+	{
+	    // map green ramp to grey, brown, red
+	    translationtables[i] = 0x60 + (i&0xf);
+	    translationtables [i+256] = 0x40 + (i&0xf);
+	    translationtables [i+512] = 0x20 + (i&0xf);
+	}
+	else
+	{
+	    // Keep all other colours as is.
+	    translationtables[i] = translationtables[i+256]
+		= translationtables[i+512] = i;
+	}
+    }
+    R_InitTintTables ();
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawColumn
 // Source is the top of the column to scale.
@@ -82,7 +207,7 @@ fixed_t			dc_texturemid;
 byte*			dc_source;
 
 // just for profiling
-int			dccount;
+// static int		dccount;
 
 /* ------------------------------------------------------------------------------------------------ */
 
@@ -95,7 +220,7 @@ int			dccount;
       mask = dc_ylim - 1;						\
       if ((dc_ylim & mask) == 0)	/* Power of 2 height? */	\
       {									\
-        frac &= mask;			/* Yes. Can just mask off. */	\
+	frac &= mask;			/* Yes. Can just mask off. */	\
       }									\
       else if (frac < 0)						\
       {									\
@@ -408,6 +533,58 @@ void R_DrawFuzzColumn (void)
 
 /* ------------------------------------------------------------------------------------------------ */
 
+void R_DrawTranslucentColumn (void)
+{
+    int			count;
+    byte*		dest;
+    byte*		scrnlimit;
+    fixed_t		frac;
+    fixed_t		fracstep;
+
+    count = (dc_yh - dc_yl) + 1;
+
+    // Zero length, column does not exceed a pixel.
+    if (count < 1)
+	return;
+
+#ifdef RANGECHECK
+    if ((unsigned)dc_x >= SCREENWIDTH)
+    {
+	printf ("R_DrawColumn: %i to %i at %i\n", dc_yl, dc_yh, dc_x);
+	return;
+    }
+#endif
+
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
+
+    // Determine scaling,
+    //  which is the only mapping to be done.
+    fracstep = dc_iscale;
+    get_frac();
+
+    // Inner loop that does the actual texture mapping,
+    //  e.g. a DDA-lile scaling.
+    do
+    {
+	if (dest > scrnlimit)
+	  break;
+
+	if (dest >= screens[0])
+	{
+	  *dest = tinttab[(*dest << 8) + dc_colormap[dc_source[frac >> FRACBITS]]];
+	}
+
+	dest += SCREENWIDTH;
+	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
+    } while (--count);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawTranslatedColumn
 // Used to draw player sprites
@@ -492,40 +669,6 @@ void R_DrawTranslatedColumn (void)
 	  frac -= dc_ylim;
 
     } while (--count);
-}
-
-/* ------------------------------------------------------------------------------------------------ */
-//
-// R_InitTranslationTables
-// Creates the translation tables to map
-//  the green color ramp to grey, brown, red.
-// Assumes a given structure of the PLAYPAL.
-// Could be read from a lump instead.
-//
-void R_InitTranslationTables (void)
-{
-    int		i;
-
-    translationtables = Z_Malloc (256*3+255, PU_STATIC, 0);
-    translationtables = (byte *)(( (uintptr_t)translationtables + 255 )& ~255);
-
-    // translate just the 16 green colors
-    for (i=0 ; i<256 ; i++)
-    {
-	if (i >= 0x70 && i<= 0x7f)
-	{
-	    // map green ramp to grey, brown, red
-	    translationtables[i] = 0x60 + (i&0xf);
-	    translationtables [i+256] = 0x40 + (i&0xf);
-	    translationtables [i+512] = 0x20 + (i&0xf);
-	}
-	else
-	{
-	    // Keep all other colors as is.
-	    translationtables[i] = translationtables[i+256]
-		= translationtables[i+512] = i;
-	}
-    }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -780,8 +923,8 @@ void R_ClearSbarSides (void)
     {
       for (x = 0; x < ((SCREENWIDTH/2)-160); x++)
       {
-        dest [x] = 0;
-        dest [SCREENWIDTH-x-1] = 0;
+	dest [x] = 0;
+	dest [SCREENWIDTH-x-1] = 0;
       }
     }
   }
@@ -822,9 +965,9 @@ void R_FillBackScreen (void)
     if (src == NULL)				// Just in case!!
     {
       if (gamemode == commercial)
-        name = borderpatch_1;
+	name = borderpatch_1;
       else
-        name = borderpatch_2;
+	name = borderpatch_2;
 
       src = W_CacheLumpName (name, PU_CACHE);
     }

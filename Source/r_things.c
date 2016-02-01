@@ -703,6 +703,10 @@ R_DrawVisSprite
 	// NULL colormap = shadow draw
 	colfunc = fuzzcolfunc;
     }
+    else if (vis->mobjflags & MF_TRANSLUCENT)
+    {
+	colfunc = R_DrawTranslucentColumn;
+    }
     else if (vis->mobjflags & MF_TRANSLATION)
     {
 	colfunc = R_DrawTranslatedColumn;
