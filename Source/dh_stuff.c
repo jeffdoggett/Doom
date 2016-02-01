@@ -741,9 +741,14 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "COUNTITEM",	MF_COUNTITEM},
   { "SKULLFLY",		MF_SKULLFLY},
   { "NOTDMATCH",	MF_NOTDMATCH},
-  { "TRANSLATION",	MF_TRANSLATION},
+  { "TRANSLATION",	0x04000000	/*MF_TRANSLATION*/},
+  { "UNUSED1",		0x08000000	/*MF_TRANSLATION*/},
+  { "UNUSED2",		0x10000000},
+  { "UNUSED3",		0x20000000},
+  { "UNUSED4",		0x40000000},
   { "BOUNCES",		MF_BOUNCES},
-  { "FRIEND",		MF_FRIEND}
+  { "FRIEND",		MF_FRIEND},
+  { "TRANSLUCENT",	0x80000000}
 };
 
 /* ---------------------------------------------------------------------------- */
