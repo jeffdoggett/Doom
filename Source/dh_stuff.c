@@ -4396,6 +4396,8 @@ void Parse_Mapinfo (char * ptr, char * top)
   {
     while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
 
+    // printf ("Parse_Mapinfo (%s), %u,%u\n", ptr, episode, map);
+
     if (strncasecmp (ptr, "defaultmap", 10) == 0)
     {
       doing_default = 1;
@@ -5072,6 +5074,8 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
   {
     while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
 
+    // printf ("Parse_IndivMapinfo (%s), %u,%u\n", ptr, episode, map);
+
     // In CodLev.wad this says: [level info]
     // In rf_1024.wad this says: [Map27] etc.
 
@@ -5276,7 +5280,8 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
 void Load_Mapinfo (void)
 {
   int lump;
-  int foundmapinfo;
+  unsigned int found;
+  unsigned int foundmapinfo;	// Bit 0 = found in Iwad, Bit 1 = found in pwad
   unsigned int episode;
   unsigned int map;
   unsigned int length;
@@ -5288,15 +5293,17 @@ void Load_Mapinfo (void)
   // DTWID-LE requires both MAPINFO & ZMAPINFO, whereas D2TWID requires only one....
 
   foundmapinfo = 0;
-
   lump = 0;
   do
   {
     if ((strncasecmp (lumpinfo[lump].name, "MAPINFO", 8) == 0)
      || (strncasecmp (lumpinfo[lump].name, "ZMAPINFO", 8) == 0))
     {
-      foundmapinfo = 1;
       dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+      if (dh_changing_pwad == false)
+	foundmapinfo |= 1;
+      else
+	foundmapinfo |= 2;
       ptr = malloc (W_LumpLength (lump) + 4); 	// Allow extra because some mapinfos lack a trailing CR/LF
       if (ptr)
       {
@@ -5322,8 +5329,8 @@ void Load_Mapinfo (void)
       length = W_LumpLength (lump);
       if (length)
       {
-	foundmapinfo = 1;
 	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	foundmapinfo = 3;
 	ptr = malloc (W_LumpLength (lump) + 4);
 	if (ptr)
 	{
@@ -5351,8 +5358,8 @@ void Load_Mapinfo (void)
 	length = W_LumpLength (lump);
 	if (length)
 	{
-	  foundmapinfo = 1;
 	  dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	  foundmapinfo = 3;
 	  ptr = malloc (W_LumpLength (lump) + 4);
 	  if (ptr)
 	  {
@@ -5368,7 +5375,7 @@ void Load_Mapinfo (void)
   } while (++episode < 10);
 
   // The EMAPINFO appears to be a poor mans version of the others.
-  if (foundmapinfo == 0)
+  if ((foundmapinfo & 2) == 0)
   {
     lump = 0;
     do
@@ -5376,20 +5383,27 @@ void Load_Mapinfo (void)
       if (strncasecmp (lumpinfo[lump].name, "EMAPINFO", 8) == 0)	// e.g. rf_1024.wad
       {
 	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-	ptr = malloc (W_LumpLength (lump) + 4);
-	if (ptr)
+	if (dh_changing_pwad == false)
+	  found = 1;
+	else
+	  found = 2;
+
+	/* Only load if not already loaded a better one. */
+	if ((found & foundmapinfo) == 0)
 	{
-	  W_ReadLump (lump, ptr);
-	  top = ptr + W_LumpLength (lump);
-	  *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
-	  Parse_IndivMapinfo (ptr, top, 255, 0);
-	  free (ptr);
+	  ptr = malloc (W_LumpLength (lump) + 4);
+	  if (ptr)
+	  {
+	    W_ReadLump (lump, ptr);
+	    top = ptr + W_LumpLength (lump);
+	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
+	    Parse_IndivMapinfo (ptr, top, 255, 0);
+	    free (ptr);
+	  }
 	}
       }
     } while (++lump < numlumps);
-  }
-
-  // DH_DetectPwads ();
+  }  
 }
 
 /* ---------------------------------------------------------------------------- */
