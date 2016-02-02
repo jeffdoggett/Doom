@@ -129,6 +129,7 @@ static char* finaleflat;
 static char* finalepic;
 static char* nextfinaletext;
 static char* nextfinaleflat;
+static char* nextfinalepic;
 
 static void F_StartCast (void);
 void	F_CastTicker (void);
@@ -190,7 +191,7 @@ static void F_DetermineIntermissionTexts (void)
   nextfinaletext = NULL;
   finaleflat = NULL;
   nextfinaleflat = NULL;
-  finalepic = finale_backdrops[BG_BOSSBACK];
+  nextfinalepic = finalepic = finale_backdrops[BG_BOSSBACK];
 
 
   /* If this map is in a PWAD and the messages haven't */
@@ -253,6 +254,7 @@ static void F_DetermineIntermissionTexts (void)
       {
 	nextfinaletext = cp -> entertext;
 	nextfinaleflat = cp -> flat;
+	nextfinalepic  = cp -> pic;
       }
     }
 
@@ -271,8 +273,10 @@ static void F_DetermineIntermissionTexts (void)
     {
       finaletext = nextfinaletext;
       finaleflat = nextfinaleflat;
+      finalepic  = nextfinalepic;
       nextfinaletext = NULL;
       nextfinaleflat = NULL;
+      nextfinalepic = NULL;
     }
   }
   else
@@ -503,8 +507,10 @@ void F_Ticker (void)
 	{
 	  finaletext = nextfinaletext;
 	  finaleflat = nextfinaleflat;
+	  finalepic  = nextfinalepic;
 	  nextfinaletext = NULL;
 	  nextfinaleflat = NULL;
+	  nextfinalepic  = NULL;
 	  finalestage = 0;
 	  finalecount = 0;
 	  return;
@@ -552,8 +558,10 @@ void F_Ticker (void)
       {
 	finaletext = nextfinaletext;
 	finaleflat = nextfinaleflat;
+	finalepic  = nextfinalepic;
 	nextfinaletext = NULL;
 	nextfinaleflat = NULL;
+	nextfinalepic  = NULL;
       }
       else
       {
@@ -937,12 +945,12 @@ static boolean F_CastResponder (event_t* ev)
     switch (ev->data1)			// Based on code from Doom Retro
     {					// which in turn based on Doom Eternal.
       case KEY_LEFTARROW:
-        castrot++;
-        return true;
+	castrot++;
+	return true;
 
       case KEY_RIGHTARROW:
-        castrot--;
-        return true;
+	castrot--;
+	return true;
     }
 
     /* The PAC-MAN character in original.wad crashes here, so */
@@ -1258,7 +1266,10 @@ void F_Drawer (void)
     switch (finalestage)
     {
       case 0:
-        F_DrawBackgroundFlat (finaleflat);
+	if (finaleflat == NULL)
+	  F_DrawBackgroundFlat (finalepic);
+	else
+	  F_DrawBackgroundFlat (finaleflat);
 	F_TextWrite ();
 	break;
 

@@ -4190,6 +4190,7 @@ static char * replace_titletext (char * ptr, unsigned int episode, unsigned int 
     if (episode && map) sprintf (buf, mdest_ptr -> titlepatch, episode-1, map-1);
   }
 
+  // printf ("replace_titletext (%s) (%s)\n", ptr, buf)
   if (strcasecmp (ptr, buf))
   {
     newtext = strdup (ptr);
@@ -4370,12 +4371,16 @@ void Parse_Mapinfo (char * ptr, char * top)
   unsigned int doing_default;
   unsigned int doing_episode;
   unsigned int textislump;
+  unsigned int clusterdefpresent;
   char * ptr2;
   char * newtext;
   clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
   unsigned int args [8];
+
+  *top = 0;
+  clusterdefpresent = dh_instr (ptr, "clusterdef");
 
   top = split_lines (ptr, top);
 
@@ -4827,10 +4832,11 @@ void Parse_Mapinfo (char * ptr, char * top)
     {
       ptr += 8;
       while (*ptr == ' ') ptr++;
-      if (*ptr == '=')			// If the = sign is missing then it's a clusterdef
+      if ((clusterdefpresent)
+       || (*ptr == '='))		// If the = sign is missing then it's a clusterdef
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> cluster = read_int (ptr+1);
+	mdest_ptr -> cluster = read_int (ptr);
       }
       else
       {
@@ -5197,23 +5203,7 @@ void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned 
     }
     else if (strncasecmp (ptr, "levelpic", 8) == 0)
     {
-      ptr += 8;
-      while (*ptr == ' ') ptr++;
-      while (*ptr == '=') ptr++;
-      while (*ptr == ' ') ptr++;
-      if (*ptr == '\"')
-      {
-	ptr++;
-	l = dh_inchar (ptr, '"');
-	if (l) ptr[l-1] = 0;
-      }
-      l = strlen (ptr);
-      newtext = malloc (l+1);
-      if (newtext)
-      {
-	strcpy (newtext, ptr);
-	mdest_ptr -> titlepatch = newtext;
-      }
+      ptr = replace_titletext (ptr+9, episode, map);
     }
     else if (strncasecmp (ptr, "endofgame = true", 16) == 0)
     {
@@ -5403,7 +5393,7 @@ void Load_Mapinfo (void)
 	}
       }
     } while (++lump < numlumps);
-  }  
+  }
 }
 
 /* ---------------------------------------------------------------------------- */
