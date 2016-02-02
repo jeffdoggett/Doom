@@ -61,7 +61,8 @@ int		viewwindowy;
 //  translate a limited part to another
 //  (color ramps used for  suit colors).
 //
-byte		translations[3][256];
+byte*		dc_translation;
+byte*		translationtables;
 
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
@@ -173,7 +174,7 @@ void R_InitTranslationTables (void)
     // translate just the 16 green colours
     for (i=0 ; i<256 ; i++)
     {
-	if (i >= 0x70 && i<= 0x7f)
+	if (general[i] == GREENS)
 	{
 	    // map green ramp to grey, brown, red
 	    translationtables[i] = 0x60 + (i&0xf);
@@ -183,8 +184,7 @@ void R_InitTranslationTables (void)
 	else
 	{
 	    // Keep all other colours as is.
-	    translationtables[i] = translationtables[i+256]
-		= translationtables[i+512] = i;
+	    translationtables[i] = translationtables[i+256] = translationtables[i+512] = i;
 	}
     }
     R_InitTintTables ();
@@ -594,8 +594,6 @@ void R_DrawTranslucentColumn (void)
 //  of the BaronOfHell, the HellKnight, uses
 //  identical sprites, kinda brightened up.
 //
-byte*	dc_translation;
-byte*	translationtables;
 
 void R_DrawTranslatedColumn (void)
 {
