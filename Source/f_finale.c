@@ -180,10 +180,10 @@ clusterdefs_t * F_Access_ClusterDef (unsigned int num)
 static void F_DetermineIntermissionTexts (void)
 {
   int i,j;
-  int cluster;
   int text_base;
   int finaletextnum;
-  clusterdefs_t * cp;
+  clusterdefs_t * cp_p;
+  clusterdefs_t * cp_n;
   map_dests_t * map_info_p;
   map_dests_t * map_info_n;
 
@@ -202,81 +202,87 @@ static void F_DetermineIntermissionTexts (void)
     return;
 
   map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
-  cluster = map_info_p -> cluster;
-  cp = F_Access_ClusterDef (cluster);
+  cp_p = F_Access_ClusterDef (map_info_p -> cluster);
 
-  if ((cp)
-   || (cluster))
+  if (secretexit)
   {
-    if (secretexit)
-    {
-      i = map_info_p -> secret_exit_to_episode;
-      j = map_info_p -> secret_exit_to_map;
-    }
-    else
-    {
-      i = map_info_p -> normal_exit_to_episode;
-      j = map_info_p -> normal_exit_to_map;
-    }
+    i = map_info_p -> secret_exit_to_episode;
+    j = map_info_p -> secret_exit_to_map;
+  }
+  else
+  {
+    i = map_info_p -> normal_exit_to_episode;
+    j = map_info_p -> normal_exit_to_map;
+  }
 
-    if (G_MapLump (i, j) == -1)
-    {
-      map_info_n = NULL;
-    }
-    else
-    {
-      map_info_n = G_Access_MapInfoTab (i,j);
-      if (map_info_n -> cluster == cluster)
-	return;
-    }
+  if (G_MapLump (i, j) == -1)
+  {
+    map_info_n = NULL;
+    cp_n = NULL;
+  }
+  else
+  {
+    map_info_n = G_Access_MapInfoTab (i,j);
+    cp_n = F_Access_ClusterDef (map_info_n -> cluster);
+  }
 
-    if (cp)
-    {
-      finaletext = cp -> exittext;
-      finaleflat = cp -> flat;
-      if ((cp -> pic)
-       && (W_CheckNumForName (cp -> pic) != -1))
-	finalepic = cp -> pic;
-    }
+  /* If the present map or the next map is in a cluster */
+  /* then use the cluster based stuff. */
 
-    /* Big problem here.				*/
-    /* Ideally, if we are returning from a secret level */
-    /* back to the main flow, then we do not want to	*/
-    /* show the entry text for that cluster if it is	*/
-    /* the same cluster that we came from.		*/
-    /* Snag is that I have long since forgotten where	*/
-    /* we came from.					*/
-
-    if (map_info_n)
+  if ((cp_p)
+   || (cp_n)
+   || (map_info_p -> cluster)
+   || (map_info_n && map_info_n -> cluster))
+  {
+    if ((map_info_n == NULL)
+     || (map_info_n -> cluster != map_info_p -> cluster))
     {
-      cp = F_Access_ClusterDef (map_info_n -> cluster);
-      if (cp)
+      if (cp_p)
       {
-	nextfinaletext = cp -> entertext;
-	nextfinaleflat = cp -> flat;
-	nextfinalepic  = cp -> pic;
+	finaletext = cp_p -> exittext;
+	finaleflat = cp_p -> flat;
+	if ((cp_p -> pic)
+	 && (W_CheckNumForName (cp_p -> pic) != -1))
+	  finalepic = cp_p -> pic;
       }
-    }
 
-    if ((finaletext == NULL)
+      /* Big problem here.				*/
+      /* Ideally, if we are returning from a secret level */
+      /* back to the main flow, then we do not want to	*/
+      /* show the entry text for that cluster if it is	*/
+      /* the same cluster that we came from.		*/
+      /* Snag is that I have long since forgotten where	*/
+      /* we came from.					*/
 
-     // If we have taken the secret exit, and the next normal
-     // level is in the same cluster, then it is probably
-     // wrong to show the exit text.
-     || ((secretexit != 0)
+      if (cp_n)
+      {
+	nextfinaletext = cp_n -> entertext;
+	nextfinaleflat = cp_n -> flat;
+	if ((cp_n -> pic)
+	 && (W_CheckNumForName (cp_n -> pic) != -1))
+	  nextfinalepic = cp_n -> pic;
+      }
 
-      && (G_MapLump (map_info_p -> normal_exit_to_episode,
-		     map_info_p -> normal_exit_to_map) != -1)
+      if ((finaletext == NULL)
 
-      && (G_Access_MapInfoTab (map_info_p -> normal_exit_to_episode,
-			       map_info_p -> normal_exit_to_map) -> cluster == cluster)))
-    {
-      finaletext = nextfinaletext;
-      finaleflat = nextfinaleflat;
-      finalepic  = nextfinalepic;
-      nextfinaletext = NULL;
-      nextfinaleflat = NULL;
-      nextfinalepic = NULL;
+       // If we have taken the secret exit, and the next normal
+       // level is in the same cluster, then it is probably
+       // wrong to show the exit text.
+       || ((secretexit != 0)
+
+	&& (G_MapLump (map_info_p -> normal_exit_to_episode,
+		       map_info_p -> normal_exit_to_map) != -1)
+
+	&& (G_Access_MapInfoTab (map_info_p -> normal_exit_to_episode,
+				 map_info_p -> normal_exit_to_map) -> cluster == map_info_p->cluster)))
+      {
+	finaletext = nextfinaletext;
+	finaleflat = nextfinaleflat;
+	finalepic  = nextfinalepic;
+	nextfinaletext = NULL;
+	nextfinaleflat = NULL;
+	nextfinalepic = NULL;
+      }
     }
   }
   else
