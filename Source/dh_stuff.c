@@ -4361,7 +4361,7 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 /* ---------------------------------------------------------------------------- */
 
-void Parse_Mapinfo (char * ptr, char * top)
+static void Parse_Mapinfo (char * ptr, char * top)
 {
   char cc;
   unsigned int i,j,l;
@@ -5051,7 +5051,7 @@ void Parse_Mapinfo (char * ptr, char * top)
 
 /* ---------------------------------------------------------------------------- */
 
-void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
+static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
 {
   char cc;
   unsigned int i,j,l;
@@ -5409,10 +5409,11 @@ void Change_To_Mapinfo (FILE * fin)
   size = (size_t) (ftell (fin) - pos);
   fseek (fin, pos, SEEK_SET);
 
-  ptr = malloc (size);
+  ptr = malloc (size + 4);	// Extra 'cos we add a line terminator and a null.
   if (ptr)
   {
     size = fread (ptr, 1, size, fin);
+    ptr [size++] = '\n';
     Parse_Mapinfo (ptr, ptr+size);
     free (ptr);
   }
