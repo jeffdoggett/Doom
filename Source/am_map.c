@@ -671,7 +671,7 @@ static void AM_findMinMaxBoundaries(void)
     a = FixedDiv(f_w<<FRACBITS, max_w);
     b = FixedDiv(f_h<<FRACBITS, max_h);
 
-    min_scale_mtof = a < b ? a : b;
+    min_scale_mtof = (a < b ? a : b) / 2;
     max_scale_mtof = FixedDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
 
 }
