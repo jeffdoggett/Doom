@@ -37,6 +37,8 @@ extern boolean finale_message_changed;
 //  0 = text, 1 = art screen, 2 = character cast
 static int	finalestage;
 static int	finalecount;
+static int	finalexpos = 10;
+static int	finaleypos = 10;
 
 #define	TEXTSPEED	3
 #define	TEXTWAIT	250
@@ -672,6 +674,12 @@ static void F_TextWrite (void)
 
   // draw some of the text onto the screen
 
+  if (finalecount == 0)
+  {
+    finalexpos = 10;
+    finaleypos = 10;
+  }
+
   count = (finalecount - 10)/TEXTSPEED;
   if (count < 1)
       return;
@@ -686,8 +694,8 @@ static void F_TextWrite (void)
     dy = 11;
   }
 
-  cx = 10;
-  cy = 10;
+  cx = finalexpos;
+  cy = finaleypos;
   ch = finaletext;
 
   do
@@ -698,7 +706,7 @@ static void F_TextWrite (void)
 
     if (c == '\n')
     {
-      cx = 10;
+      cx = finalexpos;
       cy += dy;
       continue;
     }
@@ -711,10 +719,17 @@ static void F_TextWrite (void)
     }
 
     w = SHORT (hu_font[c]->width);
-    if ((cx+w) <= 320)
-      V_DrawPatchScaled(cx, cy, 0, hu_font[c]);
-    w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
-    cx+=w;
+    if ((cx+w) > 320)
+    {
+      if (finalexpos)
+        finalexpos--;
+    }
+    else
+    {
+      V_DrawPatchScaled (cx, cy, 0, hu_font[c]);
+      w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
+      cx+=w;
+    }
   } while (--count);
 }
 
