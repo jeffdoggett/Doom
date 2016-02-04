@@ -39,6 +39,7 @@ static int	finalestage;
 static int	finalecount;
 static int	finalexpos = 10;
 static int	finaleypos = 10;
+static int	finaleydy;
 
 #define	TEXTSPEED	3
 #define	TEXTWAIT	250
@@ -667,31 +668,33 @@ static void F_TextWrite (void)
   int c;
   int cx;
   int w;
-  int cy,dy;
+  int cy;
   int count;
   int lines;
   char*	ch;
 
   // draw some of the text onto the screen
 
-  if (finalecount == 0)
+  count = (finalecount - 10)/TEXTSPEED;
+  if (count < 1)
   {
     finalexpos = 10;
     finaleypos = 10;
-  }
 
-  count = (finalecount - 10)/TEXTSPEED;
-  if (count < 1)
-      return;
-
-  lines = qty_of_lines (finaletext);
-  if (lines > ((200-10)/11))
-  {
-    dy = (200-10) / lines;
-  }
-  else
-  {
-    dy = 11;
+    lines = qty_of_lines (finaletext);
+    if (lines > ((200-10)/11))
+    {
+      finaleypos = 0;
+      if (lines > (200/11))
+	finaleydy = 200 / lines;
+      else
+	finaleydy = 11;
+    }
+    else
+    {
+      finaleydy = 11;
+    }
+    return;
   }
 
   cx = finalexpos;
@@ -707,7 +710,7 @@ static void F_TextWrite (void)
     if (c == '\n')
     {
       cx = finalexpos;
-      cy += dy;
+      cy += finaleydy;
       continue;
     }
 
@@ -727,9 +730,9 @@ static void F_TextWrite (void)
     else
     {
       V_DrawPatchScaled (cx, cy, 0, hu_font[c]);
-      w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
-      cx+=w;
     }
+    w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
+    cx+=w;
   } while (--count);
 }
 
