@@ -670,10 +670,10 @@ static void F_TextWrite (void)
 
       if (c == '\n')
       {
-        lines++;
-        if (cx > longest)
-          longest = cx;
-        cx = 0;
+	lines++;
+	if (cx > longest)
+	  longest = cx;
+	cx = 0;
       }
       else
       {
@@ -687,12 +687,16 @@ static void F_TextWrite (void)
 	  w = SHORT (hu_font[c]->width);
 	  w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
 	  cx+=w;
-        }
+	}
       }
     } while (1);
 
-    if (ch[-2] != '\n')
+    if (cx)
+    {
       lines++;
+      if (cx > longest)
+	longest = cx;
+    }
 
     if (lines > ((200-10)/11))
     {
@@ -707,12 +711,12 @@ static void F_TextWrite (void)
       finaleydy = 11;
     }
 
-    if (longest > 190)
+    if (longest > 310)
     {
-      if (longest > 210)
+      if (longest > 330)
 	finalexpos = 0;
       else
-	finalexpos = (210-longest)/2;
+	finalexpos = (330-longest)/2;
     }
     return;
   }
