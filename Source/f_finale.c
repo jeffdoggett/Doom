@@ -584,30 +584,6 @@ void F_Ticker (void)
 
 // --------------------------------------------------------------------------------------------
 
-static unsigned int qty_of_lines (const char * s)
-{
-  char cc;
-  unsigned int q;
-
-  q = 0;
-
-  if (*s)
-  {
-    do
-    {
-      cc = *s++;
-      if (cc == '\n')
-	q++;
-    } while (cc);
-    if (s[-1] != '\n')
-      q++;
-  }
-
-  return (q);
-}
-
-// --------------------------------------------------------------------------------------------
-
 void F_DrawBackgroundFlat (const char * flat)
 {
   int c;
@@ -671,6 +647,7 @@ static void F_TextWrite (void)
   int cy;
   int count;
   int lines;
+  int longest;
   char*	ch;
 
   // draw some of the text onto the screen
@@ -681,7 +658,42 @@ static void F_TextWrite (void)
     finalexpos = 10;
     finaleypos = 10;
 
-    lines = qty_of_lines (finaletext);
+    longest = 0;
+    lines = 0;
+    cx = 0;
+    ch = finaletext;
+    do
+    {
+      c = *ch++;
+      if (c == 0)
+	break;
+
+      if (c == '\n')
+      {
+        lines++;
+        if (cx > longest)
+          longest = cx;
+        cx = 0;
+      }
+      else
+      {
+	c = toupper(c) - HU_FONTSTART;
+	if (c < 0 || c> HU_FONTSIZE)
+	{
+	  cx += 4;
+	}
+	else
+	{
+	  w = SHORT (hu_font[c]->width);
+	  w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
+	  cx+=w;
+        }
+      }
+    } while (1);
+
+    if (ch[-2] != '\n')
+      lines++;
+
     if (lines > ((200-10)/11))
     {
       finaleypos = 0;
@@ -693,6 +705,14 @@ static void F_TextWrite (void)
     else
     {
       finaleydy = 11;
+    }
+
+    if (longest > 190)
+    {
+      if (longest > 210)
+	finalexpos = 0;
+      else
+	finalexpos = (210-longest)/2;
     }
     return;
   }
@@ -722,15 +742,8 @@ static void F_TextWrite (void)
     }
 
     w = SHORT (hu_font[c]->width);
-    if ((cx+w) > 320)
-    {
-      if (finalexpos)
-        finalexpos--;
-    }
-    else
-    {
+    if ((cx+w) < 320)
       V_DrawPatchScaled (cx, cy, 0, hu_font[c]);
-    }
     w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
     cx+=w;
   } while (--count);
