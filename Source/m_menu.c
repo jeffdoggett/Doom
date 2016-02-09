@@ -2205,10 +2205,10 @@ void M_Drawer (void)
 	  {
 	    patch = W_CacheLumpNum (lump,PU_CACHE);
 	    len = SHORT(patch->width) + x;
-	    if ((len >= 320)			// Will it fit?
+	    if ((len >= 319)			// Will it fit?
 	     && (x > 0))
 	    {
-	      x -= (len - (320-1));
+	      x -= (len - (320-2));
 	      if (x < 0)
 		x = 0;
 	      currentMenu->x = x;
@@ -2307,7 +2307,10 @@ static int M_EpisodePresent (const char * name, unsigned int episode)
 
 static void M_SetEpisodeMenuPos (void)
 {
+  int lump;
+  unsigned int len;
   unsigned int episode;
+  char * str;
   menuitem_t * m_ptr;
 
   episode = EpiDef.numitems;
@@ -2324,18 +2327,26 @@ static void M_SetEpisodeMenuPos (void)
   m_ptr = &EpisodeMenu[0];
   do
   {
-    int lump = W_CheckNumForName (m_ptr -> name);
-    if (lump != -1)
+    len = 0;
+    lump = W_CheckNumForName (m_ptr -> name);
+    if (lump == -1)
+    {
+      str = episode_names[episode_num [episode]];
+      if (str != NULL)
+	len = V_MenuTextWidth (str);
+    }
+    else
     {
       patch_t* patch = W_CacheLumpNum (lump,PU_CACHE);
-      int len = SHORT(patch->width) + EpiDef.x;
-      if (len >= 320)			// Will it fit?
-      {
-	int x = EpiDef.x - (len - (320-1));
-	if (x < 0)
-	  x = 0;
-	EpiDef.x = x;
-      }
+      len = SHORT(patch->width);
+    }
+    len += EpiDef.x;
+    if (len >= 319)			// Will it fit?
+    {
+      int x = EpiDef.x - (len - (320-2));
+      if (x < 0)
+	x = 0;
+      EpiDef.x = x;
     }
     m_ptr++;
   } while ((EpiDef.x) && (++episode < EpiDef.numitems));
@@ -2343,7 +2354,6 @@ static void M_SetEpisodeMenuPos (void)
   if (M_CheckParm("-showepisodetable"))
   {
     // DEBUG !!
-    char * str;
     m_ptr = &EpisodeMenu[0];
     episode = 0;
     do

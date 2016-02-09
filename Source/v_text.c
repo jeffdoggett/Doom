@@ -2178,6 +2178,7 @@ static unsigned int V_textwidth (const char * str, const unsigned char * const *
       if (cc < ARRAY_SIZE (wilv_charset))
       {
 	p = charset [cc];
+	if ((p == NULL) && (charset == red_charset)) p = wilv_charset [cc];
 	if (p != NULL)
 	  j = (*p - 2) - gen_kern (cc+'!', *str, kern);
       }
@@ -2271,6 +2272,9 @@ unsigned int V_drawMenuText (int x, int y, const char *str)
   do
   {
     cc = *str++;
+    if (cc == 0)
+      break;
+
     if (cc < '!')
     {
       j = 6;
@@ -2282,12 +2286,21 @@ unsigned int V_drawMenuText (int x, int y, const char *str)
     x += j;
     if (x > 320)
       return (0);
-  } while (cc);
+  } while (1);
 
   return (red_charset [0][1]);
 }
 
 /* ---------------------------------------------------------------------------- */
+
+unsigned int V_MenuTextWidth (const char * str)
+{
+  return (V_textwidth (str, red_charset, m_kern));
+}
+
+/* ---------------------------------------------------------------------------- */
+
+
 #if 0
 void V_drawMenuTextCentered (int y, const char *str)
 {
