@@ -1130,6 +1130,7 @@ void W_Find_Start_Ends (void)
 
   lump = 0;
   loading = 0;
+  endlump = 0;
   lump_ptr = &lumpinfo[0];
 
   do
@@ -1152,6 +1153,7 @@ void W_Find_Start_Ends (void)
       {
 	loading = 1;
 	startlump = lump;
+	endlump = 0;
 	// printf ("%s lump = %u\n", lump_ptr->name, lump);
       }
     }
