@@ -1115,3 +1115,76 @@ int W_SameWadfile (int lump1, int lump2)
 }
 
 /* -------------------------------------------------------------------------------------------- */
+/*
+   Sort out the ?_START and ?_END markers.
+   Some wads have ??_START or ??_END and also can be badly nested.
+*/
+
+void W_Find_Start_Ends (void)
+{
+  int loading;
+  int lump;
+  int endlump;
+  int startlump;
+  lumpinfo_t* lump_ptr;
+
+  lump = 0;
+  loading = 0;
+  lump_ptr = &lumpinfo[0];
+
+  do
+  {
+    if (strncasecmp (lump_ptr->name+2, "_START", 6) == 0)
+    {
+      /* Found a ??_START marker, shuffle it down */
+      // printf ("Shuffled %s %u\n", lump_ptr->name, lump);
+      memcpy (lump_ptr->name+1, lump_ptr->name+2, 6);
+      lump_ptr->name [7] = 0;
+    }
+    if (strncasecmp (lump_ptr->name+1, "_START", 7) == 0)
+    {
+      if (loading)		// Nested?
+      {
+	// printf ("Nested start (%s) %u\n", lump_ptr->name, lump);
+	memset (lump_ptr->name, 0, 8);
+      }
+      else
+      {
+	loading = 1;
+	startlump = lump;
+	// printf ("%s lump = %u\n", lump_ptr->name, lump);
+      }
+    }
+    if (strncasecmp (lump_ptr->name+2, "_END", 5) == 0)
+    {
+      /* Found a ??_END marker, shuffle it down */
+      // printf ("Shuffled %s %u\n", lump_ptr->name, lump);
+      memcpy (lump_ptr->name+1, lump_ptr->name+2, 6);
+      lump_ptr->name [7] = 0;
+    }
+    if (strncasecmp (lump_ptr->name+1, "_END", 5) == 0)
+    {
+      if ((loading == 0)
+       && (endlump))
+      {
+	memset (lump_ptr->name, 0, 8);
+	// printf ("Previous end was nested\n");
+      }
+      loading = 0;
+      endlump = lump;
+      // printf ("%s lump = %u\n", lump_ptr->name, lump);
+    }
+
+    if ((loading)
+     && (lump_ptr->handle != lumpinfo[startlump].handle))
+    {
+      loading = 0;
+      endlump = 0;
+      // printf ("Ran off end of WAD without finding END marker\n");
+    }
+
+    lump_ptr++;
+  } while (++lump < numlumps);
+}
+
+/* -------------------------------------------------------------------------------------------- */

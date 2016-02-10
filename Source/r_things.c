@@ -214,15 +214,13 @@ static void R_InitSpriteDefs (char** namelist)
 	{
 	  /* Search for 'end' */
 	  lump--;
-	  if ((strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
-	   || (strncasecmp (lumpinfo[lump].name, "SS_END", 8) == 0))
+	  if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
 	  {
 	    done = 0;
 	    do
 	    {
 	      lump--;
 	      if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
-	       || (strncasecmp (lumpinfo[lump].name, "SS_START", 8) == 0)
 	       || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
 	      {
 		done = 1;

@@ -772,12 +772,10 @@ static void R_RemoveDuplicateSprites (const char * name, int sprlump)
   {
     if (loading == 0)
     {
-      if ((strncasecmp (lump_ptr->name, "S_START", 8) == 0)
-       || (strncasecmp (lump_ptr->name+1, "S_START", 7) == 0))
+      if (strncasecmp (lump_ptr->name, "S_START", 8) == 0)
 	loading = 1;
     }
     else if ((strcasecmp (lump_ptr->name, "S_END") == 0)
-	  || (strcasecmp (lump_ptr->name+1, "S_END") == 0)
 	  || (lump_ptr->handle != (lump_ptr-1)->handle))
     {
       loading = 0;
@@ -854,16 +852,6 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
   int loading;
   int valid;
   lumpinfo_t* lump_ptr;
-  char sstart [12];
-  char eend  [12];
-
-  /* Some pwads have names with the first letter duplicated */
-  /* e.g. S_START becomes SS_START */
-  sstart [0] = start [0];
-  strcpy (&sstart[1], start);
-
-  eend [0] = end [0];
-  strcpy (&eend[1], end);
 
   total = 0;
   lump = numlumps;
@@ -877,12 +865,10 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 
     if (loading == 0)
     {
-      if ((strncasecmp (lump_ptr->name, end, 8) == 0)
-       || (strncasecmp (lump_ptr->name, eend, 8) == 0))
+      if (strncasecmp (lump_ptr->name, end, 8) == 0)
 	loading = 1;
     }
     else if ((strncasecmp (lump_ptr->name, start, 8) == 0)
-	  || (strncasecmp (lump_ptr->name, sstart, 8) == 0)
 	  || (lump_ptr->handle != (lump_ptr+1)->handle))
     {
       loading = 0;
@@ -895,8 +881,6 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 #ifdef MIN_SIZE_LUMP
        || (lump_ptr->size < MIN_SIZE_LUMP)
 #endif
-       || (strncasecmp (lump_ptr->name, end, 8) == 0)	/* Nested? */
-       || (strncasecmp (lump_ptr->name, eend, 8) == 0)
        || (W_CheckNumForNameLinear (lump_ptr->name) != lump)) /* If there's another one at a higher pos */
       {
 	valid = false;
@@ -952,23 +936,19 @@ static void R_InitFlats (void)
   {
     if (loading == 0)
     {
-      if ((strncasecmp (lump_ptr->name, "F_START", 8) == 0)
-       || (strncasecmp (lump_ptr->name, "FF_START", 8) == 0))
+      if (strncasecmp (lump_ptr->name, "F_START", 8) == 0)
 	loading = 1;
     }
     else if ((strncasecmp (lump_ptr->name, "F_END", 8) == 0)
-	  || (strncasecmp (lump_ptr->name, "FF_END", 8) == 0)
 	  || (lump_ptr->handle != (lump_ptr-1)->handle))
     {
       loading = 0;
     }
     else
-    if ((lump_ptr->name[0])
+    if ((lump_ptr->name[0]))
 #ifdef MIN_SIZE_LUMP
      && (lump_ptr->size >= MIN_SIZE_LUMP)
 #endif
-     && (strncasecmp (lump_ptr->name, "F_START", 8))
-     && (strncasecmp (lump_ptr->name, "FF_START", 8)))
     {
       if (!(i&63))
 	putchar ('.');
@@ -1020,23 +1000,19 @@ static void R_InitSpriteLumps (void)
   {
     if (loading == 0)
     {
-      if ((strncasecmp (lump_ptr->name, "S_START", 8) == 0)
-       || (strncasecmp (lump_ptr->name, "SS_START", 8) == 0))
+      if (strncasecmp (lump_ptr->name, "S_START", 8) == 0)
 	loading = 1;
     }
     else if ((strncasecmp (lump_ptr->name, "S_END", 8) == 0)
-	  || (strncasecmp (lump_ptr->name, "SS_END", 8) == 0)
 	  || (lump_ptr->handle != (lump_ptr-1)->handle))
     {
       loading = 0;
     }
     else
-    if ((lump_ptr->name[0])
+    if ((lump_ptr->name[0]))
 #ifdef MIN_SIZE_LUMP
      && (lump_ptr -> size >= MIN_SIZE_LUMP)
 #endif
-     && (strncasecmp (lump_ptr->name, "S_START", 8))
-     && (strncasecmp (lump_ptr->name, "SS_START", 8)))
     {
       if (!(i&63))
 	putchar ('.');
@@ -1119,6 +1095,7 @@ void R_InitData (void)
 #ifndef PADDED_STRUCTS
     R_CheckStructs ();
 #endif
+    W_Find_Start_Ends ();
     printf ("\nInitTextures");
     R_InitTextures ();
     printf ("\nInitFlats");
