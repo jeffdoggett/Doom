@@ -1167,7 +1167,7 @@ void W_Find_Start_Ends (void)
       if ((loading == 0)
        && (endlump))
       {
-	memset (lump_ptr->name, 0, 8);
+	memset (lumpinfo[endlump].name, 0, 8);
 	// printf ("Previous end was nested\n");
       }
       loading = 0;
