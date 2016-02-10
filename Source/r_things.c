@@ -268,9 +268,12 @@ static void R_InitSpriteDefs (char** namelist)
 	    switch ((int)sprptr->rotate)
 	    {
 	      case -1:
+#if 0
 		// no rotations were found for that frame at all
-		I_Error ("R_InitSprites: No patches found "
-			 "for %s frame %c", namelist[i], frame+'A');
+		printf ("R_InitSprites: No patches found "
+			 "for %s frame %c\n", namelist[i], frame+'A');
+#endif
+		sprptr->rotate = false;
 		break;
 
 	      case 0:

@@ -375,6 +375,21 @@ static void init_text_messages (void)
   } while (name);
 
 
+  // Initialise extra DeHacked states to 3999
+  count = EXTRASTATES;
+  i_ptr = &states [EXTRASTATES];
+  do
+  {
+    i_ptr -> sprite = SPR_TNT1;
+    i_ptr -> frame = 0;
+    i_ptr -> tics = -1;
+    i_ptr -> action.acv = NULL;
+    i_ptr -> nextstate = count;
+    i_ptr -> misc1 = 0;
+    i_ptr -> misc2 = 0;
+    i_ptr++;
+  } while (++count < NUMSTATES);
+
 
   a_ptr = states_ptr_copy;
   i_ptr = states;

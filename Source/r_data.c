@@ -783,10 +783,11 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else if (doing_sprites)
       {
+	memcpy (sprname, lump_ptr->name, 8);
+	sprname [8] = 0;
+
 	if (lump_ptr->name[6])		/* Does it have a flipped section ? */
 	{
-	  memcpy (sprname, lump_ptr->name, 8);
-	  sprname [8] = 0;
 	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
 	  if (i != -1)
 	  {
@@ -798,7 +799,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 	  {
 	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
 	  }
-
+#if 0
 	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
 	  {				/* Remove all rotated sprites */
     	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
@@ -818,7 +819,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 	    }
 	    memcpy (sprname, lump_ptr->name, 8);
 	  }
-
+#endif
 	  sprname [4] = lump_ptr->name [6];
 	  sprname [5] = lump_ptr->name [7];
 	  sprname [6] = lump_ptr->name [4];
@@ -857,8 +858,6 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 	}
 	else
 	{
-	  memcpy (sprname, lump_ptr->name, 8);
-	  sprname [8] = 0;
 	  sprname [6] = lump_ptr->name [4];
 	  sprname [7] = lump_ptr->name [5];
 

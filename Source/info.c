@@ -53,7 +53,7 @@ char *sprnames [ARRAY_SIZE(sprnames_orig)];
 
 //-----------------------------------------------------------------------------
 
-state_t states[] =
+state_t states[NUMSTATES] =
 {
   //  sprite	frame		  tics	action		nextstate	 misc1	misc2	    state
   { SPR_TROO,	0,		    -1, NULL,		S_NULL, 	 0,	0 }, // S_NULL
