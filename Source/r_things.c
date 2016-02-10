@@ -236,7 +236,8 @@ static void R_InitSpriteDefs (char** namelist)
 		  frame = lumpinfo[lump].name[4] - 'A';
 		  rotation = lumpinfo[lump].name[5] - '0';
 
-		  R_InstallSpriteLump (index, lump, frame, rotation, false);
+		  if (frame >= 0)
+		    R_InstallSpriteLump (index, lump, frame, rotation, false);
 
 		  if (lumpinfo[lump].name[6])
 		  {
@@ -268,12 +269,17 @@ static void R_InitSpriteDefs (char** namelist)
 	    switch ((int)sprptr->rotate)
 	    {
 	      case -1:
-#if 0
-		// no rotations were found for that frame at all
-		printf ("R_InitSprites: No patches found "
-			 "for %s frame %c\n", namelist[i], frame+'A');
-#endif
+		if (M_CheckParm ("-showunknown"))
+		{
+		  // no rotations were found for that frame at all
+		  printf ("R_InitSprites: No patches found for %s frame %c\n",
+				namelist[i], frame+'A');
+		}
 		sprptr->rotate = false;
+		if (frame)
+		  maxframe = frame - 1;
+		else
+		  maxframe = 0;
 		break;
 
 	      case 0:
@@ -286,11 +292,11 @@ static void R_InitSpriteDefs (char** namelist)
 		{
 		  if (sprptr->lump[rotation] == -1)
 		  {
-#if 0
-		    printf ("R_InitSprites: Sprite %s frame %c "
-			     "is missing rotation %u\n",
-			     namelist[i], frame+'A', rotation);
-#endif
+		    if (M_CheckParm ("-showunknown"))
+		    {
+		      printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
+				namelist[i], frame+'A', rotation);
+		    }
 
 		    switch (rotation)
 		    {

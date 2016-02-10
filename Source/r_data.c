@@ -711,6 +711,131 @@ static void R_InitTextures (void)
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+
+#define R_NameCompare(a,b)		\
+	((name1 [a] == name2 [b])	\
+	&& (((c1 = name1 [a+1]) == '0')	\
+	 || ((c2 = name2 [b+1]) == '0')	\
+	 || (c1 == c2)))
+
+/* ------------------------------------------------------------------------------------------------ */
+
+static int R_CanRemove (const char * name1, const char * name2)
+{
+  int rc;
+  char c1,c2;
+
+  if ((name1 [5] == 0)
+   || (name2 [5] == 0))
+  {
+    if (name1 [4] == name2 [4])
+      return (1);
+    return (0);
+  }
+
+  rc = 0;
+
+  if (R_NameCompare (4,4))
+    rc |= 1;
+
+  if ((name1 [6])
+   && (R_NameCompare (6,4)))
+    rc |= 2;
+
+  if (name2 [6])
+  {
+    if (R_NameCompare (4,6))
+      rc |= 4;
+
+    if ((name1 [6])
+     && (R_NameCompare (6,6)))
+      rc |= 8;
+  }
+
+  return (rc);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+
+static void R_RemoveDuplicateSprites (const char * name, int sprlump)
+{
+  int pos;
+  int loading;
+  int lump;
+  lumpinfo_t* lump_ptr;
+
+  lump = 0;
+  loading = 0;
+  lump_ptr = &lumpinfo[0];
+
+  while (lump < sprlump)
+  {
+    if (loading == 0)
+    {
+      if ((strncasecmp (lump_ptr->name, "S_START", 8) == 0)
+       || (strncasecmp (lump_ptr->name+1, "S_START", 7) == 0))
+	loading = 1;
+    }
+    else if ((strcasecmp (lump_ptr->name, "S_END") == 0)
+	  || (strcasecmp (lump_ptr->name+1, "S_END") == 0)
+	  || (lump_ptr->handle != (lump_ptr-1)->handle))
+    {
+      loading = 0;
+    }
+    else
+    {
+      if (strncasecmp (lump_ptr -> name, name, 4) == 0)
+      {
+	pos = R_CanRemove (lump_ptr -> name, name);
+	if (pos)
+	{
+	  // printf ("Lump %u Result = %X (%s)(%s)\n", lump, pos, lump_ptr -> name, name);
+	  switch (pos)
+          {
+            case 1:
+	    case 4:
+              if (lump_ptr -> name [4] && lump_ptr -> name [6])
+              {
+		lump_ptr -> name [4] = '@';
+	      }
+	      else
+	      {
+		lump_ptr -> name [0] = 0;
+	      }
+	      break;
+
+	    case 2:
+	    case 8:
+	      if (lump_ptr -> name [4] == '@')
+	      {
+		lump_ptr -> name [0] = 0;
+	      }
+	      else
+	      {
+		lump_ptr -> name [6] = 0;
+		lump_ptr -> name [7] = 0;
+	      }
+	      break;
+
+	    case 3:
+	    case 5:
+	    case 9:
+	      lump_ptr -> name [0] = 0;
+	      break;
+
+	    default:
+	      printf ("Uncoded result = %X (%s)(%s)\n", pos, lump_ptr -> name, name);
+          }
+          // printf ("To '%s'\n", lump_ptr -> name);
+        }
+      }
+    }
+    lump_ptr++;
+    lump++;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 /* Count the number of unique lumps between start and end
 ** We have to discard duplicates. In the case of sprites this
 ** is really tricky because of flipped ones.
@@ -721,9 +846,6 @@ static void R_InitTextures (void)
 ** So when I parse SARG A1B2 I must also check for SARG xxA1,
 ** SARG A1xx, SARG xxB2 and SARG B2xx.
 */
-static const char mask_ffff00ff[] = { 255,255,255,255,0,0,255,255 };
-static const char mask_fffff300[] = { 255,255,255,255,255,0x30,0,0 };
-static const char mask_ffffff00[] = { 255,255,255,255,255,255,0,0 };
 
 static int R_CountEntities (char * start, char * end, int doing_sprites)
 {
@@ -731,11 +853,9 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
   int total;
   int loading;
   int valid;
-  int i;
   lumpinfo_t* lump_ptr;
   char sstart [12];
   char eend  [12];
-  char sprname [12];
 
   /* Some pwads have names with the first letter duplicated */
   /* e.g. S_START becomes SS_START */
@@ -783,115 +903,8 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else if (doing_sprites)
       {
-	memcpy (sprname, lump_ptr->name, 8);
-	sprname [8] = 0;
-
-	if (lump_ptr->name[6])		/* Does it have a flipped section ? */
-	{
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-#if 0
-	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
-	  {				/* Remove all rotated sprites */
-    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	    while (i != -1)
-    	    {
-     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	    }
-	  }
-	  else				/* Having found a rotated sprite, remove */
-	  {				/* any non-rotated ones below */
-	    sprname [5] = '0';
-	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	    if (i != -1)
-	    {
-	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	    }
-	    memcpy (sprname, lump_ptr->name, 8);
-	  }
-#endif
-	  sprname [4] = lump_ptr->name [6];
-	  sprname [5] = lump_ptr->name [7];
-	  sprname [6] = lump_ptr->name [4];
-	  sprname [7] = lump_ptr->name [5];
-
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-
-	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
-	  {				/* Remove all rotated sprites */
-    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	    while (i != -1)
-    	    {
-     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	    }
-	  }
-	  else				/* Having found a rotated sprite, remove */
-	  {				/* any non-rotated ones below */
-	    sprname [5] = '0';
-	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	    if (i != -1)
-	    {
-	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	    }
-	  }
-	}
-	else
-	{
-	  sprname [6] = lump_ptr->name [4];
-	  sprname [7] = lump_ptr->name [5];
-
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffff00ff, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-
-	  i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	  if (i != -1)
-	  {
-	    lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	  }
-
-	  if (sprname [5] == '0')	/* If this a non-rotated sprite then */
-	  {				/* Remove all rotated sprites */
-    	    i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, lump - 1);
-    	    while (i != -1)
-    	    {
-     	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-    	      i = W_CheckNumForNameMasked (sprname, (char *) mask_fffff300, i - 1);
-    	    }
-	  }
-	  else				/* Having found a rotated sprite, remove */
-	  {				/* any non-rotated ones below */
-	    sprname [5] = '0';
-	    i = W_CheckNumForNameMasked (sprname, (char *) mask_ffffff00, lump - 1);
-	    if (i != -1)
-	    {
-	      lumpinfo[i].name[0] = 0;	/* Lose the lower one */
-	    }
-	  }
-	}
+        // printf ("R_RemoveDuplicateSprites (%s,%u)\n", lump_ptr->name, lump);
+	R_RemoveDuplicateSprites (lump_ptr->name, lump);
       }
 
       if (valid == true)		/* If this is the first one */
@@ -902,6 +915,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else
       {
+        // printf ("Lump %u removed (%s)\n", lump, lump_ptr->name);
 	lump_ptr->name[0] = 0;		/* It's a duplicate, so destroy it! */
       }
     }
