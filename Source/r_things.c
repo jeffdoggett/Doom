@@ -710,15 +710,18 @@ R_DrawVisSprite
 	// NULL colormap = shadow draw
 	colfunc = fuzzcolfunc;
     }
+    else if (vis->mobjflags & MF_TRANSLATION)
+    {
+	if (vis->mobjflags & MF_TRANSLUCENT)
+	  colfunc = R_DrawTranslatedTranslucentColumn;
+	else
+	  colfunc = R_DrawTranslatedColumn;
+	dc_translation = translationtables - 256 +
+	    ( (vis->mobjflags & MF_TRANSLATION) >> (MF_TRANSSHIFT-8) );
+    }
     else if (vis->mobjflags & MF_TRANSLUCENT)
     {
 	colfunc = R_DrawTranslucentColumn;
-    }
-    else if (vis->mobjflags & MF_TRANSLATION)
-    {
-	colfunc = R_DrawTranslatedColumn;
-	dc_translation = translationtables - 256 +
-	    ( (vis->mobjflags & MF_TRANSLATION) >> (MF_TRANSSHIFT-8) );
     }
 
     dc_iscale = abs(vis->xiscale)>>detailshift;

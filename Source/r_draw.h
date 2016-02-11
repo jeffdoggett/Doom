@@ -52,6 +52,7 @@ void 	R_DrawFuzzColumn (void);
 void 	R_DrawFuzzColumnLow (void);
 
 void	R_DrawTranslucentColumn (void);
+void	R_DrawTranslatedTranslucentColumn (void);
 
 // Draw with color translation tables,
 //  for player sprite rendering,

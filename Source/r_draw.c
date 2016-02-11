@@ -689,6 +689,74 @@ void R_DrawTranslatedColumn (void)
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+
+void R_DrawTranslatedTranslucentColumn (void)
+{
+    int			count;
+    byte*		dest;
+    byte*		scrnlimit;
+    fixed_t		frac;
+    fixed_t		fracstep;
+#ifndef USE_TINT_TABLES
+    int			translucent;
+#endif
+
+    count = (dc_yh - dc_yl) + 1;
+
+    // Zero length, column does not exceed a pixel.
+    if (count < 1)
+	return;
+
+#ifdef RANGECHECK
+    if ((unsigned)dc_x >= SCREENWIDTH)
+    {
+	printf ("R_DrawColumn: %i to %i at %i\n", dc_yl, dc_yh, dc_x);
+	return;
+    }
+#endif
+
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
+
+    // Determine scaling,
+    //  which is the only mapping to be done.
+    fracstep = dc_iscale;
+    get_frac();
+
+#ifndef USE_TINT_TABLES
+    translucent = (dc_x + dc_yl) & 1;
+#endif
+
+    // Inner loop that does the actual texture mapping,
+    //  e.g. a DDA-lile scaling.
+    do
+    {
+	if (dest > scrnlimit)
+	  break;
+
+	if (dest >= screens[0])
+	{
+#ifdef USE_TINT_TABLES
+	  *dest = tinttab[(*dest << 8) + dc_colormap[dc_translation[dc_source[frac >> FRACBITS]]]];
+#else
+	  if (translucent == 0)
+	    *dest = dc_colormap[dc_translation[dc_source[frac>>FRACBITS]]];
+#endif
+	}
+
+#ifndef USE_TINT_TABLES
+	translucent ^= 1;
+#endif
+	dest += SCREENWIDTH;
+	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
+    } while (--count);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 //
 // R_DrawSpan
 // With DOOM style restrictions on view orientation,
