@@ -69,6 +69,7 @@ extern const char borderpatch_2 [];
 
 
 /* ------------------------------------------------------------------------------------------------ */
+#ifdef USE_TINT_TABLES
 
 #define ADDITIVE	-1
 
@@ -157,6 +158,7 @@ static void R_InitTintTables (void)
   tinttab = GenerateTintTable (palette, ADDITIVE, general, ALL);
 }
 
+#endif
 /* ------------------------------------------------------------------------------------------------ */
 //
 // R_InitTranslationTables
@@ -174,7 +176,7 @@ void R_InitTranslationTables (void)
     // translate just the 16 green colours
     for (i=0 ; i<256 ; i++)
     {
-	if (general[i] == GREENS)
+	if (i >= 0x70 && i<= 0x7f)
 	{
 	    // map green ramp to grey, brown, red
 	    translationtables[i] = 0x60 + (i&0xf);
@@ -187,7 +189,9 @@ void R_InitTranslationTables (void)
 	    translationtables[i] = translationtables[i+256] = translationtables[i+512] = i;
 	}
     }
+#ifdef USE_TINT_TABLES
     R_InitTintTables ();
+#endif
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -540,6 +544,9 @@ void R_DrawTranslucentColumn (void)
     byte*		scrnlimit;
     fixed_t		frac;
     fixed_t		fracstep;
+#ifndef USE_TINT_TABLES
+    int			translucent;
+#endif
 
     count = (dc_yh - dc_yl) + 1;
 
@@ -563,6 +570,10 @@ void R_DrawTranslucentColumn (void)
     fracstep = dc_iscale;
     get_frac();
 
+#ifndef USE_TINT_TABLES
+    translucent = (dc_x + dc_yl) & 1;
+#endif
+
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     do
@@ -572,9 +583,17 @@ void R_DrawTranslucentColumn (void)
 
 	if (dest >= screens[0])
 	{
+#ifdef USE_TINT_TABLES
 	  *dest = tinttab[(*dest << 8) + dc_colormap[dc_source[frac >> FRACBITS]]];
+#else
+	  if (translucent == 0)
+	    *dest = dc_colormap[dc_source[frac>>FRACBITS]];
+#endif
 	}
 
+#ifndef USE_TINT_TABLES
+	translucent ^= 1;
+#endif
 	dest += SCREENWIDTH;
 	frac += fracstep;
 
