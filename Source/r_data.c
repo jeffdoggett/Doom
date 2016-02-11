@@ -749,7 +749,7 @@ static int R_CanRemove (const char * name1, const char * name2)
 
 /* ------------------------------------------------------------------------------------------------ */
 
-#define SHOW_SPRITE_MATCHING
+// #define SHOW_SPRITE_MATCHING
 
 static void R_RemoveDuplicateSprites (const char * name, int sprlump)
 {
