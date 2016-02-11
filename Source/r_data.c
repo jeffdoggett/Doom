@@ -745,17 +745,19 @@ static int R_CanRemove (const char * name1, const char * name2)
   if (name2 [6])
   {
     if (R_NameCompare (4,6))
-      rc |= 4;
+      rc |= 1;
 
     if ((name1 [6])
      && (R_NameCompare (6,6)))
-      rc |= 8;
+      rc |= 2;
   }
 
   return (rc);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+
+// #define SHOW_SPRITE_MATCHING
 
 static void R_RemoveDuplicateSprites (const char * name, int sprlump)
 {
@@ -785,48 +787,43 @@ static void R_RemoveDuplicateSprites (const char * name, int sprlump)
       if (strncasecmp (lump_ptr -> name, name, 4) == 0)
       {
 	pos = R_CanRemove (lump_ptr -> name, name);
+#ifdef SHOW_SPRITE_MATCHING
 	if (pos)
+	  printf ("Result = %X (%s)(%s)", pos, lump_ptr -> name, name);
+#endif
+	switch (pos)
 	{
-	  // printf ("Lump %u Result = %X (%s)(%s)\n", lump, pos, lump_ptr -> name, name);
-	  switch (pos)
-          {
-            case 1:
-	    case 4:
-              if (lump_ptr -> name [4] && lump_ptr -> name [6])
-              {
-		lump_ptr -> name [4] = '@';
-	      }
-	      else
-	      {
-		lump_ptr -> name [0] = 0;
-	      }
-	      break;
-
-	    case 2:
-	    case 8:
-	      if (lump_ptr -> name [4] == '@')
-	      {
-		lump_ptr -> name [0] = 0;
-	      }
-	      else
-	      {
-		lump_ptr -> name [6] = 0;
-		lump_ptr -> name [7] = 0;
-	      }
-	      break;
-
-	    case 3:
-	    case 5:
-	    case 6:
-	    case 9:
+	  case 1:
+	    if (lump_ptr -> name [4] && lump_ptr -> name [6])
+	    {
+	      lump_ptr -> name [4] = '@';
+	    }
+	    else
+	    {
 	      lump_ptr -> name [0] = 0;
-	      break;
+	    }
+	    break;
 
-	    default:
-	      printf ("Uncoded result = %X (%s)(%s)\n", pos, lump_ptr -> name, name);
-          }
-          // printf ("To '%s'\n", lump_ptr -> name);
-        }
+	  case 2:
+	    if (lump_ptr -> name [4] == '@')
+	    {
+	      lump_ptr -> name [0] = 0;
+	    }
+	    else
+	    {
+	      lump_ptr -> name [6] = 0;
+	      lump_ptr -> name [7] = 0;
+	    }
+	    break;
+
+	  case 3:
+	    lump_ptr -> name [0] = 0;
+	    break;
+	}
+#ifdef SHOW_SPRITE_MATCHING
+	if (pos)
+	  printf (" To (%s)\n", lump_ptr -> name);
+#endif
       }
     }
     lump_ptr++;
@@ -888,7 +885,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else if (doing_sprites)
       {
-        // printf ("R_RemoveDuplicateSprites (%s,%u)\n", lump_ptr->name, lump);
+	// printf ("R_RemoveDuplicateSprites (%s,%u)\n", lump_ptr->name, lump);
 	R_RemoveDuplicateSprites (lump_ptr->name, lump);
       }
 
@@ -900,7 +897,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else
       {
-        // printf ("Lump %u removed (%s)\n", lump, lump_ptr->name);
+	// printf ("Lump %u removed (%s)\n", lump, lump_ptr->name);
 	lump_ptr->name[0] = 0;		/* It's a duplicate, so destroy it! */
       }
     }
