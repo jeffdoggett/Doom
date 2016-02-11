@@ -1507,11 +1507,14 @@ static void P_GroupLines (void)
 	    // printf ("P_GroupLines: No front sector\n");
 	}
 
-	li->frontsector->linecount++;
-	if (li->backsector && li->backsector != li->frontsector)
+	if (li->frontsector)
 	{
-	    li->backsector->linecount++;
-	    total++;
+	  li->frontsector->linecount++;
+	  if (li->backsector && li->backsector != li->frontsector)
+	  {
+	      li->backsector->linecount++;
+	      total++;
+	  }
 	}
     }
 
@@ -1533,9 +1536,12 @@ static void P_GroupLines (void)
     // Enter those lines
     for (i = 0, li = lines; i < numlines; i++, li++)
     {
+      if (li->frontsector)
+      {
 	P_AddLineToSector (li, li->frontsector);
 	if (li->backsector && li->backsector != li->frontsector)
 	    P_AddLineToSector (li, li->backsector);
+      }
     }
 
     for (i = 0, sector = sectors; i < numsectors; i++, sector++)

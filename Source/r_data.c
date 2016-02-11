@@ -817,6 +817,7 @@ static void R_RemoveDuplicateSprites (const char * name, int sprlump)
 
 	    case 3:
 	    case 5:
+	    case 6:
 	    case 9:
 	      lump_ptr -> name [0] = 0;
 	      break;
