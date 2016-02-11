@@ -729,35 +729,27 @@ static int R_CanRemove (const char * name1, const char * name2)
    || (name2 [5] == 0))
   {
     if (name1 [4] == name2 [4])
-      return (1);
+      return (3);
     return (0);
   }
 
   rc = 0;
 
-  if (R_NameCompare (4,4))
+  if ((R_NameCompare (4,4))
+   || ((name2 [6]) && (R_NameCompare (4,6))))
     rc |= 1;
 
   if ((name1 [6])
-   && (R_NameCompare (6,4)))
+   && ((R_NameCompare (6,4))
+   || ((name2 [6]) && (R_NameCompare (6,6)))))
     rc |= 2;
-
-  if (name2 [6])
-  {
-    if (R_NameCompare (4,6))
-      rc |= 1;
-
-    if ((name1 [6])
-     && (R_NameCompare (6,6)))
-      rc |= 2;
-  }
 
   return (rc);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 
-// #define SHOW_SPRITE_MATCHING
+#define SHOW_SPRITE_MATCHING
 
 static void R_RemoveDuplicateSprites (const char * name, int sprlump)
 {
