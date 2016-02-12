@@ -1037,10 +1037,12 @@ P_KillMobj
   int		th;
   int		flags;
   int		special;
+  int		gibhealth;
   fixed_t	height;
   fixed_t	dropheight;
   char *	msg;
   mobj_t*	mo;
+  mobjinfo_t*	info;
   item_to_drop_t * p;
 
   target->flags &= ~(MF_SHOOTABLE|MF_FLOAT|MF_SKULLFLY);
@@ -1184,16 +1186,19 @@ P_KillMobj
 
   th = target->health;
   target->health = -1;
+  info = target->info;
+  gibhealth = info->gibhealth;
 
-  if (th < -target->info->spawnhealth
-      && target->info->xdeathstate)
+  if ((gibhealth < 0)
+   && (th < gibhealth)
+   && (info->xdeathstate))
   {
-    if (P_SetMobjState (target, (statenum_t)target->info->xdeathstate) == false)
+    if (P_SetMobjState (target, (statenum_t)info->xdeathstate) == false)
       return;
   }
   else
   {
-    if (P_SetMobjState (target, (statenum_t)target->info->deathstate) == false)
+    if (P_SetMobjState (target, (statenum_t)info->deathstate) == false)
       return;
   }
 

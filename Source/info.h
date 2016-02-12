@@ -264,6 +264,7 @@ typedef struct
   int	doomednum;
   int	spawnstate;
   int	spawnhealth;
+  int	gibhealth;
   int	seestate;
   int	seesound;
   int	reactiontime;

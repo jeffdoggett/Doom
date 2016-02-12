@@ -213,6 +213,7 @@ static const char * const dehack_things [] =
   "ID #",
   "Initial frame",
   "Hit points",
+  "Gib health",
   "First moving frame",
   "Alert sound",
   "Reaction time",
@@ -1167,27 +1168,28 @@ static void write_all_things (FILE * fout)
     fprintf (fout, "%s = %d\n", dehack_things [0], ptr -> doomednum);
     fprintf (fout, "%s = %d\n", dehack_things [1], ptr -> spawnstate);
     fprintf (fout, "%s = %d\n", dehack_things [2], ptr -> spawnhealth);
-    fprintf (fout, "%s = %d\n", dehack_things [3], ptr -> seestate);
-    fprintf (fout, "%s = %d\n", dehack_things [4], ptr -> seesound);
-    fprintf (fout, "%s = %d\n", dehack_things [5], ptr -> reactiontime);
-    fprintf (fout, "%s = %d\n", dehack_things [6], ptr -> attacksound);
-    fprintf (fout, "%s = %d\n", dehack_things [7], ptr -> painstate);
-    fprintf (fout, "%s = %d\n", dehack_things [8], ptr -> painchance);
-    fprintf (fout, "%s = %d\n", dehack_things [9], ptr -> painsound);
-    fprintf (fout, "%s = %d\n", dehack_things [10], ptr -> meleestate);
-    fprintf (fout, "%s = %d\n", dehack_things [11], ptr -> missilestate);
-    fprintf (fout, "%s = %d\n", dehack_things [12], ptr -> deathstate);
-    fprintf (fout, "%s = %d\n", dehack_things [13], ptr -> xdeathstate);
-    fprintf (fout, "%s = %d\n", dehack_things [14], ptr -> deathsound);
-    fprintf (fout, "%s = %d\n", dehack_things [15], ptr -> speed);
-    fprintf (fout, "%s = %d\n", dehack_things [16], ptr -> radius);
-    fprintf (fout, "%s = %d\n", dehack_things [17], ptr -> height);
-    fprintf (fout, "%s = %d\n", dehack_things [18], ptr -> mass);
-    fprintf (fout, "%s = %d\n", dehack_things [19], ptr -> damage);
-    fprintf (fout, "%s = %d\n", dehack_things [20], ptr -> activesound);
-    fprintf (fout, "%s = %d\n", dehack_things [21], ptr -> flags);
-    fprintf (fout, "%s = %d\n", dehack_things [22], ptr -> raisestate);
-    fprintf (fout, "%s = %d\n", dehack_things [23], ptr -> scale);
+    fprintf (fout, "%s = %d\n", dehack_things [3], ptr -> gibhealth);
+    fprintf (fout, "%s = %d\n", dehack_things [4], ptr -> seestate);
+    fprintf (fout, "%s = %d\n", dehack_things [5], ptr -> seesound);
+    fprintf (fout, "%s = %d\n", dehack_things [6], ptr -> reactiontime);
+    fprintf (fout, "%s = %d\n", dehack_things [7], ptr -> attacksound);
+    fprintf (fout, "%s = %d\n", dehack_things [8], ptr -> painstate);
+    fprintf (fout, "%s = %d\n", dehack_things [9], ptr -> painchance);
+    fprintf (fout, "%s = %d\n", dehack_things [10], ptr -> painsound);
+    fprintf (fout, "%s = %d\n", dehack_things [11], ptr -> meleestate);
+    fprintf (fout, "%s = %d\n", dehack_things [12], ptr -> missilestate);
+    fprintf (fout, "%s = %d\n", dehack_things [13], ptr -> deathstate);
+    fprintf (fout, "%s = %d\n", dehack_things [14], ptr -> xdeathstate);
+    fprintf (fout, "%s = %d\n", dehack_things [15], ptr -> deathsound);
+    fprintf (fout, "%s = %d\n", dehack_things [16], ptr -> speed);
+    fprintf (fout, "%s = %d\n", dehack_things [17], ptr -> radius);
+    fprintf (fout, "%s = %d\n", dehack_things [18], ptr -> height);
+    fprintf (fout, "%s = %d\n", dehack_things [19], ptr -> mass);
+    fprintf (fout, "%s = %d\n", dehack_things [20], ptr -> damage);
+    fprintf (fout, "%s = %d\n", dehack_things [21], ptr -> activesound);
+    fprintf (fout, "%s = %d\n", dehack_things [22], ptr -> flags);
+    fprintf (fout, "%s = %d\n", dehack_things [23], ptr -> raisestate);
+    fprintf (fout, "%s = %d\n", dehack_things [24], ptr -> scale);
 
     fprintf (fout, "\n\n");
     ptr++;
@@ -1301,28 +1303,29 @@ static void dh_write_to_thing (unsigned int number, unsigned int record, unsigne
     case  0:ptr -> doomednum	= value; break;
     case  1:ptr -> spawnstate	= value; break;
     case  2:ptr -> spawnhealth	= value; break;
-    case  3:ptr -> seestate	= value; break;
-    case  4:ptr -> seesound	= value; break;
-    case  5:ptr -> reactiontime	= value; break;
-    case  6:ptr -> attacksound	= value; break;
-    case  7:ptr -> painstate	= value; break;
-    case  8:ptr -> painchance	= value; break;
-    case  9:ptr -> painsound	= value; break;
-    case 10:ptr -> meleestate	= value; break;
-    case 11:ptr -> missilestate	= value; break;
-    case 12:ptr -> deathstate	= value; break;
-    case 13:ptr -> xdeathstate	= value; break;
-    case 14:ptr -> deathsound	= value; break;
-    case 15:ptr -> speed	= value; break;
-    case 16:ptr -> radius	= value;
+    case  3:ptr -> gibhealth	= value; break;
+    case  4:ptr -> seestate	= value; break;
+    case  5:ptr -> seesound	= value; break;
+    case  6:ptr -> reactiontime	= value; break;
+    case  7:ptr -> attacksound	= value; break;
+    case  8:ptr -> painstate	= value; break;
+    case  9:ptr -> painchance	= value; break;
+    case 10:ptr -> painsound	= value; break;
+    case 11:ptr -> meleestate	= value; break;
+    case 12:ptr -> missilestate	= value; break;
+    case 13:ptr -> deathstate	= value; break;
+    case 14:ptr -> xdeathstate	= value; break;
+    case 15:ptr -> deathsound	= value; break;
+    case 16:ptr -> speed	= value; break;
+    case 17:ptr -> radius	= value;
 	    ptr -> pickupradius	= value; break;
-    case 17:ptr -> height	= value; break;
-    case 18:ptr -> mass		= value; break;
-    case 19:ptr -> damage	= value; break;
-    case 20:ptr -> activesound	= value; break;
-    case 21:ptr -> flags	= value; break;
-    case 22:ptr -> raisestate	= value; break;
-    case 23:ptr -> scale	= value; break;
+    case 18:ptr -> height	= value; break;
+    case 19:ptr -> mass		= value; break;
+    case 20:ptr -> damage	= value; break;
+    case 21:ptr -> activesound	= value; break;
+    case 22:ptr -> flags	= value; break;
+    case 23:ptr -> raisestate	= value; break;
+    case 24:ptr -> scale	= value; break;
     default:fprintf (stderr, "Invalid Thing record\n");
   }
   // printf ("Patched element %d of THINGS %d to %X\n", record, number, value);
@@ -3265,7 +3268,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      switch (counter1)
 	      {
-		case 21:				// Writing to "bits"
+		case 22:				// Writing to "bits"
 		  counter2 = dh_inchar (a_line, '=');
 		  if (counter2)
 		  {
@@ -3274,7 +3277,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  }
 		  break;
 
-		case 23:				// Writing to "scale"
+		case 24:				// Writing to "scale"
 		  counter2 = dh_inchar (a_line, '=');
 		  if (counter2)
 		  {
