@@ -204,6 +204,7 @@ void P_LoadSegs (int lump)
 {
   byte*		data;
   int		i;
+  int		s;
   mapseg_t*	ml;
   seg_t*	li;
   line_t*	ldef;
@@ -289,13 +290,38 @@ void P_LoadSegs (int lump)
       printf ("P_LoadSegs: Seg %i side = %u\n", i, side);
       side = 0;
     }
-    li->sidedef = &sides[ldef->sidenum[side]];
-    li->frontsector = sides[ldef->sidenum[side]].sector;
-    if (ldef-> flags & ML_TWOSIDED)
-	li->backsector = sides[ldef->sidenum[side^1]].sector;
-    else
-	li->backsector = 0;
 
+
+    // cph 2006/09/30 - our frontsector can be the second side of the
+    // linedef, so must check for NO_INDEX in case we are incorrectly
+    // referencing the back of a 1S line
+    s = ldef->sidenum[side];
+    if ((s != NO_INDEX)
+     && ((unsigned) s < numsides))
+    {
+	li->sidedef = &sides[s];
+	li->frontsector = sides[s].sector;
+    }
+    else
+    {
+	printf ("The front of seg %u has no sidedef.\n", i);
+	li->sidedef = NULL;
+	li->frontsector = NULL;
+    }
+
+    // killough 5/3/98: ignore 2s flag if second sidedef missing:
+    if ((ldef->flags & ML_TWOSIDED)
+     && ((s = ldef->sidenum[side ^ 1]) != NO_INDEX)
+     && ((unsigned) s < numsides))
+    {
+	li->backsector = sides[s].sector;
+    }
+    else
+    {
+//	printf ("The back of seg %u has no sidedef.\n", i);
+	li->backsector = NULL;
+	ldef->flags &= ~ML_TWOSIDED;
+    }
 
     v1 = USHORT(ml->v1);
     v2 = USHORT(ml->v2);
@@ -709,7 +735,7 @@ static void P_LoadSegs_V4 (int lump)
     if ((unsigned)linedef >= (unsigned)numlines)
     {
       I_Error("P_LoadSegs_V4: seg %d references a non-existent linedef %d",
-        i, (unsigned)linedef);
+	i, (unsigned)linedef);
     }
 
     ldef = &lines[linedef];
@@ -727,7 +753,7 @@ static void P_LoadSegs_V4 (int lump)
     if ((unsigned)ldef->sidenum[side] >= (unsigned)numsides)
     {
       I_Error("P_LoadSegs_V4: linedef %d for seg %d references a non-existent sidedef %d",
-        linedef, i, (unsigned)ldef->sidenum[side]);
+	linedef, i, (unsigned)ldef->sidenum[side]);
     }
 
     li->sidedef = &sides[ldef->sidenum[side]];
@@ -860,7 +886,7 @@ static void P_LoadNodes_V4 (int lump)
       no->children[j] = read_32 ((unsigned char*) &mn->children[j]);
 
       for (k=0 ; k<4 ; k++)
-        no->bbox[j][k] = read_16 ((unsigned char*) &mn->bbox[j][k])<<FRACBITS;
+	no->bbox[j][k] = read_16 ((unsigned char*) &mn->bbox[j][k])<<FRACBITS;
     }
     no++;
     mn++;
@@ -1037,7 +1063,7 @@ void P_LoadLineDefs (int lump)
 	ld->soundorg.y = (ld->bbox[BOXTOP] + ld->bbox[BOXBOTTOM]) / 2;
 
 	sidenum = USHORT(mld->sidenum[0]);
-	if (sidenum == 0xFFFF)
+	if (sidenum == NO_INDEX)
 	{
 	  ld->sidenum[0] = (dushort_t) -1;
 	  ld->frontsector = 0;
@@ -1054,7 +1080,7 @@ void P_LoadLineDefs (int lump)
 	}
 
 	sidenum = USHORT(mld->sidenum[1]);
-	if (sidenum == 0xFFFF)
+	if (sidenum == NO_INDEX)
 	{
 	  ld->sidenum[1] = (dushort_t) -1;
 	  ld->backsector = 0;
