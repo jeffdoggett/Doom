@@ -197,6 +197,44 @@ void P_LoadVertexes (int lump)
 }
 
 //-----------------------------------------------------------------------------
+// cph 2006/09/30 - our frontsector can be the second side of the
+// linedef, so must check for NO_INDEX in case we are incorrectly
+// referencing the back of a 1S line
+
+static void P_CheckSides (seg_t* li, line_t* ldef, int side)
+{
+  int s;
+
+  s = ldef->sidenum[side];
+  if ((s != NO_INDEX)
+   && ((unsigned) s < numsides))
+  {
+    li->sidedef = &sides[s];
+    li->frontsector = sides[s].sector;
+  }
+  else
+  {
+    printf ("The front of seg %u has no sidedef.\n", segs-li);
+    li->sidedef = NULL;
+    li->frontsector = NULL;
+  }
+
+  // killough 5/3/98: ignore 2s flag if second sidedef missing:
+  if ((ldef->flags & ML_TWOSIDED)
+   && ((s = ldef->sidenum[side ^ 1]) != NO_INDEX)
+   && ((unsigned) s < numsides))
+  {
+    li->backsector = sides[s].sector;
+  }
+  else
+  {
+//  printf ("The back of seg %u has no sidedef.\n", segs-li);
+    li->backsector = NULL;
+    ldef->flags &= ~ML_TWOSIDED;
+  }
+}
+
+//-----------------------------------------------------------------------------
 //
 // P_LoadSegs
 //
@@ -204,7 +242,6 @@ void P_LoadSegs (int lump)
 {
   byte*		data;
   int		i;
-  int		s;
   mapseg_t*	ml;
   seg_t*	li;
   line_t*	ldef;
@@ -291,37 +328,7 @@ void P_LoadSegs (int lump)
       side = 0;
     }
 
-
-    // cph 2006/09/30 - our frontsector can be the second side of the
-    // linedef, so must check for NO_INDEX in case we are incorrectly
-    // referencing the back of a 1S line
-    s = ldef->sidenum[side];
-    if ((s != NO_INDEX)
-     && ((unsigned) s < numsides))
-    {
-	li->sidedef = &sides[s];
-	li->frontsector = sides[s].sector;
-    }
-    else
-    {
-	printf ("The front of seg %u has no sidedef.\n", i);
-	li->sidedef = NULL;
-	li->frontsector = NULL;
-    }
-
-    // killough 5/3/98: ignore 2s flag if second sidedef missing:
-    if ((ldef->flags & ML_TWOSIDED)
-     && ((s = ldef->sidenum[side ^ 1]) != NO_INDEX)
-     && ((unsigned) s < numsides))
-    {
-	li->backsector = sides[s].sector;
-    }
-    else
-    {
-//	printf ("The back of seg %u has no sidedef.\n", i);
-	li->backsector = NULL;
-	ldef->flags &= ~ML_TWOSIDED;
-    }
+    P_CheckSides (li, ldef, side);
 
     v1 = USHORT(ml->v1);
     v2 = USHORT(ml->v2);
@@ -537,23 +544,7 @@ static byte * P_LoadZSegs (const byte *data)
 	  linedef, i, (unsigned int)ldef->sidenum[side]);
     }
 
-    li->sidedef = &sides[ldef->sidenum[side]];
-
-    // cph 2006/09/30 - our frontsector can be the second side of the
-    // linedef, so must check for NO_INDEX in case we are incorrectly
-    // referencing the back of a 1S line
-    if (ldef->sidenum[side] != NO_INDEX)
-      li->frontsector = sides[ldef->sidenum[side]].sector;
-    else
-    {
-      li->frontsector = 0;
-      printf ("P_LoadZSegs: front of seg %i has no sidedef.", i);
-    }
-
-    if ((ldef->flags & ML_TWOSIDED) && (ldef->sidenum[side ^ 1] != NO_INDEX))
-      li->backsector = sides[ldef->sidenum[side ^ 1]].sector;
-    else
-      li->backsector = 0;
+    P_CheckSides (li, ldef, side);
 
     li->v1 = &vertexes[v1];
     li->v2 = &vertexes[v2];
@@ -756,25 +747,7 @@ static void P_LoadSegs_V4 (int lump)
 	linedef, i, (unsigned)ldef->sidenum[side]);
     }
 
-    li->sidedef = &sides[ldef->sidenum[side]];
-
-    /* cph 2006/09/30 - our frontsector can be the second side of the
-    * linedef, so must check for NO_INDEX in case we are incorrectly
-    * referencing the back of a 1S line */
-    if (ldef->sidenum[side] != NO_INDEX)
-    {
-      li->frontsector = sides[ldef->sidenum[side]].sector;
-    }
-    else
-    {
-      li->frontsector = 0;
-      printf ("P_LoadSegs_V4: front of seg %i has no sidedef\n", i);
-    }
-
-    if (ldef->flags & ML_TWOSIDED && ldef->sidenum[side^1]!=NO_INDEX)
-      li->backsector = sides[ldef->sidenum[side^1]].sector;
-    else
-      li->backsector = 0;
+    P_CheckSides (li, ldef, side);
 
     v1 = read_32((unsigned char *) &ml->v1);
     v2 = read_32((unsigned char *) &ml->v2);
