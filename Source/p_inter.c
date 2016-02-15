@@ -33,7 +33,6 @@ extern char* player_names[];
 extern unsigned char player_genders[];
 extern int gamecompletedtimer;
 extern boolean crushchange;
-extern boolean gamekeydown[NUMKEYS];
 
 #define BONUSADD	6
 

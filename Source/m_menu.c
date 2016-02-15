@@ -136,7 +136,6 @@ int qty_endmsg_nums = ARRAY_SIZE(endmsg_orig)-1;
 
 /* ----------------------------------------------------------------------- */
 
-extern boolean		gamekeydown[NUMKEYS];
 extern patch_t*		hu_font[HU_FONTSIZE];
 extern boolean		message_dontfuckwithme;
 extern char *		finale_backdrops [];

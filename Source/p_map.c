@@ -64,7 +64,6 @@ boolean		Monsters_Infight2 = false;		// Controlled by the command line
 static mobj_t*	onmobj;
 
 extern void P_ExplodeMissile (mobj_t* mo);
-extern boolean	gamekeydown[NUMKEYS];
 
 static boolean	telefrag;
 

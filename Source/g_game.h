@@ -74,6 +74,7 @@ typedef struct item_to_drop_s
 } item_to_drop_t;
 
 extern boolean par_changed;
+extern boolean gamekeydown[NUMKEYS];
 
 void G_DeathMatchSpawnPlayer (int playernum);
 

@@ -114,11 +114,14 @@ void T_MoveCeiling (ceiling_t* ceiling)
 	    break;
 
 	  case silentCrushAndRaise:
-	    S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-			 sfx_pstop);
+	    S_StartSound((mobj_t *)&ceiling->sector->soundorg, sfx_pstop);
+
 	  case fastCrushAndRaise:
 	  case crushAndRaise:
-	    ceiling->direction = -1;
+	    if (netgame || (!gamekeydown['`'])) 	// Stay open cheat
+	      ceiling->direction = -1;
+	    else
+	      P_RemoveActiveCeiling(ceiling);
 	    break;
 
 	  default:
