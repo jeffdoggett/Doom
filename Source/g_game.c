@@ -3398,3 +3398,88 @@ void G_Patch_Map (void)
 }
 
 /* -------------------------------------------------------------------------------------------- */
+/*
+  Read patches from the .msq file.
+
+  Examples:
+    Patch E1M5 Thing 14 options=12
+*/
+
+void G_Patch_Map_Things (int thingnumber, mapthing_t * mt)
+{
+  unsigned int pos;
+  unsigned int index;
+  unsigned int patch;
+  map_patch_t * ptr;
+  char * pp;
+  char * pq;
+
+  ptr = map_patches_head;
+  if (ptr)
+  {
+    do
+    {
+      pp = ptr -> patch;
+
+      if (gamemode == commercial)
+      {
+	if (strncasecmp (pp, "map", 3))
+	  continue;
+	if (atoi (pp+3) != gamemap)
+	  continue;
+	pp += 5;
+      }
+      else
+      {
+	if ((pp [0] != 'E')
+	 || (pp [2] != 'M')
+	 || (pp [4] != ' ')
+	 || ((pp [1] - '0') != gameepisode)
+	 || ((pp [3] - '0') != gamemap))
+	  continue;
+	pp += 4;
+      }
+
+      pos = dh_inchar (pp, '=');
+      if (pos == 0)
+	continue;
+
+      pq = pp + pos;
+      while (*pq == ' ') pq++;
+      patch = atoi (pq);
+      while (*pp == ' ') pp++;
+      if (strncasecmp (pp, "THING ",6) == 0)
+      {
+	pp += 6;
+	index = atoi (pp);
+	if (index == thingnumber)
+	{
+	  while (*pp && (*pp != ' ')) pp++;
+	  while (*pp == ' ') pp++;
+	  if (strncasecmp (pp, "X", 1) == 0)
+	  {
+	    mt -> x = patch;
+	  }
+	  else if (strncasecmp (pp, "Y", 1) == 0)
+	  {
+	    mt -> y = patch;
+	  }
+	  else if (strncasecmp (pp, "ANGLE", 5) == 0)
+	  {
+	    mt -> angle = patch;
+	  }
+	  else if (strncasecmp (pp, "TYPE", 4) == 0)
+	  {
+	    mt -> type = patch;
+	  }
+	  else if (strncasecmp (pp, "OPTIONS", 7) == 0)
+	  {
+	    mt -> options = patch;
+	  }
+	}
+      }
+    } while ((ptr = ptr -> next) != NULL);
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- */

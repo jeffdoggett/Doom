@@ -133,6 +133,7 @@ const char * leafname (const char * path);
 void dirname (char * dest, const char * path);
 void scan_dir (char * dirname, char * filename, boolean do_it);
 void G_Patch_Map (void);
+void G_Patch_Map_Things (int thingnumber, mapthing_t * mt);
 
 #endif
 //-----------------------------------------------------------------------------

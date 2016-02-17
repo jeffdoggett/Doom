@@ -876,10 +876,10 @@ static unsigned int P_LoadThings (int lump)
 {
     byte*		data;
     int			i;
+    int			type;
     mapthing_t*		mt;
     mapthing_t		mtl;
     int			numthings;
-    boolean		spawn;
     unsigned int	nomonsterbits;
     unsigned int	monsternotloaded;
 
@@ -905,36 +905,28 @@ static unsigned int P_LoadThings (int lump)
     mt = (mapthing_t *)data;
     for (i=0 ; i<numthings ; i++)
     {
-	spawn = true;
+	mtl.x = SHORT(mt->x);
+	mtl.y = SHORT(mt->y);
+	mtl.angle = SHORT(mt->angle);
+	mtl.type = SHORT(mt->type);
+	mtl.options = SHORT(mt->options);
+
+	G_Patch_Map_Things (i, &mtl);
 
 	// Do not spawn cool, new monsters if !commercial
-	if ( gamemode != commercial)
-	{
-	    switch(SHORT(mt->type))
-	    {
-	      case 68:	// Arachnotron
-	      case 64:	// Archvile
-	      case 88:	// Boss Brain
-	      case 89:	// Boss Shooter
-	      case 69:	// Hell Knight
-	      case 67:	// Mancubus
-	      case 71:	// Pain Elemental
-	      case 65:	// Former Human Commando
-	      case 66:	// Revenant
-	      case 84:	// Wolf SS
-		spawn = false;
-		break;
-	    }
-	}
-
-	if (spawn)
+	if ((gamemode == commercial)
+	 || (((type = mtl.type) != 68)	// Arachnotron
+	  && (type != 64)		// Archvile
+	  && (type != 88)		// Boss Brain
+	  && (type != 89)		// Boss Shooter
+	  && (type != 69)		// Hell Knight
+	  && (type != 67)		// Mancubus
+	  && (type != 71)		// Pain Elemental
+	  && (type != 65)		// Former Human Commando
+	  && (type != 66)		// Revenant
+	  && (type != 84)))		// Wolf SS
 	{
 	  // Do spawn all other stuff.
-	  mtl.x = SHORT(mt->x);
-	  mtl.y = SHORT(mt->y);
-	  mtl.angle = SHORT(mt->angle);
-	  mtl.type = SHORT(mt->type);
-	  mtl.options = SHORT(mt->options);
 
 #if 0
 	  // [BH] change all wolfenstein ss' into zombiemen when using
