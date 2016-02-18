@@ -3440,13 +3440,6 @@ void G_Patch_Map_Things (int thingnumber, mapthing_t * mt)
 	pp += 4;
       }
 
-      pos = dh_inchar (pp, '=');
-      if (pos == 0)
-	continue;
-
-      pq = pp + pos;
-      while (*pq == ' ') pq++;
-      patch = atoi (pq);
       while (*pp == ' ') pp++;
       if (strncasecmp (pp, "THING ",6) == 0)
       {
@@ -3454,8 +3447,17 @@ void G_Patch_Map_Things (int thingnumber, mapthing_t * mt)
 	index = atoi (pp);
 	if (index == thingnumber)
 	{
+	  pos = dh_inchar (pp, '=');
+	  if (pos == 0)
+	    continue;
+
+	  pq = pp + pos;
+	  while (*pq == ' ') pq++;
+	  patch = atoi (pq);
+
 	  while (*pp && (*pp != ' ')) pp++;
 	  while (*pp == ' ') pp++;
+
 	  if (strncasecmp (pp, "X", 1) == 0)
 	  {
 	    mt -> x = patch;
