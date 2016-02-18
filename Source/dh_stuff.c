@@ -767,7 +767,7 @@ static const bit_names_t dehack_thing_bit_names [] =
 actionf_t states_ptr_copy [NUMSTATES];
 
 /* ---------------------------------------------------------------------------- */
-// #define CREATE_DEHACK_FILE
+#define CREATE_DEHACK_FILE
 #ifdef CREATE_DEHACK_FILE
 extern const char * const thing_names [];
 
@@ -3488,33 +3488,6 @@ void DH_parse_hacker_file (const char * filename)
   {
     fprintf (stderr, "DeHackEd:Cannot open file %s\n", filename);
   }
-
-#ifdef CREATE_DEHACK_FILE
-#ifdef __riscos
-  fin = fopen ("<DeHack$Dir>.Resources.DeHack/Deh", "w");
-#else
-  fin = fopen ("DeHack.Deh", "w");
-#endif
-  if (fin)
-  {
-    fprintf (fin, "Patch File for DeHackEd v3.0\n");
-    fprintf (fin, "Doom version = 21\n");
-    fprintf (fin, "Patch format = 6\n\n");
-
-    write_all_things (fin);
-    write_all_sounds (fin);
-    write_all_frames (fin);
-    // write_all_sprites (fin);
-    write_all_ammos (fin);
-    write_all_weapons (fin);
-    // write_all_pointers (fin);
-    write_all_cheats (fin);
-    write_all_miscs (fin);
-    write_all_texts (fin);
-    fclose (fin);
-    printf ("Wrote DeHack file\n");
-  }
-#endif
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4038,6 +4011,37 @@ void DH_remove_duplicate_mapinfos (void)
       map_ptr++;
     } while (--i);
   }
+
+#ifdef CREATE_DEHACK_FILE
+  if (M_CheckParm ("-writedehfile"))
+  {
+    FILE * fout;
+#ifdef __riscos
+    fout = fopen ("<DeHack$Dir>.Resources.DeHack/Deh", "w");
+#else
+    fout = fopen ("DeHack.Deh", "w");
+#endif
+    if (fout)
+    {
+      fprintf (fout, "Patch File for DeHackEd v3.0\n");
+      fprintf (fout, "Doom version = 21\n");
+      fprintf (fout, "Patch format = 6\n\n");
+
+      write_all_things (fout);
+      write_all_sounds (fout);
+      write_all_frames (fout);
+      // write_all_sprites (fout);
+      write_all_ammos (fout);
+      write_all_weapons (fout);
+      // write_all_pointers (fout);
+      write_all_cheats (fout);
+      write_all_miscs (fout);
+      write_all_texts (fout);
+      fclose (fout);
+      printf ("Wrote DeHack file\n");
+    }
+  }
+#endif
 }
 
 /* ---------------------------------------------------------------------------- */
