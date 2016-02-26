@@ -562,9 +562,9 @@ static void I_Do_24 (void)
 //
 void I_FinishUpdate (void)
 {
-  static int	lasttic;
-  int		tics;
-  int		i;
+  static unsigned int	lasttic;
+  unsigned int		tics;
+  unsigned int		i;
   // UNUSED static unsigned char *bigscreen=0;
 
   // draws little dots on the bottom of the screen

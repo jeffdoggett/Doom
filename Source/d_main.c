@@ -411,9 +411,9 @@ void D_Display (void)
     static  boolean		fullscreen = false;
     static  gamestate_t		oldgamestate = (gamestate_t)-1;
     static  int			borderdrawcount;
-    int				nowtime;
-    int				tics;
-    int				wipestart;
+    unsigned int		nowtime;
+    unsigned int		tics;
+    unsigned int		wipestart;
     int				y;
     boolean			done;
     boolean			wipe;

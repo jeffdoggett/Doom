@@ -93,7 +93,7 @@ boolean		usergame;		// ok to save / end game
 static boolean	timingdemo;		// if true, exit with report on completion
 boolean		nodrawers;		// for comparative timing purposes
 static boolean	noblit;			// for comparative timing purposes
-static int	starttime;		// for comparative timing purposes
+static unsigned int starttime;		// for comparative timing purposes
 
 boolean		viewactive;
 
@@ -2399,7 +2399,7 @@ void G_TimeDemo (char* name)
 
 boolean G_CheckDemoStatus (void)
 {
-  int	     endtime;
+  unsigned int endtime;
 
   if (timingdemo)
   {

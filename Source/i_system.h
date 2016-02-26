@@ -36,7 +36,7 @@ void I_Init (void);
 
 // Called by D_DoomLoop,
 // returns current time in tics.
-int I_GetTime (void);
+unsigned int I_GetTime (void);
 
 
 //
