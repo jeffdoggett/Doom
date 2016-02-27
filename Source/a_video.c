@@ -10,13 +10,14 @@
 extern boolean	menuactive;
 extern int 	novert;
 
-#define OS_Word			 0x07
-#define OS_Mouse		 0x1C
-#define OS_SpriteOp		 0x2E
-#define OS_ReadVduVariables	 0x31
-#define OS_SWINumberFromString	 0x39
-#define OS_ScreenMode		 0x65
-#define ColourTrans_WritePalette 0x4075D
+#define OS_Word				0x07
+#define OS_Mouse			0x1C
+#define OS_SpriteOp			0x2E
+#define OS_ReadVduVariables		0x31
+#define OS_SWINumberFromString		0x39
+#define OS_ScreenMode			0x65
+#define ColourTrans_ReturnColourNumber	0x40744
+#define ColourTrans_WritePalette	0x4075D
 
 #define MOUSE_SELECT 1
 #define MOUSE_MENU   3
@@ -1067,80 +1068,6 @@ void I_ReadScreen (byte* scr)
 
 /* -------------------------------------------------------------------------- */
 
-static void set_palette_24 (byte * palette)
-{
-  unsigned int colour;
-  unsigned int red;
-  unsigned int green;
-  unsigned int blue;
-
-  colour = 0;
-  do
-  {
-    red   = gammatable[usegamma][*palette++];
-    green = gammatable[usegamma][*palette++];
-    blue  = gammatable[usegamma][*palette++];
-
-    palette_table [colour] = (blue << 16) | (green << 8) | (red);
-  } while (++colour < 256);
-}
-
-/* -------------------------------------------------------------------------- */
-
-static void set_palette_16 (byte * palette)
-{
-  unsigned int colour;
-  unsigned int red;
-  unsigned int green;
-  unsigned int blue;
-
-  colour = 0;
-  do
-  {
-    red   = gammatable[usegamma][*palette++];
-    green = gammatable[usegamma][*palette++];
-    blue  = gammatable[usegamma][*palette++];
-
-
-    palette_table [colour] = ((blue  & 0xF8) << 7)
-			   | ((green & 0xF8) << 2)
-			   | ((red   & 0xF8) >> 3);
-  } while (++colour < 256);
-}
-
-/* -------------------------------------------------------------------------- */
-
-static void set_palette_8_non_rpc (byte * palette)
-{
-  unsigned int colour;
-  unsigned int red;
-  unsigned int green;
-  unsigned int blue;
-
-  colour = 0;
-  do
-  {
-    red   = gammatable[usegamma][*palette++];
-    green = gammatable[usegamma][*palette++];
-    blue  = gammatable[usegamma][*palette++];
-
-
-	// if (red & 0x0F)   red   |= 0x10;
-	// if (blue & 0x0F)  blue  |= 0x10;
-	// if (green & 0x0F) green |= 0x10;
-
-    palette_table [colour] = (blue & 0x80)
-	   		| ((green & 0xC0) >> 1)
-			| ((red & 0x80) >> 3)
-			| ((blue & 0x40) >> 3)
-			| ((red & 0x40) >> 4)
-			| (((blue | green | red) & 0x30) >> 4);
-
-  } while (++colour < 256);
-}
-
-/* -------------------------------------------------------------------------- */
-
 static void set_palette_8_rpc (byte * palette)
 {
   unsigned int colour;
@@ -1170,6 +1097,147 @@ static void set_palette_8_rpc (byte * palette)
   regs.r[6] = 0;
   regs.r[7] = 0;
   _kernel_swi (ColourTrans_WritePalette, &regs, &regs);
+}
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef ColourTrans_ReturnColourNumber
+
+static void set_palette_xx (byte * palette)
+{
+  unsigned int colour;
+  unsigned int red;
+  unsigned int green;
+  unsigned int blue;
+  _kernel_swi_regs regs;
+
+  colour = 0;
+  do
+  {
+    red   = gammatable[usegamma][*palette++];
+    green = gammatable[usegamma][*palette++];
+    blue  = gammatable[usegamma][*palette++];
+    regs.r[0] = (blue << 24) | (green << 16) | (red << 8);
+    _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
+    palette_table [colour] = regs.r[0];
+  } while (++colour < 256);
+}
+
+/* -------------------------------------------------------------------------- */
+//
+// I_SetPalette
+//
+void I_SetPalette (byte* palette)
+{
+  if (devparm)
+  {
+    devparm_black = AM_load_colour (0, 0, 0, palette);
+    devparm_white = AM_load_colour (255, 255, 255, palette);
+  }
+
+  switch (screen_mode)
+  {
+    case MODE_USER_DEF:
+      switch (screen_user_def [3])
+      {
+	case 3:
+	  if (rpc_palette)
+	  {
+	    set_palette_8_rpc (palette);
+	    return;
+	  }
+	  break;
+      }
+      break;
+
+    case MODE_320_x_200_8bpp: /* 8bpp */
+    case MODE_320_x_240_8bpp:
+    case MODE_320_x_256_8bpp:
+    case MODE_320_x_400_8bpp:
+    case MODE_320_x_480_8bpp:
+    case MODE_640_x_400_8bpp:
+    case MODE_640_x_480_8bpp:
+      if (rpc_palette)
+      {
+        set_palette_8_rpc (palette);
+        return;
+      }
+      break;
+  }
+
+  set_palette_xx (palette);
+}
+
+#else
+
+/* -------------------------------------------------------------------------- */
+
+static void set_palette_24 (byte * palette)
+{
+  unsigned int colour;
+  unsigned int red;
+  unsigned int green;
+  unsigned int blue;
+
+  colour = 0;
+  do
+  {
+    red   = gammatable[usegamma][*palette++];
+    green = gammatable[usegamma][*palette++];
+    blue  = gammatable[usegamma][*palette++];
+    palette_table [colour] = (blue << 16) | (green << 8) | (red);
+  } while (++colour < 256);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static void set_palette_16 (byte * palette)
+{
+  unsigned int colour;
+  unsigned int red;
+  unsigned int green;
+  unsigned int blue;
+
+  colour = 0;
+  do
+  {
+    red   = gammatable[usegamma][*palette++];
+    green = gammatable[usegamma][*palette++];
+    blue  = gammatable[usegamma][*palette++];
+
+    palette_table [colour] = ((blue  & 0xF8) << 7)
+			   | ((green & 0xF8) << 2)
+			   | ((red   & 0xF8) >> 3);
+  } while (++colour < 256);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static void set_palette_8_non_rpc (byte * palette)
+{
+  unsigned int colour;
+  unsigned int red;
+  unsigned int green;
+  unsigned int blue;
+
+  colour = 0;
+  do
+  {
+    red   = gammatable[usegamma][*palette++];
+    green = gammatable[usegamma][*palette++];
+    blue  = gammatable[usegamma][*palette++];
+
+	// if (red & 0x0F)   red   |= 0x10;
+	// if (blue & 0x0F)  blue  |= 0x10;
+	// if (green & 0x0F) green |= 0x10;
+
+    palette_table [colour] = (blue & 0x80)
+	   		| ((green & 0xC0) >> 1)
+			| ((red & 0x80) >> 3)
+			| ((blue & 0x40) >> 3)
+			| ((red & 0x40) >> 4)
+			| (((blue | green | red) & 0x30) >> 4);
+  } while (++colour < 256);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1242,7 +1310,7 @@ void I_SetPalette (byte* palette)
       set_palette_24 (palette);
   }
 }
-
+#endif
 /* -------------------------------------------------------------------------- */
 
 static int read_k_var (char * line, int * ptr)
