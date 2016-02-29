@@ -1224,132 +1224,125 @@ int R_TextureNumForName (const char* name)
 // R_PrecacheLevel
 // Preloads all relevant graphics for the level.
 //
-int		flatmemory;
-int		texturememory;
-int		spritememory;
 
 void R_PrecacheLevel (void)
 {
-    char*		flatpresent;
-    char*		texturepresent;
-    char*		spritepresent;
+  int 		f;
+  int 		i;
+  int 		j;
+  int 		k;
+  int 		s;
+  int 		t;
+  int 		lump;
+  byte*		hitlist;
+  texture_t*	texture;
+  thinker_t*	th;
+  spriteframe_t* sf;
 
-    int 		f;
-    int 		i;
-    int 		j;
-    int 		k;
-    int 		s;
-    int 		t;
-    int 		lump;
+  if (demoplayback)
+      return;
 
-    texture_t*		texture;
-    thinker_t*		th;
-    spriteframe_t*	sf;
+  s = numtextures;
+  if (numflats > s)   s = numflats;
+  if (numsprites > s) s = numsprites;
+  hitlist = malloc (s);
+  if (hitlist == NULL)
+    I_Error ("R_PrecacheLevel: out of memory\n");
 
-    if (demoplayback)
-	return;
+  // Precache flats.
+  memset (hitlist,0,numflats);
 
-    // Precache flats.
-    flatpresent = alloca(numflats);
-    memset (flatpresent,0,numflats);
+  for (i=0 ; i<numsectors ; i++)
+  {
+    f = sectors[i].floorpic;
+    if ((unsigned)f < numflats)
+      hitlist[f] = 1;
+    f = sectors[i].ceilingpic;
+    if ((unsigned)f < numflats)
+      hitlist[f] = 1;
+  }
 
-    for (i=0 ; i<numsectors ; i++)
+  for (i=0 ; i<numflats ; i++)
+  {
+    if (hitlist[i])
     {
-      f = sectors[i].floorpic;
-      if (f < numflats)
-	flatpresent[f] = 1;
-      f = sectors[i].ceilingpic;
-      if (f < numflats)
-	flatpresent[f] = 1;
+      lump = flatlumps [i];
+      W_CacheLumpNum(lump, PU_CACHE);
     }
+  }
 
-    flatmemory = 0;
+  // Precache textures.
+  memset (hitlist,0, numtextures);
 
-    for (i=0 ; i<numflats ; i++)
+  for (i=0 ; i<numsides ; i++)
+  {
+    t = sides[i].toptexture;
+    if ((unsigned)t < numtextures)
+      hitlist[t] = 1;
+    t = sides[i].midtexture;
+    if ((unsigned)t < numtextures)
+      hitlist[t] = 1;
+    t = sides[i].bottomtexture;
+    if ((unsigned)t < numtextures)
+      hitlist[t] = 1;
+  }
+
+  // Sky texture is always present.
+  // Note that F_SKY1 is the name used to
+  //	indicate a sky floor/ceiling as a flat,
+  //	while the sky texture is stored like
+  //	a wall texture, with an episode dependent
+  //	name.
+
+  t = skytexture;
+  if ((unsigned)t < numtextures)
+    hitlist[t] = 1;
+
+  for (i=0 ; i<numtextures ; i++)
+  {
+    if (hitlist[i])
     {
-	if (flatpresent[i])
+      texture = textures[i];
+
+      for (j=0 ; j<texture->patchcount ; j++)
+      {
+	lump = texture->patches[j].patch;
+	W_CacheLumpNum(lump , PU_CACHE);
+      }
+    }
+  }
+
+  // Precache sprites.
+  memset (hitlist,0, numsprites);
+
+  for (th = thinker_head ; th != NULL ; th=th->next)
+  {
+    if (th->function.acp1 == (actionf_p1)P_MobjThinker)
+    {
+      s = ((mobj_t *)th)->sprite;
+      if ((unsigned)s < numsprites)
+	hitlist[s] = 1;
+    }
+  }
+
+  for (i=0 ; i<numsprites ; i++)
+  {
+    if (hitlist[i])
+    {
+      for (j=0 ; j<sprites[i].numframes ; j++)
+      {
+	sf = &sprites[i].spriteframes[j];
+	for (k=0 ; k<8 ; k++)
 	{
-	    lump = flatlumps [i];
-	    flatmemory += lumpinfo[lump].size;
-	    W_CacheLumpNum(lump, PU_CACHE);
+	  lump = sf->lump[k];
+	  if (lump != -1)
+	    W_CacheLumpNum (lump, PU_CACHE);
 	}
+      }
     }
+  }
 
-    // Precache textures.
-    texturepresent = alloca(numtextures);
-    memset (texturepresent,0, numtextures);
-
-    for (i=0 ; i<numsides ; i++)
-    {
-      t = sides[i].toptexture;
-      if (t < numtextures)
-	texturepresent[t] = 1;
-      t = sides[i].midtexture;
-      if (t < numtextures)
-	texturepresent[t] = 1;
-      t = sides[i].bottomtexture;
-      if (t < numtextures)
-	texturepresent[t] = 1;
-    }
-
-    // Sky texture is always present.
-    // Note that F_SKY1 is the name used to
-    //	indicate a sky floor/ceiling as a flat,
-    //	while the sky texture is stored like
-    //	a wall texture, with an episode dependent
-    //	name.
-
-    t = skytexture;
-    if (t < numtextures)
-      texturepresent[t] = 1;
-
-    texturememory = 0;
-    for (i=0 ; i<numtextures ; i++)
-    {
-	if (!texturepresent[i])
-	    continue;
-
-	texture = textures[i];
-
-	for (j=0 ; j<texture->patchcount ; j++)
-	{
-	    lump = texture->patches[j].patch;
-	    texturememory += lumpinfo[lump].size;
-	    W_CacheLumpNum(lump , PU_CACHE);
-	}
-    }
-
-    // Precache sprites.
-    spritepresent = alloca(numsprites);
-    memset (spritepresent,0, numsprites);
-
-    for (th = thinker_head ; th != NULL ; th=th->next)
-    {
-	if (th->function.acp1 == (actionf_p1)P_MobjThinker)
-	{
-	  s = ((mobj_t *)th)->sprite;
-	  if (s < numsprites)
-	    spritepresent[s] = 1;
-	}
-    }
-
-    spritememory = 0;
-    for (i=0 ; i<numsprites ; i++)
-    {
-	if (!spritepresent[i])
-	    continue;
-
-	for (j=0 ; j<sprites[i].numframes ; j++)
-	{
-	    sf = &sprites[i].spriteframes[j];
-	    for (k=0 ; k<8 ; k++)
-	    {
-		lump = sf->lump[k];
-		spritememory += lumpinfo[lump].size;
-		W_CacheLumpNum(lump , PU_CACHE);
-	    }
-	}
-    }
+  free (hitlist);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
