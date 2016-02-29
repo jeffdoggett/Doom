@@ -892,7 +892,13 @@ void F_CastTicker (void)
 	if ((castdeath == 0)
 	 && (caststate == &states[S_PLAY_ATK1]))
 	    goto stopattack;	// Oh, gross hack!
-	st = caststate->nextstate;
+
+	if ((caststate -> action.acp2 == (actionf_p2) A_RandomJump)
+	 && (P_Random() < caststate->misc2))
+	  st = (int) caststate->misc1;
+	else
+	  st = caststate->nextstate;
+
 	caststate = &states[st];
 	castframes++;
 
@@ -967,9 +973,20 @@ void F_CastTicker (void)
 
     casttics = (int) caststate->tics;
     if (casttics == -1)
-	casttics = 15;
-}
+    {
+      if (caststate -> action.acp2 == (actionf_p2) A_RandomJump)
+      {
+	if (P_Random() < caststate->misc2)
+	  caststate = &states [caststate->misc1];
+	else
+	  caststate = &states [caststate->nextstate];
+	casttics = (int)caststate->tics;
 
+      }
+      if (casttics == -1)
+	casttics = 15;
+    }
+}
 
 // --------------------------------------------------------------------------------------------
 //
@@ -1012,6 +1029,15 @@ static boolean F_CastResponder (event_t* ev)
 
       caststate = &states[mobjinfo[castorder[castnum].type].deathstate];
       casttics = (int)caststate->tics;
+      if ((casttics == -1)
+       && (caststate -> action.acp2 == (actionf_p2) A_RandomJump))
+      {
+	if (P_Random() < caststate->misc2)
+	  caststate = &states [caststate->misc1];
+	else
+	  caststate = &states [caststate->nextstate];
+	casttics = (int)caststate->tics;
+      }
     }
 
     castframes = 0;
