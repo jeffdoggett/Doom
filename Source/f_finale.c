@@ -889,7 +889,8 @@ void F_CastTicker (void)
     else
     {
 	// just advance to next state in animation
-	if (caststate == &states[S_PLAY_ATK1])
+	if ((castdeath == 0)
+	 && (caststate == &states[S_PLAY_ATK1]))
 	    goto stopattack;	// Oh, gross hack!
 	st = caststate->nextstate;
 	caststate = &states[st];
@@ -931,7 +932,8 @@ void F_CastTicker (void)
 	    S_StartSound (NULL, sfx);
     }
 
-    if (castframes == 12)
+    if ((castdeath == 0)
+     && (castframes == 12))
     {
 	// go into attack frame
 	castattacking = true;
