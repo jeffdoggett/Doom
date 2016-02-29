@@ -932,8 +932,8 @@ void F_CastTicker (void)
 	    S_StartSound (NULL, sfx);
     }
 
-    if ((castdeath == 0)
-     && (castframes == 12))
+    if ((castframes == 12)
+     && (castdeath == 0))
     {
 	// go into attack frame
 	castattacking = true;
