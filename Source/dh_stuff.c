@@ -1302,7 +1302,7 @@ static void dh_write_to_thing (unsigned int number, unsigned int record, unsigne
   {
     case  0:ptr -> doomednum	= value; break;
     case  1:ptr -> spawnstate	= value; break;
-    case  2:ptr -> spawnhealth	= value; break;
+    case  2:ptr -> spawnhealth	= value; value = -value; /* Fall through */
     case  3:ptr -> gibhealth	= value; break;
     case  4:ptr -> seestate	= value; break;
     case  5:ptr -> seesound	= value; break;
