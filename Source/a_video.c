@@ -15,6 +15,7 @@ extern int 	novert;
 #define OS_SpriteOp			0x2E
 #define OS_ReadVduVariables		0x31
 #define OS_SWINumberFromString		0x39
+#define OS_SetColour			0x61
 #define OS_ScreenMode			0x65
 #define ColourTrans_ReturnColourNumber	0x40744
 #define ColourTrans_WritePalette	0x4075D
@@ -1456,7 +1457,7 @@ static void init_key_tables (void)
 
 /* -------------------------------------------------------------------------- */
 
-static _kernel_oserror * select_screen_mode (int number)
+static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 {
   _kernel_oserror * rc;
   _kernel_swi_regs regs;
@@ -1494,12 +1495,15 @@ static _kernel_oserror * select_screen_mode (int number)
       if (SCREENHEIGHT > MAXSCREENHEIGHT)
 	SCREENHEIGHT = MAXSCREENHEIGHT;
 #endif
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((screen_user_def [2] / 8) - 1); /* Bottom Y */
-      _kernel_oswrch ((screen_user_def [1] / 8) - 1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((screen_user_def [2] / 8) - 1); /* Bottom Y */
+	_kernel_oswrch ((screen_user_def [1] / 8) - 1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1514,12 +1518,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((200/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((200/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1533,12 +1540,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((240/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((240/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1563,13 +1573,16 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 256;
 
-	    /* Define text window */
-	    /* This prevents the screen scrolling! */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((256/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	/* This prevents the screen scrolling! */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((256/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_400_8bpp: /* Select screen mode 320x400 8 bit colours */
@@ -1582,12 +1595,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((400/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((400/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_480_8bpp: /* Select screen mode 320x480 8 bit colours */
@@ -1610,12 +1626,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1627,12 +1646,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((200/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((200/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1644,12 +1666,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((240/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((240/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1661,12 +1686,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 256;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((256/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((256/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_400_16bpp: /* Select screen mode 320x400 16 bit colours */
@@ -1677,12 +1705,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((400/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((400/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_480_16bpp: /* Select screen mode 320x480 16 bit colours */
@@ -1693,12 +1724,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_200_24bpp:
@@ -1709,12 +1743,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((200/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((200/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
 
@@ -1726,12 +1763,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((240/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((240/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_256_24bpp: /* Select screen mode 320x256 24 bit colours */
@@ -1742,12 +1782,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 256;
 
-	    /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((256/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((256/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_400_24bpp: /* Select screen mode 320x400 24 bit colours */
@@ -1758,12 +1801,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((320/8)-1); /* Bottom Y */
-      _kernel_oswrch ((400/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((320/8)-1); /* Bottom Y */
+	_kernel_oswrch ((400/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_320_x_480_24bpp: /* Select screen mode 320x480 24 bit colours */
@@ -1774,12 +1820,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((320/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((320/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_640_x_400_8bpp: /* Select screen mode 640x400 8 bit colours */
@@ -1791,12 +1840,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((400/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((400/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_640_x_480_8bpp: /* Select screen mode 640x480 8 bit colours */
@@ -1808,12 +1860,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_640_x_400_16bpp: /* Select screen mode 640x400 16 bit colours */
@@ -1825,12 +1880,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((400/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((400/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_640_x_480_16bpp: /* Select screen mode 640x480 16 bit colours */
@@ -1841,12 +1899,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
     case MODE_640_x_400_24bpp: /* Select screen mode 640x400 24 bit colours */
@@ -1858,12 +1919,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
 
-	  /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((400/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((400/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
 
      case MODE_640_x_480_24bpp: /* Select screen mode 640x480 24 bit colours */
@@ -1874,12 +1938,15 @@ static _kernel_oserror * select_screen_mode (int number)
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
 
-      /* Define text window */
-      _kernel_oswrch (28);
-      _kernel_oswrch (0);  /* Left X */
-      _kernel_oswrch ((480/8)-1); /* Bottom Y */
-      _kernel_oswrch ((640/8)-1); /* Right X */
-      _kernel_oswrch (00); /* Top Y */
+      if (set_text_window)
+      {
+	/* Define text window */
+	_kernel_oswrch (28);
+	_kernel_oswrch (0);  /* Left X */
+	_kernel_oswrch ((480/8)-1); /* Bottom Y */
+	_kernel_oswrch ((640/8)-1); /* Right X */
+	_kernel_oswrch (00); /* Top Y */
+      }
       break;
   }
   return (rc);
@@ -1968,22 +2035,26 @@ static int get_screen_mode_arg (void)
 
 static void select_text_mode (void)
 {
-  _kernel_oswrch (22);
-  _kernel_oswrch (28);
-  if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 28)
+  _kernel_swi_regs regs;
+
+
+  if ((SCREENWIDTH != 640)
+   || (SCREENHEIGHT != 480))
   {
-    printf ("\n");
-  }
-  else
-  {
-    _kernel_oswrch (22);
-    _kernel_oswrch (12);
+    regs.r[0] = 0;
+    regs.r[1] = (int) screen_640x480x8;
+    if (_kernel_swi (OS_ScreenMode, &regs, &regs))
+    {
+      regs.r[0] = 0;
+      regs.r[1] = (int) screen_640x480x24;
+      _kernel_swi (OS_ScreenMode, &regs, &regs);
+    }
   }
 }
 
 /* -------------------------------------------------------------------------- */
 
-static unsigned char mode_search [] =
+static const unsigned char mode_search [] =
 {
   MODE_640_x_480_8bpp,
   MODE_640_x_480_24bpp,
@@ -2003,7 +2074,7 @@ static unsigned char mode_search [] =
 
 void I_SetScreenSize (void)
 {
-    unsigned char * mode_number;
+    const unsigned char * mode_number;
     _kernel_oserror * rc;
     _kernel_swi_regs regs;
 
@@ -2020,7 +2091,7 @@ void I_SetScreenSize (void)
     if (screen_mode == MODE_USER_DEF)
     {
       decode_screendef (M_CheckParm("-0"));
-      select_screen_mode (0);
+      select_screen_mode (0,0);
       init_sprite_area ();
     }
 
@@ -2039,7 +2110,7 @@ void I_SetScreenSize (void)
 
 	do
 	{
-	  rc = select_screen_mode (*mode_number);
+	  rc = select_screen_mode (*mode_number, 0);
 	  if (rc)
 	    mode_number++;
 	  else
@@ -2055,7 +2126,7 @@ void I_SetScreenSize (void)
       }
     }
 
-    rc = select_screen_mode (screen_mode);
+    rc = select_screen_mode (screen_mode,0);
     if (rc)
     {
       select_text_mode ();
@@ -2083,7 +2154,7 @@ void I_InitGraphics (void)
 
     vsync = M_CheckParm ("-vsync");
     memset (key_down_table, 0, sizeof (key_down_table));
-    select_screen_mode (screen_mode);
+    select_screen_mode (screen_mode, 1);
 
     if (screen_mode == MODE_USER_DEF)
     {
