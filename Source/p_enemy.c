@@ -2569,8 +2569,13 @@ void A_SpawnFly (mobj_t* mo, pspdef_t* psp)
 // travelling cube sound
 void A_SpawnSound (mobj_t* mo, pspdef_t* psp)
 {
-    S_StartSound (mo,sfx_boscub);
-    A_SpawnFly(mo,psp);
+  S_StartSound (mo,sfx_boscub);
+
+  /* Note: Batman TC calls this function when BANE dies at the end */
+  /* of map 30. If we let it call A_SpawnFly then it's bad news! */
+
+  if (mo->type == MT_SPAWNSHOT)
+    A_SpawnFly (mo,psp);
 }
 
 
