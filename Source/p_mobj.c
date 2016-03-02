@@ -78,6 +78,8 @@ P_SetMobjState
 {
   int tics;
   unsigned int guard;
+  unsigned int r;
+  static unsigned int recurse;
   state_t* st;
 
   guard = 100;			// Assume that if we go round too many
@@ -108,7 +110,22 @@ P_SetMobjState
     // Modified handling.
     // Call action functions when the state is set
     if (st->action.acp2)
-      st->action.acp2(mobj,NULL);
+    {
+      /* If someone makes a mess of the DeHackEd it's */
+      /* possible to get stuck in a recursive loop here. */
+      if ((r = recurse) > 99)
+      {
+	printf ("P_SetMobjState: Excessive recursions at state %u\n", state);
+      }
+      else
+      {
+	recurse = r + 1;
+	st->action.acp2(mobj,NULL);
+	recurse = r;
+	if (mobj->thinker.function.aci == -1)	// Did it remove itself?
+	  return false;
+      }
+    }
 
     state = st->nextstate;
   } while (!mobj->tics);
