@@ -79,7 +79,7 @@ P_SetMobjState
   int tics;
   unsigned int guard;
   unsigned int r;
-  static unsigned int recurse;
+  static unsigned int recurse = 0;
   state_t* st;
 
   guard = 100;			// Assume that if we go round too many
