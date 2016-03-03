@@ -19,8 +19,7 @@ extern castinfo_t castorder[];
 extern clusterdefs_t * finale_clusterdefs_head;
 
 /* Structs from p_enemy.c */
-extern bossdeath_t boss_death_table[];
-extern bossdeath_t * boss_death_table_2;
+extern bossdeath_t * boss_death_actions_head;
 
 /* Strings from p_inter.c */
 extern char * got_messages [];
@@ -3900,16 +3899,30 @@ static void EV_DoNothing (void)
 
 /* ---------------------------------------------------------------------------- */
 
+static bossdeath_t * new_bossdeath_action (void)
+{
+  bossdeath_t * bd_ptr;
+
+  bd_ptr = malloc (sizeof (bossdeath_t));
+  if (bd_ptr)
+  {
+    memset (bd_ptr,0,sizeof (bossdeath_t));
+    bd_ptr -> next = boss_death_actions_head;
+    boss_death_actions_head = bd_ptr;
+  }
+
+  return (bd_ptr);  
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static bossdeath_t * access_boss_actions (unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
 {
   if (bd_ptr == NULL)
   {
-    bd_ptr = malloc (sizeof (bossdeath_t) * 50);
+    bd_ptr = new_bossdeath_action ();
     if (bd_ptr == NULL)
       return (bd_ptr);
-
-    boss_death_table_2 = bd_ptr;
-    memset (bd_ptr,0,sizeof (bossdeath_t) * 50);
   }
 
   if (bd_ptr -> func == NULL)
@@ -3929,8 +3942,9 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 {
   if (bd_ptr -> func != (actionf2) EV_DoNothing)	// This one already used?
   {
-    memcpy (bd_ptr + 1, bd_ptr, sizeof (bossdeath_t));	// Yes. Make another
-    bd_ptr++;
+    bd_ptr = new_bossdeath_action ();			// Yes. Make another
+    if (bd_ptr == NULL)
+      return (bd_ptr);
   }
 
   bd_ptr -> func = func;
@@ -3940,15 +3954,17 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 
 /* ---------------------------------------------------------------------------- */
 
-static void show_boss_action (unsigned int bossnum, bossdeath_t * bd_ptr)
+static void show_boss_action (void)
 {
   char monsters [100];
+  bossdeath_t * bd_ptr;
   char * ptr;
 
+  bd_ptr = boss_death_actions_head;
   do
   {
     ptr = monsters;
-    *ptr = 0;
+    strcpy (ptr, " [Removed]");
 
     if (bd_ptr -> monsterbits & (1<<MT_FATSO))
       ptr += sprintf (ptr, " FATSO");
@@ -3961,16 +3977,15 @@ static void show_boss_action (unsigned int bossnum, bossdeath_t * bd_ptr)
     if (bd_ptr -> monsterbits & (1<<MT_SPIDER))
       ptr += sprintf (ptr, " SPIDER");
 
-    printf ("Boss %u %u,%u%s %u %Xl %u\n",
-		bossnum,
+    printf ("Boss action: %u,%u%s %u %lX %u\n",
 		bd_ptr -> episode,
 		bd_ptr -> map,
 		monsters,
 		bd_ptr -> tag,
 		(uintptr_t)bd_ptr -> func,
 		bd_ptr -> action);
-    bd_ptr++;
-  } while (bd_ptr -> func);
+    bd_ptr = bd_ptr -> next;
+  } while (bd_ptr);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4026,12 +4041,13 @@ void DH_remove_duplicate_mapinfos (void)
   bossdeath_t * bd_ptr_1;
   map_dests_t * map_ptr;
 
-  if (boss_death_table_2)
+
+  bd_ptr = boss_death_actions_head;
+  do
   {
-    bd_ptr = boss_death_table_2;
-    do
+    bd_ptr_1 = bd_ptr -> next;
+    if (bd_ptr_1)
     {
-      bd_ptr_1 = boss_death_table;
       do
       {
 	if ((bd_ptr_1 -> episode == bd_ptr -> episode)
@@ -4046,38 +4062,17 @@ void DH_remove_duplicate_mapinfos (void)
 //	  bd_ptr_1 -> func = (actionf2) EV_DoNothing;	// For safety!
 //	  printf ("Removed duplicate boss action from %u,%u (%X %X)\n", bd_ptr_1 -> episode, bd_ptr_1 -> map, bd_ptr_1 -> monsterbits,bd_ptr -> monsterbits);
 	}
-	bd_ptr_1++;
-      } while (bd_ptr_1 -> func);
+	bd_ptr_1 = bd_ptr_1 -> next;
+      } while (bd_ptr_1);
+    }
+    bd_ptr = bd_ptr -> next;
+  } while (bd_ptr);
 
-      bd_ptr_1 = boss_death_table_2;
-      do
-      {
-	if ((bd_ptr_1 != bd_ptr)
-	 && (bd_ptr_1 -> episode == bd_ptr -> episode)
-	 && (bd_ptr_1 -> map == bd_ptr -> map)
-	 && (bd_ptr_1 -> monsterbits & bd_ptr -> monsterbits)
-	 && (bd_ptr_1 -> tag == bd_ptr -> tag)
-	 && (bd_ptr_1 -> func == bd_ptr -> func)
-	 && (bd_ptr_1 -> action == bd_ptr -> action))
-	{
-	  bd_ptr_1 -> monsterbits &= ~bd_ptr -> monsterbits;
-//	  bd_ptr_1 -> tag = 0;		// and this inhibits the -nomonster cheat in A_Activate_Death_Sectors
-//	  bd_ptr_1 -> func = (actionf2) EV_DoNothing;	// For safety!
-//	  printf ("Removed duplicate boss action from %u,%u (%X %X)\n", bd_ptr_1 -> episode, bd_ptr_1 -> map, bd_ptr_1 -> monsterbits,bd_ptr -> monsterbits);
-	}
-	bd_ptr_1++;
-      } while (bd_ptr_1 -> func);
-
-      bd_ptr++;
-    } while (bd_ptr -> func);
-  }
 
   if (M_CheckParm ("-showmonstertables"))
   {
     putchar ('\n');
-    show_boss_action (1, boss_death_table);
-    if ((bd_ptr = boss_death_table_2) != NULL)
-      show_boss_action (2, bd_ptr);
+    show_boss_action ();
 
     if ((cp = finale_clusterdefs_head) != NULL)
     {
@@ -4509,13 +4504,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
   intertext = -1;
   doing_episode = 0;
   doing_default = 0;
-  bd_ptr = boss_death_table_2;
-
-  if (bd_ptr)
-  {
-    while (bd_ptr -> func != NULL)
-      bd_ptr++;
-  }
+  bd_ptr = NULL;
 
   do
   {
@@ -4652,7 +4641,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  //printf ("Map %u %u has %u text (%s)\n", episode, map, l, newtext);
 	}
       }
-      if ((bd_ptr) && (bd_ptr -> func)) bd_ptr++;
+      if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
     }
     else if (strncasecmp (ptr, "next ", 5) == 0)
     {
@@ -4836,13 +4825,16 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	bd_ptr -> monsterbits = 1<<MT_FATSO;
 	bd_ptr -> func = (actionf2) EV_DoFloor;
 	bd_ptr -> action = lowerFloorToLowest;
-	bd_ptr++;
-	bd_ptr -> episode = episode;
-	bd_ptr -> map = map;
-	bd_ptr -> tag = 667;
-	bd_ptr -> monsterbits = 1<<MT_BABY;
-	bd_ptr -> func = (actionf2) EV_DoFloor;
-	bd_ptr -> action = raiseToTexture;
+	bd_ptr = new_bossdeath_action ();
+	if (bd_ptr)
+	{	
+	  bd_ptr -> episode = episode;
+	  bd_ptr -> map = map;
+	  bd_ptr -> tag = 667;
+	  bd_ptr -> monsterbits = 1<<MT_BABY;
+	  bd_ptr -> func = (actionf2) EV_DoFloor;
+	  bd_ptr -> action = raiseToTexture;
+	}
       }
     }
     else if (strncasecmp (ptr, "baronspecial", 12) == 0)
@@ -4946,7 +4938,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  bd_ptr = find_special_action (ptr2, episode, map, args, bd_ptr);
 	}
       }
-      if ((bd_ptr) && (bd_ptr -> func)) bd_ptr++;
+      if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
     }
     else if (strncasecmp (ptr, "cluster ", 8) == 0)
     {
@@ -5178,20 +5170,9 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
   unsigned int intertext;
   char * newtext;
   clusterdefs_t * cp;
-  //bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
 
   top = split_lines (ptr, top);
-
-#if 0
-  bd_ptr = boss_death_table_2;
-
-  if (bd_ptr)
-  {
-    while (bd_ptr -> func != NULL)
-      bd_ptr++;
-  }
-#endif
 
   intertext = -1;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);

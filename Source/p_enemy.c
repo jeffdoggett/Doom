@@ -1954,21 +1954,52 @@ void A_Explode (mobj_t* thingy, pspdef_t* psp)
    Episode 255 = Doom2 level
    Episode or map 0 = match any (ie the MT_KEEN works on all levels)
 */
+// Episode, Map, trigger,    tag,	function,		type, next
 
-bossdeath_t boss_death_table [] =
-{// Episode, Map, trigger,    tag,	function,		type
-  {	255,  7, 1<<MT_FATSO,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest},
-  {	255,  7, 1<<MT_BABY,	667, (actionf2) EV_DoFloor,  raiseToTexture},
-  {	  1,  8, 1<<MT_BRUISER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest},
-  {	  2,  8, 1<<MT_CYBORG,	0,   (actionf2) G_ExitLevel, 0},
-  {	  3,  8, 1<<MT_SPIDER,	0,   (actionf2) G_ExitLevel, 0},
-  {	  4,  6, 1<<MT_CYBORG,	666, (actionf2) EV_DoDoor,   blazeOpen},
-  {	  4,  8, 1<<MT_SPIDER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest},
-//{	  0,  0, 1<<MT_KEEN,	666, (actionf2) EV_DoDoor,   normalOpen},
-  {	  0,  0, 0,		0, NULL, 0}
+static bossdeath_t bd_action_7 =
+{
+  4, 8, 1<<MT_SPIDER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, NULL
 };
 
-bossdeath_t * boss_death_table_2 = 0;
+static bossdeath_t bd_action_6 =
+{
+  4, 6, 1<<MT_CYBORG,	666, (actionf2) EV_DoDoor,   blazeOpen, &bd_action_7
+};
+
+static bossdeath_t bd_action_5 =
+{
+  3, 8, 1<<MT_SPIDER,	0,   (actionf2) G_ExitLevel, 0, &bd_action_6
+};
+
+static bossdeath_t bd_action_4 =
+{
+  2, 8, 1<<MT_CYBORG,	0,   (actionf2) G_ExitLevel, 0, &bd_action_5
+};
+
+static bossdeath_t bd_action_3 =
+{
+  1, 8, 1<<MT_BRUISER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_4
+};
+
+static bossdeath_t bd_action_2 =
+{
+  255, 7, 1<<MT_BABY,	667, (actionf2) EV_DoFloor,  raiseToTexture, &bd_action_3
+};
+
+static bossdeath_t bd_action_1 =
+{
+  255, 7, 1<<MT_FATSO,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_2
+};
+
+#if 0
+static bossdeath_t bd_action_0 =
+{
+  0, 0, 1<<MT_KEEN,	666, (actionf2) EV_DoDoor,   normalOpen, &bd_action_1
+};
+#endif
+
+
+bossdeath_t * boss_death_actions_head = &bd_action_1;
 
 /* ---------------------------------------------------------------------------- */
 
@@ -2041,7 +2072,7 @@ static void A_Scan_death_tables (unsigned int monsterbits)
   else
     epi = gameepisode;
 
-  bd_ptr = boss_death_table;
+  bd_ptr = boss_death_actions_head;
   do
   {
     if ((bd_ptr -> monsterbits & monsterbits)
@@ -2052,22 +2083,8 @@ static void A_Scan_death_tables (unsigned int monsterbits)
       junk.tag = bd_ptr -> tag;
       (bd_ptr -> func)(&junk,bd_ptr -> action);
     }
-    bd_ptr++;
-  } while (bd_ptr -> func != NULL);
-
-  bd_ptr = boss_death_table_2;
-  if (bd_ptr)
-  do
-  {
-    if ((bd_ptr -> monsterbits & monsterbits)
-     && ((bd_ptr -> episode == 0) || (bd_ptr -> episode == epi))
-     && ((bd_ptr -> map == 0) || (bd_ptr -> map == gamemap)))
-    {
-      junk.tag = bd_ptr -> tag;
-      (bd_ptr -> func)(&junk,bd_ptr -> action);
-    }
-    bd_ptr++;
-  } while (bd_ptr -> func != NULL);
+    bd_ptr = bd_ptr -> next;
+  } while (bd_ptr);
 }
 
 /* ---------------------------------------------------------------------------- */

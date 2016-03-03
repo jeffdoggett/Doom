@@ -29,7 +29,7 @@
 #endif
 
 typedef void (*actionf2)( void*, unsigned int);
-typedef struct
+typedef struct bossdeath_s
 {
   unsigned char episode;
   unsigned char map;
@@ -37,6 +37,7 @@ typedef struct
   unsigned int tag;
   actionf2 func;
   unsigned int action;
+  struct bossdeath_s * next;
 } bossdeath_t;
 
 extern void A_Light0 (mobj_t* mo, pspdef_t* psp);
