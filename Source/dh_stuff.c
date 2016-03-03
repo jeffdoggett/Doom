@@ -238,6 +238,35 @@ static const char * const dehack_things [] =
   NULL
 };
 
+/* Must match the table above */
+typedef enum
+{
+  THING_ID,
+  THING_Initial_frame,
+  THING_Hit_points,
+  THING_Gib_health,
+  THING_First_moving_frame,
+  THING_Alert_sound,
+  THING_Reaction_time,
+  THING_Attack_sound,
+  THING_Injury_frame,
+  THING_Pain_chance,
+  THING_Pain_sound,
+  THING_Close_attack_frame,
+  THING_Far_attack_frame,
+  THING_Death_frame,
+  THING_Exploding_frame,
+  THING_Death_sound,
+  THING_Speed,
+  THING_Width,
+  THING_Height,
+  THING_Mass,
+  THING_Missile_damage,
+  THING_Action_sound,
+  THING_Bits,
+  THING_Respawn_frame,
+  THING_Scale
+} thing_element_t;
 
 static const char * const dehack_sounds [] =
 {
@@ -1292,41 +1321,125 @@ static void decode_things_bits (unsigned int * params, const char * string1)
 
 /* ---------------------------------------------------------------------------- */
 
-static void dh_write_to_thing (unsigned int number, unsigned int record, unsigned int value)
+static void dh_write_to_thing (unsigned int number, thing_element_t record, unsigned int value)
 {
   mobjinfo_t * ptr;
+
+  if ((number == 0)
+   || (number >= NUMMOBJTYPES))
+  {
+    fprintf (stderr, "Invalid thing number %u\n", number);
+    return;
+  }
 
   ptr = &mobjinfo[number-1];
 
   switch (record)
   {
-    case  0:ptr -> doomednum	= value; break;
-    case  1:ptr -> spawnstate	= value; break;
-    case  2:ptr -> spawnhealth	= value; value = -value; /* Fall through */
-    case  3:ptr -> gibhealth	= value; break;
-    case  4:ptr -> seestate	= value; break;
-    case  5:ptr -> seesound	= value; break;
-    case  6:ptr -> reactiontime	= value; break;
-    case  7:ptr -> attacksound	= value; break;
-    case  8:ptr -> painstate	= value; break;
-    case  9:ptr -> painchance	= value; break;
-    case 10:ptr -> painsound	= value; break;
-    case 11:ptr -> meleestate	= value; break;
-    case 12:ptr -> missilestate	= value; break;
-    case 13:ptr -> deathstate	= value; break;
-    case 14:ptr -> xdeathstate	= value; break;
-    case 15:ptr -> deathsound	= value; break;
-    case 16:ptr -> speed	= value; break;
-    case 17:ptr -> radius	= value;
-	    ptr -> pickupradius	= value; break;
-    case 18:ptr -> height	= value; break;
-    case 19:ptr -> mass		= value; break;
-    case 20:ptr -> damage	= value; break;
-    case 21:ptr -> activesound	= value; break;
-    case 22:ptr -> flags	= value; break;
-    case 23:ptr -> raisestate	= value; break;
-    case 24:ptr -> scale	= value; break;
-    default:fprintf (stderr, "Invalid Thing record\n");
+    case THING_ID:
+      ptr -> doomednum = value;
+      break;
+
+    case THING_Initial_frame:
+      ptr -> spawnstate = value;
+      break;
+
+    case THING_Hit_points:
+      if (ptr -> gibhealth == -ptr -> spawnhealth) // If Gib health is still in step
+	ptr -> gibhealth = -value;		   // then keep it in step.
+      ptr -> spawnhealth = value;
+      break;
+
+    case THING_Gib_health:
+      ptr -> gibhealth = value;
+      break;
+
+    case THING_First_moving_frame:
+      ptr -> seestate = value;
+      break;
+
+    case THING_Alert_sound:
+      ptr -> seesound = value;
+      break;
+
+    case THING_Reaction_time:
+      ptr -> reactiontime = value;
+      break;
+
+    case THING_Attack_sound:
+      ptr -> attacksound = value;
+      break;
+
+    case THING_Injury_frame:
+      ptr -> painstate = value;
+      break;
+
+    case THING_Pain_chance:
+      ptr -> painchance = value;
+      break;
+
+    case THING_Pain_sound:
+      ptr -> painsound = value;
+      break;
+
+    case THING_Close_attack_frame:
+      ptr -> meleestate = value;
+      break;
+
+    case THING_Far_attack_frame:
+      ptr -> missilestate = value;
+      break;
+
+    case THING_Death_frame:
+      ptr -> deathstate = value;
+      break;
+
+    case THING_Exploding_frame:
+      ptr -> xdeathstate = value;
+      break;
+
+    case THING_Death_sound:
+      ptr -> deathsound = value;
+      break;
+
+    case THING_Speed:
+      ptr -> speed = value;
+      break;
+
+    case THING_Width:
+      ptr -> radius = value;
+      ptr -> pickupradius = value;
+      break;
+
+    case THING_Height:
+      ptr -> height = value;
+      break;
+
+    case THING_Mass:
+      ptr -> mass = value;
+      break;
+
+    case THING_Missile_damage:
+      ptr -> damage = value;
+      break;
+
+    case THING_Action_sound:
+      ptr -> activesound = value;
+      break;
+
+    case THING_Bits:
+      ptr -> flags = value;
+      break;
+
+    case THING_Respawn_frame:
+      ptr -> raisestate = value;
+      break;
+
+    case THING_Scale:
+      ptr -> scale = value;
+      break;
+
+    default:fprintf (stderr, "Invalid record %u for thing %u\n", record, number);
   }
   // printf ("Patched element %d of THINGS %d to %X\n", record, number, value);
 }
@@ -3268,7 +3381,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      switch (counter1)
 	      {
-		case 22:				// Writing to "bits"
+		case THING_Bits:			// Writing to "bits"
 		  counter2 = dh_inchar (a_line, '=');
 		  if (counter2)
 		  {
@@ -3277,7 +3390,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  }
 		  break;
 
-		case 24:				// Writing to "scale"
+		case THING_Scale:			// Writing to "scale"
 		  counter2 = dh_inchar (a_line, '=');
 		  if (counter2)
 		  {
@@ -3289,7 +3402,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  }
 		  break;
 	      }
-	      dh_write_to_thing (job_params[0], counter1, params[0]);
+	      dh_write_to_thing (job_params[0], (thing_element_t) counter1, params[0]);
 	    }
 	    break;
 
