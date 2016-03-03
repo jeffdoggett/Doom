@@ -3911,7 +3911,7 @@ static bossdeath_t * new_bossdeath_action (void)
     boss_death_actions_head = bd_ptr;
   }
 
-  return (bd_ptr);  
+  return (bd_ptr);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -3940,11 +3940,19 @@ static bossdeath_t * access_boss_actions (unsigned int episode, unsigned int map
 
 static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsigned int action)
 {
+  bossdeath_t * bd_ptr_2;
+
   if (bd_ptr -> func != (actionf2) EV_DoNothing)	// This one already used?
   {
-    bd_ptr = new_bossdeath_action ();			// Yes. Make another
-    if (bd_ptr == NULL)
-      return (bd_ptr);
+    bd_ptr_2 = new_bossdeath_action ();			// Yes. Make another
+    if (bd_ptr_2 == NULL)
+      return (bd_ptr_2);
+
+    bd_ptr_2 -> episode = bd_ptr -> episode;
+    bd_ptr_2 -> map = bd_ptr -> map;
+    bd_ptr_2 -> monsterbits = bd_ptr -> monsterbits;
+    bd_ptr_2 -> tag = bd_ptr -> tag;
+    bd_ptr = bd_ptr_2;
   }
 
   bd_ptr -> func = func;
@@ -4827,7 +4835,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	bd_ptr -> action = lowerFloorToLowest;
 	bd_ptr = new_bossdeath_action ();
 	if (bd_ptr)
-	{	
+	{
 	  bd_ptr -> episode = episode;
 	  bd_ptr -> map = map;
 	  bd_ptr -> tag = 667;
