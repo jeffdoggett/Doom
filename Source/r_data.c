@@ -824,6 +824,34 @@ static void R_RemoveDuplicateSprites (const char * name, int sprlump)
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+/* Voe.wad has a sprite that is a PNG. For now we just ignore it! */
+
+static boolean R_SpriteValid (lumpinfo_t* lump_ptr)
+{
+  FILE*	handle;
+
+  if (lump_ptr -> size < 4)
+    return (false);
+
+  handle = lump_ptr -> handle;
+  if (handle)
+  {
+    fseek (handle, lump_ptr->position, SEEK_SET);
+    if ((fgetc (handle) == 0x89)
+     && (fgetc (handle) == 'P')
+     && (fgetc (handle) == 'N')
+     && (fgetc (handle) == 'G'))
+    {
+      if (M_CheckParm ("-showunknown"))
+	printf ("Sprite %s is a PNG\n", lump_ptr -> name);
+      return (false);
+    }
+  }
+
+  return (true);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 /* Count the number of unique lumps between start and end
 ** We have to discard duplicates. In the case of sprites this
 ** is really tricky because of flipped ones.
@@ -877,8 +905,10 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
       }
       else if (doing_sprites)
       {
-	// printf ("R_RemoveDuplicateSprites (%s,%u)\n", lump_ptr->name, lump);
-	R_RemoveDuplicateSprites (lump_ptr->name, lump);
+	if (R_SpriteValid (lump_ptr) == false)
+	  valid = false;
+	else
+	  R_RemoveDuplicateSprites (lump_ptr->name, lump);
       }
 
       if (valid == true)		/* If this is the first one */
