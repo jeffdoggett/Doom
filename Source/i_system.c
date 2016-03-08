@@ -48,17 +48,17 @@ ticcmd_t*	I_BaseTiccmd(void)
 // I_GetTime
 // returns time in 1/70th second tics
 //
-unsigned int I_GetTime (void)
+int  I_GetTime (void)
 {
     struct timeval	tp;
     struct timezone	tzp;
-    unsigned int	newtics;
-    static unsigned int	basetime=0;
+    int			newtics;
+    static int		basetime=0;
 
     gettimeofday(&tp, &tzp);
     if (!basetime)
 	basetime = (int) tp.tv_sec;
-    newtics = (unsigned int) ((tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000);
+    newtics = (int) ((tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000);
     return newtics;
 }
 

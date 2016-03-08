@@ -38,7 +38,7 @@ sector_t*	backsector;
 
 drawseg_t	drawsegs[MAXDRAWSEGS];
 drawseg_t*	ds_p;
-unsigned int	drawsegstarttime;
+int		drawsegstarttime;
 
 /* killough 4/7/98: indicates doors closed wrt automap bugfix: */
 int      doorclosed;

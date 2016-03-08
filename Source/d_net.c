@@ -66,11 +66,10 @@ int		nodeforplayer[MAXPLAYERS];
 
 int             maketic;
 int		lastnettic;
+int		skiptics;
 int		ticdup;
 int		maxsend;	// BACKUPTICS/(2*ticdup)-1
 
-static unsigned int skiptics;
-static unsigned int gametime;
 
 void D_ProcessEvents (void);
 void G_BuildTiccmd (ticcmd_t *cmd);
@@ -359,21 +358,22 @@ void GetPackets (void)
 // Builds ticcmds for console player,
 // sends out a packet
 //
+int      gametime;
 
 void NetUpdate (void)
 {
-    unsigned int	nowtime;
-    unsigned int	newtics;
-    int			i,j;
-    int			realstart;
-    int			gameticdiv;
+    int             nowtime;
+    int             newtics;
+    int				i,j;
+    int				realstart;
+    int				gameticdiv;
 
     // check time
     nowtime = I_GetTime ()/ticdup;
     newtics = nowtime - gametime;
     gametime = nowtime;
 
-    if (newtics == 0) 	// nothing new to update
+    if (newtics <= 0) 	// nothing new to update
 	goto listen;
 
     if (skiptics <= newtics)
@@ -448,10 +448,10 @@ void NetUpdate (void)
 void CheckAbort (void)
 {
     event_t *ev;
-    unsigned int stoptic;
+    int		stoptic;
 
-    stoptic = I_GetTime ();
-    while ((I_GetTime() - stoptic) < 2)
+    stoptic = I_GetTime () + 2;
+    while (I_GetTime() < stoptic)
 	I_StartTic ();
 
     I_StartTic ();
@@ -632,15 +632,15 @@ void TryRunTics (void)
 {
     int		i;
     int		lowtic;
-    unsigned int entertic;
-    static unsigned int	oldentertics;
-    unsigned int realtics;
-    unsigned int availabletics;
+    int		entertic;
+    static int	oldentertics;
+    int		realtics;
+    int		availabletics;
     int		counts;
     int		numplaying;
 
     // get real tics
-    entertic = I_GetTime () / ticdup;
+    entertic = I_GetTime ()/ticdup;
     realtics = entertic - oldentertics;
     oldentertics = entertic;
 

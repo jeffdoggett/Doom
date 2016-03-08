@@ -843,9 +843,9 @@ static void put_sprite (void)
 //
 void I_FinishUpdate (void)
 {
-    static unsigned int  lasttic;
-    unsigned int	tics;
-    unsigned int	i,j,p;
+    static int  lasttic;
+    int		tics;
+    int		i,j,p;
     unsigned char  * screen_copy;
     unsigned char  * screen_8;
     unsigned short * screen_16;

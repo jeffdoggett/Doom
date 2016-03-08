@@ -555,7 +555,7 @@ void R_StoreWallRange(int start, int stop)
 {
     unsigned int	pos;
     unsigned int	tex;
-    unsigned int	timesofar;
+    int			timesofar;
     int64_t     dx, dy, dx1, dy1;
 
     pos = (unsigned int) (ds_p - drawsegs);

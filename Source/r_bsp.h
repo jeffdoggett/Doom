@@ -44,7 +44,7 @@ extern boolean		skymap;
 
 extern drawseg_t	drawsegs[MAXDRAWSEGS];
 extern drawseg_t*	ds_p;
-extern unsigned int	drawsegstarttime;
+extern int		drawsegstarttime;
 
 extern lighttable_t**	hscalelight;
 extern lighttable_t**	vscalelight;
