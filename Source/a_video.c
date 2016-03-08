@@ -31,8 +31,9 @@ extern int 	novert;
 static int      screen_mode = 1;
 static int	vsync;
 static unsigned int * screen_addr;
-static unsigned int   palette_table   [256];
-static unsigned char  key_down_table  [128];
+static unsigned int   palette_table [256];
+static unsigned int   bgr_palette_table [256];
+static unsigned char  key_down_table [128];
 static unsigned char  num_keys_down [10];
 static unsigned char  key_to_scan;
 
@@ -65,6 +66,11 @@ typedef struct
 
 static sprite_area_t * sprite_mem = 0;
 
+/* -------------------------------------------------------------------------- */
+
+// #define DEBUG_SCREEN_MODES
+
+/* -------------------------------------------------------------------------- */
 // screen_mode
 #define MODE_USER_DEF		0
 
@@ -92,7 +98,7 @@ static sprite_area_t * sprite_mem = 0;
 #define MODE_640_x_400_24bpp	20
 #define MODE_640_x_480_24bpp	21
 
-
+/* -------------------------------------------------------------------------- */
 
 static const unsigned int screen_320x200x8 [] =
 {
@@ -308,6 +314,7 @@ unsigned int screen_user_def [] =
   -1		/* End of table */
 };
 
+/* -------------------------------------------------------------------------- */
 /* Table to convert Acorn inkey() values to Doom key strokes */
 /* These tables are overwritten by the contents of file "Inkeys" if it exists */
 
@@ -435,6 +442,8 @@ static unsigned char key_xlate_table [] =
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0
 };
+
+/* -------------------------------------------------------------------------- */
 
 /* Table to swap mouse buttons round */
 static int mouse_button_conv[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
@@ -1110,6 +1119,7 @@ static void set_palette_xx (byte * palette)
   unsigned int red;
   unsigned int green;
   unsigned int blue;
+  unsigned int bgr;
   _kernel_swi_regs regs;
 
   colour = 0;
@@ -1118,9 +1128,17 @@ static void set_palette_xx (byte * palette)
     red   = gammatable[usegamma][*palette++];
     green = gammatable[usegamma][*palette++];
     blue  = gammatable[usegamma][*palette++];
-    regs.r[0] = (blue << 24) | (green << 16) | (red << 8);
-    _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
-    palette_table [colour] = regs.r[0];
+    bgr = (blue << 24) | (green << 16) | (red << 8);
+    if (bgr_palette_table [colour] != bgr)
+    {
+      bgr_palette_table [colour] = bgr;
+      regs.r[0] = bgr;
+      _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
+      palette_table [colour] = regs.r[0];
+#ifdef DEBUG_SCREEN_MODES
+      printf ("Colour %u palette = %08X, ColNum = %08X\n", colour, bgr, regs.r[0]);
+#endif
+    }
   } while (++colour < 256);
 }
 
@@ -1456,20 +1474,78 @@ static void init_key_tables (void)
 }
 
 /* -------------------------------------------------------------------------- */
+/*
+   Select a screen mode given a mode selector block
 
-static _kernel_oserror * select_screen_mode (int number, int set_text_window)
+   Block [0] = 1;
+   Block [1] = X Resolution (Pixels)
+   Block [2] = Y Resolution (Pixels)
+   Block [3] = Log2BPP value
+   Block [4] = Frame rate (-1 = first match)
+   Block [5] = Mode Variable numbers followed by value.
+   Block [n] = -1 (Terminator)
+*/
+
+static _kernel_oserror * os_screen_mode (const unsigned int * mode_selector_block)
 {
   _kernel_oserror * rc;
   _kernel_swi_regs regs;
 
+  regs.r[0] = 0;
+  regs.r[1] = (int) mode_selector_block;
+  rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+
+#ifdef DEBUG_SCREEN_MODES
+
+  printf ("Attempted to select screen mode %u x %u, log2bpp=%u, flags=%X ",
+	mode_selector_block [1],
+	mode_selector_block [2],
+	mode_selector_block [3],
+	mode_selector_block [0]);
+
+  if (rc)
+    printf (" - Error %s\n", rc -> errmess);
+  else
+    printf (" - OK\n");
+#endif
+
+  if ((rc)
+   && (mode_selector_block [3] > 3))
+  {
+    unsigned int * p;
+
+    p = (unsigned int *) mode_selector_block;	// Writing back to a 'const' - never a good thing.
+    p [0] ^= (4<<12);				// Try explicitly (de)selecting TRGB
+
+    regs.r[0] = 0;
+    regs.r[1] = (int) mode_selector_block;
+    rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+
+#ifdef DEBUG_SCREEN_MODES
+
+    printf ("Retry with flags=%X", mode_selector_block [0]);
+
+    if (rc)
+      printf (" - Error %s\n", rc -> errmess);
+    else
+      printf (" - OK\n");
+#endif
+  }
+
+  return (rc);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static _kernel_oserror * select_screen_mode (int number, int set_text_window)
+{
+  _kernel_oserror * rc;
   rpc_palette = 0;
 
   switch (number)
   {
     case MODE_USER_DEF:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_user_def;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_user_def);
       if (rc == 0)
 	rpc_palette = 1;
 
@@ -1509,9 +1585,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_200_8bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x200x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x200x8);
       if (rc == 0)
 	rpc_palette = 1;
 
@@ -1531,9 +1605,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_240_8bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x240x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x240x8);
       if (rc == 0)
 	rpc_palette = 1;
 
@@ -1556,9 +1628,8 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 	    			/* We carefully avoid using Risc PC SWI here :) */
 
       /* Try RPC mode with programmable palette first */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x256x8;
-      if (_kernel_swi (OS_ScreenMode, &regs, &regs) == 0)
+      rc = os_screen_mode (screen_320x256x8);
+      if (rc == 0)
       {
 	rpc_palette = 1;
       }
@@ -1586,9 +1657,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_400_8bpp: /* Select screen mode 320x400 8 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x400x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x400x8);
       if (rc == 0)
 	rpc_palette = 1;
 
@@ -1607,9 +1676,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_480_8bpp: /* Select screen mode 320x480 8 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x480x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x480x8);
       if (rc == 0)
       {
 	rpc_palette = 1;
@@ -1639,9 +1706,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_200_16bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x200x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x200x16);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
@@ -1659,9 +1724,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_240_16bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x240x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x240x16);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
@@ -1679,9 +1742,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_256_16bpp: /* Select screen mode 320x256 16 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x256x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x256x16);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 256;
@@ -1698,9 +1759,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_400_16bpp: /* Select screen mode 320x400 16 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x400x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x400x16);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
@@ -1717,9 +1776,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_480_16bpp: /* Select screen mode 320x480 16 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x480x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x480x16);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
@@ -1736,9 +1793,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_200_24bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x200x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x200x24);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
@@ -1756,9 +1811,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
 
 
     case MODE_320_x_240_24bpp:
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x240x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x240x24);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
@@ -1775,9 +1828,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_256_24bpp: /* Select screen mode 320x256 24 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x256x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x256x24);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 256;
@@ -1794,9 +1845,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_400_24bpp: /* Select screen mode 320x400 24 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x400x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x400x24);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 200;
@@ -1813,9 +1862,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_320_x_480_24bpp: /* Select screen mode 320x480 24 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_320x480x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_320x480x24);
 
       SCREENWIDTH  = 320;
       SCREENHEIGHT = 240;
@@ -1832,10 +1879,9 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_640_x_400_8bpp: /* Select screen mode 640x400 8 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x400x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
-      rpc_palette = 1;
+      rc = os_screen_mode (screen_640x400x8);
+      if (rc == 0)
+	rpc_palette = 1;
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
@@ -1852,10 +1898,9 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_640_x_480_8bpp: /* Select screen mode 640x480 8 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x480x8;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
-      rpc_palette = 1;
+      rc = os_screen_mode (screen_640x480x8);
+      if (rc == NULL)
+	rpc_palette = 1;
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
@@ -1872,10 +1917,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_640_x_400_16bpp: /* Select screen mode 640x400 16 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x400x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
-      rpc_palette = 1;
+      rc = os_screen_mode (screen_640x400x16);
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
@@ -1892,9 +1934,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_640_x_480_16bpp: /* Select screen mode 640x480 16 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x480x16;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_640x480x16);
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
@@ -1911,10 +1951,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
     case MODE_640_x_400_24bpp: /* Select screen mode 640x400 24 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x400x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
-      rpc_palette = 1;
+      rc = os_screen_mode (screen_640x400x24);
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 400;
@@ -1931,9 +1968,7 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
       break;
 
      case MODE_640_x_480_24bpp: /* Select screen mode 640x480 24 bit colours */
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x480x24;
-      rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
+      rc = os_screen_mode (screen_640x480x24);
 
       SCREENWIDTH  = 640;
       SCREENHEIGHT = 480;
@@ -1969,10 +2004,12 @@ static void decode_screendef (int p)
       case 'x':
 	screen_user_def [1] = atoi (&myargv[p][1]);
 	break;
+
       case 'Y':
       case 'y':
 	screen_user_def [2] = atoi (&myargv[p][1]);
 	break;
+
       case 'C':
       case 'c':
 	i = atoi (&myargv[p][1]);
@@ -1996,6 +2033,13 @@ static void decode_screendef (int p)
 	      screen_user_def [3] = 3;
 	}
 	break;
+
+      case 'L':
+      case 'l':
+	if (strcasecmp (myargv[p], "LTRGB") == 0)
+	  screen_user_def [0] |= (4<<12);
+	break;
+
       default:
 	p = myargc;
     }
@@ -2035,20 +2079,11 @@ static int get_screen_mode_arg (void)
 
 static void select_text_mode (void)
 {
-  _kernel_swi_regs regs;
-
-
   if ((SCREENWIDTH != 640)
    || (SCREENHEIGHT != 480))
   {
-    regs.r[0] = 0;
-    regs.r[1] = (int) screen_640x480x8;
-    if (_kernel_swi (OS_ScreenMode, &regs, &regs))
-    {
-      regs.r[0] = 0;
-      regs.r[1] = (int) screen_640x480x24;
-      _kernel_swi (OS_ScreenMode, &regs, &regs);
-    }
+    if (os_screen_mode (screen_640x480x8))
+      os_screen_mode (screen_640x480x24);
   }
 }
 
@@ -2074,74 +2109,83 @@ static const unsigned char mode_search [] =
 
 void I_SetScreenSize (void)
 {
-    const unsigned char * mode_number;
-    _kernel_oserror * rc;
-    _kernel_swi_regs regs;
+  int count;
+  const unsigned char * mode_number;
+  _kernel_oserror * rc;
+  _kernel_swi_regs regs;
 
-    /* Set VDU driver screen bank to default */
-    _kernel_osbyte (112, 0, 0);
+  /* Set VDU driver screen bank to default */
+  _kernel_osbyte (112, 0, 0);
 
-    /* Set hardware screen bank to default */
-    _kernel_osbyte (113, 0, 0);
+  /* Set hardware screen bank to default */
+  _kernel_osbyte (113, 0, 0);
 
-    /* Set Non-shadow */
-    _kernel_osbyte (114, 1, 0);
+  /* Set Non-shadow */
+  _kernel_osbyte (114, 1, 0);
 
-    screen_mode = get_screen_mode_arg ();
-    if (screen_mode == MODE_USER_DEF)
-    {
-      decode_screendef (M_CheckParm("-0"));
-      select_screen_mode (0,0);
-      init_sprite_area ();
-    }
+  screen_mode = get_screen_mode_arg ();
+  if (screen_mode == MODE_USER_DEF)
+  {
+    decode_screendef (M_CheckParm("-0"));
+    select_screen_mode (0,0);
+    init_sprite_area ();
+  }
 
-    else if (screen_mode < 0)	/* No screen size/resolution given... */
-    {
-      regs.r[1] = (int) "OS_ScreenMode";
-      if ((_kernel_swi (OS_SWINumberFromString, &regs, &regs)) == 0)
-      {  /* So the OS_ScreenMode call exists, which means that 16/24 bit */
-	 /* colour may be available..... */
-	 /* I tested this code by preventing my Risc PC from executing it's */
-	 /* !boot programs, hence the monitor definition file wasn't read and */
-	 /* hence the 16/24 bit modes were not available...... */
+  else if (screen_mode < 0)	/* No screen size/resolution given... */
+  {
+    regs.r[1] = (int) "OS_ScreenMode";
+    if ((_kernel_swi (OS_SWINumberFromString, &regs, &regs)) == 0)
+    {  /* So the OS_ScreenMode call exists, which means that 16/24 bit */
+       /* colour may be available..... */
+       /* I tested this code by preventing my Risc PC from executing it's */
+       /* !boot programs, hence the monitor definition file wasn't read and */
+       /* hence the 16/24 bit modes were not available...... */
 
-	 /* Try first for the best... */
-	mode_number = mode_search;
+       /* Try first for the best... */
+      mode_number = mode_search;
+      count = ARRAY_SIZE (mode_search);
 
-	do
-	{
-	  rc = select_screen_mode (*mode_number, 0);
-	  if (rc)
-	    mode_number++;
-	  else
-	    screen_mode = *mode_number;
-	} while (rc);
-      }
-      else  /* Not an RPC, so try mode 49 */
+      do
       {
-	_kernel_oswrch (22);
-	_kernel_oswrch (49);
-	if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
-	  screen_mode = MODE_320_x_480_8bpp;
-      }
-    }
+	rc = select_screen_mode (screen_mode = *mode_number, 0);
+	if (rc == 0)
+	  break;
 
-    rc = select_screen_mode (screen_mode,0);
-    if (rc)
+	mode_number++;
+	if (--count == 0)
+	{
+	  I_Error ("Failed to find a suitable screen mode (%s)\n", rc -> errmess);
+	}
+      } while (1);
+    }
+    else  /* Not an RPC, so try mode 49 */
     {
-      select_text_mode ();
-      I_Error ("Failed to select screen mode (%s)\n", rc -> errmess);
+      _kernel_oswrch (22);
+      _kernel_oswrch (49);
+      if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
+	screen_mode = MODE_320_x_480_8bpp;
     }
+  }
 
+  rc = select_screen_mode (screen_mode,0);
+  if (rc)
+  {
     select_text_mode ();
+    I_Error ("Failed to select screen mode (%s)\n", rc -> errmess);
+  }
 
-    // printf ("Welcome to Doom For Acorn RiscPC.\nFree software built from the Linux source by Jeff Doggett\n\n");
-    //k = 0;
-    //do
-    //{
-    //  printf ("Run %s ", myargv[k++]);
-    //} while (k < myargc);
-    //printf ("\n\n");
+  select_text_mode ();
+
+  memset (bgr_palette_table, 255, sizeof (bgr_palette_table));
+
+
+  // printf ("Welcome to Doom For Acorn RiscPC.\nFree software built from the Linux source by Jeff Doggett\n\n");
+  //k = 0;
+  //do
+  //{
+  //  printf ("Run %s ", myargv[k++]);
+  //} while (k < myargc);
+  //printf ("\n\n");
 }
 
 /* -------------------------------------------------------------------------- */
