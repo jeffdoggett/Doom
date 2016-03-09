@@ -4111,21 +4111,23 @@ void DH_remove_duplicate_mapinfos (void)
   {
     putchar ('\n');
 
-    i = (9*10);
+    i = 0;
     map_ptr = G_Access_MapInfoTab_E (1,0);
     do
     {
+      printf ("E%uM%u:", (i/10)+1,i%10);
       show_map_dests (map_ptr);
       map_ptr++;
-    } while (--i);
+    } while (++i < (9*10));
 
-    i = 100;
+    i = 0;
     map_ptr = G_Access_MapInfoTab_E (255,0);
     do
     {
+      printf ("Map%02u:", i);
       show_map_dests (map_ptr);
       map_ptr++;
-    } while (--i);
+    } while (++i < 100);
   }
 
 #ifdef CREATE_DEHACK_FILE
@@ -4162,7 +4164,7 @@ void DH_remove_duplicate_mapinfos (void)
 
 /* ---------------------------------------------------------------------------- */
 
-static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int intertext, unsigned int episode, unsigned int map)
+static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int intertext)
 {
   char cc;
   unsigned int l;
@@ -4172,10 +4174,8 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   char * newtext;
   char * lump_ptr;
   char ** source;
-  //bossdeath_t * bd_ptr;
-  map_dests_t * mdest_ptr;
 
-  // printf ("set_enter_exit_text (%s), %u, %u, %u\n", ptr, intertext, episode, map);
+  // printf ("set_enter_exit_text (%s), %u\n", ptr, intertext);
 
   do
   {
@@ -4227,17 +4227,9 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   }
   else
   {
-    if (intertext == -1)			// Just in case!
-      return (ptr);
-
-    cp = F_Create_ClusterDef (intertext);
-    if (cp)
+    if ((intertext != -1)			// Just in case!
+     && ((cp = F_Create_ClusterDef (intertext)) != NULL))
     {
-      if ((episode != 255) && (map != 255))
-      {
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-	mdest_ptr -> cluster = intertext;
-      }
       if (doexit)
 	cp->exittext = newtext;
       else
@@ -4961,16 +4953,12 @@ static void Parse_Mapinfo (char * ptr, char * top)
       else
       {
 	intertext = read_int (ptr);
-	episode = 255;
-	map = 255;
 	textislump = 0;
       }
     }
     else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
     {
       intertext = read_int (ptr + 11);
-      episode = 255;
-      map = 255;
       textislump = 0;
     }
     else if (strncasecmp (ptr, "entertextislump", 15) == 0)
@@ -4982,18 +4970,18 @@ static void Parse_Mapinfo (char * ptr, char * top)
       i = dh_inchar (ptr, '"');
       if (textislump & 1)
       {
-	ptr = set_enter_exit_text (ptr+i, 0, intertext, episode, map);
+	ptr = set_enter_exit_text (ptr+i, 0, intertext);
       }
       else
       {
        j = dh_instr (ptr, "lookup");
        if ((j) && (j < i))
        {
-	 ptr = set_enter_exit_text (ptr+j+5, 0, intertext, episode, map);
+	 ptr = set_enter_exit_text (ptr+j+5, 0, intertext);
        }
        else if (i && (ptr[i] == '$'))
        {
-	 ptr = set_enter_exit_text (ptr+i+1, 0, intertext, episode, map);
+	 ptr = set_enter_exit_text (ptr+i+1, 0, intertext);
        }
        else
        {
@@ -5040,18 +5028,18 @@ static void Parse_Mapinfo (char * ptr, char * top)
       i = dh_inchar (ptr, '"');
       if (textislump & 2)
       {
-	ptr = set_enter_exit_text (ptr+i, 1, intertext, episode, map);
+	ptr = set_enter_exit_text (ptr+i, 1, intertext);
       }
       else
       {
 	j = dh_instr (ptr, "lookup");
 	if ((j) && (j < i))
 	{
-	  ptr = set_enter_exit_text (ptr+j+5, 1, intertext, episode, map);
+	  ptr = set_enter_exit_text (ptr+j+5, 1, intertext);
 	}
 	else if (i && (ptr[i] == '$'))
 	{
-	  ptr = set_enter_exit_text (ptr+i+1, 1, intertext, episode, map);
+	  ptr = set_enter_exit_text (ptr+i+1, 1, intertext);
 	}
 	else
 	{
@@ -5327,7 +5315,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	intertext = (episode*10)+map;
 
       mdest_ptr -> cluster = intertext;
-      ptr = set_enter_exit_text (ptr+9, 1, intertext, episode, map);
+      ptr = set_enter_exit_text (ptr+9, 1, intertext);
     }
     else if (strncasecmp (ptr, "inter-backdrop", 14) == 0)
     {
