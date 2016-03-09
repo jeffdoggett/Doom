@@ -84,6 +84,8 @@ void P_Init_SpecHit (void)
 //
 boolean PIT_StompThing (mobj_t* thing)
 {
+    int		damage;
+    int		gibhealth;
     fixed_t	blockdist;
 
     if (!(thing->flags & MF_SHOOTABLE) )
@@ -102,24 +104,24 @@ boolean PIT_StompThing (mobj_t* thing)
     if (thing == tmthing)
 	return true;
 
-    // monsters don't stomp things except on boss level (30)
-    if (!tmthing->player) // && gamemap != 30)
+    if (telefrag == false)
     {
-      if ((telefrag == false)
-       && (G_Access_MapInfoTab (gameepisode, gamemap) -> allow_monster_telefrags == 0))
-	return false;
+      if (tmthing->flags2 & MF2_PASSMOBJ)
+      {
+	if (tmz > thing->z + thing->height)
+	  return true; // overhead
+	if (tmz + tmthing->height < thing->z)
+	  return true; // underneath
+      }
+      return false;
     }
 
-    if (tmthing->flags2 & MF2_PASSMOBJ)
-    {
-      if (tmz > thing->z + thing->height)
-        return true; // overhead
-      if (tmz + tmthing->height < thing->z)
-        return true; // underneath
-    }
-
-    P_DamageMobj (thing, tmthing, tmthing, (thing->health+thing->info->spawnhealth)*2);
-
+    gibhealth = thing->info->gibhealth;
+    if (gibhealth < 0)
+      damage = (thing->health - gibhealth) + 1;
+    else
+      damage = (thing->health + thing->info->spawnhealth) + 1;
+    P_DamageMobj (thing, tmthing, tmthing, damage);
     return true;
 }
 
@@ -137,7 +139,13 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     int		by;
     subsector_t*	newsubsec;
 
-    telefrag = (boolean) (thing->player || boss);
+    // monsters don't stomp things except on boss level (30)
+    if ((boss)
+     || (thing->player)
+     || (G_Access_MapInfoTab (gameepisode, gamemap) -> allow_monster_telefrags))
+      telefrag = true;
+    else
+      telefrag = false;
 
     // kill anything occupying the position
     tmthing = thing;
@@ -233,8 +241,8 @@ boolean PIT_CheckLine (line_t* ld)
 	if ( ld->flags & ML_BLOCKING )
 	    return false;	// explicitly blocking everything
 
-        // killough 8/9/98: monster-blockers don't affect friends
-        if (!(tmthing->flags & MF_FRIEND || tmthing->player)
+	// killough 8/9/98: monster-blockers don't affect friends
+	if (!(tmthing->flags & MF_FRIEND || tmthing->player)
 	  && ld->flags & ML_BLOCKMONSTERS)
 	    return false;	// block monsters only
     }
@@ -641,7 +649,7 @@ void P_FakeZMovement (mobj_t *mo)
 
 	    if (P_ApproxDistance(mo->x - mo->target->x, mo->y - mo->target->y) < ABS(delta))
 		mo->z += (delta < 0 ? -FLOATSPEED : FLOATSPEED);
-        }
+	}
     }
 
     // clip movement
@@ -649,16 +657,16 @@ void P_FakeZMovement (mobj_t *mo)
     {
 	// hit the floor
 	if (mo->flags & MF_SKULLFLY)
-            mo->momz = -mo->momz; // the skull slammed into something
+	    mo->momz = -mo->momz; // the skull slammed into something
 
 	if (mo->momz < 0)
-            mo->momz = 0;
+	    mo->momz = 0;
 	mo->z = mo->floorz;
     }
     else if (!(mo->flags & MF_NOGRAVITY))
     {
 	if (!mo->momz)
-            mo->momz = -GRAVITY;
+	    mo->momz = -GRAVITY;
 	mo->momz -= GRAVITY;
     }
 
@@ -666,10 +674,10 @@ void P_FakeZMovement (mobj_t *mo)
     {
 	// hit the ceiling
 	if (mo->momz > 0)
-            mo->momz = 0;
+	    mo->momz = 0;
 
 	if (mo->flags & MF_SKULLFLY)
-            mo->momz = -mo->momz; // the skull slammed into something
+	    mo->momz = -mo->momz; // the skull slammed into something
 
 	mo->z = mo->ceilingz - mo->height;
     }
