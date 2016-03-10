@@ -1223,6 +1223,9 @@ void A_BruisAttack (mobj_t* actor, pspdef_t* psp)
     if (!actor->target)
 	return;
 
+    // [BH] fix baron nobles not facing targets correctly when attacking
+    A_FaceTarget(actor, psp);
+
     if (P_CheckMeleeRange (actor))
     {
 	S_StartSound (actor, sfx_claw);

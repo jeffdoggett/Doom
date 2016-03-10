@@ -264,11 +264,11 @@ static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum)
     if (twoSided (secnum, i) )
     {
       side = getSide(secnum,i,0);
-      if (side->bottomtexture >= 0)
+      if (side->bottomtexture > 0)
 	if (textureheight[side->bottomtexture] < offset)
 	    offset = textureheight[side->bottomtexture];
       side = getSide(secnum,i,1);
-      if (side->bottomtexture >= 0)
+      if (side->bottomtexture > 0)
 	if (textureheight[side->bottomtexture] < offset)
 	  offset = textureheight[side->bottomtexture];
     }
