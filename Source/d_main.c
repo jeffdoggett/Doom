@@ -2001,15 +2001,6 @@ void D_DoomMain (void)
   unsigned int	p;
   map_starts_t *  map_info_p;
 
-  D_SetDebugOut ();
-  init_text_messages ();
-  I_SetScreenSize ();
-  IdentifyVersion ();
-
-  setbuf (stdout, NULL);
-  modifiedgame = false;
-  D_LoadCheats ();
-
   respawnparm = (boolean) M_CheckParm ("-respawn");
   fastparm = (boolean) M_CheckParm ("-fast");
   devparm = (boolean) M_CheckParm ("-devparm");
@@ -2018,6 +2009,14 @@ void D_DoomMain (void)
   else if (M_CheckParm ("-deathmatch"))
     deathmatch = (boolean) 1;
 
+  D_SetDebugOut ();
+  init_text_messages ();
+  I_SetScreenSize ();
+  IdentifyVersion ();
+
+  setbuf (stdout, NULL);
+  modifiedgame = false;
+  D_LoadCheats ();
   D_LoadWads ();
 
   dh_changing_pwad = false;
