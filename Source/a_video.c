@@ -2168,14 +2168,25 @@ void I_SetScreenSize (void)
   else if (screen_mode < 0)	/* No screen size/resolution given... */
   {
     regs.r[1] = (int) "OS_ScreenMode";
-    if ((_kernel_swi (OS_SWINumberFromString, &regs, &regs)) == 0)
-    {  /* So the OS_ScreenMode call exists, which means that 16/24 bit */
-       /* colour may be available..... */
-       /* I tested this code by preventing my Risc PC from executing it's */
-       /* !boot programs, hence the monitor definition file wasn't read and */
-       /* hence the 16/24 bit modes were not available...... */
+    rc = _kernel_swi (OS_SWINumberFromString, &regs, &regs);
+    if (rc)
+    {
+      _kernel_oswrch (22);
+      _kernel_oswrch (49);
+      if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
+	screen_mode = MODE_320_x_480_8bpp;
+      else
+	I_Error ("Failed to verify the OS_ScreenMode call (%s)\n", rc -> errmess);
+    }
+    else
+    {
+      /* So the OS_ScreenMode call exists, which means that 16/24 bit */
+      /* colour may be available..... */
+      /* I tested this code by preventing my Risc PC from executing it's */
+      /* !boot programs, hence the monitor definition file wasn't read and */
+      /* hence the 16/24 bit modes were not available...... */
 
-       /* Try first for the best... */
+      /* Try first for the best... */
       mode_number = mode_search;
       count = ARRAY_SIZE (mode_search);
 
@@ -2191,15 +2202,6 @@ void I_SetScreenSize (void)
 	  I_Error ("Failed to find a suitable screen mode (%s)\n", rc -> errmess);
 	}
       } while (1);
-    }
-    else  /* Not an RPC, so try mode 49 */
-    {
-      _kernel_oswrch (22);
-      _kernel_oswrch (49);
-      if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
-	screen_mode = MODE_320_x_480_8bpp;
-      else
-	I_Error ("Failed to select screen mode (%s)\n", rc -> errmess);
     }
   }
   else
