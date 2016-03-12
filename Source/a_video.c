@@ -2161,7 +2161,9 @@ void I_SetScreenSize (void)
   if (screen_mode == MODE_USER_DEF)
   {
     decode_screendef (M_CheckParm("-0"));
-    select_screen_mode (0,0);
+    rc = select_screen_mode (screen_mode,0);
+    if (rc)
+      I_Error ("Failed to select user def mode (%s)\n", rc -> errmess);
     init_sprite_area ();
   }
 
