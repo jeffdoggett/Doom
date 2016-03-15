@@ -71,6 +71,7 @@ void I_Init (void)
 {
     S_InitSound();
     //  I_InitGraphics();
+    atexit (I_ShutdownNetwork);
 }
 
 //
@@ -82,6 +83,7 @@ void I_Quit (void)
     S_ShutdownSound();
     M_SaveDefaults ();
     I_ShutdownGraphics();
+    I_ShutdownNetwork();
     exit(0);
 }
 
@@ -141,6 +143,7 @@ void I_Error (char *error, ...)
     D_QuitNetGame ();
     S_ShutdownSound();
     I_ShutdownGraphics();
+    I_ShutdownNetwork();
 
     exit(-1);
 }

@@ -34,6 +34,7 @@
 
 
 void I_InitNetwork (void);
+void I_ShutdownNetwork (void);
 void I_NetCmd (void);
 
 

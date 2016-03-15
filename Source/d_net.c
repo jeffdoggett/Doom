@@ -621,7 +621,6 @@ void D_QuitNetGame (void)
 //
 // TryRunTics
 //
-static int	frametics[4];
 static int	frameon;
 static int	frameskip[4];
 static int	oldnettics;

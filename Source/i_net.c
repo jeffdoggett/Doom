@@ -49,6 +49,7 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #endif
 #include "i_net.h"
 
+extern int socketclose (int);
 
 #ifndef ntohl
 
@@ -66,6 +67,10 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 #define htonl(x) ntohl(x)
 #define htons(x) ntohs(x)
+#endif
+
+#ifndef SHUT_RDWR
+#define SHUT_RDWR 2
 #endif
 
 void	NetSend (void);
@@ -334,6 +339,19 @@ void I_InitNetwork (void)
     sendsocket = UDPsocket ();
 }
 
+void I_ShutdownNetwork (void)
+{
+  if (netgame == true)
+  {
+    shutdown (insocket, SHUT_RDWR);
+    shutdown (sendsocket, SHUT_RDWR);
+#ifdef __riscos
+    socketclose (insocket);
+    socketclose (sendsocket);
+#endif
+    netgame = false;
+  }
+}
 
 void I_NetCmd (void)
 {

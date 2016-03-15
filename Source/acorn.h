@@ -27,4 +27,8 @@ char * strdup (const char * string);
 void usleep (unsigned int time);
 int RiscOs_expand_path (const char * path_name);
 
+
+/* Required by the sockets lib only on RiscOS */
+extern int socketclose (int);
+
 #endif

@@ -1156,8 +1156,8 @@ void G_Ticker (void)
 		  && consistancy[i][buf] != cmd->consistancy)
 	      {
 #ifdef NORMALUNIX
-		  printf ("consistency failure (%i should be %i)\n",
-			   cmd->consistancy, consistancy[i][buf]);
+		  printf ("consistency failure %u (%i should be %i)\n",
+			   i, cmd->consistancy, consistancy[i][buf]);
 #endif
 	      }
 	      if (players[i].mo)
