@@ -83,7 +83,7 @@ doomdata_t	reboundstore;
 //
 //
 //
-int NetbufferSize (void)
+static int NetbufferSize (void)
 {
     return (uintptr_t)&(((doomdata_t *)0)->cmds[netbuffer->numtics]);
 }
@@ -91,10 +91,10 @@ int NetbufferSize (void)
 //
 // Checksum
 //
-unsigned NetbufferChecksum (void)
+static unsigned NetbufferChecksum (void)
 {
     // FIXME -endianess?
-#ifdef NORMALUNIX
+#ifndef ADD_NET_CHECKSUM
     return 0;			// byte order problems
 #else
     unsigned	c;
@@ -112,7 +112,7 @@ unsigned NetbufferChecksum (void)
 //
 //
 //
-int ExpandTics (int low)
+static int ExpandTics (int low)
 {
     int	delta;
 
@@ -134,10 +134,7 @@ int ExpandTics (int low)
 //
 // HSendPacket
 //
-void
-HSendPacket
- (int	node,
-  int	flags )
+static void HSendPacket (int node, int flags)
 {
     netbuffer->checksum = NetbufferChecksum () | flags;
 
@@ -184,7 +181,7 @@ HSendPacket
 // HGetPacket
 // Returns false if no packet is waiting
 //
-boolean HGetPacket (void)
+static boolean HGetPacket (void)
 {
     if (reboundpacket)
     {
@@ -213,13 +210,16 @@ boolean HGetPacket (void)
 	return false;
     }
 
+#ifdef ADD_NET_CHECKSUM
     if (NetbufferChecksum () != (netbuffer->checksum&NCMD_CHECKSUM) )
     {
 	if (debugfile)
 	    fprintf (debugfile,"bad packet checksum\n");
+	else
+	    fprintf (stderr,"bad packet checksum\n");
 	return false;
     }
-
+#endif
     if (debugfile)
     {
 	int		realretrans;
@@ -251,9 +251,9 @@ boolean HGetPacket (void)
 //
 // GetPackets
 //
-char    exitmsg[80];
+static char    exitmsg[80];
 
-void GetPackets (void)
+static void GetPackets (void)
 {
     int		netconsole;
     int		netnode;
@@ -358,7 +358,7 @@ void GetPackets (void)
 // Builds ticcmds for console player,
 // sends out a packet
 //
-int      gametime;
+static int      gametime;
 
 void NetUpdate (void)
 {
@@ -445,7 +445,7 @@ void NetUpdate (void)
 //
 // CheckAbort
 //
-void CheckAbort (void)
+static void CheckAbort (void)
 {
     event_t *ev;
     int		stoptic;
@@ -468,7 +468,7 @@ void CheckAbort (void)
 //
 // D_ArbitrateNetStart
 //
-void D_ArbitrateNetStart (void)
+static void D_ArbitrateNetStart (void)
 {
     int		i;
     boolean	gotinfo[MAXNETNODES];
@@ -621,10 +621,10 @@ void D_QuitNetGame (void)
 //
 // TryRunTics
 //
-int	frametics[4];
-int	frameon;
-int	frameskip[4];
-int	oldnettics;
+static int	frametics[4];
+static int	frameon;
+static int	frameskip[4];
+static int	oldnettics;
 
 extern	boolean	advancedemo;
 

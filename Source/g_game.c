@@ -1155,8 +1155,10 @@ void G_Ticker (void)
 	      if (gametic > BACKUPTICS
 		  && consistancy[i][buf] != cmd->consistancy)
 	      {
-		  I_Error ("consistency failure (%i should be %i)",
+#ifdef NORMALUNIX
+		  printf ("consistency failure (%i should be %i)\n",
 			   cmd->consistancy, consistancy[i][buf]);
+#endif
 	      }
 	      if (players[i].mo)
 		  consistancy[i][buf] = players[i].mo->x;
