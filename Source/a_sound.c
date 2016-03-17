@@ -13,150 +13,154 @@
 
 // #define DEBUG_MUSIC
 
-#define DataVox_Type               0x44380
-#define DataVox_Timed              0x44381
-#define DataVox_Pitch              0x44382
-#define DataVox_ReadPitch          0x44383
-#define DataVox_ReadTimer          0x44384
-#define DataVox_ReadType           0x44385
-#define DataVox_SetMemory          0x44386
-#define DataVox_ReadMemory         0x44387
-#define DataVox_ReadAddress        0x44388
-#define DataVox_SetRepeat          0x44389
-#define DataVox_ReadRepeat         0x4438A
-#define DataVox_SetReverse         0x4438B
-#define DataVox_ReadReverse        0x4438C
-#define DataVox_PitchToSample      0x4438D
-#define DataVox_SampleToPitch      0x4438E
-#define DataVox_Duplicate          0x4438F
-#define DataVox_Unset              0x44390
-#define DataVox_ConvertByte        0x44391
-#define DataVox_ReadBufferFlag     0x44392
-#define DataVox_AllocateChannel    0x44393
-#define DataVox_DeAllocateChannel  0x44394
-#define DataVox_RequestChannel     0x44395
-#define DataVox_ChannelsFree       0x44396
-#define DataVox_ConvertArea        0x44397
-#define DataVox_ChannelFreeMap     0x44398
-#define DataVox_UpCallHandler      0x44399
-#define DataVox_FlushKeys          0x4439A
-#define DataVox_VoiceActive        0x4439B
-#define DataVox_SystemSpeed        0x4439C
-#define DataVox_Version            0x4439D
-#define DataVox_SlaveChannel       0x4439E
-#define DataVox_ReadMaster         0x4439F
-#define DataVox_ReadUpCallStatus   0x443A0
-#define DataVox_SetUpCallStatus    0x443A1
-#define DataVox_AdjustMemory       0x443A2
-#define DataVox_SetInternalPitch   0x443A3
-
-#define Sound_Configure		   0x40140
-#define Sound_Stereo		   0x40142
-#define Sound_AttachVoice	   0x40185
-#define Sound_Control		   0x40189
-#define Sound_AttachNamedVoice	   0x4018A
-
-#define OS_ReadMonotonicTime	   0x42
+#define OS_Module			0x1E
+#define OS_ReadMonotonicTime		0x42
 
 
-#define MIDI_SoundEnable	   0x404C0
-#define MIDI_SetMode		   0x404C1
-#define MIDI_SetTxChannel	   0x404C2
-#define MIDI_SetTxActiveSensing	   0x404C3
-#define MIDI_InqSongPositionPointer 0x404C4
-#define MIDI_InqBufferSize	   0x404C5
-#define MIDI_InqError		   0x404C6
-#define MIDI_RxByte		   0x404C7
-#define MIDI_RxCommand		   0x404C8
-#define MIDI_TxByte		   0x404C9
-#define MIDI_TxCommand		   0x404CA
-#define MIDI_TxNoteOff		   0x404CB
-#define MIDI_TxNoteOn		   0x404CC
-#define MIDI_TxPolyKeyPressure	   0x404CD
-#define MIDI_TxControlChange	   0x404CE
-#define MIDI_TxLocalControl	   0x404CF
-#define MIDI_TxAllNotesOff	   0x404D0
-#define MIDI_TxOmniModeOff	   0x404D1
-#define MIDI_TxOmniModeOn	   0x404D2
-#define MIDI_TxMonoModeOn	   0x404D3
-#define MIDI_TxPolyModeOn	   0x404D4
-#define MIDI_TxProgramChange	   0x404D5
-#define MIDI_TxChannelPressure	   0x404D6
-#define MIDI_TxPitchWheel	   0x404D7
-#define MIDI_TxSongPositionPointer 0x404D8
-#define MIDI_TxSongSelect	   0x404D9
-#define MIDI_TxTuneRequest	   0x404DA
-#define MIDI_TxStart		   0x404DB
-#define MIDI_TxContinue		   0x404DC
-#define MIDI_TxStop		   0x404DD
-#define MIDI_TxSystemReset	   0x404DE
-#define MIDI_IgnoreTiming	   0x404DF
-#define MIDI_SynchSoundScheduler   0x404E0
-#define MIDI_FastClock		   0x404E1
-#define MIDI_Init		   0x404E2
-#define MIDI_SetBufferSize	   0x404E3
-#define MIDI_Interface		   0x404E4
-#define MIDI_InstallDriver	   0x404E5
-#define MIDI_PortMapRx		   0x404E6
-#define MIDI_PortMapTx		   0x404E7
-#define MIDI_DriverInfo		   0x404E8
-#define MIDI_ClockStamp		   0x404E9
-#define MIDI_Thru		   0x404EA
-
-#define QTM_Load		   0x47E40
-#define QTM_Start		   0x47E41
-#define QTM_Stop		   0x47E42
-#define QTM_Pause		   0x47E43
-#define QTM_Clear		   0x47E44
-#define QTM_Info		   0x47E45
-#define QTM_Pos		   	   0x47E46
-#define QTM_EffectControl	   0x47E47
-#define QTM_Volume		   0x47E48
-#define QTM_SetSampleSpeed	   0x47E49
-#define QTM_DMABuffer		   0x47E4A
-#define QTM_RemoveChannel	   0x47E4B
-#define QTM_RestoreChannel	   0x47E4C
-#define QTM_Stereo		   0x47E4D
-#define QTM_ReadSongLength	   0x47E4E
-#define QTM_ReadSequenceTable	   0x47E4F
-#define QTM_VUBarControl	   0x47E50
-#define QTM_ReadVULevels	   0x47E51
-#define QTM_ReadSampleTable	   0x47E52
-#define QTM_ReadSpeed		   0x47E53
-#define QTM_PlaySample		   0x47E54
-#define QTM_SongStatus		   0x47E55
-#define QTM_ReadPlayingTime	   0x47E56
-#define QTM_PlayRawSample	   0x47E57
-#define QTM_SoundControl	   0x47E58
-#define QTM_SWITableAddress	   0x47E59
-#define QTM_RegisterSample	   0x47E5A
-#define QTM_SetSpeed		   0x47E5B
-#define QTM_MusicVolume		   0x47E5C
-#define QTM_SampleVolume	   0x47E5D
-#define QTM_MusicOptions	   0x47E5E
-#define QTM_MusicInterrupt	   0x47E5F
-#define QTM_ReadChannelData	   0x47E60
-#define QTM_ReadNoteWord	   0x47E61
+#define Sound_Configure			0x40140
+#define Sound_Stereo			0x40142
+#define Sound_AttachVoice		0x40185
+#define Sound_Control			0x40189
+#define Sound_AttachNamedVoice		0x4018A
 
 
-#define TimPlayer_Version	   0x51380
-#define TimPlayer_Configure	   0x51381
-#define TimPlayer_SongLoad	   0x51382
-#define TimPlayer_SongUnload	   0x51383
-#define TimPlayer_SongNew	   0x51384
-#define TimPlayer_SongLoad2	   0x51385
-#define TimPlayer_SongDecompress   0x51386
-#define TimPlayer_SongPlay	   0x51388
-#define TimPlayer_SongPause	   0x51389
-#define TimPlayer_SongStop	   0x5138A
-#define TimPlayer_SongPosition	   0x5138B
-#define TimPlayer_SongVolume	   0x5138C
-#define TimPlayer_SongStatus	   0x5138D
-#define TimPlayer_SongConfigure	   0x5138E
-#define TimPlayer_SongInfo	   0x51390
-#define TimPlayer_SongTexts	   0x51391
-#define TimPlayer_SongInitialSettings	   0x51392
-#define TimPlayer_ChannelInitialSettings   0x51393
+#define DataVox_Type			0x44380
+#define DataVox_Timed			0x44381
+#define DataVox_Pitch			0x44382
+#define DataVox_ReadPitch		0x44383
+#define DataVox_ReadTimer		0x44384
+#define DataVox_ReadType		0x44385
+#define DataVox_SetMemory		0x44386
+#define DataVox_ReadMemory		0x44387
+#define DataVox_ReadAddress		0x44388
+#define DataVox_SetRepeat		0x44389
+#define DataVox_ReadRepeat		0x4438A
+#define DataVox_SetReverse		0x4438B
+#define DataVox_ReadReverse		0x4438C
+#define DataVox_PitchToSample		0x4438D
+#define DataVox_SampleToPitch		0x4438E
+#define DataVox_Duplicate		0x4438F
+#define DataVox_Unset			0x44390
+#define DataVox_ConvertByte		0x44391
+#define DataVox_ReadBufferFlag		0x44392
+#define DataVox_AllocateChannel		0x44393
+#define DataVox_DeAllocateChannel	0x44394
+#define DataVox_RequestChannel		0x44395
+#define DataVox_ChannelsFree		0x44396
+#define DataVox_ConvertArea		0x44397
+#define DataVox_ChannelFreeMap		0x44398
+#define DataVox_UpCallHandler		0x44399
+#define DataVox_FlushKeys		0x4439A
+#define DataVox_VoiceActive		0x4439B
+#define DataVox_SystemSpeed		0x4439C
+#define DataVox_Version			0x4439D
+#define DataVox_SlaveChannel		0x4439E
+#define DataVox_ReadMaster		0x4439F
+#define DataVox_ReadUpCallStatus	0x443A0
+#define DataVox_SetUpCallStatus		0x443A1
+#define DataVox_AdjustMemory		0x443A2
+#define DataVox_SetInternalPitch	0x443A3
+
+
+#define MIDI_SoundEnable		0x404C0
+#define MIDI_SetMode			0x404C1
+#define MIDI_SetTxChannel		0x404C2
+#define MIDI_SetTxActiveSensing		0x404C3
+#define MIDI_InqSongPositionPointer	0x404C4
+#define MIDI_InqBufferSize		0x404C5
+#define MIDI_InqError			0x404C6
+#define MIDI_RxByte			0x404C7
+#define MIDI_RxCommand			0x404C8
+#define MIDI_TxByte			0x404C9
+#define MIDI_TxCommand			0x404CA
+#define MIDI_TxNoteOff			0x404CB
+#define MIDI_TxNoteOn			0x404CC
+#define MIDI_TxPolyKeyPressure		0x404CD
+#define MIDI_TxControlChange		0x404CE
+#define MIDI_TxLocalControl		0x404CF
+#define MIDI_TxAllNotesOff		0x404D0
+#define MIDI_TxOmniModeOff		0x404D1
+#define MIDI_TxOmniModeOn		0x404D2
+#define MIDI_TxMonoModeOn		0x404D3
+#define MIDI_TxPolyModeOn		0x404D4
+#define MIDI_TxProgramChange		0x404D5
+#define MIDI_TxChannelPressure		0x404D6
+#define MIDI_TxPitchWheel		0x404D7
+#define MIDI_TxSongPositionPointer	0x404D8
+#define MIDI_TxSongSelect		0x404D9
+#define MIDI_TxTuneRequest		0x404DA
+#define MIDI_TxStart			0x404DB
+#define MIDI_TxContinue			0x404DC
+#define MIDI_TxStop			0x404DD
+#define MIDI_TxSystemReset		0x404DE
+#define MIDI_IgnoreTiming		0x404DF
+#define MIDI_SynchSoundScheduler	0x404E0
+#define MIDI_FastClock			0x404E1
+#define MIDI_Init			0x404E2
+#define MIDI_SetBufferSize		0x404E3
+#define MIDI_Interface			0x404E4
+#define MIDI_InstallDriver		0x404E5
+#define MIDI_PortMapRx			0x404E6
+#define MIDI_PortMapTx			0x404E7
+#define MIDI_DriverInfo			0x404E8
+#define MIDI_ClockStamp			0x404E9
+#define MIDI_Thru			0x404EA
+
+
+#define QTM_Load			0x47E40
+#define QTM_Start			0x47E41
+#define QTM_Stop			0x47E42
+#define QTM_Pause			0x47E43
+#define QTM_Clear			0x47E44
+#define QTM_Info			0x47E45
+#define QTM_Pos				0x47E46
+#define QTM_EffectControl		0x47E47
+#define QTM_Volume			0x47E48
+#define QTM_SetSampleSpeed		0x47E49
+#define QTM_DMABuffer			0x47E4A
+#define QTM_RemoveChannel		0x47E4B
+#define QTM_RestoreChannel		0x47E4C
+#define QTM_Stereo			0x47E4D
+#define QTM_ReadSongLength		0x47E4E
+#define QTM_ReadSequenceTable		0x47E4F
+#define QTM_VUBarControl		0x47E50
+#define QTM_ReadVULevels		0x47E51
+#define QTM_ReadSampleTable		0x47E52
+#define QTM_ReadSpeed			0x47E53
+#define QTM_PlaySample			0x47E54
+#define QTM_SongStatus			0x47E55
+#define QTM_ReadPlayingTime		0x47E56
+#define QTM_PlayRawSample		0x47E57
+#define QTM_SoundControl		0x47E58
+#define QTM_SWITableAddress		0x47E59
+#define QTM_RegisterSample		0x47E5A
+#define QTM_SetSpeed			0x47E5B
+#define QTM_MusicVolume			0x47E5C
+#define QTM_SampleVolume		0x47E5D
+#define QTM_MusicOptions		0x47E5E
+#define QTM_MusicInterrupt		0x47E5F
+#define QTM_ReadChannelData		0x47E60
+#define QTM_ReadNoteWord		0x47E61
+
+
+#define TimPlayer_Version		0x51380
+#define TimPlayer_Configure		0x51381
+#define TimPlayer_SongLoad		0x51382
+#define TimPlayer_SongUnload		0x51383
+#define TimPlayer_SongNew		0x51384
+#define TimPlayer_SongLoad2		0x51385
+#define TimPlayer_SongDecompress	0x51386
+#define TimPlayer_SongPlay		0x51388
+#define TimPlayer_SongPause		0x51389
+#define TimPlayer_SongStop		0x5138A
+#define TimPlayer_SongPosition		0x5138B
+#define TimPlayer_SongVolume		0x5138C
+#define TimPlayer_SongStatus		0x5138D
+#define TimPlayer_SongConfigure		0x5138E
+#define TimPlayer_SongInfo		0x51390
+#define TimPlayer_SongTexts		0x51391
+#define TimPlayer_SongInitialSettings	0x51392
+#define TimPlayer_ChannelInitialSettings 0x51393
 
 
 #define AMPlayer_Play			0x52E00
@@ -210,8 +214,6 @@ int		timplayer_vol_tab [] =
   0x20,0x24,0x28,0x2C,0x30,0x34,0x38,0x3C
 };
 
-static char amp_filepath [100];
-
 #define MIDI_AVAILABLE	1
 #define QTM_PLAYING	2
 #define TIM_PLAYING	4
@@ -219,13 +221,30 @@ static char amp_filepath [100];
 
 /* ------------------------------------------------------------ */
 
-typedef struct
+typedef struct mus_dir_s
 {
   char musname [12];
   char filename [100];
+  struct mus_dir_s * next;
 } mus_dir_t;
 
-mus_dir_t * music_directory;
+static mus_dir_t * music_directory_head;
+static mus_dir_t * amp_current;
+
+/* ------------------------------------------------------------ */
+
+static _kernel_oserror * RmLoad_Module (const char * filepath)
+{
+  _kernel_oserror * rc;
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 1;
+  regs.r[1] = (int) filepath;
+  rc = _kernel_swi (OS_Module, &regs, &regs);
+  if (rc)
+    printf ("RmLoad: %s Error (%s)\n", filepath, rc -> errmess);
+  return (rc);
+}
 
 /* ------------------------------------------------------------ */
 //
@@ -330,8 +349,8 @@ static void I_FindData (unsigned int * start, unsigned int * end, unsigned int *
       ptr_2 = ptr_1 + 1;
       do
       {
-        *ptr_1++ = *ptr_2 + 0x80;
-        ptr_2 += 2;
+	*ptr_1++ = *ptr_2 + 0x80;
+	ptr_2 += 2;
       } while (--newlength);
     }
     else
@@ -383,11 +402,11 @@ static void I_SaveSoundLump (char * filename, unsigned char * data, unsigned int
 //
 int
 I_StartSound
-( int           id,
-  int           vol,
-  int           sep,
-  int           pitch,
-  int           priority )
+( int	   id,
+  int	   vol,
+  int	   sep,
+  int	   pitch,
+  int	   priority )
 {
   sfxinfo_t*	sfx;
   unsigned int length;
@@ -645,7 +664,7 @@ I_InitSound(void)
   prev_snd_config [4] = regs.r[4];
   prev_snd_config [5] = regs.r[5];
 
-  system ("tuning 0");                 // Set to default
+  system ("tuning 0");			// Set to default
 
   channel = MIN_SFX_CHAN;
   do
@@ -957,34 +976,57 @@ static void Mus_AMP_restart_song (const char * filename)
 
 /* ------------------------------------------------------------ */
 
+static int I_Validate_MusName (const char * musname)
+{
+  musicinfo_t * sptr;
+
+  if (strncasecmp (musname, "D_", 2))
+    return (1);
+
+  sptr = S_music;
+  sptr++;		// 1st one is empty.
+  musname += 2;
+  do
+  {
+    if (strcasecmp (sptr -> name, musname) == 0)
+      return (0);
+    sptr++;
+  } while (sptr -> name);
+
+  return (1);
+}
+
+/* ------------------------------------------------------------ */
+
 static void I_InitMusicDirectory (void)
 {
-  int pos;
+  unsigned int pos;
+  unsigned int line;
   FILE * fin;
-  mus_dir_t * ptr;
+  mus_dir_t * mptr;
   char * prefix;
   char * bptr;
   char buffer [200];
+  char filename [100];
 
-  if (Mus_AMP_set_volume (127))
+  if ((Mus_AMP_set_volume (127))
+   && ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer"))
+    || (Mus_AMP_set_volume (127))))
   {
     printf ("Failed to initialise AMPlayer\n");
     return;
   }
 
-  music_directory = malloc (sizeof (mus_dir_t) * 100);
-  if (music_directory == NULL)
-    return;
-
-  memset (music_directory, 0, (sizeof (mus_dir_t) * 100));
-
   fin = fopen ("<DoomMusDir>.Directory", "rb");
   if (fin == NULL)
+  {
+    fprintf (stderr, "Failed to open music directory (%s)\n", "<DoomMusDir>.Directory");
     return;
+  }
 
   /* Work out which version we are */
   prefix = "Doom1";
-  if (gamemode == retail)
+  if (gamemode == commercial)
   {
     prefix = "Doom2";
     if (gamemission == pack_plut)
@@ -993,9 +1035,10 @@ static void I_InitMusicDirectory (void)
       prefix = "Tnt";
   }
 
-  ptr = music_directory;
+  line = 0;
   do
   {
+    line++;
     dh_fgets (buffer, sizeof (buffer), fin);
     if ((buffer [0]) && (buffer [0] != '#'))
     {
@@ -1003,19 +1046,46 @@ static void I_InitMusicDirectory (void)
       pos = dh_inchar (bptr, ':');
       if (pos)
       {
-        buffer [pos-1] = 0;
-        if (dh_instr (buffer, prefix))
-          continue;
-        bptr = buffer + pos;
+	buffer [pos-1] = 0;
+	if (dh_instr (buffer, prefix) == 0)
+	  continue;
+	bptr = buffer + pos;
       }
       pos = dh_inchar (bptr,',');
       if (pos)
       {
 	bptr [pos-1] = 0;
-	strcpy (ptr -> musname, bptr);
-	strcpy (ptr -> filename, bptr+pos);
-//      printf ("Mus dir (%s) -> (%s)\n", ptr -> musname, ptr -> filename);
-	ptr++;
+	if (I_Validate_MusName (bptr))
+	{
+	  fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
+	}
+	else
+	{
+	  if (dh_inchar (bptr,'$'))	// Assume full path if $ present
+	    strcpy (filename, bptr+pos);
+	  else
+	    sprintf (filename,"<DoomMusDir>.%s", bptr+pos);
+
+	  if (access (filename, R_OK))
+	  {
+	    fprintf (stderr, "Directory line %u: Sound file %s not found\n", line, filename);
+	  }
+	  else
+	  {
+	    mptr = malloc (sizeof (mus_dir_t));
+	    if (mptr == NULL)
+	      break;
+
+	    mptr -> next = music_directory_head;
+	    music_directory_head = mptr;
+
+	    strcpy (mptr -> musname, bptr);
+	    strcpy (mptr -> filename, filename);
+
+  	    if (M_CheckParm ("-showmusdir"))
+              printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
+          }
+        }
       }
     }
   } while (!feof (fin));
@@ -1034,8 +1104,8 @@ void I_InitMusic (int musicfiles)
   music_pause = 0;
   music_data = NULL;
   music_pos = NULL;
-  amp_filepath [0] = 0;
-  music_directory = NULL;
+  amp_current = NULL;
+  music_directory_head = NULL;
 
   if (musicfiles)
   {
@@ -1113,10 +1183,10 @@ void I_FillMusBuffer(int handle)
   int free,cmd,delay,ch,par1,par2;
 
   if ((music_available & AMP_PLAYING)
-   && (amp_filepath [0])
+   && (amp_current)
    && (music_loop))
   {
-    Mus_AMP_restart_song (amp_filepath);
+    Mus_AMP_restart_song (amp_current->filename);
     return;
   }
 
@@ -1129,62 +1199,62 @@ void I_FillMusBuffer(int handle)
     switch ((cmd>>4) &7)
     {
       case 0: /* NoteOff */
-        free=Mus_TxCommand(0x400080|ch|(*music_pos++<<8),music_time);
-        break;
+	free=Mus_TxCommand(0x400080|ch|(*music_pos++<<8),music_time);
+	break;
       case 1: /* NoteOn */
-        par1=*music_pos++;
-        if (par1 &128)
-          par2=(music_vel[ch]=*music_pos++)+music_midivol;
-        else
-          par2=music_vel[ch]+music_midivol;
-        par1&=127;
-        if (par2>0) free=Mus_TxCommand(0x90|ch|(par1<<8)|(par2<<16),music_time);
-        break;
+	par1=*music_pos++;
+	if (par1 &128)
+	  par2=(music_vel[ch]=*music_pos++)+music_midivol;
+	else
+	  par2=music_vel[ch]+music_midivol;
+	par1&=127;
+	if (par2>0) free=Mus_TxCommand(0x90|ch|(par1<<8)|(par2<<16),music_time);
+	break;
       case 2: /* Bend */
-        par1=*music_pos++;
-        free=Mus_TxCommand(0xE0|ch|((par1 &127)<<8)|((par1 &128)<<1),music_time);
-        break;
+	par1=*music_pos++;
+	free=Mus_TxCommand(0xE0|ch|((par1 &127)<<8)|((par1 &128)<<1),music_time);
+	break;
       case 3: /* System */
-        switch (*music_pos++)
-        {
-          case 10:
-          case 11: free=Mus_TxCommand(0x7BB0|ch,music_time); break;
-          case 12: free=Mus_TxCommand(0x7EB0|ch,music_time); break;
-          case 13: free=Mus_TxCommand(0x7FB0|ch,music_time); break;
-          case 14: free=Mus_TxCommand(0x79B0|ch,music_time); break;
-        }
-        break;
+	switch (*music_pos++)
+	{
+	  case 10:
+	  case 11: free=Mus_TxCommand(0x7BB0|ch,music_time); break;
+	  case 12: free=Mus_TxCommand(0x7EB0|ch,music_time); break;
+	  case 13: free=Mus_TxCommand(0x7FB0|ch,music_time); break;
+	  case 14: free=Mus_TxCommand(0x79B0|ch,music_time); break;
+	}
+	break;
       case 4: /* ControlChange */
-        par1=*music_pos++;
-        par2=*music_pos++;
-        switch (par1)
-        {
-          case 0: free=Mus_TxCommand(0x00C0|ch|(par2<<8),music_time); break;
-          case 2: free=Mus_TxCommand(0x01B0|ch|(par2<<16),music_time); break;
-          case 3: free=Mus_TxCommand(0x07B0|ch|(par2<<16),music_time); break;
-          case 4: free=Mus_TxCommand(0x0AB0|ch|(par2<<16),music_time); break;
-          case 5: free=Mus_TxCommand(0x0BB0|ch|(par2<<16),music_time); break;
-          case 6: free=Mus_TxCommand(0x5BB0|ch|(par2<<16),music_time); break;
-          case 7: free=Mus_TxCommand(0x5DB0|ch|(par2<<16),music_time); break;
-          case 8: free=Mus_TxCommand(0x40B0|ch|(par2<<16),music_time); break;
-          case 9: free=Mus_TxCommand(0x43B0|ch|(par2<<16),music_time); break;
-        }
-        break;
+	par1=*music_pos++;
+	par2=*music_pos++;
+	switch (par1)
+	{
+	  case 0: free=Mus_TxCommand(0x00C0|ch|(par2<<8),music_time); break;
+	  case 2: free=Mus_TxCommand(0x01B0|ch|(par2<<16),music_time); break;
+	  case 3: free=Mus_TxCommand(0x07B0|ch|(par2<<16),music_time); break;
+	  case 4: free=Mus_TxCommand(0x0AB0|ch|(par2<<16),music_time); break;
+	  case 5: free=Mus_TxCommand(0x0BB0|ch|(par2<<16),music_time); break;
+	  case 6: free=Mus_TxCommand(0x5BB0|ch|(par2<<16),music_time); break;
+	  case 7: free=Mus_TxCommand(0x5DB0|ch|(par2<<16),music_time); break;
+	  case 8: free=Mus_TxCommand(0x40B0|ch|(par2<<16),music_time); break;
+	  case 9: free=Mus_TxCommand(0x43B0|ch|(par2<<16),music_time); break;
+	}
+	break;
       case 6: /* End */
-        if (music_loop)
-          music_pos=music_data;
-        else
-          music_pos=NULL;
-        break;
+	if (music_loop)
+	  music_pos=music_data;
+	else
+	  music_pos=NULL;
+	break;
     }
     if (cmd>127)
     {
       delay=0;
       while (1)
       {
-        cmd=*music_pos++;
-        delay=(cmd & 127)|(delay<<7);
-        if (cmd<128) break;
+	cmd=*music_pos++;
+	delay=(cmd & 127)|(delay<<7);
+	if (cmd<128) break;
       }
       music_time+=delay;
     }
@@ -1343,7 +1413,7 @@ void I_StopSong (int handle)
   {
     Mus_AMP_stop ();
     Mus_AMP_clear ();
-    amp_filepath [0] = 0;
+    amp_current = NULL;
     music_available &= ~AMP_PLAYING;
     return;
   }
@@ -1376,33 +1446,33 @@ void I_ShutdownMusic (void)
 
 /* ------------------------------------------------------------ */
 
-int I_PlayMusicFile (const char * filename)
+int I_PlayMusicFile (const char * lumpname)
 {
   mus_dir_t * ptr;
 
-  ptr = music_directory;
+  ptr = music_directory_head;
   if (ptr == NULL)
     return (1);
 
   do
   {
-//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, filename);
-    if (strcasecmp (ptr -> musname, filename) == 0)
+//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
+    if (strcasecmp (ptr -> musname, lumpname) == 0)
     {
-      sprintf (amp_filepath,"<DoomMusDir>.%s", ptr -> filename);
       I_UnRegisterSong (1);
-      if (Mus_AMP_load (amp_filepath) == 0)
+      if (Mus_AMP_load (ptr -> filename) == 0)
       {
-//	printf ("Playing %s\n", amp_filepath);
+	amp_current = ptr;
+//	printf ("Playing %s\n", ptr -> filename);
 	music_available |= AMP_PLAYING;
 	return (0);
       }
       break;
     }
-    ptr++;
-  } while (ptr -> musname [0]);
+    ptr = ptr -> next;
+  } while (ptr);
 
-  amp_filepath [0] = 0;
+  amp_current = NULL;
   return (1);
 }
 

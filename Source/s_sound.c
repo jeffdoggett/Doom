@@ -246,6 +246,7 @@ void S_Start(void)
 {
   int cnum;
   int mnum;
+  unsigned int gm;
 
   // kill all playing sounds at start of level
   //  (trust me - a good idea)
@@ -258,9 +259,10 @@ void S_Start(void)
 
   if (gamemode == commercial)
   {
-    mnum = mus_runnin + gamemap - 1;
-    if (mnum >= NUMMUSIC)
-      mnum = NUMMUSIC-1;
+    gm = gamemap;
+    while (gm > 32)
+      gm -= 32;
+    mnum = mus_runnin + gm - 1;
   }
   else
   {
@@ -270,10 +272,9 @@ void S_Start(void)
     }
     else
     {
-      unsigned int gm;
       gm = gamemap-1;
-      if (gm >= sizeof (spmus))
-	gm = 0;
+      while (gm >= ARRAY_SIZE (spmus))
+	gm -= ARRAY_SIZE (spmus);
       mnum = spmus[gm];
     }
   }
