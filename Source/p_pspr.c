@@ -517,6 +517,7 @@ static void A_FireSomething (player_t* player, unsigned int adder)
   P_SetPsprite (player, &player->psprites[ps_flash], (statenum_t) (weaponinfo[player->readyweapon].flashstate + adder));
 
   if ((weaponrecoil)
+   && (!netgame)
    && ((move = recoil [player->readyweapon]) != 0))
     P_Thrust (player, ANG180 + player->mo->angle, 2048 * move);
 }

@@ -151,6 +151,8 @@ void PacketSend (void)
 	sw.cmds[c].consistancy = htons(netbuffer->cmds[c].consistancy);
 	sw.cmds[c].chatchar = netbuffer->cmds[c].chatchar;
 	sw.cmds[c].buttons = netbuffer->cmds[c].buttons;
+	sw.cmds[c].argnum = netbuffer->cmds[c].argnum;
+	sw.cmds[c].value = netbuffer->cmds[c].value;
     }
 
     //printf ("sending %i\n",gametic);
@@ -222,6 +224,8 @@ void PacketGet (void)
 	netbuffer->cmds[c].consistancy = ntohs(sw.cmds[c].consistancy);
 	netbuffer->cmds[c].chatchar = sw.cmds[c].chatchar;
 	netbuffer->cmds[c].buttons = sw.cmds[c].buttons;
+	netbuffer->cmds[c].argnum = sw.cmds[c].argnum;
+	netbuffer->cmds[c].value = sw.cmds[c].value;
     }
 }
 

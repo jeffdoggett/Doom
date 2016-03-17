@@ -2230,7 +2230,8 @@ void P_SpawnSpecials (void)
     levelTimeCount = time;
   }
 
-  if (M_CheckParm ("-nobadfloors"))
+  if ((M_CheckParm ("-nobadfloors"))
+   && (!netgame))
     P_MakeSuitPerm ();
 
   //	Init special SECTORs.

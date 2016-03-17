@@ -44,6 +44,11 @@ unsigned int Initial_Health  = 100;
 unsigned int Initial_Bullets = 50;
 boolean par_changed = false;
 extern boolean dh_changing_pwad;
+extern boolean Give_Max_Damage;
+extern boolean Monsters_Infight1;
+extern boolean Monsters_Infight2;
+extern boolean Give_Max_Damage;
+extern boolean nobrainspitcheat;
 
 extern char * finale_backdrops [];
 extern clusterdefs_t * finale_clusterdefs;
@@ -635,9 +640,32 @@ void G_BuildTiccmd (ticcmd_t* cmd)
   base = I_BaseTiccmd ();		// empty, or external driver
   memcpy (cmd,base,sizeof(*cmd));
 
-  cmd->consistancy =
-      consistancy[consoleplayer][maketic%BACKUPTICS];
+  cmd->argnum = i = maketic%BACKUPTICS;
+  cmd->consistancy = consistancy[consoleplayer][i];
+  cmd->spare1 = 0;
+  cmd->spare2 = 0;
 
+  switch (i)
+  {
+    case 0:
+      cmd->value = Give_Max_Damage;
+      break;
+
+    case 1:
+      cmd->value = Monsters_Infight1;
+      break;
+
+    case 2:
+      cmd->value = Monsters_Infight2;
+      break;
+
+    case 3:
+      cmd->value = nobrainspitcheat;
+      break;
+
+    default:
+      cmd->value = 0;
+  }
 
   strafe = (boolean) (gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
       || joybuttons[joybstrafe]);
@@ -1164,6 +1192,30 @@ void G_Ticker (void)
 		  consistancy[i][buf] = players[i].mo->x;
 	      else
 		  consistancy[i][buf] = rndindex;
+
+	      /* Try to prevent consistancy errors by copying */
+	      /* some of the cheats across */
+	      if (i)
+	      {
+		switch (cmd->argnum)
+		{
+		  case 0:
+		    Give_Max_Damage = (boolean) cmd->value;
+		    break;
+
+		  case 1:
+		    Monsters_Infight1 = (boolean) cmd->value;
+		    break;
+
+		  case 2:
+		    Monsters_Infight2 = (boolean) cmd->value;
+		    break;
+
+		  case 3:
+		    nobrainspitcheat = (boolean) cmd->value;
+		    break;
+		}
+	      }
 	  }
       }
   }
