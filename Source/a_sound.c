@@ -14,6 +14,7 @@
 // #define DEBUG_MUSIC
 
 #define OS_Module			0x1E
+#define OS_SWINumberFromString		0x39
 #define OS_ReadMonotonicTime		0x42
 
 
@@ -214,10 +215,12 @@ int		timplayer_vol_tab [] =
   0x20,0x24,0x28,0x2C,0x30,0x34,0x38,0x3C
 };
 
-#define MIDI_AVAILABLE	1
-#define QTM_PLAYING	2
-#define TIM_PLAYING	4
-#define AMP_PLAYING	8
+#define MIDI_AVAILABLE	0x01
+#define TIM_LOADED	0x02
+#define TIM_NOT_AVAIL	0x04
+#define TIM_PLAYING	0x08
+#define QTM_PLAYING	0x10
+#define AMP_PLAYING	0x20
 
 /* ------------------------------------------------------------ */
 
@@ -907,6 +910,32 @@ static unsigned int Mus_TIM_set_volume (unsigned int vol)
   return (0);
 }
 
+static unsigned int Mus_Load_TimPlayer (void)
+{
+  _kernel_swi_regs regs;
+
+  if ((music_available & (TIM_LOADED | TIM_NOT_AVAIL)) == 0)	// Been here before?
+  {
+    regs.r[1] = (int) "TimPlayer_SongVolume";
+    if (_kernel_swi (OS_SWINumberFromString, &regs, &regs) == 0)
+    {
+      music_available |= TIM_LOADED;		// Was already loaded
+    }
+    else if (RmLoad_Module ("System:Modules.Audio.Trackers.TimPlayer"))
+    {
+      music_available |= TIM_NOT_AVAIL;
+    }
+    else
+    {
+      music_available |= TIM_LOADED;
+      return (0);
+    }
+  }
+
+  /* Was already loaded, so we cannot try again */
+  return (1);
+}
+
 /* ------------------------------------------------------------ */
 
 static unsigned int Mus_AMP_load (const char * filename)
@@ -1165,12 +1194,22 @@ int I_RegisterSong (void * vdata, unsigned int size)
     return (timplayer_handle);
   }
 
-  if ((music_available & MIDI_AVAILABLE)
-   && (((int*)data)[0]==0x1a53554d))
+  if (((int*)data)[0]==0x1a53554d)
   {
-    offset=*(data+6)+((*(data+7))<<8);
-    music_data=data+offset;
-    return 1;
+    if (music_available & MIDI_AVAILABLE)
+    {
+      offset=*(data+6)+((*(data+7))<<8);
+      music_data=data+offset;
+      return 1;
+    }
+    return (0);
+  }
+
+  if ((Mus_Load_TimPlayer () == 0)	// Have we now loaded TimPlayer?
+   && (Mus_TIM_load (data,size) == 0))	// Did TIM player recognise it?
+  {
+    music_available |= TIM_PLAYING;
+    return (timplayer_handle);
   }
 
   return 0;
