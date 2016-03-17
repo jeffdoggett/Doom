@@ -8,18 +8,8 @@
    most of the comments are ID's.
 */
 
-#include "z_zone.h"
-
-#include "i_system.h"
-#include "i_sound.h"
-#include "m_argv.h"
-#include "m_misc.h"
-#include "w_wad.h"
-
-#include "doomdef.h"
-
+#include "includes.h"
 #include <kernel.h>
-#include <stdlib.h>
 
 // #define DEBUG_MUSIC
 
@@ -169,6 +159,24 @@
 #define TimPlayer_ChannelInitialSettings   0x51393
 
 
+#define AMPlayer_Play			0x52E00
+#define AMPlayer_Stop			0x52E01
+#define AMPlayer_Pause			0x52E02
+#define AMPlayer_Locate			0x52E03
+#define AMPlayer_Info			0x52E04
+#define AMPlayer_Control		0x52E05
+#define AMPlayer_Plugin			0x52E06
+#define AMPlayer_FileInfo		0x52E07
+#define AMPlayer_StreamOpen		0x52E08
+#define AMPlayer_StreamClose		0x52E09
+#define AMPlayer_StreamGiveData		0x52E0A
+#define AMPlayer_StreamInfo		0x52E0B
+#define AMPlayer_MetaDataPollChange	0x52E0C
+#define AMPlayer_MetaDataLookup		0x52E0D
+#define AMPlayer_SoundSystem		0x52E0E
+#define AMPlayer_StreamReadData		0x52E0F
+#define AMPlayer_Instance		0x52E10
+
 
 #define MIN_SFX_CHAN		   1
 #define MAX_SFX_CHAN		   8
@@ -193,6 +201,7 @@ static int	music_pause=0;		/* Time that music was paused, or 0 if it isn't	*/
 static int 	music_midivol;		/* Main volume (-127..0)			*/
 static int	music_qtmvol;
 static int	music_timvol;
+static int	music_ampvol;
 static int	qtm_channels_swiped = 0;/* Number of sound channels used by qtm		*/
 static int	timplayer_handle = 0;
 int		timplayer_vol_tab [] =
@@ -201,9 +210,22 @@ int		timplayer_vol_tab [] =
   0x20,0x24,0x28,0x2C,0x30,0x34,0x38,0x3C
 };
 
+static char amp_filepath [100];
+
 #define MIDI_AVAILABLE	1
 #define QTM_PLAYING	2
 #define TIM_PLAYING	4
+#define AMP_PLAYING	8
+
+/* ------------------------------------------------------------ */
+
+typedef struct
+{
+  char musname [12];
+  char filename [100];
+} mus_dir_t;
+
+mus_dir_t * music_directory;
 
 /* ------------------------------------------------------------ */
 //
@@ -868,15 +890,157 @@ static unsigned int Mus_TIM_set_volume (unsigned int vol)
 
 /* ------------------------------------------------------------ */
 
+static unsigned int Mus_AMP_load (const char * filename)
+{
+  _kernel_swi_regs regs;
+  _kernel_oserror * rc;
+
+  regs.r[0] = 0;
+  regs.r[1] = (int) filename;
+  rc = _kernel_swi (AMPlayer_Play, &regs, &regs);
+#ifdef DEBUG_MUSIC
+  if (rc)
+    printf ("AMP Load:%s (%s)\n", rc -> errmess, filename);
+#endif
+  return ((unsigned int) rc);
+}
+
+static unsigned int Mus_AMP_start (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 1;
+  _kernel_swi (AMPlayer_Pause, &regs, &regs);
+  return (0);
+}
+
+static unsigned int Mus_AMP_stop (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+  return ((int)_kernel_swi (AMPlayer_Stop, &regs, &regs));
+}
+
+static unsigned int Mus_AMP_pause (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+  return ((int)_kernel_swi (AMPlayer_Pause, &regs, &regs));
+}
+
+static unsigned int Mus_AMP_clear (void)
+{
+  return (0);
+}
+
+static unsigned int Mus_AMP_set_volume (unsigned int vol)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+//regs.r[1] = 0;
+  regs.r[1] = vol; // Docs say R2, Actually R1
+  return ((int)_kernel_swi (AMPlayer_Control, &regs, &regs));
+}
+
+static void Mus_AMP_restart_song (const char * filename)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+  if ((_kernel_swi (AMPlayer_Info, &regs, &regs) == 0)
+   && (regs.r[0] == 0))
+    Mus_AMP_load (filename);
+}
+
+/* ------------------------------------------------------------ */
+
+static void I_InitMusicDirectory (void)
+{
+  int pos;
+  FILE * fin;
+  mus_dir_t * ptr;
+  char * prefix;
+  char * bptr;
+  char buffer [200];
+
+  if (Mus_AMP_set_volume (127))
+  {
+    printf ("Failed to initialise AMPlayer\n");
+    return;
+  }
+
+  music_directory = malloc (sizeof (mus_dir_t) * 100);
+  if (music_directory == NULL)
+    return;
+
+  memset (music_directory, 0, (sizeof (mus_dir_t) * 100));
+
+  fin = fopen ("<DoomMusDir>.Directory", "rb");
+  if (fin == NULL)
+    return;
+
+  /* Work out which version we are */
+  prefix = "Doom1";
+  if (gamemode == retail)
+  {
+    prefix = "Doom2";
+    if (gamemission == pack_plut)
+      prefix = "Plutonia";
+    else if (gamemission == pack_tnt)
+      prefix = "Tnt";
+  }
+
+  ptr = music_directory;
+  do
+  {
+    dh_fgets (buffer, sizeof (buffer), fin);
+    if ((buffer [0]) && (buffer [0] != '#'))
+    {
+      bptr = buffer;
+      pos = dh_inchar (bptr, ':');
+      if (pos)
+      {
+        buffer [pos-1] = 0;
+        if (dh_instr (buffer, prefix))
+          continue;
+        bptr = buffer + pos;
+      }
+      pos = dh_inchar (bptr,',');
+      if (pos)
+      {
+	bptr [pos-1] = 0;
+	strcpy (ptr -> musname, bptr);
+	strcpy (ptr -> filename, bptr+pos);
+//      printf ("Mus dir (%s) -> (%s)\n", ptr -> musname, ptr -> filename);
+	ptr++;
+      }
+    }
+  } while (!feof (fin));
+
+  fclose (fin);
+}
+
+/* ------------------------------------------------------------ */
+
 char midimap[16]={0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,9};
 
 /* This is called once at startup */
-void I_InitMusic(void)
+void I_InitMusic (int musicfiles)
 {
   music_available = 0;
   music_pause = 0;
   music_data = NULL;
   music_pos = NULL;
+  amp_filepath [0] = 0;
+  music_directory = NULL;
+
+  if (musicfiles)
+  {
+    I_InitMusicDirectory();
+  }
 
   if (music_pause==0)
   {
@@ -897,8 +1061,6 @@ void I_InitMusic(void)
 }
 
 /* ------------------------------------------------------------ */
-
-
 /* This will restore system resources to their state
  * before I_ClaimMusic was called
  */
@@ -909,7 +1071,7 @@ void I_ReleaseMusic(void)
   I_PauseSong(1);
 }
 
-
+/* ------------------------------------------------------------ */
 /* Song has been loaded, and placed at 'data'.
    If music is ready, get ready to play.
    Return a dummy handle */
@@ -944,10 +1106,19 @@ int I_RegisterSong (void * vdata, unsigned int size)
   return 0;
 }
 
+/* ------------------------------------------------------------ */
 /* Keep scheduler buffer full */
 void I_FillMusBuffer(int handle)
 {
   int free,cmd,delay,ch,par1,par2;
+
+  if ((music_available & AMP_PLAYING)
+   && (amp_filepath [0])
+   && (music_loop))
+  {
+    Mus_AMP_restart_song (amp_filepath);
+    return;
+  }
 
   if (music_pos==NULL) return;
   free=Mus_TxCommand(0xFE,music_time);
@@ -1020,6 +1191,7 @@ void I_FillMusBuffer(int handle)
   }
 }
 
+/* ------------------------------------------------------------ */
 /* If a song is registered, start playing it */
 void I_PlaySong (int handle, int loop)
 {
@@ -1041,6 +1213,14 @@ void I_PlaySong (int handle, int loop)
     return;
   }
 
+  if (music_available & AMP_PLAYING)
+  {
+    Mus_AMP_start ();
+    Mus_AMP_set_volume (music_ampvol);
+    music_loop=loop;
+    return;
+  }
+
   if (((music_available & MIDI_AVAILABLE) == 0)
    || (music_data == NULL))
     return;
@@ -1054,26 +1234,32 @@ void I_PlaySong (int handle, int loop)
 }
 
 
+/* ------------------------------------------------------------ */
 /* Is the song playing, even if paused? */
 int I_QrySongPlaying (int handle)
 {
-  if ((music_available & (QTM_PLAYING|TIM_PLAYING))
+  if ((music_available & (QTM_PLAYING|TIM_PLAYING|AMP_PLAYING))
    || (music_pos != NULL))
     return (1);
 
   return (0);
 }
 
+/* ------------------------------------------------------------ */
+
 void I_SetMusicVolume (int volume) /* 0..15 */
 {
   if (volume > 15) volume = 15;
   music_midivol = (volume-15)*127/15;
-  music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-64 */
+  music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-63 */
   music_timvol  = timplayer_vol_tab [volume];	/* Convert volume 0-15 to 0-256 */
+  music_ampvol  = volume << 3;	/* Convert volume 0-15 to 0-127 */
   Mus_QTM_set_volume (music_qtmvol);
   Mus_TIM_set_volume (music_timvol);
+  Mus_AMP_set_volume (music_ampvol);
 }
 
+/* ------------------------------------------------------------ */
 /* Pause song, be silent */
 void I_PauseSong (int handle)
 {
@@ -1082,9 +1268,16 @@ void I_PauseSong (int handle)
     Mus_QTM_pause ();
     return;
   }
+
   if (music_available & TIM_PLAYING)
   {
     Mus_TIM_pause ();
+    return;
+  }
+
+  if (music_available & AMP_PLAYING)
+  {
+    Mus_AMP_pause ();
     return;
   }
 
@@ -1096,6 +1289,7 @@ void I_PauseSong (int handle)
   Mus_StopSound();
 }
 
+/* ------------------------------------------------------------ */
 /* Resume song, obviously */
 void I_ResumeSong (int handle)
 {
@@ -1111,6 +1305,12 @@ void I_ResumeSong (int handle)
     return;
   }
 
+  if (music_available & AMP_PLAYING)
+  {
+    Mus_AMP_start ();
+    return;
+  }
+
   if (((music_available & MIDI_AVAILABLE) == 0)
    || (music_pause == 0))
     return;				/* Wasn't paused */
@@ -1119,6 +1319,7 @@ void I_ResumeSong (int handle)
   music_pause=0;
 }
 
+/* ------------------------------------------------------------ */
 /* Stop song and sounds */
 void I_StopSong (int handle)
 {
@@ -1138,6 +1339,15 @@ void I_StopSong (int handle)
     return;
   }
 
+  if (music_available & AMP_PLAYING)
+  {
+    Mus_AMP_stop ();
+    Mus_AMP_clear ();
+    amp_filepath [0] = 0;
+    music_available &= ~AMP_PLAYING;
+    return;
+  }
+
   if (((music_available & MIDI_AVAILABLE) == 0)
    || (music_data == NULL))		/* Not registered */
     return;
@@ -1148,6 +1358,7 @@ void I_StopSong (int handle)
   music_pause=0;
 }
 
+/* ------------------------------------------------------------ */
 /* Stop and forget song */
 void I_UnRegisterSong (int handle)
 {
@@ -1155,11 +1366,44 @@ void I_UnRegisterSong (int handle)
   music_data=NULL;
 }
 
+/* ------------------------------------------------------------ */
 /* This should kill playing music, and tidy up */
 void I_ShutdownMusic (void)
 {
   I_UnRegisterSong(1);
   music_available = 0;
+}
+
+/* ------------------------------------------------------------ */
+
+int I_PlayMusicFile (const char * filename)
+{
+  mus_dir_t * ptr;
+
+  ptr = music_directory;
+  if (ptr == NULL)
+    return (1);
+
+  do
+  {
+//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, filename);
+    if (strcasecmp (ptr -> musname, filename) == 0)
+    {
+      sprintf (amp_filepath,"<DoomMusDir>.%s", ptr -> filename);
+      I_UnRegisterSong (1);
+      if (Mus_AMP_load (amp_filepath) == 0)
+      {
+//	printf ("Playing %s\n", amp_filepath);
+	music_available |= AMP_PLAYING;
+	return (0);
+      }
+      break;
+    }
+    ptr++;
+  } while (ptr -> musname [0]);
+
+  amp_filepath [0] = 0;
+  return (1);
 }
 
 /* ------------------------------------------------------------ */

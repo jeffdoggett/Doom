@@ -859,7 +859,7 @@ I_InitSound()
 // Still no music done.
 // Remains. Dummies.
 //
-void I_InitMusic(void)		{ }
+void I_InitMusic(int j)		{ }
 void I_ShutdownMusic(void)	{ }
 
 static int	looping=0;

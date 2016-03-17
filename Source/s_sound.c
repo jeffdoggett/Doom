@@ -119,6 +119,7 @@ static int		nextcleanup;
 
 static int		nomusic;
 static int		nosfx;
+static int		musicfiles;
 
 //
 // Internals.
@@ -157,10 +158,12 @@ void S_InitSound (void)
       nomusic = true;
     if (M_CheckParm ("-nosfx"))
       nosfx = true;
+    if (M_CheckParm ("-mp3"))
+      musicfiles = true;
   }
 
   if (!nomusic)
-    I_InitMusic ();
+    I_InitMusic (musicfiles);
 
   if ((nosfx == false) || (nomusic == false))
     I_InitSound ();
@@ -720,6 +723,20 @@ S_ChangeMusic
 
   // shutdown old music
   S_StopMusic();
+
+#ifdef __riscos
+  extern int I_PlayMusicFile (const char * filename);
+  if (musicfiles)
+  {
+    sprintf (namebuf, "d_%s", music->name);
+    if (I_PlayMusicFile (namebuf) == 0)
+    {
+      mus_playing = music;
+      I_PlaySong(music->handle, looping);
+    }
+    return;
+  }
+#endif
 
   // get lumpnum if neccessary
   if (music->lumpnum == 0)
