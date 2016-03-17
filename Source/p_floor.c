@@ -242,7 +242,7 @@ void T_MoveFloor(floormove_t* floor)
 	      sec->special, floor->newspecial,
 	      sec->floorpic, floor->newtexture);
 #endif
-    sec->special = floor->newspecial;			// We have aready set these to the
+    sec->special = floor->newspecial;			// We have already set these to the
     sec->floorpic = floor->newtexture;			// correct special/texture so we can
 							// just write them always.
     P_RemoveThinker(&floor->thinker);
@@ -254,9 +254,21 @@ void T_MoveFloor(floormove_t* floor)
 
 static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum)
 {
+  int min_text_num;
   unsigned int	i;
   unsigned int	offset;
   side_t*	side;
+
+/*
+  Map 25 of Memento Mori 2 relies on the buggy behavior of this function.
+  Line 1289, Action 30, operates sector 274 and raises it too high if this
+  function is corrected.
+*/
+#if 1
+  min_text_num = 0;
+#else
+  min_text_num = 1;
+#endif
 
   offset = ~0;
   for (i = 0; i < sec->linecount; i++)
@@ -264,11 +276,11 @@ static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum)
     if (twoSided (secnum, i) )
     {
       side = getSide(secnum,i,0);
-      if (side->bottomtexture > 0)
+      if (side->bottomtexture >= min_text_num)
 	if (textureheight[side->bottomtexture] < offset)
 	    offset = textureheight[side->bottomtexture];
       side = getSide(secnum,i,1);
-      if (side->bottomtexture > 0)
+      if (side->bottomtexture >= min_text_num)
 	if (textureheight[side->bottomtexture] < offset)
 	  offset = textureheight[side->bottomtexture];
     }
