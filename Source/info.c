@@ -1461,6 +1461,39 @@ state_t states[NUMSTATES] =
 
 //-----------------------------------------------------------------------------
 
+#define EXTRA_MOBJINFO \
+{					\
+  -1, 			/* doomednum	*/ \
+  S_NULL,		/* spawnstate	*/ \
+  0,			/* spawnhealth	*/ \
+  0,			/* gibhealth	*/ \
+  S_NULL,		/* seestate	*/ \
+  sfx_None,		/* seesound	*/ \
+  0,			/* reactiontime	*/ \
+  sfx_None,		/* attacksound	*/ \
+  S_NULL,		/* painstate	*/ \
+  0,			/* painchance	*/ \
+  sfx_None, 		/* painsound	*/ \
+  S_NULL,		/* meleestate	*/ \
+  S_NULL,		/* missilestate	*/ \
+  S_NULL,		/* deathstate	*/ \
+  S_NULL,		/* xdeathstate	*/ \
+  sfx_None, 		/* deathsound	*/ \
+  0,			/* speed	*/ \
+  0,			/* radius	*/ \
+  0,			/* pickupradius	*/ \
+  0,			/* height	*/ \
+  0,			/* mass		*/ \
+  0,			/* damage	*/ \
+  sfx_None,		/* activesound	*/ \
+  0,			/* flags	*/ \
+  0,			/* flags2	*/ \
+  S_NULL,		/* raisestate	*/ \
+  FRACUNIT		/* scale	*/ \
+}
+
+//-----------------------------------------------------------------------------
+
 mobjinfo_t mobjinfo[] =
 {
   {								// MT_PLAYER
@@ -5849,7 +5882,36 @@ mobjinfo_t mobjinfo[] =
     0,								// flags2
     S_NULL,							// raisestate
     FRACUNIT							// scale
-  }
+  },
+
+  EXTRA_MOBJINFO,			// Blue Blood (MT_BLUEBLOOD)
+  EXTRA_MOBJINFO,			// Green Blood (MT_GREENBLOOD)
+  EXTRA_MOBJINFO,			// Fuzzy Blood (MT_FUZZYBLOOD)
+  EXTRA_MOBJINFO,			// Blood Splat (MT_BLOODSPLAT)
+  EXTRA_MOBJINFO,			// Smoke Trail (MT_TRAIL)
+  EXTRA_MOBJINFO,			// Shadow (MT_SHADOW)
+
+  /* Extra mobjs from MT_EXTRA00 to MT_EXTRA99 */
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
+  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO
 };
 
 //-----------------------------------------------------------------------------
