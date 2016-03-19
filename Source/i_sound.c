@@ -899,11 +899,8 @@ void I_UnRegisterSong(int handle)
   handle = 0;
 }
 
-int I_RegisterSong(void* data, unsigned int size)
+int I_RegisterSong(musicinfo_t*	music)
 {
-  // UNUSED.
-  data = NULL;
-  size = size;
   return 1;
 }
 

@@ -119,7 +119,6 @@ static int		nextcleanup;
 
 static int		nomusic;
 static int		nosfx;
-static int		musicfiles;
 
 //
 // Internals.
@@ -158,12 +157,10 @@ void S_InitSound (void)
       nomusic = true;
     if (M_CheckParm ("-nosfx"))
       nosfx = true;
-    if (M_CheckParm ("-mp3"))
-      musicfiles = true;
   }
 
   if (!nomusic)
-    I_InitMusic (musicfiles);
+    I_InitMusic (M_CheckParm ("-mp3"));
 
   if ((nosfx == false) || (nomusic == false))
     I_InitSound ();
@@ -733,20 +730,6 @@ void S_ChangeMusic (int musicnum, int looping)
   // shutdown old music
   S_StopMusic();
 
-#ifdef __riscos
-  extern int I_PlayMusicFile (const char * filename);
-  if (musicfiles)
-  {
-    sprintf (namebuf, "d_%s", music->name);
-    if (I_PlayMusicFile (namebuf) == 0)
-    {
-      mus_playing = music;
-      I_PlaySong(music->handle, looping);
-    }
-    return;
-  }
-#endif
-
   // get lumpnum if neccessary
   if (music->lumpnum == 0)
   {
@@ -758,7 +741,7 @@ void S_ChangeMusic (int musicnum, int looping)
   {
     // load & register it
     music->data = (void *) W_CacheLumpNum(music->lumpnum, PU_MUSIC);
-    music->handle = I_RegisterSong(music->data, W_LumpLength (music->lumpnum));
+    music->handle = I_RegisterSong (music);
 
     // play it
     I_PlaySong(music->handle, looping);

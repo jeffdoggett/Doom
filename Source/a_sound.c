@@ -186,6 +186,8 @@
 #define MIN_SFX_CHAN		   1
 #define MAX_SFX_CHAN		   8
 
+#define MUS_TEMP_FILE	"<Wimp$Scrap>"
+
 /* ------------------------------------------------------------ */
 
 static unsigned int current_play_id [MAX_SFX_CHAN + 1];
@@ -233,6 +235,13 @@ typedef struct mus_dir_s
 
 static mus_dir_t * music_directory_head;
 static mus_dir_t * amp_current;
+
+static const mus_dir_t wimp_temp =
+{
+  "fred",
+  MUS_TEMP_FILE,
+  NULL
+};
 
 /* ------------------------------------------------------------ */
 
@@ -372,23 +381,19 @@ static void I_FindData (unsigned int * start, unsigned int * end, unsigned int *
 }
 
 /* ------------------------------------------------------------ */
-//#define SAVE_SOUND_LUMP
 
-#ifdef SAVE_SOUND_LUMP
-
-static void I_SaveSoundLump (char * filename, unsigned char * data, unsigned int size)
+static int I_Save_MusFile (const char * filename, void * start, unsigned int length)
 {
-  FILE * fout;
+  int rc;
+  _kernel_osfile_block block;
 
-  fout = fopen (filename, "wb");
-  if (fout)
-  {
-    fwrite (data, 1, size, fout);
-    fclose (fout);
-  }
+  block.load = 0x1AD;	// MP3 file
+  block.exec = 0;
+  block.start = (int) start;
+  block.end = (int) start + length;
+  rc = _kernel_osfile (10, filename, &block);
+  return (rc - 10);		// Returns with r0 preserved if no error.
 }
-
-#endif
 
 /* ------------------------------------------------------------ */
 //
@@ -472,8 +477,8 @@ I_StartSound
   // R2 = End of data
   _kernel_swi (DataVox_SetMemory, &regs, &regs);
 
-#ifdef SAVE_SOUND_LUMP
-  I_SaveSoundLump (sfx->name, sfx->data, regs.r[2] - (unsigned int) sfx->data);
+#if 0
+  I_Save_MusFile (sfx->name, sfx->data, regs.r[2] - (unsigned int) sfx->data);
 #endif
 
   regs.r[0] = channel;
@@ -1003,6 +1008,14 @@ static void Mus_AMP_restart_song (const char * filename)
     Mus_AMP_load (filename);
 }
 
+static int Mus_AMP_info (void)
+{
+  _kernel_swi_regs regs;
+  regs.r[0] = 0;
+  _kernel_swi (AMPlayer_Info, &regs, &regs);
+  return (regs.r[0]);
+}
+
 /* ------------------------------------------------------------ */
 
 static int I_Validate_MusName (const char * musname)
@@ -1196,16 +1209,53 @@ void I_ReleaseMusic(void)
 }
 
 /* ------------------------------------------------------------ */
+
+static int I_PlayMusicFile (const char * lumpname)
+{
+  mus_dir_t * ptr;
+
+  ptr = music_directory_head;
+  if (ptr == NULL)
+    return (1);
+
+  do
+  {
+//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
+    if (strcasecmp (ptr -> musname, lumpname) == 0)
+    {
+      if (Mus_AMP_load (ptr -> filename) == 0)
+      {
+	amp_current = ptr;
+//	printf ("Playing %s\n", ptr -> filename);
+	music_available |= AMP_PLAYING;
+	return (0);
+      }
+      break;
+    }
+    ptr = ptr -> next;
+  } while (ptr);
+
+  amp_current = NULL;
+  return (1);
+}
+
+/* ------------------------------------------------------------ */
 /* Song has been loaded, and placed at 'data'.
    If music is ready, get ready to play.
    Return a dummy handle */
-int I_RegisterSong (void * vdata, unsigned int size)
+int I_RegisterSong (musicinfo_t * music)
 {
+  void * vdata;
+  unsigned int size;
   byte * data;
   unsigned int offset;
+  char namebuf[9];
 
   I_UnRegisterSong (1);
+
+  vdata = music->data;
   data = (byte*) vdata;
+  size = W_LumpLength (music->lumpnum);
 
   if (Mus_QTM_load (data) == 0)		// Did QTM recognise it?
   {
@@ -1221,6 +1271,13 @@ int I_RegisterSong (void * vdata, unsigned int size)
 
   if (((int*)data)[0]==0x1a53554d)
   {
+    if (M_CheckParm ("-mp3"))
+    {
+      sprintf (namebuf, "d_%s", music->name);
+      if (I_PlayMusicFile (namebuf) == 0)
+	return 1;
+    }
+
     if (music_available & MIDI_AVAILABLE)
     {
       offset=*(data+6)+((*(data+7))<<8);
@@ -1235,6 +1292,28 @@ int I_RegisterSong (void * vdata, unsigned int size)
   {
     music_available |= TIM_PLAYING;
     return (timplayer_handle);
+  }
+
+
+  if ((Mus_AMP_set_volume (127) == 0)	// Is Amplayer loaded?
+   || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
+    && (Mus_AMP_set_volume (127) == 0)))
+  {
+    if ((I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0)
+     && (Mus_AMP_load (MUS_TEMP_FILE) == 0))
+    {
+      amp_current = (mus_dir_t *) &wimp_temp;
+//    printf ("Playing %s\n", ptr -> filename);
+      music_available |= AMP_PLAYING;
+        return 1;
+    }
+  }
+
+  if (M_CheckParm ("-mp3"))
+  {
+    sprintf (namebuf, "d_%s", music->name);
+    if (I_PlayMusicFile (namebuf) == 0)
+      return 1;
   }
 
   return 0;
@@ -1457,6 +1536,8 @@ void I_ResumeSong (int handle)
 /* Stop song and sounds */
 void I_StopSong (int handle)
 {
+  int i,j;
+
   if (music_available & QTM_PLAYING)
   {
     Mus_QTM_stop ();
@@ -1477,6 +1558,15 @@ void I_StopSong (int handle)
   {
     Mus_AMP_stop ();
     Mus_AMP_clear ();
+    if (amp_current == (mus_dir_t *) &wimp_temp)
+    {
+      i = I_GetTime ();
+      do
+      {
+        j = Mus_AMP_info ();
+      } while ((j) && ((I_GetTime () - i) < 100));
+      remove (amp_current -> filename);
+    }
     amp_current = NULL;
     music_available &= ~AMP_PLAYING;
     return;
@@ -1506,38 +1596,6 @@ void I_ShutdownMusic (void)
 {
   I_UnRegisterSong(1);
   music_available = 0;
-}
-
-/* ------------------------------------------------------------ */
-
-int I_PlayMusicFile (const char * lumpname)
-{
-  mus_dir_t * ptr;
-
-  ptr = music_directory_head;
-  if (ptr == NULL)
-    return (1);
-
-  do
-  {
-//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
-    if (strcasecmp (ptr -> musname, lumpname) == 0)
-    {
-      I_UnRegisterSong (1);
-      if (Mus_AMP_load (ptr -> filename) == 0)
-      {
-	amp_current = ptr;
-//	printf ("Playing %s\n", ptr -> filename);
-	music_available |= AMP_PLAYING;
-	return (0);
-      }
-      break;
-    }
-    ptr = ptr -> next;
-  } while (ptr);
-
-  amp_current = NULL;
-  return (1);
 }
 
 /* ------------------------------------------------------------ */
