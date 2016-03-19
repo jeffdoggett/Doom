@@ -160,7 +160,7 @@ void S_InitSound (void)
   }
 
   if (!nomusic)
-    I_InitMusic (M_CheckParm ("-mp3"));
+    I_InitMusic ();
 
   if ((nosfx == false) || (nomusic == false))
     I_InitSound ();

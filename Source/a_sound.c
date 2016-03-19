@@ -1165,7 +1165,7 @@ static void I_InitMusicDirectory (void)
 char midimap[16]={0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,9};
 
 /* This is called once at startup */
-void I_InitMusic (int musicfiles)
+void I_InitMusic (void)
 {
   music_available = 0;
   music_pause = 0;
@@ -1174,7 +1174,7 @@ void I_InitMusic (int musicfiles)
   amp_current = NULL;
   music_directory_head = NULL;
 
-  if (musicfiles)
+  if (M_CheckParm ("-mp3"))
   {
     I_InitMusicDirectory();
   }
@@ -1245,10 +1245,10 @@ static int I_PlayMusicFile (const char * lumpname)
    Return a dummy handle */
 int I_RegisterSong (musicinfo_t * music)
 {
-  void * vdata;
   unsigned int size;
-  byte * data;
   unsigned int offset;
+  byte * data;
+  void * vdata;
   char namebuf[9];
 
   I_UnRegisterSong (1);
@@ -1295,17 +1295,21 @@ int I_RegisterSong (musicinfo_t * music)
   }
 
 
-  if ((Mus_AMP_set_volume (127) == 0)	// Is Amplayer loaded?
+  if (((Mus_AMP_set_volume (127) == 0)	// Is Amplayer loaded?
    || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
     && (Mus_AMP_set_volume (127) == 0)))
+   && (I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0))
   {
-    if ((I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0)
-     && (Mus_AMP_load (MUS_TEMP_FILE) == 0))
+    if (Mus_AMP_load (MUS_TEMP_FILE) == 0)
     {
       amp_current = (mus_dir_t *) &wimp_temp;
 //    printf ("Playing %s\n", ptr -> filename);
       music_available |= AMP_PLAYING;
-        return 1;
+	return 1;
+    }
+    else
+    {
+      remove (MUS_TEMP_FILE);
     }
   }
 
