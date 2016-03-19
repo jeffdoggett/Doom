@@ -1090,7 +1090,8 @@ static void I_InitMusicDirectory (void)
 	}
 	else
 	{
-	  if (dh_inchar (bptr,'$'))	// Assume full path if $ present
+	  if ((bptr [pos] == '<')		// Assume full path if starts with '<'
+	   || (dh_inchar (bptr+pos,'$')))	// or if $ present
 	    strcpy (filename, bptr+pos);
 	  else
 	    sprintf (filename,"<DoomMusDir>.%s", bptr+pos);
