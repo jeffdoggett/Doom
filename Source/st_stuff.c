@@ -610,7 +610,8 @@ ST_Responder (event_t* ev)
       // 'fa' cheat for killer fucking arsenal
       else if (cht_CheckCheat(&cheat_ammonokey, ev->data1))
       {
-	if (M_CheckParm ("-idfabackpack"))
+        if ((!netgame)
+	 && (M_CheckParm ("-idfabackpack")))
 	{
 	  if (!plyr->backpack)
 	  {
@@ -637,7 +638,8 @@ ST_Responder (event_t* ev)
       // 'kfa' cheat for key full ammo
       else if (cht_CheckCheat(&cheat_ammo, ev->data1))
       {
-	if (M_CheckParm ("-idkfabackpack"))
+        if ((!netgame)
+	 && (M_CheckParm ("-idkfabackpack")))
 	{
 	  if (!plyr->backpack)
 	  {

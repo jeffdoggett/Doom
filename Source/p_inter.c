@@ -254,7 +254,8 @@ P_GiveWeapon
       else
 	  P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
 
-      if (M_CheckParm ("-noautoweaponchange") == 0)
+      if ((netgame)
+       || (M_CheckParm ("-noautoweaponchange") == 0))
 	player->pendingweapon = weapon;
 
       if (player == &players[consoleplayer])
@@ -280,7 +281,8 @@ P_GiveWeapon
   {
       gaveweapon = true;
       player->weaponowned[weapon] = true;
-      if (M_CheckParm ("-noautoweaponchange") == 0)
+      if ((netgame)
+       || (M_CheckParm ("-noautoweaponchange") == 0))
 	player->pendingweapon = weapon;
   }
 
@@ -613,9 +615,12 @@ P_TouchSpecialThing
       if (!P_GivePower (player, pw_strength))
 	  return;
       player->message = got_messages [P_GOTBERSERK];
-      if ((M_CheckParm ("-noautoweaponchange") == 0)
-       && (player->readyweapon != wp_fist))
+      if (player->readyweapon != wp_fist)
+      {
+        if ((netgame)
+         || (M_CheckParm ("-noautoweaponchange") == 0))
 	  player->pendingweapon = wp_fist;
+      }
       sound = sfx_getpow;
       break;
 
