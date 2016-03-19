@@ -4003,6 +4003,7 @@ static void show_map_dests (map_dests_t * map_ptr)
   double skydelta;
   char * sky;
   char * titlepatch;
+  char * music;
 
 
   sky = map_ptr -> sky;
@@ -4013,11 +4014,15 @@ static void show_map_dests (map_dests_t * map_ptr)
   if (titlepatch == NULL)
     titlepatch = "";
 
+  music = map_ptr -> music;
+  if (music == NULL)
+    music = "";
+
   skydelta = 0;
   if (map_ptr -> skydelta)
     skydelta = -(((double)map_ptr -> skydelta) / FRACUNIT);
 
-  printf ("%u %2u %u %2u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s'\n",
+  printf ("%u %2u %u %2u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
 	map_ptr -> normal_exit_to_map,
 	map_ptr -> secret_exit_to_episode,
@@ -4034,7 +4039,8 @@ static void show_map_dests (map_dests_t * map_ptr)
 	sky, titlepatch,
 	map_ptr -> enterpic,
 	map_ptr -> exitpic,
-	map_ptr -> bordertexture);
+	map_ptr -> bordertexture,
+	music);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4351,7 +4357,8 @@ static char * replace_map_text (char ** dest, char * ptr)
   if (rc == ptr)
     rc = ptr + strlen (ptr);
 
-  if (strcasecmp (ptr, *dest))
+  if ((*dest == NULL)
+   || (strcasecmp (ptr, *dest)))
   {
     newtext = strdup (ptr);
     if (newtext)
@@ -4760,6 +4767,11 @@ static void Parse_Mapinfo (char * ptr, char * top)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       ptr = replace_map_text (&mdest_ptr -> bordertexture, ptr + 15);
+    }
+    else if (strncasecmp (ptr, "music ", 6) == 0)
+    {
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      ptr = replace_map_text (&mdest_ptr -> music, ptr + 6);
     }
     else if (strncasecmp (ptr, "sky1 ", 5) == 0)
     {

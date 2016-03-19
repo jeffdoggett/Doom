@@ -105,6 +105,7 @@ musicinfo_t S_music[] =
     { "read_m", 0 },
     { "dm2ttl", 0 },
     { "dm2int", 0 },
+    { "dm2int", 0 },	// extra position for dehacked sounds...
     { 0, 0}
 };
 

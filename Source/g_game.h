@@ -58,6 +58,7 @@ typedef struct
   char *	enterpic;
   char *	exitpic;
   char *	bordertexture;
+  char *	music;
 } map_dests_t;
 
 typedef struct

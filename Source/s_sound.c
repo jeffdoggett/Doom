@@ -247,6 +247,9 @@ void S_Start(void)
   int cnum;
   int mnum;
   unsigned int gm;
+  char * music;
+  map_dests_t * map_ptr;
+  musicinfo_t*	musinfo;
 
   // kill all playing sounds at start of level
   //  (trust me - a good idea)
@@ -257,33 +260,41 @@ void S_Start(void)
   // start new music for the level
   mus_paused = false;
 
-  if (gamemode == commercial)
+  map_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
+  music = map_ptr -> music;
+  if (music)
+  {
+    if (strncasecmp (music, "D_", 2) == 0)
+      music += 2;
+
+    mnum = mus_extra;
+    musinfo = &S_music[mnum];
+    musinfo->name = music;
+  }
+  else if (gamemode == commercial)
   {
     gm = gamemap;
     while (gm > 32)
       gm -= 32;
     mnum = mus_runnin + gm - 1;
   }
+  else if (gameepisode < 4)
+  {
+    mnum = mus_e1m1 + (gameepisode-1)*9 + gamemap-1;
+  }
   else
   {
-    if (gameepisode < 4)
-    {
-      mnum = mus_e1m1 + (gameepisode-1)*9 + gamemap-1;
-    }
-    else
-    {
-      gm = gamemap-1;
-      while (gm >= ARRAY_SIZE (spmus))
-	gm -= ARRAY_SIZE (spmus);
-      mnum = spmus[gm];
-    }
+    gm = gamemap-1;
+    while (gm >= ARRAY_SIZE (spmus))
+      gm -= ARRAY_SIZE (spmus);
+    mnum = spmus[gm];
   }
 
   // HACK FOR COMMERCIAL
   //  if (commercial && mnum > mus_e3m9)
   //      mnum -= mus_e3m9;
 
-  S_ChangeMusic(mnum, true);
+  S_ChangeMusic (mnum, true);
 
   nextcleanup = 15;
 }
@@ -690,17 +701,14 @@ void S_SetSfxVolume(int volume)
 //
 // Starts some music with the music id found in sounds.h.
 //
-void S_StartMusic(int m_id)
+void S_StartMusic (int m_id)
 {
-    S_ChangeMusic(m_id, false);
+    S_ChangeMusic (m_id, false);
 }
 
 /* ------------------------------------------------------------ */
 
-void
-S_ChangeMusic
-( int			musicnum,
-  int			looping )
+void S_ChangeMusic (int musicnum, int looping)
 {
   musicinfo_t*	music;
   char		namebuf[9];

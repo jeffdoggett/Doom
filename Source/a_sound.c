@@ -1007,7 +1007,9 @@ static void Mus_AMP_restart_song (const char * filename)
 
 static int I_Validate_MusName (const char * musname)
 {
+  unsigned int i;
   musicinfo_t * sptr;
+  map_dests_t * map_ptr;
 
   if (strncasecmp (musname, "D_", 2))
     return (1);
@@ -1021,6 +1023,28 @@ static int I_Validate_MusName (const char * musname)
       return (0);
     sptr++;
   } while (sptr -> name);
+
+  /* Failed to find it in the standard tables - try the map table */
+
+  i = 0;
+  map_ptr = G_Access_MapInfoTab_E (1,0);
+  do
+  {
+    if ((map_ptr -> music)
+     && (strcasecmp (map_ptr -> music, musname) == 0))
+      return (0);
+    map_ptr++;
+  } while (++i < (9*10));
+
+  i = 0;
+  map_ptr = G_Access_MapInfoTab_E (255,0);
+  do
+  {
+    if ((map_ptr -> music)
+     && (strcasecmp (map_ptr -> music, musname) == 0))
+      return (0);
+    map_ptr++;
+  } while (++i < 100);
 
   return (1);
 }
