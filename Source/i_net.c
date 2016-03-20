@@ -153,6 +153,8 @@ void PacketSend (void)
 	sw.cmds[c].buttons = netbuffer->cmds[c].buttons;
 	sw.cmds[c].argnum = netbuffer->cmds[c].argnum;
 	sw.cmds[c].value = netbuffer->cmds[c].value;
+	sw.cmds[c].spare1 = netbuffer->cmds[c].spare1;
+	sw.cmds[c].spare2 = netbuffer->cmds[c].spare2;
     }
 
     //printf ("sending %i\n",gametic);
