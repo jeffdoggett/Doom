@@ -1130,209 +1130,126 @@ static void AM_clearFB(int colour)
 // faster reject and precalculated slopes.  If the speed is needed,
 // use a hash algorithm to handle  the common cases.
 //
-static boolean
-AM_clipMline
-( const mline_t* ml,
-  fline_t*      fl )
+static boolean AM_clipMline (const mline_t* ml, fline_t* fl)
 {
     enum
     {
-	LEFT    =1,
-	RIGHT   =2,
-	BOTTOM  =4,
-	TOP     =8
+        LEFT   = 1,
+        RIGHT  = 2,
+        TOP    = 4,
+        BOTTOM = 8
     };
 
-    register int	outcode1 = 0;
-    register int	outcode2 = 0;
-    register int	outside;
+    unsigned int        outcode1 = 0;
+    unsigned int        outcode2 = 0;
 
-    fpoint_t    tmp;
-    int	 dx;
-    int	 dy;
-
-
-#define DOOUTCODE(oc, mx, my) \
-    (oc) = 0; \
-    if ((my) < 0) (oc) |= TOP; \
-    else if ((my) >= f_h) (oc) |= BOTTOM; \
-    if ((mx) < 0) (oc) |= LEFT; \
-    else if ((mx) >= f_w) (oc) |= RIGHT;
-
-
-    // do trivial rejects and outcodes
-    if (ml->a.y > m_y2)
-	outcode1 = TOP;
-    else if (ml->a.y < m_y)
-	outcode1 = BOTTOM;
-
-    if (ml->b.y > m_y2)
-	outcode2 = TOP;
-    else if (ml->b.y < m_y)
-	outcode2 = BOTTOM;
-
-    if (outcode1 & outcode2)
-	return false; // trivially outside
-
-    if (ml->a.x < m_x)
-	outcode1 |= LEFT;
-    else if (ml->a.x > m_x2)
-	outcode1 |= RIGHT;
-
-    if (ml->b.x < m_x)
-	outcode2 |= LEFT;
-    else if (ml->b.x > m_x2)
-	outcode2 |= RIGHT;
-
-    if (outcode1 & outcode2)
-	return false; // trivially outside
-
-    // transform to frame-buffer coordinates.
     fl->a.x = CXMTOF(ml->a.x);
-    fl->a.y = CYMTOF(ml->a.y);
+    if (fl->a.x < -1)
+        outcode1 = LEFT;
+    else if (fl->a.x >= (int)f_w)
+        outcode1 = RIGHT;
     fl->b.x = CXMTOF(ml->b.x);
-    fl->b.y = CYMTOF(ml->b.y);
-
-    DOOUTCODE(outcode1, fl->a.x, fl->a.y);
-    DOOUTCODE(outcode2, fl->b.x, fl->b.y);
-
+    if (fl->b.x < -1)
+        outcode2 = LEFT;
+    else if (fl->b.x >= (int)f_w)
+        outcode2 = RIGHT;
     if (outcode1 & outcode2)
-	return false;
-
-    while (outcode1 | outcode2)
-    {
-	// may be partially inside box
-	// find an outside point
-	if (outcode1)
-	    outside = outcode1;
-	else
-	    outside = outcode2;
-
-	// clip to each side
-	if (outside & TOP)
-	{
-	    dy = fl->a.y - fl->b.y;
-	    dx = fl->b.x - fl->a.x;
-	    tmp.x = fl->a.x + (dx*(fl->a.y))/dy;
-	    tmp.y = 0;
-	}
-	else if (outside & BOTTOM)
-	{
-	    dy = fl->a.y - fl->b.y;
-	    dx = fl->b.x - fl->a.x;
-	    tmp.x = fl->a.x + (dx*(fl->a.y-f_h))/dy;
-	    tmp.y = f_h-1;
-	}
-	else if (outside & RIGHT)
-	{
-	    dy = fl->b.y - fl->a.y;
-	    dx = fl->b.x - fl->a.x;
-	    tmp.y = fl->a.y + (dy*(f_w-1 - fl->a.x))/dx;
-	    tmp.x = f_w-1;
-	}
-	else if (outside & LEFT)
-	{
-	    dy = fl->b.y - fl->a.y;
-	    dx = fl->b.x - fl->a.x;
-	    tmp.y = fl->a.y + (dy*(-fl->a.x))/dx;
-	    tmp.x = 0;
-	}
-
-	if (outside == outcode1)
-	{
-	    fl->a = tmp;
-	    DOOUTCODE(outcode1, fl->a.x, fl->a.y);
-	}
-	else
-	{
-	    fl->b = tmp;
-	    DOOUTCODE(outcode2, fl->b.x, fl->b.y);
-	}
-
-	if (outcode1 & outcode2)
-	    return false; // trivially outside
-    }
-
-    return true;
+        return false;
+    fl->a.y = CYMTOF(ml->a.y);
+    if (fl->a.y < -1)
+        outcode1 |= TOP;
+    else if (fl->a.y >= (int)f_h)
+        outcode1 |= BOTTOM;
+    fl->b.y = CYMTOF(ml->b.y);
+    if (fl->b.y < -1)
+        outcode2 |= TOP;
+    else if (fl->b.y >= (int)f_h)
+        outcode2 |= BOTTOM;
+    return (boolean)(!(outcode1 & outcode2));
 }
-#undef DOOUTCODE
+
+/* ---------------------------------------------------------------------- */
+
+#define PUTDOT(xx,yy,cc)		\
+	if ((xx >= 0) && (xx < f_w)	\
+	 && (yy >= 0) && (yy < f_h))	\
+	  fb[(yy)*f_w+(xx)]=(cc)
 
 /* ---------------------------------------------------------------------- */
 //
-// Classic Bresenham w/ whatever optimizations needed for speed
+// This function is based on Bresenham's algorithm
 //
-static void
-AM_drawFline
-( const fline_t* fl,
-  int	   colour )
+static void AM_drawFline (const fline_t* fl, int colour)
 {
-    register int x;
-    register int y;
-    register int dx;
-    register int dy;
-    register int sx;
-    register int sy;
-    register int ax;
-    register int ay;
-    register int d;
+  int x0, y0, x1, y1;
+  int dy;
+  int dx;
+  int stepx, stepy;
+  int fraction;
 
-    static int fuck = 0;
+  x0 = fl->a.x;
+  x1 = fl->b.x;
+  y0 = fl->a.y;
+  y1 = fl->b.y;
 
-    // For debugging only
-    if (      fl->a.x < 0 || fl->a.x >= f_w
-	   || fl->a.y < 0 || fl->a.y >= f_h
-	   || fl->b.x < 0 || fl->b.x >= f_w
-	   || fl->b.y < 0 || fl->b.y >= f_h)
+  dy = y1 - y0;
+  dx = x1 - x0;
+
+  if (dy < 0)
+  {
+    dy = -dy;
+    stepy = -1;
+  }
+  else
+  {
+    stepy = 1;
+  }
+
+  if (dx < 0)
+  {
+    dx = -dx;
+    stepx = -1;
+  }
+  else
+  {
+    stepx = 1;
+  }
+
+  dy <<= 1;
+  dx <<= 1;
+
+  PUTDOT (x0, y0, colour);
+
+  if (dx > dy)
+  {
+    fraction = dy - (dx >> 1);
+    while (x0 != x1)
     {
-	fprintf(stderr, "fuck %d \r", fuck++);
-	return;
+      if (fraction >= 0)
+      {
+        y0 += stepy;
+        fraction -= dx;
+      }
+      x0 += stepx;
+      fraction += dy;
+      PUTDOT (x0, y0, colour);
     }
-
-#define PUTDOT(xx,yy,cc) fb[(yy)*f_w+(xx)]=(cc)
-
-    dx = fl->b.x - fl->a.x;
-    ax = 2 * (dx<0 ? -dx : dx);
-    sx = dx<0 ? -1 : 1;
-
-    dy = fl->b.y - fl->a.y;
-    ay = 2 * (dy<0 ? -dy : dy);
-    sy = dy<0 ? -1 : 1;
-
-    x = fl->a.x;
-    y = fl->a.y;
-
-    if (ax > ay)
+  }
+  else
+  {
+    fraction = dx - (dy >> 1);
+    while (y0 != y1)
     {
-	d = ay - ax/2;
-	while (1)
-	{
-	    PUTDOT(x,y,colour);
-	    if (x == fl->b.x) return;
-	    if (d>=0)
-	    {
-		y += sy;
-		d -= ax;
-	    }
-	    x += sx;
-	    d += ay;
-	}
+      if (fraction >= 0)
+      {
+        x0 += stepx;
+        fraction -= dy;
+      }
+      y0 += stepy;
+      fraction += dx;
+      PUTDOT (x0, y0, colour);
     }
-    else
-    {
-	d = ax - ay/2;
-	while (1)
-	{
-	    PUTDOT(x, y, colour);
-	    if (y == fl->b.y) return;
-	    if (d >= 0)
-	    {
-		x += sx;
-		d -= ay;
-	    }
-	    y += sy;
-	    d += ax;
-	}
-    }
+  }
 }
 
 /* ---------------------------------------------------------------------- */
@@ -1344,7 +1261,7 @@ AM_drawMline
 ( const mline_t* ml,
   int	   colour )
 {
-    static fline_t fl;
+    fline_t fl;
 
     if (colour==-1)	// jff 4/3/98 allow not drawing any sort of line
       return;		// by setting its colour to -1
