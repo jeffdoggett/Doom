@@ -1140,6 +1140,8 @@ static void F_CastDrawer (void)
 
   if (info->flags & MF_SHADOW)
     drawstyle |= 2;			/* Bit 1 = draw fuzzy */
+  else if (info->flags & MF_TRANSLUCENT)
+    drawstyle |= 4;			/* Bit 2 = draw translucent */
 
   scale = info->scale;
 

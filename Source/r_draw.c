@@ -63,11 +63,12 @@ int		viewwindowy;
 //
 byte*		dc_translation;
 byte*		translationtables;
+byte*		tinttab = NULL;
 
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
 
-
+#define USE_TINT_TABLES
 /* ------------------------------------------------------------------------------------------------ */
 #ifdef USE_TINT_TABLES
 
@@ -105,8 +106,6 @@ static const byte general [256] =
 #define GREENS		G
 #define BLUES		B
 #define EXTRAS		X
-
-static byte *tinttab;
 
 /* ------------------------------------------------------------------------------------------------ */
 
@@ -163,8 +162,31 @@ static void R_InitTintTables (void)
 {
   byte * palette;
 
+  // printf ("\nBuilding Tint tables\n");
   palette = W_CacheLumpName("PLAYPAL", PU_STATIC);
   tinttab = GenerateTintTable (palette, ADDITIVE, general, ALL);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+/*
+   Only bother to build the tint tables if the MF_TRANSLUCENT bit is set.
+*/
+
+static int R_TintTableRequired (void)
+{
+  unsigned int c;
+  mobjinfo_t * m;
+
+  m = mobjinfo;
+  c = 0;
+  do
+  {
+    if (m->flags & MF_TRANSLUCENT)
+      return (1);
+    m++;
+  } while (++c < NUMMOBJTYPES);
+
+  return (0);
 }
 
 #endif
@@ -199,7 +221,8 @@ void R_InitTranslationTables (void)
 	}
     }
 #ifdef USE_TINT_TABLES
-    R_InitTintTables ();
+    if (R_TintTableRequired ())
+      R_InitTintTables ();
 #endif
 }
 
@@ -555,6 +578,9 @@ void R_DrawTranslucentColumn (void)
     fixed_t		fracstep;
 #ifndef USE_TINT_TABLES
     int			translucent;
+#else
+    if (tinttab == NULL)		// Just in case!
+      R_InitTintTables ();
 #endif
 
     count = (dc_yh - dc_yl) + 1;

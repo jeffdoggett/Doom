@@ -139,6 +139,7 @@ int	usegamma;
 
 extern int fuzzoffset [50];
 extern int fuzzpos;
+extern byte *tinttab;
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -212,6 +213,7 @@ V_CopyRect
 /* ---------------------------------------------------------------------------- */
 // drawstyle bit 0 = flip
 //	     bit 1 = fuzzy
+//	     bit 2 = translucent
 
 void V_DrawPatchScaleFlip (int x, int y, int scrn,
 		patch_t * patch, fixed_t xscale, fixed_t yscale, int drawstyle)
@@ -229,6 +231,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
   int td;
   int topdelta;
   int lastlength;
+  int translucent;
 
   if (xscale == FRACUNIT)
     xiscale = xscale;
@@ -318,6 +321,26 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	      fuzzpos = 0;
 	  }
 
+	  dest += SCREENWIDTH;
+	  row += yiscale;
+        } while ((row >> FRACBITS) < lastlength);
+      }
+      else if (drawstyle & 4)				// Translucent?
+      {
+	translucent = (x + y) & 1;
+	source = (byte *)column + 3;
+	do
+	{
+	  if (dest >= scrnlimit)
+	    break;
+	  if (dest >= screens[scrn])
+	  {
+	    if (tinttab)
+	      *dest = tinttab[(*dest << 8) + source [row >> FRACBITS]];
+	    else if (translucent == 0)
+	      *dest = source [row >> FRACBITS];
+	  }
+	  translucent ^= 1;
 	  dest += SCREENWIDTH;
 	  row += yiscale;
         } while ((row >> FRACBITS) < lastlength);
