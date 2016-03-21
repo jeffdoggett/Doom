@@ -101,6 +101,7 @@ static const unsigned char colour_init_tab [] =
   103,0,0		// skull
 };
 
+//-----------------------------------------------------------------------------
 
 /* MUST be in the same order as above... */
 typedef struct
@@ -234,8 +235,7 @@ static const default_doom_colours_t default_doom_colours [] =
 #define CXMTOF(x)  (f_x + MTOF((x)-m_x))
 #define CYMTOF(y)  (f_y + (f_h - MTOF((y)-m_y)))
 
-// the following is crap
-#define LINE_NEVERSEE ML_DONTDRAW
+//-----------------------------------------------------------------------------
 
 typedef struct
 {
@@ -269,6 +269,7 @@ typedef struct
 } mshape_t;
 
 
+//-----------------------------------------------------------------------------
 //
 // The vector graphics for the automap.
 //  A line drawing of the player pointing right,
@@ -575,6 +576,7 @@ AM_getIslope
 
 }
 #endif
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -590,6 +592,7 @@ static void AM_activateNewScale(void)
     m_y2 = m_y + m_h;
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -601,6 +604,7 @@ static void AM_saveScaleAndLoc(void)
     old_m_h = m_h;
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -625,6 +629,7 @@ static void AM_restoreScaleAndLoc(void)
     scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
 }
 
+/* ---------------------------------------------------------------------- */
 //
 // adds a marker at the current location
 //
@@ -636,6 +641,7 @@ static void AM_addMark(void)
 
 }
 
+/* ---------------------------------------------------------------------- */
 //
 // Determines bounding box of all vertices,
 // sets global variables controlling zoom range.
@@ -676,7 +682,7 @@ static void AM_findMinMaxBoundaries(void)
 
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -705,6 +711,7 @@ static void AM_changeWindowLoc(void)
     m_y2 = m_y + m_h;
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -752,6 +759,7 @@ static void AM_initVariables(void)
     ST_AutoMapEvent (AM_MSGENTERED);
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -768,6 +776,8 @@ static void AM_loadPics(void)
 
 }
 
+/* ---------------------------------------------------------------------- */
+
 static void AM_unloadPics(void)
 {
     int i;
@@ -776,6 +786,8 @@ static void AM_unloadPics(void)
 	Z_ChangeTag(marknums[i], PU_CACHE);
 
 }
+
+/* ---------------------------------------------------------------------- */
 
 static void AM_clearMarks(void)
 {
@@ -786,6 +798,7 @@ static void AM_clearMarks(void)
     markpointnum = 0;
 }
 
+/* ---------------------------------------------------------------------- */
 //
 // should be called at the start of every level
 // right now, i figure it out myself
@@ -807,9 +820,7 @@ void AM_LevelInit(void)
   scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
 }
 
-
-
-
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -821,6 +832,7 @@ void AM_Stop (void)
     stopped = true;
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -842,6 +854,7 @@ void AM_Start (unsigned int restart)
   AM_loadPics();
 }
 
+/* ---------------------------------------------------------------------- */
 //
 // set the window scale to the maximum size
 //
@@ -852,6 +865,7 @@ static void AM_minOutWindowScale(void)
     AM_activateNewScale();
 }
 
+/* ---------------------------------------------------------------------- */
 //
 // set the window scale to the minimum size
 //
@@ -862,7 +876,7 @@ static void AM_maxOutWindowScale(void)
     AM_activateNewScale();
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Handle events (user inputs) in automap mode
 //
@@ -1005,7 +1019,7 @@ AM_Responder
     return (boolean)rc;
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Zooming
 //
@@ -1024,7 +1038,7 @@ static void AM_changeWindowScale(void)
 	AM_activateNewScale();
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -1047,6 +1061,7 @@ static void AM_doFollowPlayer(void)
     }
 }
 
+/* ---------------------------------------------------------------------- */
 //
 //
 //
@@ -1068,6 +1083,7 @@ static void AM_updateLightLev(void)
 }
 #endif
 
+/* ---------------------------------------------------------------------- */
 //
 // Updates on Game Tick
 //
@@ -1097,7 +1113,7 @@ void AM_Ticker (void)
     R_ClearSbarSides ();
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Clear automap frame buffer.
 //
@@ -1106,7 +1122,7 @@ static void AM_clearFB(int colour)
     memset(fb, colour, f_w*f_h*sizeof(pixel_t));
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Automap clipping of lines.
 //
@@ -1241,7 +1257,7 @@ AM_clipMline
 }
 #undef DOOUTCODE
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Classic Bresenham w/ whatever optimizations needed for speed
 //
@@ -1319,7 +1335,7 @@ AM_drawFline
     }
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Clip lines, draw visible part sof lines.
 //
@@ -1340,8 +1356,7 @@ AM_drawMline
 	AM_drawFline(&fl, colour); // draws it on frame buffer using fb coords
 }
 
-
-
+/* ---------------------------------------------------------------------- */
 //
 // Draws flat (floor/ceiling tile) aligned grid lines.
 //
@@ -1387,7 +1402,7 @@ static void AM_drawGrid(int colour)
 
 }
 
-
+/* ---------------------------------------------------------------------- */
 // AM_DoorColour()
 
 // Returns the 'colour' or key needed for a door linedef type
@@ -1444,7 +1459,7 @@ static int AM_DoorColour(int type)
   return (-1);		// Not a keyed door
 }
 
-
+/* ---------------------------------------------------------------------- */
 
 static boolean secret_sector (sector_t * sector)
 {
@@ -1463,6 +1478,8 @@ static boolean secret_sector (sector_t * sector)
   return (false);
 }
 
+/* ---------------------------------------------------------------------- */
+
 static boolean moving_sector (sector_t * sector)
 {
   if (((amclock & 8) == 0)
@@ -1471,6 +1488,7 @@ static boolean moving_sector (sector_t * sector)
   return (true);
 }
 
+/* ---------------------------------------------------------------------- */
 /* We treat a door as closed if the ceiling is near to the floor. */
 /* (Fragport.wad level 13 has a Blue key door that is one pixel */
 /* above the floor and Nova.wad level 28 has some bars way above the floor) */
@@ -1500,6 +1518,7 @@ static boolean door_closed (line_t* line)
   return (false);
 }
 
+/* ---------------------------------------------------------------------- */
 // Determines visible lines, draws them.
 // This is LineDef based, not LineSeg based.
 //
@@ -1646,7 +1665,7 @@ static void AM_drawWalls(void)
   }
 }
 
-
+/* ---------------------------------------------------------------------- */
 //
 // Rotation in 2D.
 // Used to rotate player arrow line character.
@@ -1669,6 +1688,8 @@ AM_rotate
 
     *x = tmpx;
 }
+
+/* ---------------------------------------------------------------------- */
 
 static void
 AM_drawLineCharacter
@@ -1719,6 +1740,8 @@ AM_drawLineCharacter
     }
 }
 
+/* ---------------------------------------------------------------------- */
+
 static void AM_drawPlayers(void)
 {
     int	 i;
@@ -1759,6 +1782,8 @@ static void AM_drawPlayers(void)
 
 }
 
+/* ---------------------------------------------------------------------- */
+
 static void
 AM_drawThings (void)
 {
@@ -1788,6 +1813,8 @@ AM_drawThings (void)
     sector++;
   } while (--i);
 }
+
+/* ---------------------------------------------------------------------- */
 
 static void
 AM_drawkeys (void)
@@ -1884,6 +1911,8 @@ AM_drawkeys (void)
     sector++;
   } while (--i);
 }
+
+/* ---------------------------------------------------------------------- */
 
 static void
 AM_drawThingsDifferently (void)
@@ -2135,6 +2164,8 @@ AM_drawThingsDifferently (void)
   }
 }
 
+/* ---------------------------------------------------------------------- */
+
 static void AM_drawMarks(void)
 {
   int i;
@@ -2161,6 +2192,8 @@ static void AM_drawMarks(void)
       while (j>0);
     }
 }
+
+/* ---------------------------------------------------------------------- */
 
 static void AM_drawCrosshair(int colour)
 {
@@ -2190,3 +2223,5 @@ void AM_Drawer (void)
 
     V_MarkRect(f_x, f_y, f_w, f_h);
 }
+
+/* ---------------------------------------------------------------------- */
