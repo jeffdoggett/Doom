@@ -239,7 +239,6 @@ static const unsigned int screen_320x400x24 [] =
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
   0,0x00,
-  -1,
   -1		/* End of table */
 };
 
@@ -261,8 +260,6 @@ static const unsigned int screen_640x400x8 [] =
   -1,		/* framerate - use first found */
   0,0x80,
   3,0xFF,
-  -1,		/* Two spare words. */
-  -1,
   -1		/* End of table */
 };
 
