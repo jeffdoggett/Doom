@@ -1137,7 +1137,7 @@ P_SpawnMissile
     an = R_PointToAngle2 (source->x, source->y, dest->x, dest->y);
 
     // fuzzy player
-    if (dest->flags & MF_SHADOW)
+    if (dest->flags & (MF_SHADOW | MF_TRANSLUCENT))
     {
 	int t=P_Random();	/* remove dependence on order of evaluation */
 	an += (t-P_Random())<<20;

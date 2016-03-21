@@ -1012,7 +1012,7 @@ void A_FaceTarget (mobj_t* actor, pspdef_t* psp)
 				    actor->target->x,
 				    actor->target->y);
 
-    if (actor->target->flags & MF_SHADOW)
+    if (actor->target->flags & (MF_SHADOW | MF_TRANSLUCENT))
     {
 	int t = P_Random();	/* remove dependence on order of evaluation */
 	actor->angle += (t-P_Random())<<21;
