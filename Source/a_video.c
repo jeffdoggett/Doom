@@ -158,8 +158,7 @@ static const unsigned int screen_320x200x16 [] =
   320, 200,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -169,8 +168,7 @@ static const unsigned int screen_320x240x16 [] =
   320, 240,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -180,8 +178,7 @@ static const unsigned int screen_320x256x16 [] =
   320, 256,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -191,8 +188,7 @@ static const unsigned int screen_320x400x16 [] =
   320, 400,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -202,8 +198,7 @@ static const unsigned int screen_320x480x16 [] =
   320, 480,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -213,8 +208,7 @@ static const unsigned int screen_320x200x24 [] =
   320, 200,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -224,8 +218,7 @@ static const unsigned int screen_320x240x24 [] =
   320, 240,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -235,8 +228,7 @@ static const unsigned int screen_320x256x24 [] =
   320, 256,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -246,7 +238,7 @@ static const unsigned int screen_320x400x24 [] =
   320, 400,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
+  0,0x00,
   -1,
   -1		/* End of table */
 };
@@ -257,8 +249,7 @@ static const unsigned int screen_320x480x24 [] =
   320, 480,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -281,8 +272,7 @@ static const unsigned int screen_640x400x16 [] =
   640, 400,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -292,8 +282,7 @@ static const unsigned int screen_640x400x24 [] =
   640, 400,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -314,8 +303,7 @@ static const unsigned int screen_640x480x16 [] =
   640, 480,
   4,		/* 16bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -325,8 +313,7 @@ static const unsigned int screen_640x480x24 [] =
   640, 480,
   5,		/* 24bpp */
   -1,		/* framerate - use first found */
-  -1,		/* Two spare words. */
-  -1,
+  0,0x00,
   -1		/* End of table */
 };
 
@@ -1503,6 +1490,28 @@ static void init_key_tables (void)
 }
 
 /* -------------------------------------------------------------------------- */
+
+static void show_mode_sel_block (const unsigned int * mode_selector_block)
+{
+  unsigned int pos;
+
+  printf ("Screen mode %u x %u, log2bpp=%u, frame=%d",
+	mode_selector_block [1],
+	mode_selector_block [2],
+	mode_selector_block [3],
+	mode_selector_block [4]);
+
+  pos = 5;
+  while (mode_selector_block [pos] != -1)
+  {
+    printf (", var=%d, val=%d",
+	mode_selector_block [pos],
+	mode_selector_block [pos+1]);
+    pos += 2;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*
    Select a screen mode given a mode selector block
 
@@ -1531,14 +1540,7 @@ static _kernel_oserror * os_screen_mode (const unsigned int * mode_selector_bloc
 
     if (devparm)
     {
-      printf ("Screen mode %u x %u, log2bpp=%u, frame=%d, Var=%d, flags=%X",
-	mode_selector_block [1],
-	mode_selector_block [2],
-	mode_selector_block [3],
-	mode_selector_block [4],
-	mode_selector_block [5],
-	mode_selector_block [6]);
-
+      show_mode_sel_block (mode_selector_block);
       if (rc)
 	printf (" - Error %s\n", rc -> errmess);
       else
@@ -1565,10 +1567,11 @@ static _kernel_oserror * sel_os_screen_mode (const unsigned int * mode_selector_
   _kernel_oserror * rc;
   unsigned int * p;
 
-  p = (unsigned int *) mode_selector_block;	// Writing back to a 'const' - never a good thing.
-
-  if (mode_selector_block != screen_user_def)
+  if ((mode_selector_block != screen_user_def)
+   && (mode_selector_block [3] >= 4))
   {
+    p = (unsigned int *) mode_selector_block;	// Writing back to a 'const' - never a good thing.
+
     if ((framerate = screen_user_def [4]) != -1)// User entered a frame rate?
     {
       if (p [4] == -1)
