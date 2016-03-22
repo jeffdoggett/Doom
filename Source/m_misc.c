@@ -206,6 +206,7 @@ extern char*	chat_macros[];
 
 //-----------------------------------------------------------------------------
 #ifdef __riscos
+extern int	mp3priority;
 extern int	timplayer_vol_tab [16];
 #endif
 
@@ -281,6 +282,7 @@ default_t	defaults[] =
   {"lightscaleshift",&lightScaleShift, sizeof(int), (char *) LIGHTSCALESHIFT},
 
 #ifdef __riscos
+  {"mp3priority", (int *) &mp3priority,  sizeof(int), (char *) 0x01},
   {"timplayer_vol0", (int *) &timplayer_vol_tab[0],  sizeof(int), (char *) 0x00},
   {"timplayer_vol1", (int *) &timplayer_vol_tab[1],  sizeof(int), (char *) 0x04},
   {"timplayer_vol2", (int *) &timplayer_vol_tab[2],  sizeof(int), (char *) 0x08},

@@ -226,6 +226,8 @@ int		timplayer_vol_tab [] =
 
 /* ------------------------------------------------------------ */
 
+int mp3priority = 1;
+
 typedef struct mus_dir_s
 {
   char musname [12];
@@ -1257,6 +1259,15 @@ int I_RegisterSong (musicinfo_t * music)
   data = (byte*) vdata;
   size = W_LumpLength (music->lumpnum);
 
+  if ((mp3priority == 0)
+   && (M_CheckParm ("-mp3")))
+  {
+    sprintf (namebuf, "d_%s", music->name);
+    if (I_PlayMusicFile (namebuf) == 0)
+      return 1;
+  }
+
+
   if (Mus_QTM_load (data) == 0)		// Did QTM recognise it?
   {
     music_available |= QTM_PLAYING;
@@ -1271,7 +1282,8 @@ int I_RegisterSong (musicinfo_t * music)
 
   if (((int*)data)[0]==0x1a53554d)
   {
-    if (M_CheckParm ("-mp3"))
+    if ((mp3priority)
+     && (M_CheckParm ("-mp3")))
     {
       sprintf (namebuf, "d_%s", music->name);
       if (I_PlayMusicFile (namebuf) == 0)
@@ -1313,7 +1325,8 @@ int I_RegisterSong (musicinfo_t * music)
     }
   }
 
-  if (M_CheckParm ("-mp3"))
+  if ((mp3priority)
+   && (M_CheckParm ("-mp3")))
   {
     sprintf (namebuf, "d_%s", music->name);
     if (I_PlayMusicFile (namebuf) == 0)
