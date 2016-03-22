@@ -2166,15 +2166,18 @@ static const unsigned char mode_search [] =
   MODE_640_x_480_8bpp,
   MODE_640_x_480_24bpp,
   MODE_640_x_480_16bpp,
+
   MODE_640_x_400_8bpp,
   MODE_640_x_400_24bpp,
   MODE_640_x_400_16bpp,
+
+  MODE_320_x_480_8bpp,
   MODE_320_x_480_24bpp,
   MODE_320_x_480_16bpp,
-  MODE_320_x_480_8bpp,
+
+  MODE_320_x_256_8bpp,
   MODE_320_x_256_24bpp,
-  MODE_320_x_256_16bpp,
-  MODE_320_x_256_8bpp
+  MODE_320_x_256_16bpp
 };
 
 /* -------------------------------------------------------------------------- */

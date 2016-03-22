@@ -198,6 +198,7 @@ static int last_snd_channel = MIN_SFX_CHAN - 1;
 /* ------------------------------------------------------------ */
 
 /* Info about music playing */
+static const char midimap[16]={0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,9};
 static unsigned int music_available = 0;/* true if MIDI initialised ok			*/
 static byte*	music_data=NULL;	/* Pointer to score if registered, else 0	*/
 static byte*	music_pos=NULL;		/* Current position if playing, else 0	 	*/
@@ -1164,11 +1165,10 @@ static void I_InitMusicDirectory (void)
 
 /* ------------------------------------------------------------ */
 
-char midimap[16]={0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,9};
-
 /* This is called once at startup */
 void I_InitMusic (void)
 {
+  int p;
   music_available = 0;
   music_pause = 0;
   music_data = NULL;
@@ -1176,8 +1176,14 @@ void I_InitMusic (void)
   amp_current = NULL;
   music_directory_head = NULL;
 
-  if (M_CheckParm ("-mp3"))
+  p = M_CheckParm ("-mp3");
+  if (p)
   {
+    p++;
+    if ((p < myargc) && (isdigit(myargv[p][0])))
+    {
+      mp3priority = atoi (myargv[p]);
+    }
     I_InitMusicDirectory();
   }
 
