@@ -677,7 +677,7 @@ static void AM_findMinMaxBoundaries(void)
     a = FixedDiv(f_w<<FRACBITS, max_w);
     b = FixedDiv(f_h<<FRACBITS, max_h);
 
-    min_scale_mtof = (a < b ? a : b) / 2;
+    min_scale_mtof = a < b ? a : b;
     max_scale_mtof = FixedDiv(f_h<<FRACBITS, 2*PLAYERRADIUS);
 
 }
@@ -1130,6 +1130,9 @@ static void AM_clearFB(int colour)
 // faster reject and precalculated slopes.  If the speed is needed,
 // use a hash algorithm to handle  the common cases.
 //
+#define ADJUST_COORDS
+
+#ifndef ADJUST_COORDS
 static boolean AM_clipMline (const mline_t* ml, fline_t* fl)
 {
     enum
@@ -1174,7 +1177,134 @@ static boolean AM_clipMline (const mline_t* ml, fline_t* fl)
 	if ((xx >= 0) && (xx < f_w)	\
 	 && (yy >= 0) && (yy < f_h))	\
 	  fb[(yy)*f_w+(xx)]=(cc)
+#else
+/* ---------------------------------------------------------------------- */
 
+static boolean AM_clipMline (const mline_t* ml, fline_t* fl)
+{
+    enum
+    {
+	LEFT    =1,
+	RIGHT   =2,
+	BOTTOM  =4,
+	TOP     =8
+    };
+
+    register int	outcode1 = 0;
+    register int	outcode2 = 0;
+    register int	outside;
+
+    fpoint_t    tmp;
+    int	 dx;
+    int	 dy;
+
+
+#define DOOUTCODE(oc, mx, my) \
+    (oc) = 0; \
+    if ((my) < 0) (oc) |= TOP; \
+    else if ((my) >= f_h) (oc) |= BOTTOM; \
+    if ((mx) < 0) (oc) |= LEFT; \
+    else if ((mx) >= f_w) (oc) |= RIGHT;
+
+
+    // do trivial rejects and outcodes
+    if (ml->a.y > m_y2)
+	outcode1 = TOP;
+    else if (ml->a.y < m_y)
+	outcode1 = BOTTOM;
+
+    if (ml->b.y > m_y2)
+	outcode2 = TOP;
+    else if (ml->b.y < m_y)
+	outcode2 = BOTTOM;
+
+    if (outcode1 & outcode2)
+	return false; // trivially outside
+
+    if (ml->a.x < m_x)
+	outcode1 |= LEFT;
+    else if (ml->a.x > m_x2)
+	outcode1 |= RIGHT;
+
+    if (ml->b.x < m_x)
+	outcode2 |= LEFT;
+    else if (ml->b.x > m_x2)
+	outcode2 |= RIGHT;
+
+    if (outcode1 & outcode2)
+	return false; // trivially outside
+
+    // transform to frame-buffer coordinates.
+    fl->a.x = CXMTOF(ml->a.x);
+    fl->a.y = CYMTOF(ml->a.y);
+    fl->b.x = CXMTOF(ml->b.x);
+    fl->b.y = CYMTOF(ml->b.y);
+
+    DOOUTCODE(outcode1, fl->a.x, fl->a.y);
+    DOOUTCODE(outcode2, fl->b.x, fl->b.y);
+
+    if (outcode1 & outcode2)
+	return false;
+
+    while (outcode1 | outcode2)
+    {
+	// may be partially inside box
+	// find an outside point
+	if (outcode1)
+	    outside = outcode1;
+	else
+	    outside = outcode2;
+
+	// clip to each side
+	if (outside & TOP)
+	{
+	    dy = fl->a.y - fl->b.y;
+	    dx = fl->b.x - fl->a.x;
+	    tmp.x = fl->a.x + (dx*(fl->a.y))/dy;
+	    tmp.y = 0;
+	}
+	else if (outside & BOTTOM)
+	{
+	    dy = fl->a.y - fl->b.y;
+	    dx = fl->b.x - fl->a.x;
+	    tmp.x = fl->a.x + (dx*(fl->a.y-f_h))/dy;
+	    tmp.y = f_h-1;
+	}
+	else if (outside & RIGHT)
+	{
+	    dy = fl->b.y - fl->a.y;
+	    dx = fl->b.x - fl->a.x;
+	    tmp.y = fl->a.y + (dy*(f_w-1 - fl->a.x))/dx;
+	    tmp.x = f_w-1;
+	}
+	else if (outside & LEFT)
+	{
+	    dy = fl->b.y - fl->a.y;
+	    dx = fl->b.x - fl->a.x;
+	    tmp.y = fl->a.y + (dy*(-fl->a.x))/dx;
+	    tmp.x = 0;
+	}
+
+	if (outside == outcode1)
+	{
+	    fl->a = tmp;
+	    DOOUTCODE(outcode1, fl->a.x, fl->a.y);
+	}
+	else
+	{
+	    fl->b = tmp;
+	    DOOUTCODE(outcode2, fl->b.x, fl->b.y);
+	}
+
+	if (outcode1 & outcode2)
+	    return false; // trivially outside
+    }
+
+    return true;
+}
+#undef DOOUTCODE
+#define PUTDOT(xx,yy,cc) fb[(yy)*f_w+(xx)]=(cc)
+#endif
 /* ---------------------------------------------------------------------- */
 //
 // This function is based on Bresenham's algorithm
@@ -1191,6 +1321,18 @@ static void AM_drawFline (const fline_t* fl, int colour)
   x1 = fl->b.x;
   y0 = fl->a.y;
   y1 = fl->b.y;
+
+#ifdef ADJUST_COORDS
+  // For debugging only
+  if (x0 < 0 || x0 >= f_w
+   || y0 < 0 || y0 >= f_h
+   || x1 < 0 || x1 >= f_w
+   || y1 < 0 || y1 >= f_h)
+  {
+//    fprintf(stderr, "fuck %d \r", fuck++);
+      return;
+  }
+#endif
 
   dy = y1 - y0;
   dx = x1 - x0;
