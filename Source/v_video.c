@@ -331,7 +331,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	source = (byte *)column + 3;
 	do
 	{
-	  if (dest >= scrnlimit)
+	  if (dest > scrnlimit)
 	    break;
 	  if (dest >= screens[scrn])
 	  {
@@ -350,7 +350,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	source = (byte *)column + 3;
 	do
 	{
-	  if (dest >= scrnlimit)
+	  if (dest > scrnlimit)
 	    break;
 	  if (dest >= screens[scrn])
 	    *dest = source [row >> FRACBITS];

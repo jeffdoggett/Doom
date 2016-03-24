@@ -63,73 +63,28 @@ deriving 240 screenheight for all screen magnifications - hence
 the function below to work it out.
 J.A.Doggett 26/02/98.
 */
-
+#if 0
 static fixed_t weapon_top (void)
 {
   if (weaponscale > 1)
     return (32*FRACUNIT);
 
-  if (SCREENHEIGHT <= 200)
-  {
-    if (setblocks == 11)
-      return (32*FRACUNIT);
-
-    return (20*FRACUNIT);
-  }
-
-  if (sbarscale > (1<<FRACBITS))
-  {
-    if (SCREENHEIGHT <= 256)
-      return (40*FRACUNIT);
-
-    //if (SCREENHEIGHT <= 240)
-    //  return (40*FRACUNIT);
-
-    if (SCREENHEIGHT <= 400)
-    {
-      if (setblocks == 11)
-        return (140*FRACUNIT);
-
-      return (104*FRACUNIT);
-    }
-
-    if (setblocks == 11)
-      return (172*FRACUNIT);
-
-    return (140*FRACUNIT);
-  }
-
-  if (SCREENHEIGHT <= 240)
-  {
-    if (setblocks == 11)
-      return (52*FRACUNIT);
-
-    return (36*FRACUNIT);
-  }
-
-  if (SCREENHEIGHT <= 256)
-  {
-    if (setblocks == 11)
-      return (60*FRACUNIT);
-
-    return (44*FRACUNIT);
-  }
-
-  if (SCREENHEIGHT <= 400)
-  {
-    if (setblocks == 11)
-      return (142*FRACUNIT);
-
-    return (124*FRACUNIT);
-  }
-
-  if (setblocks == 11)
-    return (172*FRACUNIT);
-
-  return (156*FRACUNIT);
+  return (132*FRACUNIT);
 }
 
-#define weapon_bottom() (weapon_top()+(96*FRACUNIT))
+//#define weapon_bottom() (weapon_top()+(96*FRACUNIT))
+
+static fixed_t weapon_bottom (void)
+{
+  if (weaponscale > 1)
+    return ((32+96)*FRACUNIT);
+
+  return ((132+96)*FRACUNIT);
+}
+#endif
+
+#define weapon_top()	(weaponscale > 1)?(32*FRACUNIT):(132*FRACUNIT)
+#define weapon_bottom()	(weaponscale > 1)?((32+96)*FRACUNIT):((132+96)*FRACUNIT)
 
 //-----------------------------------------------------------------------------
 //
@@ -194,7 +149,7 @@ static void P_BringUpWeapon (player_t* player)
     newstate = (statenum_t) weaponinfo[player->pendingweapon].upstate;
 
     player->pendingweapon = wp_nochange;
-    player->psprites[ps_weapon].sy = weapon_bottom();;
+    player->psprites[ps_weapon].sy = weapon_bottom();
 
     P_SetPsprite (player, &player->psprites[ps_weapon], newstate);
 }

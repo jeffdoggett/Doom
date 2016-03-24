@@ -308,8 +308,7 @@ static const unsigned char * const keypatches [] =
 #define ST_MAPTITLEY		0
 #define ST_MAPHEIGHT		1
 
-
-#define DX(a)			(sbarscale<(2<<FRACBITS)?((SCREENWIDTH/2)-((320/2)-a)):((a*sbarscale)>>FRACBITS))
+#define DX(a)			(SCREENWIDTH/2)-((160*sbarscale)>>FRACBITS)+((sbarscale*a)>>FRACBITS)
 #define DY(a)			(SCREENHEIGHT-(((200-a)*sbarscale)>>FRACBITS))
 #define DW(a)			((sbarscale*a)>>FRACBITS)
 
@@ -562,15 +561,18 @@ void ST_Stop(void);
 
 void ST_refreshBackground(void)
 {
+  int x;
   if (st_statusbaron)
   {
     R_ClearSbarSides ();
-    STlib_drawPatch (DX(ST_X), 0, ST_BG, sbar);
+
+    x = DX(ST_X);
+    STlib_drawPatch (x, 0, ST_BG, sbar);
 
     if (netgame)
       STlib_drawPatch (DX(ST_FX), 0, ST_BG, faceback);
 
-    V_CopyRect (DX(ST_X), 0, ST_BG, ST_WIDTH, ST_HEIGHT, DX(ST_X), ST_Y, ST_FG);
+    V_CopyRect (x, 0, ST_BG, ST_WIDTH, ST_HEIGHT, x, ST_Y, ST_FG);
   }
 }
 
@@ -1692,12 +1694,8 @@ void ST_Init (void)
       hutextscale = (FRACUNIT*SCREENWIDTH)/320;
 
     ST_loadData();
-#if 0
-    screens[4] = (byte *) Z_Malloc(SCREENWIDTH*ST_HEIGHT, PU_STATIC, 0);
-#else
     /* Allow max size for dynamic resize of status bar */
-    screens[4] = (byte *) Z_Malloc(SCREENWIDTH*64, PU_STATIC, 0);
-#endif
+    screens[4] = (byte *) Z_Malloc(SCREENWIDTH*ST_HEIGHT*((SCREENWIDTH+319)/320), PU_STATIC, 0);
 }
 
 /* ---------------------------------------------------------------------------- */

@@ -1021,27 +1021,33 @@ R_InitBuffer
     else
     {
       sbarheight = (SBARHEIGHT * sbarscale) >> FRACBITS;
-      viewwindowy = (SCREENHEIGHT-sbarheight-height) >> 1;
+      viewwindowy = ((SCREENHEIGHT-sbarheight-height)+1) >> 1;
     }
 }
 
-
 /* ------------------------------------------------------------------------------------------------ */
+#define DX(a)			(SCREENWIDTH/2)-((160*sbarscale)>>FRACBITS)+((sbarscale*a)>>FRACBITS)
+
 // If we're at full screen size then we need to clear the screen memory at either
 // side of the status bar which has just appeared.
 
 void R_ClearSbarSides (void)
 {
   byte*	dest;
-  int		x;
-  int		y;
+  int	padsize;
+  int	yheight;
+  int	x;
+  int	y;
 
-  if ((SCREENWIDTH > 320) && (sbarscale < (2<<FRACBITS)))
+  padsize = DX(0);
+
+  if (padsize)
   {
-    dest = screens[0]+((SCREENHEIGHT-SBARHEIGHT)*SCREENWIDTH);
-    for (y = 0; y < SBARHEIGHT; y++, dest += SCREENWIDTH)
+    yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
+    dest = screens[0]+((SCREENHEIGHT-yheight)*SCREENWIDTH);
+    for (y = 0; y < yheight; y++, dest += SCREENWIDTH)
     {
-      for (x = 0; x < ((SCREENWIDTH/2)-160); x++)
+      for (x = 0; x < padsize; x++)
       {
 	dest [x] = 0;
 	dest [SCREENWIDTH-x-1] = 0;

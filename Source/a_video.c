@@ -95,195 +95,25 @@ static sprite_area_t * sprite_mem = 0;
 #define MODE_640_x_400_24bpp	20
 #define MODE_640_x_480_24bpp	21
 
+#define MODE_800_x_600_8bpp	22
+#define MODE_800_x_600_16bpp	23
+#define MODE_800_x_600_24bpp	24
+
+#define MODE_1024_x_768_8bpp	25
+#define MODE_1024_x_768_16bpp	26
+#define MODE_1024_x_768_24bpp	27
+
+#define MODE_1280_x_960_8bpp	28
+#define MODE_1280_x_960_16bpp	29
+#define MODE_1280_x_960_24bpp	30
+
+#define MODE_1280_x_1024_8bpp	31
+#define MODE_1280_x_1024_16bpp	32
+#define MODE_1280_x_1024_24bpp	33
+
 /* -------------------------------------------------------------------------- */
 
-static const unsigned int screen_320x200x8 [] =
-{
-  1,
-  320, 200,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x240x8 [] =
-{
-  1,
-  320, 240,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x256x8 [] =
-{
-  1,
-  320, 256,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x480x8 [] =
-{
-  1,
-  320, 480,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x400x8 [] =
-{
-  1,
-  320, 400,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x200x16 [] =
-{
-  1,
-  320, 200,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x240x16 [] =
-{
-  1,
-  320, 240,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x256x16 [] =
-{
-  1,
-  320, 256,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x400x16 [] =
-{
-  1,
-  320, 400,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x480x16 [] =
-{
-  1,
-  320, 480,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x200x24 [] =
-{
-  1,
-  320, 200,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x240x24 [] =
-{
-  1,
-  320, 240,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x256x24 [] =
-{
-  1,
-  320, 256,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x400x24 [] =
-{
-  1,
-  320, 400,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_320x480x24 [] =
-{
-  1,
-  320, 480,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_640x400x8 [] =
-{
-  1,
-  640, 400,
-  3,		/* 8bpp */
-  -1,		/* framerate - use first found */
-  0,0x80,
-  3,0xFF,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_640x400x16 [] =
-{
-  1,
-  640, 400,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_640x400x24 [] =
-{
-  1,
-  640, 400,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_640x480x8 [] =
+static unsigned int screen_mode_block [] =
 {
   1,
   640, 480,
@@ -294,36 +124,351 @@ static const unsigned int screen_640x480x8 [] =
   -1		/* End of table */
 };
 
-static const unsigned int screen_640x480x16 [] =
+static unsigned int screen_user_def [] =
 {
   1,
-  640, 480,
-  4,		/* 16bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-static const unsigned int screen_640x480x24 [] =
-{
-  1,
-  640, 480,
-  5,		/* 24bpp */
-  -1,		/* framerate - use first found */
-  0,0x00,
-  -1		/* End of table */
-};
-
-unsigned int screen_user_def [] =
-{
-  1,
-  640, 480,
-  3,		/* 8bpp */
+  0, 0,		/* X, Y */
+  0,		/* bpp */
   -1,		/* framerate - use first found */
   0,0x80,
   3,0xFF,
   -1		/* End of table */
 };
+
+/* -------------------------------------------------------------------------- */
+
+static void construct_screen_mode_block (int mode_num)
+{
+  screen_mode_block [0] = 1;
+  screen_mode_block [4] = -1;	// Framerate
+
+  switch (mode_num)
+  {
+    case MODE_USER_DEF:
+      memcpy (screen_mode_block, screen_user_def, sizeof (screen_user_def));
+      break;
+
+    case MODE_320_x_200_8bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 200;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_240_8bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 240;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_256_8bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 256;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_400_8bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_480_8bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_400_8bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_480_8bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_200_16bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 200;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_240_16bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 240;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_256_16bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 256;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_400_16bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_480_16bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_400_16bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_480_16bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_200_24bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 200;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_240_24bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 240;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_256_24bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 256;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_400_24bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_320_x_480_24bpp:
+      screen_mode_block [1] = 320;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_400_24bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 400;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_640_x_480_24bpp:
+      screen_mode_block [1] = 640;
+      screen_mode_block [2] = 480;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_800_x_600_8bpp:
+      screen_mode_block [1] = 800;
+      screen_mode_block [2] = 600;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_800_x_600_16bpp:
+      screen_mode_block [1] = 800;
+      screen_mode_block [2] = 600;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_800_x_600_24bpp:
+      screen_mode_block [1] = 800;
+      screen_mode_block [2] = 600;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_1024_x_768_8bpp:
+      screen_mode_block [1] = 1024;
+      screen_mode_block [2] = 768;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_1024_x_768_16bpp:
+      screen_mode_block [1] = 1024;
+      screen_mode_block [2] = 768;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_1024_x_768_24bpp:
+      screen_mode_block [1] = 1024;
+      screen_mode_block [2] = 768;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_1280_x_960_8bpp:
+      screen_mode_block [1] = 1280;
+      screen_mode_block [2] = 960;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_1280_x_960_16bpp:
+      screen_mode_block [1] = 1024;
+      screen_mode_block [2] = 960;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_1280_x_960_24bpp:
+      screen_mode_block [1] = 1024;
+      screen_mode_block [2] = 960;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+
+    case MODE_1280_x_1024_8bpp:
+      screen_mode_block [1] = 1280;
+      screen_mode_block [2] = 1024;
+      screen_mode_block [3] = 3;	// 8 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0x80;	// Full palette required
+      screen_mode_block [7] = 3;	// Var 3
+      screen_mode_block [8] = 0xFF;	// Max colour number
+      screen_mode_block [9] = -1;	// End of table.
+      break;
+
+    case MODE_1280_x_1024_16bpp:
+      screen_mode_block [1] = 1280;
+      screen_mode_block [2] = 1024;
+      screen_mode_block [3] = 4;	// 16 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+
+    case MODE_1280_x_1024_24bpp:
+      screen_mode_block [1] = 1280;
+      screen_mode_block [2] = 1024;
+      screen_mode_block [3] = 5;	// 24 bpp
+      screen_mode_block [5] = 0;	// Var 0
+      screen_mode_block [6] = 0;	// Nothing required
+      screen_mode_block [7] = -1;	// End of table.
+      break;
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* Table to convert Acorn inkey() values to Doom key strokes */
@@ -928,24 +1073,6 @@ void I_FinishUpdate (void)
 	put_sprite ();
 	break;
 
-      case MODE_320_x_200_8bpp:
-      case MODE_320_x_240_8bpp:
-      case MODE_320_x_256_8bpp:
-	if (rpc_palette)
-	{
-	  memcpy (screen_addr, screen_copy, SCREENHEIGHT * 320);
-	}
-	else
-	{
-	  screen_8 = (unsigned char *) screen_addr;
-	  i = 320 * SCREENHEIGHT;
-	  do
-	  {
-	    *screen_8++ = palette_table [*screen_copy++];
-	  } while (--i);
-	}
-	break;
-
       case MODE_320_x_400_8bpp:
       case MODE_320_x_480_8bpp:
 	i = SCREENHEIGHT;
@@ -982,17 +1109,6 @@ void I_FinishUpdate (void)
 	}
 	break;
 
-      case MODE_320_x_200_16bpp:
-      case MODE_320_x_240_16bpp:
-      case MODE_320_x_256_16bpp:
-	screen_16 = (unsigned short *) screen_addr;
-	i = 320 * SCREENHEIGHT;
-	do
-	{
-	  *screen_16++ = palette_table [*screen_copy++];
-	} while (--i);
-	break;
-
       case MODE_320_x_400_16bpp:
       case MODE_320_x_480_16bpp:
 	i = SCREENHEIGHT;
@@ -1007,17 +1123,6 @@ void I_FinishUpdate (void)
 	    *screen_16++ = p;
 	  } while (--j);
 	  screen_16 += 320;
-	} while (--i);
-	break;
-
-      case MODE_320_x_200_24bpp:
-      case MODE_320_x_240_24bpp:
-      case MODE_320_x_256_24bpp:
-	i = 320 * SCREENHEIGHT;
-	screen_24 = screen_addr;
-	do
-	{
-	  *screen_24++ = palette_table [*screen_copy++];
 	} while (--i);
 	break;
 
@@ -1038,42 +1143,43 @@ void I_FinishUpdate (void)
 	} while (--i);
 	break;
 
-      case MODE_640_x_400_8bpp:
-      case MODE_640_x_480_8bpp:
-	if (rpc_palette)
+      default:
+	switch (screen_mode_block [3])
 	{
-	  memcpy (screen_addr, screen_copy, SCREENHEIGHT * 640);
-	}
-	else
-	{
-	  screen_8 = (unsigned char *) screen_addr;
-	  i = 640 * SCREENHEIGHT;
-	  do
-	  {
-	    *screen_8++ = palette_table [*screen_copy++];
-	  } while (--i);
-	}
-	break;
+	  case 3:
+	    if (rpc_palette)
+	    {
+	      memcpy (screen_addr, screen_copy, SCREENHEIGHT * SCREENWIDTH);
+	    }
+	    else
+	    {
+	      screen_8 = (unsigned char *) screen_addr;
+	      i = SCREENWIDTH * SCREENHEIGHT;
+	      do
+	      {
+		*screen_8++ = palette_table [*screen_copy++];
+	      } while (--i);
+	    }
+	    break;
 
-      case MODE_640_x_400_16bpp:
-      case MODE_640_x_480_16bpp:
-	screen_16 = (unsigned short *) screen_addr;
-	i = 640 * SCREENHEIGHT;
-	do
-	{
-	  *screen_16++ = palette_table [*screen_copy++];
-	} while (--i);
-	break;
+	  case 4:
+	    screen_16 = (unsigned short *) screen_addr;
+	    i = SCREENWIDTH * SCREENHEIGHT;
+	    do
+	    {
+	      *screen_16++ = palette_table [*screen_copy++];
+	    } while (--i);
+	    break;
 
-      case MODE_640_x_400_24bpp:
-      case MODE_640_x_480_24bpp:
-	i = 640 * SCREENHEIGHT;
-	screen_24 = screen_addr;
-	do
-	{
-	  *screen_24++ = palette_table [*screen_copy++];
-	} while (--i);
-	break;
+	  case 5:
+	    screen_24 = screen_addr;
+	    i = SCREENWIDTH * SCREENHEIGHT;
+	    do
+	    {
+	      *screen_24++ = palette_table [*screen_copy++];
+	    } while (--i);
+	    break;
+	}
     }
 }
 
@@ -1167,32 +1273,13 @@ void I_SetPalette (byte* palette)
     devparm_white = AM_load_colour (255, 255, 255, palette);
   }
 
-  switch (screen_mode)
+  switch (screen_mode_block [3])
   {
-    case MODE_USER_DEF:
-      switch (screen_user_def [3])
-      {
-	case 3:
-	  if (rpc_palette)
-	  {
-	    set_palette_8_rpc (palette);
-	    return;
-	  }
-	  break;
-      }
-      break;
-
-    case MODE_320_x_200_8bpp: /* 8bpp */
-    case MODE_320_x_240_8bpp:
-    case MODE_320_x_256_8bpp:
-    case MODE_320_x_400_8bpp:
-    case MODE_320_x_480_8bpp:
-    case MODE_640_x_400_8bpp:
-    case MODE_640_x_480_8bpp:
+    case 3:
       if (rpc_palette)
       {
-        set_palette_8_rpc (palette);
-        return;
+	set_palette_8_rpc (palette);
+	return;
       }
       break;
   }
@@ -1299,47 +1386,19 @@ void I_SetPalette (byte* palette)
     devparm_white = AM_load_colour (255, 255, 255, palette);
   }
 
-  switch (screen_mode)
+  switch (screen_mode_block [3])
   {
-    case MODE_USER_DEF:
-      switch (screen_user_def [3])
-      {
-	 case 3:
-	  set_palette_8 (palette);
-	  break;
-
-	 case 4:
-	  set_palette_16 (palette);
-	  break;
-
-	 default:
-	  set_palette_24 (palette);
-	  break;
-      }
-      break;
-
-    case MODE_320_x_200_8bpp: /* 8bpp */
-    case MODE_320_x_240_8bpp:
-    case MODE_320_x_256_8bpp:
-    case MODE_320_x_400_8bpp:
-    case MODE_320_x_480_8bpp:
-    case MODE_640_x_400_8bpp:
-    case MODE_640_x_480_8bpp:
+     case 3:
       set_palette_8 (palette);
       break;
 
-    case MODE_320_x_200_16bpp: /* 16bpp */
-    case MODE_320_x_240_16bpp:
-    case MODE_320_x_256_16bpp:
-    case MODE_320_x_400_16bpp:
-    case MODE_320_x_480_16bpp:
-    case MODE_640_x_400_16bpp:
-    case MODE_640_x_480_16bpp:
+     case 4:
       set_palette_16 (palette);
       break;
 
-    default: /* 24bpp */
+     default:
       set_palette_24 (palette);
+      break;
   }
 }
 #endif
@@ -1488,22 +1547,22 @@ static void init_key_tables (void)
 
 /* -------------------------------------------------------------------------- */
 
-static void show_mode_sel_block (const unsigned int * mode_selector_block)
+static void show_mode_sel_block (void)
 {
   unsigned int pos;
 
   printf ("Screen mode %u x %u, log2bpp=%u, frame=%d",
-	mode_selector_block [1],
-	mode_selector_block [2],
-	mode_selector_block [3],
-	mode_selector_block [4]);
+	screen_mode_block [1],
+	screen_mode_block [2],
+	screen_mode_block [3],
+	screen_mode_block [4]);
 
   pos = 5;
-  while (mode_selector_block [pos] != -1)
+  while (screen_mode_block [pos] != -1)
   {
     printf (", var=%d, val=%d",
-	mode_selector_block [pos],
-	mode_selector_block [pos+1]);
+	screen_mode_block [pos],
+	screen_mode_block [pos+1]);
     pos += 2;
   }
 }
@@ -1521,36 +1580,34 @@ static void show_mode_sel_block (const unsigned int * mode_selector_block)
    Block [n] = -1 (Terminator)
 */
 
-static _kernel_oserror * os_screen_mode (const unsigned int * mode_selector_block)
+static _kernel_oserror * os_screen_mode (void)
 {
   int attempts;
   _kernel_oserror * rc;
   _kernel_swi_regs regs;
-  unsigned int * p;
 
   attempts = 2;
   do
   {
     regs.r[0] = 0;
-    regs.r[1] = (int) mode_selector_block;
+    regs.r[1] = (int) screen_mode_block;
     rc = _kernel_swi (OS_ScreenMode, &regs, &regs);
 
     if (devparm)
     {
-      show_mode_sel_block (mode_selector_block);
+      show_mode_sel_block ();
       if (rc)
 	printf (" - Error %s\n", rc -> errmess);
       else
 	printf (" - OK\n");
     }
     if ((rc == NULL)
-     || (mode_selector_block [3] < 4))
+     || (screen_mode_block [3] < 4))
       break;
 
     /* Try swapping the trgb value */
-    p = (unsigned int *) mode_selector_block;	// Writing back to a 'const' - never a good thing.
-    p [5] = 0;
-    p [6] ^= (4<<12);
+    screen_mode_block [5] = 0;
+    screen_mode_block [6] ^= (4<<12);
   } while (--attempts);
 
   return (rc);
@@ -1558,32 +1615,38 @@ static _kernel_oserror * os_screen_mode (const unsigned int * mode_selector_bloc
 
 /* -------------------------------------------------------------------------- */
 
-static _kernel_oserror * sel_os_screen_mode (const unsigned int * mode_selector_block)
+static _kernel_oserror * sel_os_screen_mode (int number)
 {
-  int framerate;
+  int j;
   _kernel_oserror * rc;
-  unsigned int * p;
 
-  if ((mode_selector_block != screen_user_def)
-   && (mode_selector_block [3] >= 4))
+  construct_screen_mode_block (number);
+
+  if ((number != MODE_USER_DEF)
+   && (screen_mode_block [3] >= 4))
   {
-    p = (unsigned int *) mode_selector_block;	// Writing back to a 'const' - never a good thing.
+    if ((j = screen_user_def [1]) != 0)		// User entered an X size?
+      screen_mode_block [1] = j;
 
-    if ((framerate = screen_user_def [4]) != -1)// User entered a frame rate?
-    {
-      if (p [4] == -1)
-	p [4] = framerate;
-    }
+    if ((j = screen_user_def [2]) != 0)		// User entered an Y size?
+      screen_mode_block [2] = j;
+
+    if ((j = screen_user_def [3]) != 0)		// User entered a bpp size?
+      screen_mode_block [3] = j;
+
+    if (((j = screen_user_def [4]) != -1)	// User entered a frame rate?
+     && (screen_mode_block [4] == -1))
+      screen_mode_block [4] = j;
 
     if (((screen_user_def [5] == 0)		// User entered a trgb mode?
      && (screen_user_def [6] & (15<<12))) != 0)
     {
-      p [5] = 0;
-      p [6] = screen_user_def [6];
+      screen_mode_block [5] = 0;
+      screen_mode_block [6] = screen_user_def [6];
     }
   }
 
-  rc = os_screen_mode (mode_selector_block);
+  rc = os_screen_mode ();
   return (rc);
 }
 
@@ -1594,449 +1657,39 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
   _kernel_oserror * rc;
   rpc_palette = 0;
 
-  switch (number)
+  rc = sel_os_screen_mode (number);
+  if (rc == 0)
   {
-    case MODE_USER_DEF:
-      rc = sel_os_screen_mode (screen_user_def);
-      if (rc == 0)
-	rpc_palette = 1;
+    rpc_palette = 1;
 
-      if (screen_user_def [1] >= 640)
-	SCREENWIDTH = 640;
-      else
-	SCREENWIDTH = 320;
+    SCREENWIDTH = screen_mode_block [1];
+    SCREENHEIGHT = screen_mode_block [2];
 
-      if (screen_user_def [2] >= 480)
-	SCREENHEIGHT = 480;
-      else if (screen_user_def [2] >= 400)
-	SCREENHEIGHT = 400;
-      else if (screen_user_def [2] >= 256)
-	SCREENHEIGHT = 256;
-      else if (screen_user_def [2] >= 240)
-	SCREENHEIGHT = 240;
-      else
-	SCREENHEIGHT = 200;
+    /* Special case for the 320 x (400/480) as we use */
+    /* pixel doubling in the Y plane only */
+
+    if ((SCREENWIDTH == 320)
+     && ((SCREENHEIGHT == 400) || (SCREENHEIGHT == 480)))
+      SCREENHEIGHT >>= 1;
 
 #if 0
-      if (SCREENWIDTH > MAXSCREENWIDTH)
-	SCREENWIDTH = MAXSCREENWIDTH;
-      if (SCREENHEIGHT > MAXSCREENHEIGHT)
-	SCREENHEIGHT = MAXSCREENHEIGHT;
+    if (SCREENWIDTH > MAXSCREENWIDTH)
+      SCREENWIDTH = MAXSCREENWIDTH;
+    if (SCREENHEIGHT > MAXSCREENHEIGHT)
+      SCREENHEIGHT = MAXSCREENHEIGHT;
 #endif
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((screen_user_def [2] / 8) - 1); /* Bottom Y */
-	_kernel_oswrch ((screen_user_def [1] / 8) - 1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
 
-
-
-    case MODE_320_x_200_8bpp:
-      rc = sel_os_screen_mode (screen_320x200x8);
-      if (rc == 0)
-	rpc_palette = 1;
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((200/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_240_8bpp:
-      rc = sel_os_screen_mode (screen_320x240x8);
-      if (rc == 0)
-	rpc_palette = 1;
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((240/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_256_8bpp:	/* Select screen mode 13, 320x256 256 colours */
-	    			/* We carefully avoid using Risc PC SWI here :) */
-
-      /* Try RPC mode with programmable palette first */
-      rc = sel_os_screen_mode (screen_320x256x8);
-      if (rc == 0)
-      {
-	rpc_palette = 1;
-      }
-      else
-      {
-	_kernel_oswrch (22);
-	_kernel_oswrch (13);
-	if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 13)
-	  rc = 0;
-	// rpc_palette = 0;
-      }
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 256;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	/* This prevents the screen scrolling! */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((256/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_400_8bpp: /* Select screen mode 320x400 8 bit colours */
-      rc = sel_os_screen_mode (screen_320x400x8);
-      if (rc == 0)
-	rpc_palette = 1;
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((400/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_480_8bpp: /* Select screen mode 320x480 8 bit colours */
-      rc = sel_os_screen_mode (screen_320x480x8);
-      if (rc == 0)
-      {
-	rpc_palette = 1;
-      }
-      else
-      {
-	_kernel_oswrch (22);
-	_kernel_oswrch (49);
-	if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
-	  rc = 0;
-	// rpc_palette = 0;
-      }
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_200_16bpp:
-      rc = sel_os_screen_mode (screen_320x200x16);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((200/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_240_16bpp:
-      rc = sel_os_screen_mode (screen_320x240x16);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((240/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_256_16bpp: /* Select screen mode 320x256 16 bit colours */
-      rc = sel_os_screen_mode (screen_320x256x16);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 256;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((256/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_400_16bpp: /* Select screen mode 320x400 16 bit colours */
-      rc = sel_os_screen_mode (screen_320x400x16);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((400/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_480_16bpp: /* Select screen mode 320x480 16 bit colours */
-      rc = sel_os_screen_mode (screen_320x480x16);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_200_24bpp:
-      rc = sel_os_screen_mode (screen_320x200x24);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((200/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-
-    case MODE_320_x_240_24bpp:
-      rc = sel_os_screen_mode (screen_320x240x24);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((240/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_256_24bpp: /* Select screen mode 320x256 24 bit colours */
-      rc = sel_os_screen_mode (screen_320x256x24);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 256;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((256/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_400_24bpp: /* Select screen mode 320x400 24 bit colours */
-      rc = sel_os_screen_mode (screen_320x400x24);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 200;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((320/8)-1); /* Bottom Y */
-	_kernel_oswrch ((400/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_320_x_480_24bpp: /* Select screen mode 320x480 24 bit colours */
-      rc = sel_os_screen_mode (screen_320x480x24);
-
-      SCREENWIDTH  = 320;
-      SCREENHEIGHT = 240;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((320/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_640_x_400_8bpp: /* Select screen mode 640x400 8 bit colours */
-      rc = sel_os_screen_mode (screen_640x400x8);
-      if (rc == 0)
-	rpc_palette = 1;
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 400;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((400/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_640_x_480_8bpp: /* Select screen mode 640x480 8 bit colours */
-      rc = sel_os_screen_mode (screen_640x480x8);
-      if (rc == NULL)
-	rpc_palette = 1;
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 480;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_640_x_400_16bpp: /* Select screen mode 640x400 16 bit colours */
-      rc = sel_os_screen_mode (screen_640x400x16);
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 400;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((400/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_640_x_480_16bpp: /* Select screen mode 640x480 16 bit colours */
-      rc = sel_os_screen_mode (screen_640x480x16);
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 480;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-    case MODE_640_x_400_24bpp: /* Select screen mode 640x400 24 bit colours */
-      rc = sel_os_screen_mode (screen_640x400x24);
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 400;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((400/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
-
-     case MODE_640_x_480_24bpp: /* Select screen mode 640x480 24 bit colours */
-      rc = sel_os_screen_mode (screen_640x480x24);
-
-      SCREENWIDTH  = 640;
-      SCREENHEIGHT = 480;
-
-      if (set_text_window)
-      {
-	/* Define text window */
-	_kernel_oswrch (28);
-	_kernel_oswrch (0);  /* Left X */
-	_kernel_oswrch ((480/8)-1); /* Bottom Y */
-	_kernel_oswrch ((640/8)-1); /* Right X */
-	_kernel_oswrch (00); /* Top Y */
-      }
-      break;
+    if (set_text_window)
+    {
+      /* Define text window */
+      _kernel_oswrch (28);
+      _kernel_oswrch (0);				/* Left X */
+      _kernel_oswrch ((screen_mode_block [2] / 8) - 1);	/* Bottom Y */
+      _kernel_oswrch ((screen_mode_block [1] / 8) - 1);	/* Right X */
+      _kernel_oswrch (0);				/* Top Y */
+    }
   }
+
   return (rc);
 }
 
@@ -2114,8 +1767,8 @@ static void decode_screendef (int p)
     }
     else
     {
-      screen_user_def [5] = -1;			// End of table
-      screen_user_def [6] = -1;			// End of table
+//    screen_user_def [5] = 0;			// Already = 0
+      screen_user_def [6] = 0;
       screen_user_def [7] = -1;			// End of table
     }
   }
@@ -2154,8 +1807,8 @@ static void select_text_mode (void)
   if ((SCREENWIDTH != 640)
    || (SCREENHEIGHT != 480))
   {
-    if (sel_os_screen_mode (screen_640x480x8))
-      sel_os_screen_mode (screen_640x480x24);
+    if (sel_os_screen_mode (MODE_640_x_480_8bpp))
+      sel_os_screen_mode (MODE_640_x_480_24bpp);
   }
 }
 
@@ -2163,6 +1816,11 @@ static void select_text_mode (void)
 
 static const unsigned char mode_search [] =
 {
+#if 0
+  MODE_800_x_600_8bpp,
+  MODE_800_x_600_24bpp,
+  MODE_800_x_600_16bpp,
+#endif
   MODE_640_x_480_8bpp,
   MODE_640_x_480_24bpp,
   MODE_640_x_480_16bpp,
@@ -2225,9 +1883,13 @@ void I_SetScreenSize (void)
       _kernel_oswrch (22);
       _kernel_oswrch (49);
       if (((_kernel_osbyte (135, 0, 0) >> 8) & 0xFF) == 49)
-	screen_mode = MODE_320_x_480_8bpp;
+      {
+	construct_screen_mode_block (screen_mode = MODE_320_x_480_8bpp);
+      }
       else
+      {
 	I_Error ("Failed to verify the OS_ScreenMode call (%s)\n", rc -> errmess);
+      }
     }
     else
     {

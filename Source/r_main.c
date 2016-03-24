@@ -618,13 +618,19 @@ void R_ExecuteSetViewSize (void)
 
     if (setsizeneeded)
     {
-      sbarscale = 1 << FRACBITS;
       if (stbar_scale > 1)
 	sbarscale = (FRACUNIT*SCREENWIDTH)/320;
+      else if (SCREENWIDTH > 800)
+	sbarscale = 2 << FRACBITS;
+      else
+	sbarscale = 1 << FRACBITS;
 
-      hutextscale = 1 << FRACBITS;
       if (hutext_scale > 1)
 	hutextscale = (FRACUNIT*SCREENWIDTH)/320;
+      else if (SCREENWIDTH > 800)
+	hutextscale = 2 << FRACBITS;
+      else
+	hutextscale = 1 << FRACBITS;
 
       ST_createWidgets ();
       HU_createWidgets (1);
@@ -679,27 +685,24 @@ void R_ExecuteSetViewSize (void)
     skyiscale = sis;
 
     // psprite scales
-    if (weaponscale < 2)
+    // Try to fix for different aspect ratios, otherwise the sky looks really weird
+    // in non-320:200 modes. Uncomment the above lines and remove the following
+    // 10 lines to get the original behaviour.
+    pspritescale = (FRACUNIT*viewwidth)/320;
+    pspriteiscale = (FRACUNIT*viewheight)/200;
+    if (pspritescale >= pspriteiscale)
     {
-      pspritescale = FRACUNIT*viewwidth/SCREENWIDTH;
-      pspriteiscale = FRACUNIT*SCREENWIDTH/viewwidth;
+      pspriteiscale = (FRACUNIT*320)/viewwidth;
     }
     else
     {
-      // Try to fix for different aspect ratios, otherwise the sky looks really weird
-      // in non-320:200 modes. Uncomment the above lines and remove the following
-      // 10 lines to get the original behaviour.
-      pspritescale = (FRACUNIT*viewwidth)/320;
-      pspriteiscale = (FRACUNIT*viewheight)/200;
-      if (pspritescale >= pspriteiscale)
-      {
-	pspriteiscale = (FRACUNIT*320)/viewwidth;
-      }
-      else
-      {
-	pspritescale = pspriteiscale;
-	pspriteiscale = (FRACUNIT*200)/viewheight;
-      }
+      pspritescale = pspriteiscale;
+      pspriteiscale = (FRACUNIT*200)/viewheight;
+    }
+    if (weaponscale < 2)
+    {
+      pspritescale = pspritescale / 2;
+      pspriteiscale = pspriteiscale * 2;
     }
 
 

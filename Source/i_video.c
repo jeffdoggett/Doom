@@ -961,15 +961,27 @@ void I_SetScreenSize (void)
 
   if (M_CheckParm("+2"))
   {
-    SCREENWIDTH = MAXSCREENWIDTH;
-    SCREENHEIGHT = MAXSCREENHEIGHT;
+    SCREENWIDTH = 640;
+    SCREENHEIGHT = 480;
+  }
+
+  if (M_CheckParm("+3"))
+  {
+    SCREENWIDTH = 1024;
+    SCREENHEIGHT = 768;
   }
 
   if (M_CheckParm("+4"))
   {
-    multiply = 2;
     SCREENWIDTH = MAXSCREENWIDTH;
     SCREENHEIGHT = MAXSCREENHEIGHT;
+  }
+
+  if (M_CheckParm("+5"))
+  {
+    multiply = 2;
+    SCREENWIDTH = 640;
+    SCREENHEIGHT = 480;
   }
 }
 
@@ -1308,7 +1320,7 @@ void I_InitGraphics (void)
   Init_Colour_Map ();
 
   /* Clear the display */
-  memset (screens[0], 0, sizeof (screens [0]));
+  memset (screens[0], 0, SCREENHEIGHT*SCREENWIDTH);
   I_FinishUpdate ();
 }
 
