@@ -30,7 +30,7 @@ static const char rcsid[] = "$Id: f_wipe.c,v 1.2 1997/02/03 22:45:09 b1 Exp $";
 
 //-----------------------------------------------------------------------------
 //
-//                       SCREEN WIPE PACKAGE
+//		       SCREEN WIPE PACKAGE
 //
 
 static unsigned int * ptrs = NULL;
@@ -133,19 +133,22 @@ boolean wipe_ScreenWipe (int ticks)
     y = *p;
     if (y < SCREENHEIGHT)
     {
-      if (rand() & 1)
+      if ((x & 3) == 0)
       {
-        if (q < 14)
-          q += 1;
-      }
-      else
-      {
-        if (q > 6)
-          q -= 1;
+	if (rand() & 1)
+	{
+	  if (q < 14)
+	    q += 1;
+	}
+	else
+	{
+	  if (q > 6)
+	    q -= 1;
+	}
       }
       r = q * ticks;
       if ((y + r) >= SCREENHEIGHT)
-        r = SCREENHEIGHT - y;
+	r = SCREENHEIGHT - y;
       wipe_CopyColumn (x, *p=y+r);
       qty++;
     }

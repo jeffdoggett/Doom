@@ -1622,8 +1622,7 @@ static _kernel_oserror * sel_os_screen_mode (int number)
 
   construct_screen_mode_block (number);
 
-  if ((number != MODE_USER_DEF)
-   && (screen_mode_block [3] >= 4))
+  if (number != MODE_USER_DEF)
   {
     if ((j = screen_user_def [1]) != 0)		// User entered an X size?
       screen_mode_block [1] = j;
@@ -1807,8 +1806,12 @@ static void select_text_mode (void)
   if ((SCREENWIDTH != 640)
    || (SCREENHEIGHT != 480))
   {
-    if (sel_os_screen_mode (MODE_640_x_480_8bpp))
-      sel_os_screen_mode (MODE_640_x_480_24bpp);
+    construct_screen_mode_block (MODE_640_x_480_8bpp);
+    if (os_screen_mode ())
+    {
+      construct_screen_mode_block (MODE_640_x_480_24bpp);
+      os_screen_mode ();
+    }
   }
 }
 
