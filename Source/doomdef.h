@@ -112,13 +112,6 @@ typedef enum
 // Defines suck. C sucks.
 // C++ might sucks for OOP, but it sure is a better C.
 // So there.
-#ifndef MAXSCREENWIDTH
-#define MAXSCREENWIDTH  320
-#endif
-//SCREEN_MUL*BASE_WIDTH //320
-#ifndef MAXSCREENHEIGHT
-#define MAXSCREENHEIGHT 200
-#endif
 //(int)(SCREEN_MUL*BASE_WIDTH*INV_ASPECT_RATIO) //200
 
 extern unsigned int SCREENWIDTH;

@@ -112,7 +112,7 @@ extern player_t*	viewplayer;
 extern angle_t		clipangle;
 
 extern int		viewangletox[FINEANGLES/2];
-extern angle_t		xtoviewangle[MAXSCREENWIDTH+1];
+extern angle_t*		xtoviewangle;
 //extern fixed_t		finetangent[FINEANGLES/2];
 
 extern angle_t		rw_normalangle;

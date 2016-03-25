@@ -31,8 +31,8 @@
 
 // Constant arrays used for psprite clipping
 //  and initializing clipping.
-extern dshort_t		negonearray[MAXSCREENWIDTH];
-extern dshort_t		screenheightarray[MAXSCREENWIDTH];
+extern dshort_t*	negonearray;
+extern dshort_t*	screenheightarray;
 
 // vars for R_DrawMaskedColumn
 extern dshort_t*	mfloorclip;

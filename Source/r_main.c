@@ -91,7 +91,7 @@ int			viewangletox[FINEANGLES/2];
 // The xtoviewangleangle[] table maps a screen pixel
 // to the lowest viewangle that maps back to x ranges
 // from clipangle to -clipangle.
-angle_t			xtoviewangle[MAXSCREENWIDTH+1];
+angle_t*		xtoviewangle;
 
 
 // UNUSED.
@@ -771,6 +771,9 @@ void R_Init (void)
 {
     if (M_CheckParm ("-nomapinfo") == 0)
       Load_Mapinfo ();
+
+    xtoviewangle = calloc (SCREENWIDTH+1, sizeof (*xtoviewangle));
+
     R_InitData ();
     // printf ("\nR_InitData");
     R_InitPointToAngle ();

@@ -605,8 +605,8 @@ static unsigned char key_xlate_table [] =
 static int mouse_button_conv[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
 
-unsigned int SCREENWIDTH = MAXSCREENWIDTH;
-unsigned int SCREENHEIGHT = MAXSCREENHEIGHT;
+unsigned int SCREENWIDTH = 320;
+unsigned int SCREENHEIGHT = 200;
 unsigned int ORIGSCREENWIDTH = 320;	// in original Doom
 unsigned int ORIGSCREENHEIGHT = 200;
 
@@ -1670,13 +1670,6 @@ static _kernel_oserror * select_screen_mode (int number, int set_text_window)
     if ((SCREENWIDTH == 320)
      && ((SCREENHEIGHT == 400) || (SCREENHEIGHT == 480)))
       SCREENHEIGHT >>= 1;
-
-#if 0
-    if (SCREENWIDTH > MAXSCREENWIDTH)
-      SCREENWIDTH = MAXSCREENWIDTH;
-    if (SCREENHEIGHT > MAXSCREENHEIGHT)
-      SCREENHEIGHT = MAXSCREENHEIGHT;
-#endif
 
     if (set_text_window)
     {

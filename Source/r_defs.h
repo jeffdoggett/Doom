@@ -543,8 +543,8 @@ typedef struct
   // Here lies the rub for all
   // dynamic resize/change of resolution.
   // leave pads for [minx-1]/[maxx+1]
-  dushort_t		top[MAXSCREENWIDTH+2];
-  dushort_t		bottom[MAXSCREENWIDTH+2];
+  dushort_t*		top;
+  dushort_t*		bottom;
   fixed_t		xoffs;
   fixed_t		yoffs;
 } visplane_t;

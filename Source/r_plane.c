@@ -71,14 +71,14 @@ dshort_t*		lastopening;
 //  floorclip starts out SCREENHEIGHT
 //  ceilingclip starts out -1
 //
-dshort_t		floorclip[MAXSCREENWIDTH];
-dshort_t		ceilingclip[MAXSCREENWIDTH];
+dshort_t*		floorclip;
+dshort_t*		ceilingclip;
 
 //
 // spanstart holds the start of a plane span
 // initialized to 0 at start
 //
-static int		spanstart[MAXSCREENHEIGHT];
+static int *		spanstart;
 
 //
 // texture mapping
@@ -86,8 +86,8 @@ static int		spanstart[MAXSCREENHEIGHT];
 lighttable_t**		planezlight;
 fixed_t			planeheight;
 
-fixed_t			yslope[MAXSCREENHEIGHT];
-fixed_t			distscale[MAXSCREENWIDTH];
+fixed_t*		yslope;
+fixed_t*		distscale;
 fixed_t			basexscale;
 fixed_t			baseyscale;
 
@@ -99,6 +99,21 @@ extern int numflats;
 extern int * flatlumps;
 
 #define PMARKER	0xFFFF
+#define VISPLANETOPSIZE		(SCREENWIDTH+2)
+
+//-----------------------------------------------------------------------------
+/* We need to malloc some more memory for the top/bottom arrays. */
+
+static void R_InitVisplanes (visplane_t * p, unsigned int qty)
+{
+  do
+  {
+    if (((p -> top = calloc (VISPLANETOPSIZE, sizeof (*p -> top))) == NULL)
+     || ((p -> bottom = calloc (VISPLANETOPSIZE, sizeof (*p -> bottom))) == NULL))
+      I_Error ("Failed to claim visplane memory\n");
+    p++;
+  } while (--qty);
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -108,12 +123,12 @@ extern int * flatlumps;
 void R_InitPlanes (void)
 {
   MAXVISPLANES = 128;		// Start low
-  visplanes = malloc (MAXVISPLANES * sizeof (visplane_t));
+  visplanes = calloc (MAXVISPLANES, sizeof (visplane_t));
   if (visplanes == NULL)
     I_Error ("Failed to claim visplane memory\n");
-  memset (visplanes, 0, MAXVISPLANES * sizeof (visplane_t));
   //printf ("visplanes = %X (%X)\n", visplanes, MAXVISPLANES * sizeof (visplane_t));
 
+  R_InitVisplanes (visplanes, MAXVISPLANES);
 
   MAXOPENINGS = 10000;		// Start low
   openings = malloc (MAXOPENINGS * sizeof (openings[0]));
@@ -122,6 +137,12 @@ void R_InitPlanes (void)
   //memset (openings, 0, MAXOPENINGS * sizeof (openings[0]));
 
   showrplanestats = (boolean) M_CheckParm ("-showrplanes");
+
+  floorclip = calloc (SCREENWIDTH, sizeof (*floorclip));
+  ceilingclip = calloc (SCREENWIDTH, sizeof (*ceilingclip));
+  spanstart = calloc (SCREENHEIGHT, sizeof (*spanstart));
+  yslope = calloc (SCREENHEIGHT, sizeof (*yslope));
+  distscale = calloc (SCREENWIDTH, sizeof (*distscale));
 }
 
 //-----------------------------------------------------------------------------
@@ -171,6 +192,7 @@ static uintptr_t R_IncreaseVisplanes (void)
   visplanes = new_visplanes;
   lastvisplane = visplanes + qty_used;
   memset (lastvisplane, 0, 128 * sizeof (visplane_t));
+  R_InitVisplanes (lastvisplane, 128);
 
   /* Need to move the global variable pointers while we are here */
 
@@ -345,7 +367,7 @@ R_FindPlane
     check->yoffs = yoffs;
 
     // memset (check->top,0xff,sizeof(check->top));
-    for (x = 0; x < ARRAY_SIZE(check->top); x++)
+    for (x = 0; x < VISPLANETOPSIZE; x++)
       check->top[x] = PMARKER;
 
     return check;
@@ -421,7 +443,7 @@ R_CheckPlane
       pl->maxx = stop;
 
       // memset (pl->top,0xff,sizeof(pl->top));
-      for (x = 0; x < ARRAY_SIZE(pl->top); x++)
+      for (x = 0; x < VISPLANETOPSIZE; x++)
 	pl->top[x] = PMARKER;
     }
 

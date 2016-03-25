@@ -91,8 +91,8 @@ static int		doPointerWarp = POINTER_WARP_COUNTDOWN;
 // to use ....
 static int		multiply=1;
 
-unsigned int SCREENWIDTH = MAXSCREENWIDTH;
-unsigned int SCREENHEIGHT = MAXSCREENHEIGHT;
+unsigned int SCREENWIDTH = 320;
+unsigned int SCREENHEIGHT = 200;
 unsigned int ORIGSCREENWIDTH = 320;	// in original Doom
 unsigned int ORIGSCREENHEIGHT = 200;
 
@@ -973,8 +973,8 @@ void I_SetScreenSize (void)
 
   if (M_CheckParm("+4"))
   {
-    SCREENWIDTH = MAXSCREENWIDTH;
-    SCREENHEIGHT = MAXSCREENHEIGHT;
+    SCREENWIDTH = 1280;
+    SCREENHEIGHT = 1024;
   }
 
   if (M_CheckParm("+5"))
@@ -1131,7 +1131,7 @@ void I_InitGraphics (void)
       else
       {
 	I_Error("Could not open display");
-      }      
+      }
     }
   }
 

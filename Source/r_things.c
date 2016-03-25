@@ -65,8 +65,10 @@ static lighttable_t**	spritelights;
 
 // constant arrays
 //  used for psprite clipping and initializing clipping
-dshort_t	negonearray[MAXSCREENWIDTH];
-dshort_t	screenheightarray[MAXSCREENWIDTH];
+dshort_t*	 negonearray;
+dshort_t*	 screenheightarray;
+static dshort_t* clipbot;
+static dshort_t* cliptop;
 
 
 //
@@ -428,6 +430,17 @@ static boolean		showvisstats;
 void R_InitSprites (char** namelist)
 {
     int 	i;
+
+    negonearray = malloc (SCREENWIDTH * sizeof (*negonearray));
+    screenheightarray = malloc (SCREENWIDTH * sizeof (*screenheightarray));
+    clipbot = malloc (SCREENWIDTH * sizeof (*clipbot));
+    cliptop = malloc (SCREENWIDTH * sizeof (*cliptop));
+
+    if ((negonearray == NULL)
+     || (screenheightarray == NULL)
+     || (clipbot == NULL)
+     || (cliptop == NULL))
+      I_Error ("Failed to claim memory\n");
 
     for (i=0 ; i<SCREENWIDTH ; i++)
     {
@@ -1114,8 +1127,6 @@ static void R_DrawPlayerSprites (void)
 static void R_DrawSprite (vissprite_t* spr)
 {
     drawseg_t*		ds;
-    dshort_t		clipbot[MAXSCREENWIDTH];
-    dshort_t		cliptop[MAXSCREENWIDTH];
     int 		x;
     int 		r1;
     int 		r2;

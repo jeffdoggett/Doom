@@ -53,8 +53,6 @@ void R_ClearDrawSegs (void)
   drawsegstarttime = I_GetTime ();
 }
 
-
-
 /* ---------------------------------------------------------------------------- */
 //
 // ClipWallSegment
@@ -69,14 +67,11 @@ typedef	struct
 } cliprange_t;
 
 
-#define MAXSEGS		(MAXSCREENWIDTH/2 + 1) // was 32
+#define MAXSEGS		(SCREENWIDTH/2 + 1) // was 32
 
 // newend is one past the last valid seg
 static cliprange_t*	newend;
-static cliprange_t	solidsegs[MAXSEGS];
-
-
-
+static cliprange_t*	solidsegs = NULL;
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -223,11 +218,21 @@ R_ClipPassWallSegment
 //
 void R_ClearClipSegs (void)
 {
-    solidsegs[0].first = -MAXINT;
-    solidsegs[0].last = -1;
-    solidsegs[1].first = viewwidth;
-    solidsegs[1].last = MAXINT;
-    newend = solidsegs+2;
+    cliprange_t * p;
+
+    p = solidsegs;
+    if (p == NULL)		// 1st time?
+    {
+      solidsegs = p = malloc (MAXSEGS * sizeof (*solidsegs));
+      if (p == NULL)
+	I_Error ("Failed to claim solidsegs\n");
+    }
+
+    p[0].first = -MAXINT;
+    p[0].last = -1;
+    p[1].first = viewwidth;
+    p[1].last = MAXINT;
+    newend = p+2;
 }
 
 /* ---------------------------------------------------------------------------- */
