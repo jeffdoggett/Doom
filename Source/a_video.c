@@ -874,7 +874,7 @@ static void poll_kbd (void)
     {
       if (num_keys_down [key])
       {
-        num_keys_down [key] = 0;
+	num_keys_down [key] = 0;
 	event.data1 = key + '0';
 	event.type = ev_keyup;
 	D_PostEvent (&event);
@@ -942,7 +942,7 @@ static void init_sprite_area (void)
   _kernel_oserror * rc;
   _kernel_swi_regs regs;
 
-  size = (SCREENWIDTH * SCREENHEIGHT);
+  size = (screen_mode_block [1] * screen_mode_block [2]);
   switch (screen_mode_block [3])
   {
     case 5:
@@ -973,8 +973,8 @@ static void init_sprite_area (void)
   regs.r[1] = (int) sprite_mem;
   regs.r[2] = (int) "DoomScreen";
   regs.r[3] = 0;			// No Palette required
-  regs.r[4] = SCREENWIDTH;
-  regs.r[5] = SCREENHEIGHT;
+  regs.r[4] = screen_mode_block [1];
+  regs.r[5] = screen_mode_block [2];
   //regs.r[6] = 28;			// Mode 28 is 640 x 480 256 colours
   regs.r[6] = ((screen_mode_block [3]+1)<<27)+(90<<14)+(90<<1)+1;
   rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
@@ -1033,131 +1033,110 @@ void I_FinishUpdate (void)
 	  screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = devparm_black;
     }
 
-    if (vsync)
-      _kernel_osbyte (19, 0, 0);
-
-	// draw the image
-    screen_copy = screens[0];
-
+    // draw the image
     if (write_via_sprite)
     {
-      switch (screen_mode_block [3])
-      {
-#if 0
-	/* No need to do this copy as screens[0] has been set */
-	/* to point to the sprite area in I_InitGraphics */
-	case 3:
-	  screen_8 = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
-	  memcpy (screen_8, screen_copy, SCREENHEIGHT * SCREENWIDTH);
-	  break;
-#endif
-	case 4:
-	  screen_16 = (unsigned short *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
-	  i = SCREENWIDTH * SCREENHEIGHT;
-	  do
-	  {
-	    *screen_16++ = palette_table [*screen_copy++];
-	  } while (--i);
-	  break;
-
-	case 5:
-	  screen_24 = (unsigned int *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
-	  i = SCREENWIDTH * SCREENHEIGHT;
-	  do
-	  {
-	    *screen_24++ = palette_table [*screen_copy++];
-	  } while (--i);
-	  break;
-      }
-
-      put_sprite ();
-      return;
+      screen_8 = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
+    }
+    else
+    {
+      if (vsync)
+	_kernel_osbyte (19, 0, 0);
+      screen_8 = (unsigned char *) screen_addr;
     }
 
+    screen_copy = screens[0];
 
-    switch (screen_mode)
+    /* 320 * 4xx is a special case as it uses pixel doubling */
+    if ((screen_mode_block [1] == 320)
+     && ((screen_mode_block [2] == 400)
+      || (screen_mode_block [2] == 480)))
     {
-      case MODE_320_x_400_8bpp:
-      case MODE_320_x_480_8bpp:
-	i = SCREENHEIGHT;
-	screen_8 = (unsigned char *) screen_addr;
-	if (rpc_palette)
-	{
-	  screen_24 = (unsigned int *) screen_8;
-	  screen_24s = (unsigned int *) screen_copy;
-	  do
-	  {
-	    j = 320 / 4;
-	    do
-	    {
-	      p = *screen_24s++;
-	      screen_24 [320/4] = p;
-	      *screen_24++ = p;
-	    } while (--j);
-	    screen_24 += (320/4);
-	  } while (--i);
-	}
-	else
-	{
-	  do
-	  {
-	    j = 320;
-	    do
-	    {
-	      p = palette_table [*screen_copy++];
-	      screen_8 [320] = p;
-	      *screen_8++ = p;
-	    } while (--j);
-	    screen_8 += 320;
-	  } while (--i);
-	}
-	break;
-
-      case MODE_320_x_400_16bpp:
-      case MODE_320_x_480_16bpp:
-	i = SCREENHEIGHT;
-	screen_16 = (unsigned short *) screen_addr;
-	do
-	{
-	  j = 320;
-	  do
-	  {
-	    p = palette_table [*screen_copy++];
-	    screen_16 [320] = p;
-	    *screen_16++ = p;
-	  } while (--j);
-	  screen_16 += 320;
-	} while (--i);
-	break;
-
-      case MODE_320_x_400_24bpp:
-      case MODE_320_x_480_24bpp:
-	i = SCREENHEIGHT;
-	screen_24 = screen_addr;
-	do
-	{
-	  j = 320;
-	  do
-	  {
-	    p = palette_table [*screen_copy++];
-	    screen_24 [320] = p;
-	    *screen_24++ = p;
-	  } while (--j);
-	  screen_24 += 320;
-	} while (--i);
-	break;
-
-      default:
 	switch (screen_mode_block [3])
 	{
 	  case 3:
+	    i = SCREENHEIGHT;
 	    if (rpc_palette)
 	    {
-	      memcpy (screen_addr, screen_copy, SCREENHEIGHT * SCREENWIDTH);
+	      screen_24 = (unsigned int *) screen_8;
+	      screen_24s = (unsigned int *) screen_copy;
+	      do
+	      {
+		j = 320 / 4;
+		do
+		{
+		  p = *screen_24s++;
+		  screen_24 [320/4] = p;
+		  *screen_24++ = p;
+		} while (--j);
+		screen_24 += (320/4);
+	      } while (--i);
 	    }
 	    else
 	    {
-	      screen_8 = (unsigned char *) screen_addr;
+	      do
+	      {
+		j = 320;
+		do
+		{
+		  p = palette_table [*screen_copy++];
+		  screen_8 [320] = p;
+		  *screen_8++ = p;
+		} while (--j);
+		screen_8 += 320;
+	      } while (--i);
+	    }
+	    break;
+
+	  case 4:
+	    i = SCREENHEIGHT;
+	    screen_16 = (unsigned short *) screen_8;
+	    do
+	    {
+	      j = 320;
+	      do
+	      {
+		p = palette_table [*screen_copy++];
+		screen_16 [320] = p;
+		*screen_16++ = p;
+	      } while (--j);
+	      screen_16 += 320;
+	    } while (--i);
+	    break;
+
+	  case 5:
+	    i = SCREENHEIGHT;
+	    screen_24 = (unsigned int *) screen_8;
+	    do
+	    {
+	      j = 320;
+	      do
+	      {
+		p = palette_table [*screen_copy++];
+		screen_24 [320] = p;
+		*screen_24++ = p;
+	      } while (--j);
+	      screen_24 += 320;
+	    } while (--i);
+	    break;
+	}
+    }
+    else
+    {
+	switch (screen_mode_block [3])
+	{
+	  case 3:
+	    if (write_via_sprite)
+	    {
+	      /* No need to do this copy as screens[0] has been set */
+	      /* to point to the sprite area in I_InitGraphics */
+	    }
+	    else if (rpc_palette)
+	    {
+	      memcpy (screen_8, screen_copy, SCREENHEIGHT * SCREENWIDTH);
+	    }
+	    else
+	    {
 	      i = SCREENWIDTH * SCREENHEIGHT;
 	      do
 	      {
@@ -1167,7 +1146,7 @@ void I_FinishUpdate (void)
 	    break;
 
 	  case 4:
-	    screen_16 = (unsigned short *) screen_addr;
+	    screen_16 = (unsigned short *) screen_8;
 	    i = SCREENWIDTH * SCREENHEIGHT;
 	    do
 	    {
@@ -1176,7 +1155,7 @@ void I_FinishUpdate (void)
 	    break;
 
 	  case 5:
-	    screen_24 = screen_addr;
+	    screen_24 = (unsigned int *) screen_8;
 	    i = SCREENWIDTH * SCREENHEIGHT;
 	    do
 	    {
@@ -1184,6 +1163,13 @@ void I_FinishUpdate (void)
 	    } while (--i);
 	    break;
 	}
+    }
+
+    if (write_via_sprite)
+    {
+      if (vsync)
+	_kernel_osbyte (19, 0, 0);
+      put_sprite ();
     }
 }
 
@@ -1258,8 +1244,8 @@ static void set_palette_xx (byte * palette)
       palette_table [colour] = regs.r[0];
       if (devparm_palette)
       {
-        devparm_palette--;
-        printf ("Colour %u palette = %08X, ColNum = %08X\n", colour, bgr, regs.r[0]);
+	devparm_palette--;
+	printf ("Colour %u palette = %08X, ColNum = %08X\n", colour, bgr, regs.r[0]);
       }
     }
   } while (++colour < 256);
@@ -1920,7 +1906,16 @@ void I_InitGraphics (void)
       write_via_sprite = 1;
       init_sprite_area ();
       if (screen_mode_block [3] == 3)
-	screens[0] = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
+      {
+	/* 320 * 4xx is a special case as it uses pixel doubling */
+	if (!((screen_mode_block [1] == 320)
+	 && ((screen_mode_block [2] == 400)
+	  || (screen_mode_block [2] == 480))))
+	{
+	  screens[0] = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
+	  screen_addr = (unsigned int *) screens[0];	// Set this as well in case.
+	}
+      }
     }
     else
     {
@@ -1940,6 +1935,10 @@ void I_InitGraphics (void)
     {
       devparm_palette = 256;
       printf ("Internal mode number is %u, Sprite mode is %u\n", screen_mode, write_via_sprite);
+      if (screens[0] == ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset))
+      {
+        printf ("Screens[0] -> Sprite memory\n");
+      }
     }
 
     /* Cursor off */
