@@ -23,16 +23,14 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #if 0
 static const char rcsid[] = "$Id: r_main.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #endif
 
-
 #include "includes.h"
 #include <math.h>
 
-
+/* -------------------------------------------------------------------------- */
 
 // Fineangles in the SCREENWIDTH wide window.
 #define FIELDOFVIEW		2048
@@ -116,8 +114,7 @@ void (*basecolfunc) (void);
 void (*fuzzcolfunc) (void);
 void (*spanfunc) (void);
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_AddPointToBox
 // Expand a given bbox
@@ -139,7 +136,7 @@ R_AddPointToBox
 	box[BOXTOP] = y;
 }
 
-
+/* -------------------------------------------------------------------------- */
 //
 // R_PointOnSide
 // Traverse BSP (sub) tree,
@@ -198,6 +195,7 @@ R_PointOnSide
     return 1;
 }
 
+/* -------------------------------------------------------------------------- */
 
 int
 R_PointOnSegSide
@@ -262,6 +260,7 @@ R_PointOnSegSide
 }
 
 
+/* -------------------------------------------------------------------------- */
 //
 // R_PointToAngle
 // To get a global angle from Cartesian coordinates,
@@ -324,17 +323,21 @@ angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
     }
 }
 
+/* -------------------------------------------------------------------------- */
 // Point of view (viewx, viewy) to point (x1, y1) angle.
 angle_t R_PointToAngle(fixed_t x, fixed_t y)
 {
     return R_PointToAngle2(viewx, viewy, x, y);
 }
 
+/* -------------------------------------------------------------------------- */
 // Point of view (viewx, viewy) to point (x1, y1) angle.
 angle_t R_PointToAngleEx(fixed_t x, fixed_t y)
 {
     return R_PointToAngleEx2(viewx, viewy, x, y);
 }
+
+/* -------------------------------------------------------------------------- */
 
 angle_t R_PointToAngleEx2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
 {
@@ -353,7 +356,7 @@ angle_t R_PointToAngleEx2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
     return R_PointToAngle2(x1, y1, x, y);
 }
 
-
+/* -------------------------------------------------------------------------- */
 
 fixed_t
 R_PointToDist
@@ -396,9 +399,7 @@ R_PointToDist
     return dist;
 }
 
-
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_InitPointToAngle
 //
@@ -421,10 +422,7 @@ void R_InitPointToAngle (void)
 #endif
 }
 
-
-
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_InitTables
 //
@@ -458,6 +456,7 @@ void R_InitTables (void)
 
 }
 
+/* -------------------------------------------------------------------------- */
 
 angle_t R_GetVertexViewAngle (vertex_t *v)
 {
@@ -470,7 +469,7 @@ angle_t R_GetVertexViewAngle (vertex_t *v)
   return (v->viewangle);
 }
 
-
+/* -------------------------------------------------------------------------- */
 //
 // R_InitTextureMapping
 //
@@ -535,8 +534,7 @@ void R_InitTextureMapping (void)
     clipangle = xtoviewangle[0];
 }
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_InitLightTables
 // Only inits the zlight table,
@@ -582,8 +580,7 @@ void R_InitLightTables (void)
     }
 }
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_SetViewSize
 // Do not really change anything here,
@@ -602,7 +599,7 @@ void R_SetViewSize (int flag, int blocks, int detail)
     setdetail = detail;
 }
 
-
+/* -------------------------------------------------------------------------- */
 //
 // R_ExecuteSetViewSize
 //
@@ -618,12 +615,9 @@ void R_ExecuteSetViewSize (void)
 
     if (setsizeneeded)
     {
-      if (stbar_scale > 1)
-	sbarscale = (FRACUNIT*SCREENWIDTH)/320;
-      else if (SCREENWIDTH > 800)
-	sbarscale = 2 << FRACBITS;
-      else
-	sbarscale = 1 << FRACBITS;
+      sbarscale = (FRACUNIT*SCREENWIDTH)/320;
+      if ((stbar_scale < 2) && (SCREENWIDTH > 320))
+	sbarscale = sbarscale / 2;
 
       if (hutext_scale > 1)
 	hutextscale = (FRACUNIT*SCREENWIDTH)/320;
@@ -640,13 +634,19 @@ void R_ExecuteSetViewSize (void)
 	AM_LevelInit ();
     }
 
-    if (setblocks == 11)
+    switch (setblocks)
     {
+      case 11:				// Full screen - no status bar
 	scaledviewwidth = SCREENWIDTH;
 	viewheight = SCREENHEIGHT;
-    }
-    else
-    {
+        break;
+
+      case 10:				// Fill width - status bar visible.
+	scaledviewwidth = SCREENWIDTH;
+	viewheight = SCREENHEIGHT-((32*sbarscale)>>FRACBITS);
+        break;
+
+      default:				// Small screen - border visible.
 	scaledviewwidth = ((setblocks*SCREENWIDTH)/10)&~7;
 	viewheight = ((setblocks*(SCREENHEIGHT-ST_HEIGHT))/10)&~7;
     }
@@ -757,14 +757,12 @@ void R_ExecuteSetViewSize (void)
     setsizeneeded = 0;
 }
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_Init
 //
 //extern int	detailLevel;		// Not currently used
 extern int	screenblocks;
-
 
 
 void R_Init (void)
@@ -795,7 +793,7 @@ void R_Init (void)
     framecount = 0;
 }
 
-
+/* -------------------------------------------------------------------------- */
 //
 // R_PointInSubsector
 //
@@ -824,8 +822,7 @@ R_PointInSubsector
     return &subsectors[nodenum & ~NF_SUBSECTOR];
 }
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_SetupFrame
 //
@@ -864,8 +861,7 @@ void R_SetupFrame (player_t* player)
     validcount++;
 }
 
-
-
+/* -------------------------------------------------------------------------- */
 //
 // R_RenderView
 //
@@ -899,3 +895,5 @@ void R_RenderPlayerView (player_t* player)
     // Check for new console commands.
     NetUpdate ();
 }
+
+/* -------------------------------------------------------------------------- */

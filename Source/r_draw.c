@@ -31,9 +31,6 @@ static const char rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #include "includes.h"
 
 /* ------------------------------------------------------------------------------------------------ */
-// ?
-#define MAXWIDTH		1120
-#define MAXHEIGHT		832
 
 // status bar height at bottom of screen
 #define SBARHEIGHT		32
@@ -1040,10 +1037,10 @@ void R_ClearSbarSides (void)
   int	y;
 
   padsize = DX(0);
+  yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
 
   if (padsize)
   {
-    yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
     dest = screens[0]+((SCREENHEIGHT-yheight)*SCREENWIDTH);
     for (y = 0; y < yheight; y++, dest += SCREENWIDTH)
     {
@@ -1053,6 +1050,15 @@ void R_ClearSbarSides (void)
 	dest [SCREENWIDTH-x-1] = 0;
       }
     }
+  }
+
+  /* This is in case the viewheight isn't a perfect */
+  /* match to the status bar height. */
+
+  if (viewheight < (SCREENHEIGHT - yheight))
+  {
+    dest = screens[0]+(viewheight*SCREENWIDTH);
+    memset (dest, 0, ((SCREENHEIGHT - yheight) - viewheight) * SCREENWIDTH);
   }
 }
 
