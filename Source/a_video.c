@@ -43,6 +43,7 @@ static unsigned int   lastmousebut;
 
 static unsigned int   rpc_palette;  /* = True when using 8 bit screen mode and */
 				    /* RPC palette is available (256 entries) */
+static unsigned int   write_via_sprite = 0;
 static unsigned char menu_in_use = 0;
 
 static unsigned char devparm_black;
@@ -69,7 +70,7 @@ static sprite_area_t * sprite_mem = 0;
 
 /* -------------------------------------------------------------------------- */
 // screen_mode
-#define MODE_USER_DEF		0
+#define MODE_USER_DEFINED	0
 
 #define MODE_320_x_200_8bpp	1
 #define MODE_320_x_240_8bpp	2
@@ -144,7 +145,7 @@ static void construct_screen_mode_block (int mode_num)
 
   switch (mode_num)
   {
-    case MODE_USER_DEF:
+    case MODE_USER_DEFINED:
       memcpy (screen_mode_block, screen_user_def, sizeof (screen_user_def));
       break;
 
@@ -942,7 +943,7 @@ static void init_sprite_area (void)
   _kernel_swi_regs regs;
 
   size = (SCREENWIDTH * SCREENHEIGHT);
-  switch (screen_user_def [3])
+  switch (screen_mode_block [3])
   {
     case 5:
       size <<= 1;
@@ -975,7 +976,7 @@ static void init_sprite_area (void)
   regs.r[4] = SCREENWIDTH;
   regs.r[5] = SCREENHEIGHT;
   //regs.r[6] = 28;			// Mode 28 is 640 x 480 256 colours
-  regs.r[6] = ((screen_user_def [3]+1)<<27)+(90<<14)+(90<<1)+1;
+  regs.r[6] = ((screen_mode_block [3]+1)<<27)+(90<<14)+(90<<1)+1;
   rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
   if (rc)
     I_Error ("Sprite 10F error %s\n", rc -> errmess);
@@ -1038,41 +1039,44 @@ void I_FinishUpdate (void)
 	// draw the image
     screen_copy = screens[0];
 
+    if (write_via_sprite)
+    {
+      switch (screen_mode_block [3])
+      {
+#if 0
+	/* No need to do this copy as screens[0] has been set */
+	/* to point to the sprite area in I_InitGraphics */
+	case 3:
+	  screen_8 = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
+	  memcpy (screen_8, screen_copy, SCREENHEIGHT * SCREENWIDTH);
+	  break;
+#endif
+	case 4:
+	  screen_16 = (unsigned short *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
+	  i = SCREENWIDTH * SCREENHEIGHT;
+	  do
+	  {
+	    *screen_16++ = palette_table [*screen_copy++];
+	  } while (--i);
+	  break;
+
+	case 5:
+	  screen_24 = (unsigned int *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
+	  i = SCREENWIDTH * SCREENHEIGHT;
+	  do
+	  {
+	    *screen_24++ = palette_table [*screen_copy++];
+	  } while (--i);
+	  break;
+      }
+
+      put_sprite ();
+      return;
+    }
+
+
     switch (screen_mode)
     {
-      case MODE_USER_DEF:			// user defined
-	switch (screen_user_def [3])
-	{
-#if 0
-	  /* No need to do this copy as screens[0] has been set */
-	  /* to point to the sprite area in I_InitGraphics */
-	  case 3:
-	    screen_8 = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
-	    memcpy (screen_8, screen_copy, SCREENHEIGHT * SCREENWIDTH);
-	    break;
-#endif
-	  case 4:
-	    screen_16 = (unsigned short *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
-	    i = SCREENWIDTH * SCREENHEIGHT;
-	    do
-	    {
-	      *screen_16++ = palette_table [*screen_copy++];
-	    } while (--i);
-	    break;
-
-	  case 5:
-	    screen_24 = (unsigned int *)(((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset));
-	    i = SCREENWIDTH * SCREENHEIGHT;
-	    do
-	    {
-	      *screen_24++ = palette_table [*screen_copy++];
-	    } while (--i);
-	    break;
-	}
-
-	put_sprite ();
-	break;
-
       case MODE_320_x_400_8bpp:
       case MODE_320_x_480_8bpp:
 	i = SCREENHEIGHT;
@@ -1617,34 +1621,9 @@ static _kernel_oserror * os_screen_mode (void)
 
 static _kernel_oserror * sel_os_screen_mode (int number)
 {
-  int j;
   _kernel_oserror * rc;
 
   construct_screen_mode_block (number);
-
-  if (number != MODE_USER_DEF)
-  {
-    if ((j = screen_user_def [1]) != 0)		// User entered an X size?
-      screen_mode_block [1] = j;
-
-    if ((j = screen_user_def [2]) != 0)		// User entered an Y size?
-      screen_mode_block [2] = j;
-
-    if ((j = screen_user_def [3]) != 0)		// User entered a bpp size?
-      screen_mode_block [3] = j;
-
-    if (((j = screen_user_def [4]) != -1)	// User entered a frame rate?
-     && (screen_mode_block [4] == -1))
-      screen_mode_block [4] = j;
-
-    if (((screen_user_def [5] == 0)		// User entered a trgb mode?
-     && (screen_user_def [6] & (15<<12))) != 0)
-    {
-      screen_mode_block [5] = 0;
-      screen_mode_block [6] = screen_user_def [6];
-    }
-  }
-
   rc = os_screen_mode ();
   return (rc);
 }
@@ -1799,12 +1778,8 @@ static void select_text_mode (void)
   if ((SCREENWIDTH != 640)
    || (SCREENHEIGHT != 480))
   {
-    construct_screen_mode_block (MODE_640_x_480_8bpp);
-    if (os_screen_mode ())
-    {
-      construct_screen_mode_block (MODE_640_x_480_24bpp);
-      os_screen_mode ();
-    }
+    if (sel_os_screen_mode (MODE_640_x_480_8bpp))
+      sel_os_screen_mode (MODE_640_x_480_24bpp);
   }
 }
 
@@ -1838,7 +1813,6 @@ static const unsigned char mode_search [] =
 
 void I_SetScreenSize (void)
 {
-  int p;
   int count;
   const unsigned char * mode_number;
   _kernel_oserror * rc;
@@ -1853,21 +1827,13 @@ void I_SetScreenSize (void)
   /* Set Non-shadow */
   _kernel_osbyte (114, 1, 0);
 
-  p = M_CheckParm("--0");
-  if (p)
-    decode_screendef (p);
-
-  if (devparm)
-    devparm_palette = 256;
-
   screen_mode = get_screen_mode_arg ();
-  if (screen_mode == MODE_USER_DEF)
+  if (screen_mode == MODE_USER_DEFINED)
   {
     decode_screendef (M_CheckParm("-0"));
     rc = select_screen_mode (screen_mode,0);
     if (rc)
       I_Error ("Failed to select user def mode (%s)\n", rc -> errmess);
-    init_sprite_area ();
   }
 
   else if (screen_mode < 0)	/* No screen size/resolution given... */
@@ -1949,9 +1915,11 @@ void I_InitGraphics (void)
     memset (key_down_table, 0, sizeof (key_down_table));
     select_screen_mode (screen_mode, 1);
 
-    if (screen_mode == MODE_USER_DEF)
+    if (M_CheckParm("--0"))
     {
-      if (screen_user_def [3] == 3)
+      write_via_sprite = 1;
+      init_sprite_area ();
+      if (screen_mode_block [3] == 3)
 	screens[0] = ((unsigned char*) &sprite_mem->sprite_size) + (sprite_mem -> offset);
     }
     else
@@ -1966,6 +1934,12 @@ void I_InitGraphics (void)
       _kernel_swi (OS_ReadVduVariables, &regs, &regs);
       screen_addr = (unsigned int *) block[2];
       /* printf ("Screen address is %X\n", screen_addr); */
+    }
+
+    if (devparm)
+    {
+      devparm_palette = 256;
+      printf ("Internal mode number is %u, Sprite mode is %u\n", screen_mode, write_via_sprite);
     }
 
     /* Cursor off */
