@@ -80,18 +80,18 @@ int wipe_EndScreen (void)
 
 //-----------------------------------------------------------------------------
 
-static void wipe_CopyColumn (unsigned int x, unsigned int y)
+static void wipe_CopyColumn (unsigned int x, unsigned int y, unsigned int pos)
 {
   byte * dest;
   byte * source;
   unsigned int qty;
 
-  dest = screens[0] + x;
+  dest = screens[0] + (y * SCREENWIDTH) + x;
 
-  if (y)
+  if (pos)
   {
-    qty = y;
-    source = wipe_scr_end + x;
+    qty = pos;
+    source = wipe_scr_end + (y * SCREENWIDTH) + x;
     do
     {
       *dest = *source;
@@ -100,7 +100,7 @@ static void wipe_CopyColumn (unsigned int x, unsigned int y)
     } while (--qty);
   }
 
-  qty = SCREENHEIGHT - y;
+  qty = SCREENHEIGHT - (y + pos);
   if (qty)
   {
     source = wipe_scr_start + x;
@@ -117,6 +117,7 @@ static void wipe_CopyColumn (unsigned int x, unsigned int y)
 
 boolean wipe_ScreenWipe (int ticks)
 {
+  unsigned int m;
   unsigned int q;
   unsigned int r;
   unsigned int x;
@@ -128,12 +129,15 @@ boolean wipe_ScreenWipe (int ticks)
   qty = 0;
   x = 0;
   q = 10;
+  m = 3;
+  if (SCREENWIDTH > 800)
+    m = 7;
   do
   {
     y = *p;
     if (y < SCREENHEIGHT)
     {
-      if ((x & 3) == 0)
+      if ((x & m) == 0)
       {
 	if (rand() & 1)
 	{
@@ -149,7 +153,8 @@ boolean wipe_ScreenWipe (int ticks)
       r = q * ticks;
       if ((y + r) >= SCREENHEIGHT)
 	r = SCREENHEIGHT - y;
-      wipe_CopyColumn (x, *p=y+r);
+      *p = y + r;
+      wipe_CopyColumn (x, y, r);
       qty++;
     }
     p++;
