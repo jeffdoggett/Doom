@@ -2327,6 +2327,7 @@ void D_DoomMain (void)
   // printf ("ST_Init: Init status bar.\n");
   ST_Init ();
   V_LoadFonts ();
+  I_InitKeyboard ();
   I_InitGraphics ();
 
 
