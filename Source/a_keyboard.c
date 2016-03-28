@@ -16,7 +16,7 @@
 
 static unsigned char  key_down_table [128];
 static unsigned char  num_keys_down [10];
-static unsigned char  key_to_scan;
+static unsigned char  key_to_scan = 3;
 
 static unsigned int   lastmousex;
 static unsigned int   lastmousey;
@@ -26,14 +26,13 @@ static unsigned char menu_in_use = 0;
 extern boolean	menuactive;
 extern int 	novert;
 
-
 /* -------------------------------------------------------------------------- */
 /* Table to convert Acorn inkey() values to Doom key strokes */
 /* These tables are overwritten by the contents of file "Inkeys" if it exists */
 
 static unsigned char key_xlate_table [] =
 {
-  0, 0, 0,
+  0, 0, 0,	/* 1st three are duplicates */
   KEY_LSHIFT,
   KEY_LCTRL,
   KEY_LALT,
@@ -338,11 +337,11 @@ static void poll_kbd (void)
       }
     }
     key_to_scan = key + 1;
-    if (key_to_scan > 127) key_to_scan = 0;
+    if (key_to_scan > 127) key_to_scan = 3;
   }
   else
   {
-    key_to_scan = 0;
+    key_to_scan = 3;
   }
 
 
