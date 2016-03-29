@@ -945,8 +945,37 @@ static unsigned int I_is_display_local (char * display)
 
 /***************************************************************************/
 
+static void decode_screendef (int p)
+{
+  do
+  {
+    p++;
+    if (p >= myargc)
+      break;
+    switch (myargv[p][0])
+    {
+      case 'X':
+      case 'x':
+	SCREENWIDTH = atoi (&myargv[p][1]);
+	break;
+
+      case 'Y':
+      case 'y':
+	SCREENHEIGHT = atoi (&myargv[p][1]);
+	break;
+
+      default:
+	p = myargc;
+    }
+  } while (1);
+}
+
+/* -------------------------------------------------------------------------- */
+
 void I_SetScreenSize (void)
 {
+  int p;
+
   SCREENWIDTH = 320;    /* Assume old style */
   SCREENHEIGHT = 240;
 
@@ -964,25 +993,22 @@ void I_SetScreenSize (void)
     SCREENWIDTH = 640;
     SCREENHEIGHT = 480;
   }
-
-  if (M_CheckParm("+3"))
+  else if (M_CheckParm("+3"))
   {
     SCREENWIDTH = 1024;
     SCREENHEIGHT = 768;
   }
-
-  if (M_CheckParm("+4"))
+  else if (M_CheckParm("+4"))
   {
     SCREENWIDTH = 1280;
     SCREENHEIGHT = 1024;
   }
-
-  if (M_CheckParm("+5"))
+  else
   {
-    multiply = 2;
-    SCREENWIDTH = 640;
-    SCREENHEIGHT = 480;
-  }
+    p = M_CheckParm("-0");
+    if (p)
+      decode_screendef (p);
+  }  
 }
 
 /***************************************************************************/
