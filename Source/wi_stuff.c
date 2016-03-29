@@ -460,41 +460,47 @@ static void WI_drawLF (void)
 
 /* ---------------------------------------------------------------------------- */
 // Draws "Entering <LevelName>"
-static void WI_drawEL (void)
+static int WI_drawEL (void)
 {
   int x;
   int y;
 
-  if (lpatch_next || ltext_next)
+  if ((lpatch_next == NULL)
+   && (ltext_next == NULL))
+    return (0);
+
+
+  y = WI_TITLEY;
+  x = (WI_SCREENWIDTH - SHORT(entering->width))/2;
+  if (x < 0)
+    x = 0;
+
+  // draw "Entering"
+  if (SHORT(entering->width) > WI_SCREENWIDTH)
+    V_DrawPatch (x, y, FB, entering);
+  else
+    V_DrawPatchScaled (x, y, FB, entering);
+
+  y += (5*SHORT(entering->height))/4;
+
+  if (lpatch_next)
   {
-    y = WI_TITLEY;
-    x = (WI_SCREENWIDTH - SHORT(entering->width))/2;
-    if (x < 0) x = 0;
+    // draw level
+    x = (WI_SCREENWIDTH - SHORT(lpatch_next->width))/2;
+    if (x < 0)
+      x = 0;
 
-    // draw "Entering"
-    if (SHORT(entering->width) > WI_SCREENWIDTH)
-      V_DrawPatch (x, y, FB, entering);
+    if (SHORT(lpatch_next->width) > WI_SCREENWIDTH)
+      V_DrawPatch (x, y, FB, lpatch_next);
     else
-      V_DrawPatchScaled (x, y, FB, entering);
+      V_DrawPatchScaled (x, y, FB, lpatch_next);
 
-    y += (5*SHORT(entering->height))/4;
-
-    if (lpatch_next)
-    {
-      // draw level
-      x = (WI_SCREENWIDTH - SHORT(lpatch_next->width))/2;
-      if (x < 0) x = 0;
-
-      if (SHORT(lpatch_next->width) > WI_SCREENWIDTH)
-	V_DrawPatch (x, y, FB, lpatch_next);
-      else
-	V_DrawPatchScaled (x, y, FB, lpatch_next);
-    }
-    else
-    {
-      V_drawWILV (y, ltext_next);
-    }
+    return (1);
   }
+
+
+  V_drawWILV (y, ltext_next);
+  return (1);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -864,7 +870,8 @@ static void WI_drawShowNextLoc(void)
     // draws which level you are entering..
     // if ( (gamemode != commercial)		Removed by JAD 30/10/99
     //	 || wbs->next != 30)
-	WI_drawEL();
+    if (WI_drawEL () == 0)
+      cnt = 1;
 
 }
 
@@ -1872,7 +1879,7 @@ static void WI_loadData (void)
     //}
 
     ltext_last = WI_GetMapName (gameepisode, wbs->last+1);
-    ltext_next = WI_GetMapName (gameepisode, wbs->next+1);
+    ltext_next = WI_GetMapName (wbs->next_episode, wbs->next+1);	// Allow for 2002ado E2M5 -> E5M1
 
     if (gamemode == commercial)
     {
