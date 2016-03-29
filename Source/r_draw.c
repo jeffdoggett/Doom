@@ -1037,10 +1037,10 @@ void R_ClearSbarSides (void)
   int	y;
 
   padsize = DX(0);
-  yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
 
   if (padsize)
   {
+    yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
     dest = screens[0]+((SCREENHEIGHT-yheight)*SCREENWIDTH);
     for (y = 0; y < yheight; y++, dest += SCREENWIDTH)
     {
@@ -1050,15 +1050,6 @@ void R_ClearSbarSides (void)
 	dest [SCREENWIDTH-x-1] = 0;
       }
     }
-  }
-
-  /* This is in case the viewheight isn't a perfect */
-  /* match to the status bar height. */
-
-  if (viewheight < (SCREENHEIGHT - yheight))
-  {
-    dest = screens[0]+(viewheight*SCREENWIDTH);
-    memset (dest, 0, ((SCREENHEIGHT - yheight) - viewheight) * SCREENWIDTH);
   }
 }
 
