@@ -296,6 +296,7 @@ static const char * const dehack_frames [] =
   "Next frame",
   "Unknown 1",
   "Unknown 2",
+  "Translucent",
   NULL
 };
 
@@ -1567,14 +1568,43 @@ static void dh_write_to_frame (unsigned int number, unsigned int record, unsigne
 
   switch (record)
   {
-    case  0:ptr -> sprite	 = (spritenum_t) value; break;
-    case  1:ptr -> frame	 = value; break;
-    case  2:ptr -> tics		 = value; break;
-    case  3:/* ptr -> action.acv  = (void*)value; */ break;
-    case  4:ptr -> nextstate	 = (statenum_t) value; break;
-    case  5:ptr -> misc1	 = value; break;
-    case  6:ptr -> misc2	 = value; break;
-    default:fprintf (stderr, "Invalid Frame record\n");
+    case  0:
+      ptr -> sprite = (spritenum_t) value;
+      break;
+
+    case  1:
+      ptr -> frame = (ptr -> frame & ~0xFFFF) | value;
+      break;
+
+    case  2:
+      ptr -> tics = value;
+      break;
+
+    case  3:
+      /* ptr -> action.acv = (void*)value; */
+      break;
+
+    case  4:
+      ptr -> nextstate = (statenum_t) value;
+      break;
+
+    case  5:
+      ptr -> misc1 = value;
+      break;
+
+    case  6:
+      ptr -> misc2 = value;
+      break;
+
+    case 7:
+      if (value)
+        ptr -> frame |= FF_TRANSLUCENT;
+      else
+        ptr -> frame &= ~FF_TRANSLUCENT;
+      break;
+
+    default:
+      fprintf (stderr, "Invalid Frame record\n");
   }
   // printf ("Patched element %d of FRAMES %d to %d\n", record, number, value);
 }

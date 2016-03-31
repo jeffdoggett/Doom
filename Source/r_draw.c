@@ -173,15 +173,25 @@ static int R_TintTableRequired (void)
 {
   unsigned int c;
   mobjinfo_t * m;
+  state_t * s;
 
   m = mobjinfo;
-  c = 0;
+  c = NUMMOBJTYPES;
   do
   {
     if (m->flags & MF_TRANSLUCENT)
       return (1);
     m++;
-  } while (++c < NUMMOBJTYPES);
+  } while (--c);
+
+  s = states;
+  c = NUMSTATES;
+  do
+  {
+    if (s -> frame & FF_TRANSLUCENT)
+      return (1);
+    s++;
+  } while (--c);
 
   return (0);
 }

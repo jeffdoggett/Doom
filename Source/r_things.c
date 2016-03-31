@@ -985,6 +985,7 @@ static void R_DrawPSprite (pspdef_t* psp)
     fixed_t		tx;
     int 		x1;
     int 		x2;
+    state_t*		state;
     spritedef_t*	sprdef;
     spriteframe_t*	sprframe;
     int 		index;
@@ -994,22 +995,24 @@ static void R_DrawPSprite (pspdef_t* psp)
     vissprite_t 	avis;
 
     // decide which patch to use
+    state = psp->state;
+
 #ifdef RANGECHECK
-    if ( (unsigned)psp->state->sprite >= numsprites)
+    if ( (unsigned)state->sprite >= numsprites)
 	I_Error ("R_DrawPSprite: invalid sprite number %i ",
-		 psp->state->sprite);
+		 state->sprite);
 #endif
-    sprdef = &sprites[psp->state->sprite];
+    sprdef = &sprites[state->sprite];
 #ifdef RANGECHECK
-    if ( (psp->state->frame & FF_FRAMEMASK) >= sprdef->numframes)
+    if ( (state->frame & FF_FRAMEMASK) >= sprdef->numframes)
 #if 1
-	psp->state->frame &= ~FF_FRAMEMASK;
+	state->frame &= ~FF_FRAMEMASK;
 #else
 	I_Error ("R_DrawPSprite: invalid sprite frame %i : %i/%i\n",
-		 psp->state->sprite, psp->state->frame, sprdef->numframes);
+		 state->sprite, state->frame, sprdef->numframes);
 #endif
 #endif
-    sprframe = &sprdef->spriteframes[ psp->state->frame & FF_FRAMEMASK ];
+    sprframe = &sprdef->spriteframes [state->frame & FF_FRAMEMASK];
 
     index = sprframe->index[0];
     lump = sprframe->lump[0];
@@ -1034,7 +1037,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     // store information in a vissprite
     vis = &avis;
-    vis->mobjflags = 0;
+    vis->mobjflags = state->frame & FF_TRANSLUCENT;	// Same as MF_TRANSLUCENT
     vis->texturemid1 =
     vis->texturemid2 = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy-spritetopoffset[index]);
     vis->x1 = x1 < 0 ? 0 : x1;
@@ -1069,7 +1072,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 	// fixed color
 	vis->colormap = fixedcolormap;
     }
-    else if (psp->state->frame & FF_FULLBRIGHT)
+    else if (state->frame & FF_FULLBRIGHT)
     {
 	// full bright
 	vis->colormap = colormaps;
