@@ -743,6 +743,8 @@ void P_RemoveMobj (mobj_t* mobj)
     }
 #endif
 
+    S_RemoveSoundOrigin (mobj);
+
     // free block
     P_RemoveThinker (&mobj->thinker);
 }

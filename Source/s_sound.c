@@ -537,6 +537,23 @@ void S_StopSound(void *origin)
 }
 
 /* ------------------------------------------------------------ */
+
+void S_RemoveSoundOrigin (void *origin)
+{
+
+    int cnum;
+
+    for (cnum=0 ; cnum<numChannels ; cnum++)
+    {
+	if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
+	{
+	    channels[cnum].origin = NULL;
+	    break;
+	}
+    }
+}
+
+/* ------------------------------------------------------------ */
 //
 // Stop and resume music, during game PAUSE.
 //

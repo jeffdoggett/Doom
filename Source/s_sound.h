@@ -74,6 +74,7 @@ S_StartSoundAtVolume
 
 // Stop sound for thing at <origin>
 void S_StopSound(void* origin);
+void S_RemoveSoundOrigin (void *origin);
 
 
 // Start music using <music_id> from sounds.h
