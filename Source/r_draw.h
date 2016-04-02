@@ -36,6 +36,7 @@ extern int		dc_yh;
 extern int		dc_ylim;
 extern fixed_t		dc_iscale;
 extern fixed_t		dc_texturemid;
+extern fixed_t		dc_texturefrac;
 
 // first pixel in a column
 extern byte*		dc_source;
@@ -44,6 +45,7 @@ extern byte*		dc_source;
 // The span blitting interface.
 // Hook in assembler or system specific BLT
 //  here.
+fixed_t	R_CalcFrac (void);
 void 	R_DrawColumn (void);
 void 	R_DrawColumnLow (void);
 

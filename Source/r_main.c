@@ -789,6 +789,8 @@ void R_Init (void)
     // printf ("\nR_InitSkyMap");
     R_InitTranslationTables ();
     // printf ("\nR_InitTranslationsTables");
+    R_InitPatches();
+//  R_InitColumnFunctions();
 
     framecount = 0;
 }

@@ -211,6 +211,21 @@ void W_RemoveDuplicates (void)
 }
 
 /* ---------------------------------------------------------------------------- */
+// Hash function used for lump names.
+unsigned int W_LumpNameHash(const char *s)
+{
+    // This is the djb2 string hash function, modded to work on strings
+    // that have a maximum length of 8.
+    unsigned int        result = 5381;
+    unsigned int        i;
+
+    for (i = 0; i < 8 && s[i] != '\0'; ++i)
+        result = ((result << 5) ^ result) ^ toupper(s[i]);
+
+    return result;
+}
+
+/* ---------------------------------------------------------------------------- */
 //
 // LUMP BASED ROUTINES.
 //
@@ -691,7 +706,7 @@ int W_NextLumpNumForName (const char* name, int startlump)
 // W_CheckNumForNameMasked
 // Returns -1 if name not found.
 //
-
+#if 0
 int W_CheckNumForNameMasked (const char* name, char * mask, int startlump)
 {
     union {
@@ -752,7 +767,7 @@ int W_CheckNumForNameMasked (const char* name, char * mask, int startlump)
     // TFB. Not found.
     return -1;
 }
-
+#endif
 /* ---------------------------------------------------------------------------- */
 //
 // W_CheckNumForName

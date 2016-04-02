@@ -26,6 +26,7 @@
 
 #include "r_defs.h"
 #include "r_state.h"
+#include "r_patch.h"
 
 #ifdef __GNUG__
 #pragma interface
@@ -72,7 +73,7 @@ typedef struct
     short		height;
     int			columndirectory;	// OBSOLETE
     short		patchcount;
-    mappatch_t	patches[1];
+    mappatch_t		patches[1];
 } maptexture_t;
 
 
@@ -96,15 +97,22 @@ typedef struct
 typedef struct
 {
     // Keep name for switch changing, etc.
-    char	name[8];
-    dshort_t    width;
-    dshort_t    height;
+    char                name[8];
+    short               width;
+    short               height;
+
+    // Index in textures list
+    int                 index;
+
+    // Next in hash table chain
+    int                 next;
+
+    unsigned int        widthmask;
 
     // All the patches[patchcount]
-    //	are drawn back to front into the cached texture.
-    dshort_t    patchcount;
-    texpatch_t	patches[1];
-
+    //  are drawn back to front into the cached texture.
+    short               patchcount;
+    texpatch_t          patches[1];
 } texture_t;
 
 
@@ -112,7 +120,7 @@ typedef struct
 
 
 // Retrieve column data for span blitting.
-byte *R_GetColumn (int tex, int col, boolean opaque);
+byte *R_GetTextureColumn (rpatch_t *texpatch, int col);
 
 
 // I/O, setting up the stuff.

@@ -614,14 +614,6 @@ static vissprite_t* R_NewVisSprite (fixed_t distance)
   return (rc);
 }
 
-
-
-//
-// R_DrawMaskedColumn
-// Used for sprites and masked mid textures.
-// Masked means: partly transparent, i.e. stored
-//  in posts/runs of opaque pixels.
-//
 dshort_t*	mfloorclip;
 dshort_t*	mceilingclip;
 
@@ -629,7 +621,9 @@ fixed_t 	spryscale;
 //fixed_t 	sprydistance;
 fixed_t 	sprtopscreen;
 
-void R_DrawMaskedColumn (column_t* column)
+
+
+static void R_DrawMaskedSpriteColumn(column_t *column)
 {
     int 	topscreen;
     int 	bottomscreen;
@@ -677,6 +671,7 @@ void R_DrawMaskedColumn (column_t* column)
 
 	    // Drawn by either R_DrawColumn
 	    //	or (SHADOW) R_DrawFuzzColumn.
+	    dc_texturefrac = R_CalcFrac ();
 	    colfunc ();
 	}
 	column = (column_t *)(	(byte *)column + lastlength + 4);
@@ -690,8 +685,6 @@ void R_DrawMaskedColumn (column_t* column)
 	I_Error ("R_DrawMaskedColumn: %i to %i", dc_yl, dc_yh);
 #endif
 }
-
-
 
 //
 // R_DrawVisSprite
@@ -754,7 +747,7 @@ R_DrawVisSprite
       {
 	column = (column_t *) ((byte *)patch +
 			       LONG(patch->columnofs[texturecolumn]));
-	R_DrawMaskedColumn (column);
+	R_DrawMaskedSpriteColumn (column);
       }
       frac += vis->xiscale;
     } while (++dc_x <= vis->x2);
@@ -1037,7 +1030,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     // store information in a vissprite
     vis = &avis;
-    vis->mobjflags = state->frame & FF_TRANSLUCENT;	// Same as MF_TRANSLUCENT
+    vis->mobjflags = (int) (state->frame & FF_TRANSLUCENT);	// Same as MF_TRANSLUCENT
     vis->texturemid1 =
     vis->texturemid2 = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy-spritetopoffset[index]);
     vis->x1 = x1 < 0 ? 0 : x1;

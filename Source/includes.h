@@ -70,6 +70,7 @@
 #include "r_draw.h"
 #include "r_local.h"
 #include "r_main.h"
+#include "r_patch.h"
 #include "r_plane.h"
 #include "r_segs.h"
 #include "r_sky.h"

@@ -245,7 +245,7 @@ int			dc_yh;
 int			dc_ylim;
 fixed_t			dc_iscale;
 fixed_t			dc_texturemid;
-
+fixed_t			dc_texturefrac;
 // first pixel in a column (possibly virtual)
 byte*			dc_source;
 
@@ -254,28 +254,34 @@ byte*			dc_source;
 
 /* ------------------------------------------------------------------------------------------------ */
 
-#define get_frac()	\
-    frac = dc_texturemid + (dc_yl-centery)*fracstep;			\
-    if ((unsigned) frac >= (unsigned) dc_ylim)				\
-    {									\
-      fixed_t mask;							\
-									\
-      mask = dc_ylim - 1;						\
-      if ((dc_ylim & mask) == 0)	/* Power of 2 height? */	\
-      {									\
-	frac &= mask;			/* Yes. Can just mask off. */	\
-      }									\
-      else if (frac < 0)						\
-      {									\
-	frac = -frac;							\
-	frac = (unsigned) frac % (unsigned) dc_ylim;			\
-	frac = dc_ylim - frac;						\
-      }									\
-      else								\
-      {									\
-	frac = (unsigned) frac % (unsigned) dc_ylim;			\
-      }									\
+fixed_t R_CalcFrac (void)
+{
+    fixed_t frac;
+
+    frac = dc_texturemid + (dc_yl-centery)*dc_iscale;
+    if ((unsigned) frac >= (unsigned) dc_ylim)
+    {
+      fixed_t mask;
+
+      mask = dc_ylim - 1;
+      if ((dc_ylim & mask) == 0)	/* Power of 2 height? */
+      {
+	frac &= mask;			/* Yes. Can just mask off. */
+      }
+      else if (frac < 0)
+      {
+	frac = -frac;
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+	frac = dc_ylim - frac;
+      }
+      else
+      {
+	frac = (unsigned) frac % (unsigned) dc_ylim;
+      }
     }
+
+    return (frac);
+}
 
 /* ------------------------------------------------------------------------------------------------ */
 //
@@ -313,7 +319,7 @@ void R_DrawColumn (void)
     // Determine scaling,
     //  which is the only mapping to be done.
     fracstep = dc_iscale;
-    get_frac();
+    frac = dc_texturefrac;
 
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
@@ -430,7 +436,7 @@ void R_DrawColumnLow (void)
     dest2 = dest + 1;
 
     fracstep = dc_iscale;
-    get_frac();
+    frac = dc_texturefrac;
 
     do
     {
@@ -610,7 +616,7 @@ void R_DrawTranslucentColumn (void)
     // Determine scaling,
     //  which is the only mapping to be done.
     fracstep = dc_iscale;
-    get_frac();
+    frac = dc_texturefrac;
 
 #ifndef USE_TINT_TABLES
     translucent = (dc_x + dc_yl) & 1;
@@ -704,7 +710,7 @@ void R_DrawTranslatedColumn (void)
 
     // Looks familiar.
     fracstep = dc_iscale;
-    get_frac();
+    frac = dc_texturefrac;
 
     // Here we do an additional index re-mapping.
     do
@@ -763,7 +769,7 @@ void R_DrawTranslatedTranslucentColumn (void)
     // Determine scaling,
     //  which is the only mapping to be done.
     fracstep = dc_iscale;
-    get_frac();
+    frac = dc_texturefrac;
 
 #ifndef USE_TINT_TABLES
     translucent = (dc_x + dc_yl) & 1;
