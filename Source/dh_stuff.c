@@ -5045,7 +5045,7 @@ do_entertext:
 	 if (i == 0)
 	 {
 	   ptr2 = next_line (ptr,top);
-	   i = dh_inchar (ptr, '"');
+	   i = dh_inchar (ptr2, '"');
 	   if (i) ptr = ptr2;
 	 }
 	 if (i)
@@ -5113,7 +5113,7 @@ do_exittext:
 	  if (i == 0)
 	  {
 	    ptr2 = next_line (ptr,top);
-	    i = dh_inchar (ptr, '"');
+	    i = dh_inchar (ptr2, '"');
 	    if (i) ptr = ptr2;
 	  }
 	  if (i)
