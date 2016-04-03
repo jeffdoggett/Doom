@@ -4259,7 +4259,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   if (newtext == NULL)
   {
     if (M_CheckParm ("-showunknown"))
-      fprintf (stderr,"DeHackEd:Failed to lookup text %s\n", ptr);
+      fprintf (stderr,"DeHackEd:Failed to lookup text '%s'\n", ptr);
   }
   else
   {
@@ -4526,6 +4526,8 @@ static void Parse_Mapinfo (char * ptr, char * top)
   unsigned int clusterdefpresent;
   char * ptr2;
   char * newtext;
+  char * entertextptr;
+  char * exittextptr;
   clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
@@ -4996,22 +4998,35 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	intertext = read_int (ptr);
 	textislump = 0;
+	entertextptr = NULL;
+	exittextptr = NULL;
       }
     }
     else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
     {
       intertext = read_int (ptr + 11);
       textislump = 0;
+      entertextptr = NULL;
+      exittextptr = NULL;
     }
     else if (strncasecmp (ptr, "entertextislump", 15) == 0)
     {
       textislump |= 1;
+      if (entertextptr)			// jenesis.wad has the entertextislump AFTER entertext
+      {
+        ptr = entertextptr;
+        entertextptr = NULL;
+        goto do_entertext;
+      }
     }
     else if (strncasecmp (ptr, "entertext", 9) == 0)
     {
+      entertextptr = ptr;
+do_entertext:
       i = dh_inchar (ptr, '"');
       if (textislump & 1)
       {
+        if (i == 0) i = 9;
 	ptr = set_enter_exit_text (ptr+i, 0, intertext);
       }
       else
@@ -5029,8 +5044,9 @@ static void Parse_Mapinfo (char * ptr, char * top)
        {
 	 if (i == 0)
 	 {
-	   ptr = next_line (ptr,top);
+	   ptr2 = next_line (ptr,top);
 	   i = dh_inchar (ptr, '"');
+	   if (i) ptr = ptr2;
 	 }
 	 if (i)
 	 {
@@ -5064,12 +5080,21 @@ static void Parse_Mapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "exittextislump", 14) == 0)
     {
       textislump |= 2;
+      if (exittextptr)			// jenesis.wad has the exittextislump AFTER exittext
+      {
+        ptr = exittextptr;
+        exittextptr = NULL;
+        goto do_exittext;
+      }
     }
     else if (strncasecmp (ptr, "exittext", 8) == 0)
     {
+      exittextptr = ptr;
+do_exittext:
       i = dh_inchar (ptr, '"');
       if (textislump & 2)
       {
+        if (i == 0) i = 8;
 	ptr = set_enter_exit_text (ptr+i, 1, intertext);
       }
       else
@@ -5087,8 +5112,9 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	{
 	  if (i == 0)
 	  {
-	    ptr = next_line (ptr,top);
+	    ptr2 = next_line (ptr,top);
 	    i = dh_inchar (ptr, '"');
+	    if (i) ptr = ptr2;
 	  }
 	  if (i)
 	  {
