@@ -242,6 +242,17 @@ static boolean P_CheckAmmo (player_t* player)
 }
 
 //-----------------------------------------------------------------------------
+
+static void A_DecrementAmmo (player_t* player, int amount)
+{
+    ammotype_t ammo;
+
+    ammo = weaponinfo[player->readyweapon].ammo;
+    if (ammo < NUMAMMO)
+      player->ammo[ammo] -= amount;
+}
+
+//-----------------------------------------------------------------------------
 //
 // P_FireWeapon.
 //
@@ -591,7 +602,7 @@ void A_FireMissile (mobj_t* mo, pspdef_t* psp)
   player_t*	player;
 
   if ((player = mo->player) != NULL)
-    player->ammo[weaponinfo[player->readyweapon].ammo]--;
+    A_DecrementAmmo (player, 1);
 
   P_SpawnPlayerMissile (mo, MT_ROCKET);
 }
@@ -605,7 +616,7 @@ void A_FireBFG (mobj_t* mo, pspdef_t* psp)
   player_t*	player;
 
   if ((player = mo->player) != NULL)
-    player->ammo[weaponinfo[player->readyweapon].ammo] -= bfg_cells;
+    A_DecrementAmmo (player, bfg_cells);
 
   P_SpawnPlayerMissile (mo, MT_BFG);
 }
@@ -631,7 +642,7 @@ void A_FireOldBFG (mobj_t* mo, pspdef_t* psp)
     P_Thrust(player, ANG180 + mo->angle,
 	     512*recoil[wp_plasma]);
 
-  player->ammo[weaponinfo[player->readyweapon].ammo]--;
+  A_DecrementAmmo (player, 1);
 
   player->extralight = 2;
 
@@ -687,7 +698,7 @@ void A_FirePlasma (mobj_t* mo, pspdef_t* psp)
 
   if ((player = mo->player) != NULL)
   {
-    player->ammo[weaponinfo[player->readyweapon].ammo]--;
+    A_DecrementAmmo (player, 1);
     A_FireSomething (player, (P_Random ()&1));
   }
 
@@ -760,7 +771,7 @@ void A_FirePistol (mobj_t* mo, pspdef_t* psp)
 
   if ((player = mo->player) != NULL)
   {
-    player->ammo[weaponinfo[player->readyweapon].ammo]--;
+    A_DecrementAmmo (player, 1);
     A_FireSomething (player, 0);
     bulletslope = P_BulletSlope (mo);
     P_GunShot (mo, (boolean) (!player->refire), bulletslope);
@@ -782,7 +793,7 @@ void A_FireShotgun (mobj_t* mo, pspdef_t* psp)
 
   if ((player = mo->player) != NULL)
   {
-    player->ammo[weaponinfo[player->readyweapon].ammo]--;
+    A_DecrementAmmo (player, 1);
     A_FireSomething (player, 0);
   }
 
@@ -809,7 +820,7 @@ void A_FireShotgun2 (mobj_t* mo, pspdef_t* psp)
 
   if ((player = mo->player) != NULL)
   {
-    player->ammo[weaponinfo[player->readyweapon].ammo]-=2;
+    A_DecrementAmmo (player, 2);
     A_FireSomething (player, 0);
   }
 
@@ -848,7 +859,7 @@ void A_FireCGun (mobj_t* mo, pspdef_t* psp)
 
   S_StartSound (mo, sfx_pistol);
   P_SetMobjState (mo, S_PLAY_ATK2);
-  player->ammo[weaponinfo[player->readyweapon].ammo]--;
+  A_DecrementAmmo (player, 1);
   A_FireSomething (player, (psp->state - &states[S_CHAIN1]) & 1);
   bulletslope = P_BulletSlope (mo);
   P_GunShot (mo, (boolean)(!player->refire), bulletslope);
