@@ -194,7 +194,7 @@ static void R_InitSpriteDefs (char** namelist)
     if (!numsprites)
 	return;
 
-    sprites = Z_Malloc(numsprites *sizeof(*sprites), PU_STATIC, NULL);
+    sprites = Z_Calloc (numsprites *sizeof(*sprites), PU_STATIC, NULL);
 
     // scan all the lump names for each of the names,
     //	noting the highest frame letter.
@@ -403,7 +403,7 @@ static void R_InitSpriteDefs (char** namelist)
 	// allocate space for the frames present and copy sprtemp to it
 	sprites[i].numframes = maxframe;
 	sprites[i].spriteframes =
-	    Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
+	    Z_Calloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
 	memcpy (sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
     }
 
@@ -992,8 +992,11 @@ static void R_DrawPSprite (pspdef_t* psp)
 
 #ifdef RANGECHECK
     if ( (unsigned)state->sprite >= numsprites)
+    {
 	I_Error ("R_DrawPSprite: invalid sprite number %i ",
 		 state->sprite);
+	return;
+    }
 #endif
     sprdef = &sprites[state->sprite];
 #ifdef RANGECHECK
@@ -1005,6 +1008,13 @@ static void R_DrawPSprite (pspdef_t* psp)
 		 state->sprite, state->frame, sprdef->numframes);
 #endif
 #endif
+
+    if (sprdef->spriteframes == NULL)
+    {
+//    printf ("Missing sprite %u (%s)\n", state->sprite, sprnames [state->sprite]);
+      return;
+    }
+
     sprframe = &sprdef->spriteframes [state->frame & FF_FRAMEMASK];
 
     index = sprframe->index[0];
