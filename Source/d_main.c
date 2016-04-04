@@ -1701,7 +1701,7 @@ static void find_language_in_wad (const char * wadname)
 	 || (strcasecmp(catname, "GAMEINFO") == 0))
 	{
 	  fseek (fin, (long int) file_pos, SEEK_SET);
-	  DH_parse_language_file_f (wadname, fin, file_pos+file_size);
+	  DH_parse_language_file_f (fin, file_size);
 	  break;
 	}
       } while (--cat_size);

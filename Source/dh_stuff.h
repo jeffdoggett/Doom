@@ -5,7 +5,7 @@
 #define __DHSTUFF_H__
 
 void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int filetop_pos);
-void DH_parse_language_file_f (const char * filename, FILE * fin, unsigned int filetop_pos);
+void DH_parse_language_file_f (FILE * fin, size_t filesize);
 void DH_replace_file_extension (char * newname, const char * oldname, const char * n_ext);
 void DH_parse_hacker_file (const char * filename);
 void DH_parse_hacker_wad_file (const char * wadname, boolean do_it);

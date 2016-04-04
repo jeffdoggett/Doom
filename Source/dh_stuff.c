@@ -1598,9 +1598,9 @@ static void dh_write_to_frame (unsigned int number, unsigned int record, unsigne
 
     case 7:
       if (value)
-        ptr -> frame |= FF_TRANSLUCENT;
+	ptr -> frame |= FF_TRANSLUCENT;
       else
-        ptr -> frame &= ~FF_TRANSLUCENT;
+	ptr -> frame &= ~FF_TRANSLUCENT;
       break;
 
     default:
@@ -3634,85 +3634,6 @@ void DH_parse_hacker_file (const char * filename)
 
 /* ---------------------------------------------------------------------------- */
 
-void DH_parse_language_file_f (const char * filename, FILE * fin, unsigned int filetop_pos)
-{
-  char		cc;
-  char		a_line [1024];
-  char		next_line [1024];
-  unsigned int	counter1;
-  unsigned int	counter2;
-  unsigned int  dh_line_number;
-
-  if (fin)
-  {
-    dh_line_number = 0;
-    next_line [0] = 0;
-    do
-    {
-
-/*
-	Harmony.wad has lines like:
-
-E1TEXT =
-	"line 1\n"
-	"line 2\n"
-*/
-      if (next_line [0])
-      {
-	strncpy (a_line, next_line, 1020);
-      }
-      else
-      {
-	dh_fgets_x (a_line, 1020, fin, filetop_pos);
-	dh_line_number++;
-      }
-
-      do
-      {
-	dh_fgets_x (next_line, 1020, fin, filetop_pos);
-	dh_line_number++;
-
-	counter1 = 0;
-	while ((next_line[counter1]) && (next_line[counter1] <= ' ')) counter1++;
-	if (next_line [counter1] != '"')
-	  break;
-
-	// printf ("Continuation line found - %s\n", next_line);
-	counter2 = strlen (a_line);
-	while (counter2)
-	{
-	  cc = a_line [--counter2];
-	  if (cc == '=')
-	  {
-	    counter2++;
-	    a_line [counter2++] = ' ';
-	    a_line [counter2++] = '"';
-	    break;
-	  }
-	  if (cc == '"')
-	  {
-	    //a_line [counter2++] = '\\';
-	    //a_line [counter2++] = 'n';
-	    break;
-	  }
-	}
-
-	strcpy (a_line+counter2,next_line+counter1+1);
-      } while (1);
-
-      // printf ("Language %s\n", a_line);
-      counter1 = DH_Parse_language_string (a_line);
-#if 1
-      if ((counter1 == -1) && (*a_line)
-       && (M_CheckParm ("-showunknowntext")))
-	fprintf (stderr,"DeHackEd:Failed to find \"%s\" at line %d of file %s\n", a_line, dh_line_number, filename);
-#endif
-    } while ((next_line[0]) || (dh_feof(fin,filetop_pos)==0));
-  }
-}
-
-/* ---------------------------------------------------------------------------- */
-
 void DH_replace_file_extension (char * newname, const char * oldname, const char * n_ext)
 {
   DIR * dirp;
@@ -3827,7 +3748,36 @@ static char * split_lines (char * ptr, char * top)
   char * ptr_3;
   unsigned int quote;
 
-  /* First look for lines that end in a ....", with the following starting with a quote */
+  /* Look for lines that end in a ...=", with the following starting with a quote */
+  /*
+	Harmony.wad has lines like:
+
+  exittext =
+	"line 1\n"
+	"line 2\n"
+  */
+
+  ptr_2 = ptr;
+  do
+  {
+    if (ptr_2 [0] == '=')
+    {
+      ptr_2++;
+      while (ptr_2 [0] == ' ') ptr_2++;
+      if (ptr_2 [0] < ' ')
+      {
+	ptr_3 = ptr_2;
+	while (ptr_3 [0] <= ' ') ptr_3++;
+	if (ptr_3 [0] == '\"')
+	{
+	  memcpy (ptr_2, ptr_3, top - ptr_3);
+	  top = top - (ptr_3 - ptr_2);
+	}
+      }
+    }
+  } while (++ptr_2 < top);
+
+  /* Look for lines that end in a ....", with the following starting with a quote */
 
   ptr_2 = ptr;
   do
@@ -3837,6 +3787,34 @@ static char * split_lines (char * ptr, char * top)
      && (ptr_2 [2] <= ' '))
     {
       ptr_3 = ptr_2 + 2;
+      do
+      {
+	ptr_3++;
+      } while ((*ptr_3 < ' ') && (ptr_3 < top));
+      if (ptr_3 < top)
+      {
+	while (*ptr_3 == ' ')
+	  ptr_3++;
+	if (*ptr_3++ == '\"')
+	{
+	  *ptr_2++ = '\n';
+	  memcpy (ptr_2, ptr_3, top - ptr_3);
+	  top = top - (ptr_3 - ptr_2);
+	  ptr_2--;
+	}
+      }
+    }
+  } while (++ptr_2 < top);
+
+  /* Look for lines that end in a ...." with the following starting with a quote */
+
+  ptr_2 = ptr;
+  do
+  {
+    if ((ptr_2 [0] == '\"')
+     && (ptr_2 [1] <= ' '))
+    {
+      ptr_3 = ptr_2 + 1;
       do
       {
 	ptr_3++;
@@ -3873,6 +3851,7 @@ static char * split_lines (char * ptr, char * top)
     }
   } while (++ptr < top);
 
+  *top = 0;
   return (top);
 }
 
@@ -4206,7 +4185,9 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   unsigned int l;
   int lump;
   unsigned int length;
+  unsigned int lookup;
   clusterdefs_t * cp;
+  char * rc;
   char * newtext;
   char * lump_ptr;
   char ** source;
@@ -4221,38 +4202,71 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
     ptr++;
   } while (*ptr);
 
+  lookup = 0;
+
+  if (strncasecmp (ptr, "lookup", 6) == 0)
+  {
+    lookup = 1;
+    ptr += 6;
+    while (*ptr == ' ') ptr++;
+  }
+
   if (*ptr == '\"')
     ptr++;
 
   l = dh_inchar (ptr, '"');
-  if (l) ptr[l-1] = 0;
+  if (l == 0)
+    l = dh_inchar (ptr, '\n');
+
+  ptr [l-1] = 0;
+  rc = ptr + l;
+
+  if (*ptr == '$')
+  {
+    lookup = 1;
+    ptr++;
+  }
 
   newtext = NULL;
 
-  // printf ("set_enter_exit_text:Looking for text lump %s\n", ptr);
-  lump = W_CheckNumForName (ptr);
-  if (lump == -1)
+  length = strlen (ptr);
+//printf ("length = %d, ptr = (%s)\n", length, ptr);
+  if (length)
   {
     source = DH_Find_language_text (ptr, false);
     if (source)
-      newtext = *source;
-  }
-  else
-  {
-    length = W_LumpLength (lump);
-    if (length)
     {
-      // printf ("Lump is %u bytes\n", length);
-      lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
-      // length = split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
+      newtext = *source;
+    }
+    else if (length < 9)
+    {
+      if ((lump = W_CheckNumForName (ptr)) != -1)
+      {
+	length = W_LumpLength (lump);
+	if (length)
+	{
+	  // printf ("Lump is %u bytes\n", length);
+	  lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
+	  // length = split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
+	  newtext = malloc (length + 20);
+	  if (newtext)
+	  {
+	    strncpy (newtext, lump_ptr, length);
+	    newtext [length] = 0;
+	    dh_remove_americanisms (newtext);
+	  }
+	  Z_Free (lump_ptr);
+	}
+      }
+    }
+    else if (lookup == 0)
+    {
       newtext = malloc (length + 20);
       if (newtext)
       {
-	strncpy (newtext, lump_ptr, length);
-	newtext [length] = 0;
+	strcpy (newtext, ptr);
 	dh_remove_americanisms (newtext);
       }
-      Z_Free (lump_ptr);
     }
   }
 
@@ -4275,7 +4289,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
     }
   }
 
-  return (ptr);
+  return (rc);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4526,8 +4540,6 @@ static void Parse_Mapinfo (char * ptr, char * top)
   unsigned int clusterdefpresent;
   char * ptr2;
   char * newtext;
-  char * entertextptr;
-  char * exittextptr;
   clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
@@ -4998,152 +5010,28 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	intertext = read_int (ptr);
 	textislump = 0;
-	entertextptr = NULL;
-	exittextptr = NULL;
       }
     }
     else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
     {
       intertext = read_int (ptr + 11);
       textislump = 0;
-      entertextptr = NULL;
-      exittextptr = NULL;
     }
     else if (strncasecmp (ptr, "entertextislump", 15) == 0)
     {
-      textislump |= 1;
-      if (entertextptr)			// jenesis.wad has the entertextislump AFTER entertext
-      {
-        ptr = entertextptr;
-        entertextptr = NULL;
-        goto do_entertext;
-      }
-    }
+      textislump |= 1;		// Not actually used as we assume that length < 9 == lump
+    }				// Also jenesis.wad sets it AFTER the entertext.
     else if (strncasecmp (ptr, "entertext", 9) == 0)
     {
-      entertextptr = ptr;
-do_entertext:
-      i = dh_inchar (ptr, '"');
-      if (textislump & 1)
-      {
-        if (i == 0) i = 9;
-	ptr = set_enter_exit_text (ptr+i, 0, intertext);
-      }
-      else
-      {
-       j = dh_instr (ptr, "lookup");
-       if ((j) && (j < i))
-       {
-	 ptr = set_enter_exit_text (ptr+j+5, 0, intertext);
-       }
-       else if (i && (ptr[i] == '$'))
-       {
-	 ptr = set_enter_exit_text (ptr+i+1, 0, intertext);
-       }
-       else
-       {
-	 if (i == 0)
-	 {
-	   ptr2 = next_line (ptr,top);
-	   i = dh_inchar (ptr2, '"');
-	   if (i) ptr = ptr2;
-	 }
-	 if (i)
-	 {
-	   l = dh_inchar (ptr + i, '"');
-	   if (l)
-	   {
-	     newtext = malloc (l+10);
-	     if (newtext)
-	     {
-	       l--;
-	       strncpy (newtext, ptr+i, l);
-	       newtext [l] = 0;
-	       ptr += l;
-	       dh_remove_americanisms (newtext);
-	       if (intertext != -1)
-	       {
-		 cp = F_Create_ClusterDef (intertext);
-		 if (cp)
-		 {
-		   cp->entertext = newtext;
-		   finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		   // printf ("Enter Text %u = %s\n", intertext, newtext);
-		 }
-	       }
-	     }
-	   }
-	 }
-       }
-     }
+      ptr = set_enter_exit_text (ptr+9, 0, intertext);
     }
     else if (strncasecmp (ptr, "exittextislump", 14) == 0)
     {
       textislump |= 2;
-      if (exittextptr)			// jenesis.wad has the exittextislump AFTER exittext
-      {
-        ptr = exittextptr;
-        exittextptr = NULL;
-        goto do_exittext;
-      }
     }
     else if (strncasecmp (ptr, "exittext", 8) == 0)
     {
-      exittextptr = ptr;
-do_exittext:
-      i = dh_inchar (ptr, '"');
-      if (textislump & 2)
-      {
-        if (i == 0) i = 8;
-	ptr = set_enter_exit_text (ptr+i, 1, intertext);
-      }
-      else
-      {
-	j = dh_instr (ptr, "lookup");
-	if ((j) && (j < i))
-	{
-	  ptr = set_enter_exit_text (ptr+j+5, 1, intertext);
-	}
-	else if (i && (ptr[i] == '$'))
-	{
-	  ptr = set_enter_exit_text (ptr+i+1, 1, intertext);
-	}
-	else
-	{
-	  if (i == 0)
-	  {
-	    ptr2 = next_line (ptr,top);
-	    i = dh_inchar (ptr2, '"');
-	    if (i) ptr = ptr2;
-	  }
-	  if (i)
-	  {
-	    l = dh_inchar (ptr + i, '"');
-	    if (l)
-	    {
-	      newtext = malloc (l+10);
-	      if (newtext)
-	      {
-		l--;
-		strncpy (newtext, ptr+i, l);
-		ptr += l;
-		newtext [l] = 0;
-		dh_remove_americanisms (newtext);
-		if (intertext != -1)
-		{
-		  cp = F_Create_ClusterDef (intertext);
-		  if (cp)
-		  {
-		    cp->exittext = newtext;
-		    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
-		    // printf ("Exit Text %u = %s\n", intertext, newtext);
-		  }
-		}
-	      }
-	    }
-	  }
-	}
-      }
+      ptr = set_enter_exit_text (ptr+8, 1, intertext);
     }
     else if (strncasecmp (ptr, "flat ", 5) == 0)
     {
@@ -5581,6 +5469,53 @@ void Change_To_Mapinfo (FILE * fin)
     ptr [size++] = '\n';
     Parse_Mapinfo (ptr, ptr+size);
     free (ptr);
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
+void DH_parse_language_file_f (FILE * fin, size_t filesize)
+{
+  char cc;
+  char * top;
+  char * mem;
+  char * ptr;
+  char * ptr2;
+
+  if (fin)
+  {
+    mem = malloc (filesize + 4);	// Extra 'cos we add a line terminator and a null.
+    if (mem)
+    {
+      filesize = fread (mem, 1, filesize, fin);
+      mem [filesize++] = '\n';
+
+      ptr = mem;
+      top = ptr + filesize;
+      *top = 0;
+
+      top = split_lines (ptr, top);
+
+      do
+      {
+	while ((((cc = *ptr) <= ' ') || (cc == '{')) && (ptr < top))
+	  ptr++;
+
+	// printf ("Language %s\n", ptr);
+	ptr2 = ptr + strlen (ptr);
+
+#if 1
+	DH_Parse_language_string (ptr);
+#else
+	if ((DH_Parse_language_string (ptr) == -1)
+	 && (M_CheckParm ("-showunknown")))
+	  fprintf (stderr,"Failed to find (%s)\n", ptr);
+#endif
+	ptr = ptr2 + 1;
+      } while (ptr < top);
+
+      free (mem);
+    }
   }
 }
 
