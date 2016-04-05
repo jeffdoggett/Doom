@@ -492,7 +492,28 @@ I_StartSound
   regs.r[1] = 0;
   _kernel_swi (DataVox_Timed, &regs, &regs);
 
-  I_UpdateSoundParams (channel, vol, sep, pitch);
+  if (pitch > 255) pitch = 255;
+  if (pitch < 0)   pitch = 0;
+
+  regs.r[0] = channel;
+  regs.r[1] = pitch + 0x1580;  /* Seems about right to me.... */
+  _kernel_swi (DataVox_Pitch, &regs, &regs);
+
+  if (sep < 1) sep = 1;
+  if (sep > 255) sep = 255;
+
+  regs.r[0] = channel;
+  regs.r[1] = sep - 128;
+  _kernel_swi (Sound_Stereo, &regs, &regs);
+
+  if (vol < 0) vol = 0;
+  if (vol > 15) vol = 15;
+
+  regs.r[0] = channel;
+  regs.r[1] = -vol;
+  regs.r[2] = 1;
+  regs.r[3] = 1;
+  _kernel_swi (Sound_Control, &regs, &regs);	// Start sound playing
 
   // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, length, vol, sep);
   return (channel);
@@ -515,15 +536,25 @@ void I_StopSound (int handle)
 
 /* ------------------------------------------------------------ */
 
-int I_SoundIsPlaying(int handle)
+int I_SoundIsPlaying (int handle)
 {
-// Sounds are worse with this in!!!!
-//  _kernel_swi_regs regs;
+  int rc;
+  _kernel_swi_regs regs;
 
-//   regs.r[0] = handle;
-//   _kernel_swi (DataVox_ReadAddress, &regs, &regs);
-//   return ((regs.r[1]) != 0);
-  return (0);
+  regs.r[0] = handle;
+  _kernel_swi (DataVox_ReadAddress, &regs, &regs);
+  rc = regs.r[1];
+  if (rc)
+  {
+    // We treat "nearly finished" as done otherwise the menu
+    // sounds get truncated when starting a new level. */
+    regs.r[0] = handle;
+    _kernel_swi (DataVox_ReadMemory, &regs, &regs);
+    rc = regs.r[2] - rc;
+    if (rc < 8000)
+      rc = 0;
+  }
+  return (rc);
 }
 
 /* ------------------------------------------------------------ */
@@ -586,14 +617,8 @@ I_UpdateSoundParams
   regs.r[1] = sep - 128;
   _kernel_swi (Sound_Stereo, &regs, &regs);
 
-  if (vol < 0) vol = 0;
-  if (vol > 15) vol = 15;
-
-  regs.r[0] = channel;
-  regs.r[1] = -vol;
-  regs.r[2] = 1;
-  regs.r[3] = 1;
-  _kernel_swi (Sound_Control, &regs, &regs);
+  /* Cannot find a call in RiscOS to update the volume of */
+  /* an already playing sound.... */
 }
 
 /* ------------------------------------------------------------ */
