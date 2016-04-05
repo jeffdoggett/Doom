@@ -72,7 +72,6 @@ extern int		numtextures;
 //
 // Lookup tables for map data.
 //
-extern unsigned int	numsprites;
 extern spritedef_t*	sprites;
 
 extern unsigned int	numvertexes;

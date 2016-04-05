@@ -78,7 +78,6 @@ static dshort_t* cliptop;
 // variables used to look up
 //  and range check thing_t sprites patches
 spritedef_t*	sprites;
-unsigned int	numsprites;
 
 static spriteframe_t	sprtemp[29];
 static int		maxframe;
@@ -172,41 +171,28 @@ R_InstallSpriteLump
 //  letter/number appended.
 // The rotation character can be 0 to signify no rotations.
 //
-static void R_InitSpriteDefs (char** namelist)
+static void R_InitSpriteDefs (void)
 {
-    char**	check;
     int 	i;
     int 	index;
-    int 	intname;
     int 	frame;
     int 	rotation;
     int 	rot;
     int 	lump;
     int 	done;
 
-    // count the number of sprite names
-    check = namelist;
-    while (*check != NULL)
-	check++;
-
-    numsprites = check-namelist;
-
-    if (!numsprites)
-	return;
-
-    sprites = Z_Calloc (numsprites *sizeof(*sprites), PU_STATIC, NULL);
+    sprites = Z_Calloc (NUMSPRITES * sizeof(*sprites), PU_STATIC, NULL);
 
     // scan all the lump names for each of the names,
     //	noting the highest frame letter.
     // Just compare 4 characters as ints
-    for (i=0 ; i<numsprites ; i++)
+    for (i=0 ; i<NUMSPRITES ; i++)
     {
-	// printf ("i = %d of %d\n", i, numsprites);
-	spritename = namelist[i];
+	// printf ("i = %d of %d\n", i, NUMSPRITES);
+	spritename = sprnames[i];
 	memset (sprtemp,-1, sizeof(sprtemp));
 
 	maxframe = -1;
-	intname = *(int *)namelist[i];
 
 	// scan the lumps,
 	//  filling in the frames for whatever is found
@@ -231,7 +217,7 @@ static void R_InitSpriteDefs (char** namelist)
 	      {
 		if (lumpinfo[lump].name[0])
 		  index--;
-		if (*(int *)lumpinfo[lump].name == intname)
+		if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
 		{
 		  frame = lumpinfo[lump].name[4] - 'A';
 		  rotation = lumpinfo[lump].name[5] - '0';
@@ -273,7 +259,7 @@ static void R_InitSpriteDefs (char** namelist)
 		{
 		  // no rotations were found for that frame at all
 		  printf ("R_InitSprites: No patches found for %s frame %c\n",
-				namelist[i], frame+'A');
+				sprnames[i], frame+'A');
 		}
 		break;
 
@@ -290,7 +276,7 @@ static void R_InitSpriteDefs (char** namelist)
 		    if (M_CheckParm ("-showunknown"))
 		    {
 		      printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
-				namelist[i], frame+'A', rotation);
+				sprnames[i], frame+'A', rotation);
 		    }
 
 		    switch (rotation)
@@ -425,7 +411,7 @@ static boolean		showvisstats;
 // R_InitSprites
 // Called at program start.
 //
-void R_InitSprites (char** namelist)
+void R_InitSprites (void)
 {
     int 	i;
 
@@ -445,7 +431,7 @@ void R_InitSprites (char** namelist)
 	negonearray[i] = -1;
     }
 
-    R_InitSpriteDefs (namelist);
+    R_InitSpriteDefs ();
 
     num_vissprite = 0;
     qty_vissprites = 128;			// Start low.
@@ -808,8 +794,8 @@ static void R_ProjectSprite (mobj_t* thing)
 
   // decide which patch to use for sprite relative to player
 #ifdef RANGECHECK
-  if ((unsigned)thing->sprite >= numsprites)
-    I_Error ("R_ProjectSprite: invalid sprite number %i/%i", thing->sprite,numsprites);
+  if ((unsigned)thing->sprite >= NUMSPRITES)
+    I_Error ("R_ProjectSprite: invalid sprite number %i/%i", thing->sprite,NUMSPRITES);
 #endif
   sprdef = &sprites[thing->sprite];
 #ifdef RANGECHECK
@@ -989,7 +975,7 @@ static void R_DrawPSprite (pspdef_t* psp)
     state = psp->state;
 
 #ifdef RANGECHECK
-    if ( (unsigned)state->sprite >= numsprites)
+    if ( (unsigned)state->sprite >= NUMSPRITES)
     {
 	I_Error ("R_DrawPSprite: invalid sprite number %i ",
 		 state->sprite);

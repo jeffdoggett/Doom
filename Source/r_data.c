@@ -901,7 +901,7 @@ void R_PrecacheLevel (void)
 
   s = numtextures;
   if (numflats > s)   s = numflats;
-  if (numsprites > s) s = numsprites;
+  if (NUMSPRITES > s) s = NUMSPRITES;
   hitlist = malloc (s);
   if (hitlist == NULL)
     I_Error ("R_PrecacheLevel: out of memory\n");
@@ -970,19 +970,19 @@ void R_PrecacheLevel (void)
   }
 
   // Precache sprites.
-  memset (hitlist,0, numsprites);
+  memset (hitlist,0, NUMSPRITES);
 
   for (th = thinker_head ; th != NULL ; th=th->next)
   {
     if (th->function.acp1 == (actionf_p1)P_MobjThinker)
     {
       s = ((mobj_t *)th)->sprite;
-      if ((unsigned)s < numsprites)
+      if ((unsigned)s < NUMSPRITES)
 	hitlist[s] = 1;
     }
   }
 
-  for (i=0 ; i<numsprites ; i++)
+  for (i=0 ; i<NUMSPRITES ; i++)
   {
     if (hitlist[i])
     {

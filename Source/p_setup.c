@@ -1903,7 +1903,7 @@ void P_Init (void)
 #endif
   P_InitSwitchList ();
   P_InitPicAnims ();
-  R_InitSprites (sprnames);
+  R_InitSprites ();
   P_Init_Intercepts ();
   P_Init_SpecHit ();
 }
