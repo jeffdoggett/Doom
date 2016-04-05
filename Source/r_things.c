@@ -80,8 +80,6 @@ static dshort_t* cliptop;
 spritedef_t*	sprites;
 
 static spriteframe_t	sprtemp[29];
-static int		maxframe;
-static char*		spritename;
 
 extern int	numspritelumps;
 
@@ -91,7 +89,9 @@ extern int	numspritelumps;
 //
 static void
 R_InstallSpriteLump
-( int		index,
+(
+  char*		spritename,
+  int		index,
   int		lump,
   unsigned	frame,
   unsigned	rotation,
@@ -108,9 +108,6 @@ R_InstallSpriteLump
     if (frame >= 29 || rotation > 8)
 	I_Error("R_InstallSpriteLump: "
 		"Bad frame characters in lump %i", lump);
-
-    if ((int)frame > maxframe)
-	maxframe = frame;
 
     if (rotation == 0)
     {
@@ -180,16 +177,15 @@ static void R_InitSpriteDefs (void)
     int 	rot;
     int 	lump;
     int 	done;
+    int		maxframe;
 
     sprites = Z_Calloc (NUMSPRITES * sizeof(*sprites), PU_STATIC, NULL);
 
     // scan all the lump names for each of the names,
     //	noting the highest frame letter.
-    // Just compare 4 characters as ints
     for (i=0 ; i<NUMSPRITES ; i++)
     {
 	// printf ("i = %d of %d\n", i, NUMSPRITES);
-	spritename = sprnames[i];
 	memset (sprtemp,-1, sizeof(sprtemp));
 
 	maxframe = -1;
@@ -223,13 +219,19 @@ static void R_InitSpriteDefs (void)
 		  rotation = lumpinfo[lump].name[5] - '0';
 
 		  if (frame >= 0)
-		    R_InstallSpriteLump (index, lump, frame, rotation, false);
+		  {
+		    if (frame > maxframe)
+		      maxframe = frame;
+		    R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
+		  }
 
 		  if (lumpinfo[lump].name[6])
 		  {
 		    frame = lumpinfo[lump].name[6] - 'A';
 		    rotation = lumpinfo[lump].name[7] - '0';
-		    R_InstallSpriteLump (index, lump, frame, rotation, true);
+		    if (frame > maxframe)
+		      maxframe = frame;
+		    R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
 		  }
 		}
 	      }
