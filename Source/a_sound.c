@@ -492,28 +492,7 @@ I_StartSound
   regs.r[1] = 0;
   _kernel_swi (DataVox_Timed, &regs, &regs);
 
-  if (pitch > 255) pitch = 255;
-  if (pitch < 0)   pitch = 0;
-
-  regs.r[0] = channel;
-  regs.r[1] = pitch + 0x1580;  /* Seems about right to me.... */
-  _kernel_swi (DataVox_Pitch, &regs, &regs);
-
-  if (sep < 1) sep = 1;
-  if (sep > 255) sep = 255;
-
-  regs.r[0] = channel;
-  regs.r[1] = sep - 128;
-  _kernel_swi (Sound_Stereo, &regs, &regs);
-
-  if (vol < 0) vol = 0;
-  if (vol > 15) vol = 15;
-
-  regs.r[0] = channel;
-  regs.r[1] = -vol;
-  regs.r[2] = 1;
-  regs.r[3] = 1;
-  _kernel_swi (Sound_Control, &regs, &regs);
+  I_UpdateSoundParams (channel, vol, sep, pitch);
 
   // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, length, vol, sep);
   return (channel);
@@ -586,17 +565,35 @@ I_SubmitSound(void)
 
 void
 I_UpdateSoundParams
-( int   handle,
+( int   channel,
   int   vol,
   int   sep,
   int   pitch)
 {
-  // I fail too see that this is used.
-  // Would be using the handle to identify
-  //  on which channel the sound might be active,
-  //  and resetting the channel parameters.
+  _kernel_swi_regs regs;
 
-  // UNUSED.
+  if (pitch > 255) pitch = 255;
+  if (pitch < 0)   pitch = 0;
+
+  regs.r[0] = channel;
+  regs.r[1] = pitch + 0x1580;  /* Seems about right to me.... */
+  _kernel_swi (DataVox_Pitch, &regs, &regs);
+
+  if (sep < 1) sep = 1;
+  if (sep > 255) sep = 255;
+
+  regs.r[0] = channel;
+  regs.r[1] = sep - 128;
+  _kernel_swi (Sound_Stereo, &regs, &regs);
+
+  if (vol < 0) vol = 0;
+  if (vol > 15) vol = 15;
+
+  regs.r[0] = channel;
+  regs.r[1] = -vol;
+  regs.r[2] = 1;
+  regs.r[3] = 1;
+  _kernel_swi (Sound_Control, &regs, &regs);
 }
 
 /* ------------------------------------------------------------ */
