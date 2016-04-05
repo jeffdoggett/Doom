@@ -402,11 +402,9 @@ static void R_InitSpriteDefs (char** namelist)
 
 	// allocate space for the frames present and copy sprtemp to it
 	sprites[i].numframes = maxframe;
-	sprites[i].spriteframes =
-	    Z_Calloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
-	memcpy (sprites[i].spriteframes, sprtemp, maxframe*sizeof(spriteframe_t));
+	sprites[i].spriteframes = Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
+	memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
     }
-
 }
 
 
