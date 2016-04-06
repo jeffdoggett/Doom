@@ -32,6 +32,7 @@ static const char rcsid[] = "$Id: am_map.c,v 1.4 1997/02/03 21:24:33 b1 Exp $";
 #include "includes.h"
 
 typedef unsigned char pixel_t;
+extern const unsigned char PLAYPAL [3*256];
 
 /* -------------------------------------------------------------- */
 
@@ -60,50 +61,6 @@ typedef enum
 
 /* ---------------------------------------------------------------------- */
 
-static const unsigned char colour_init_tab [] =
-{
-  0,0,0,		// back		map background
-  79,79,79,		// grid		grid lines colour
-  191,0,0,		// wall		normal 1s wall colour (23)
-  191,123,75,		// fchg		line at floor height change colour
-  215,187,67,		// cchg		line at ceiling height change colour
-  123,127,99,		// clsd		line at sector with floor=ceiling colour
-  255,31,31,		// rkey		red key colour
-  0,0,155,		// bkey		blue key colour
-  255,255,0,		// ykey		yellow key colour
-  255,31,31,		// rdor		red door colour  (diff from keys to allow option)
-  0,0,155,		// bdor		blue door colour (of enabling one but not other)
-  255,255,0,		// ydor		yellow door colour
-  67,147,55,		// tele		teleporter line colour
-  207,0,207,		// secr		secret sector boundary colour
-  119,255,111,		// exit		jff 4/23/98 add exit line colour
-  79,79,79,		// unsn		computer map unseen line colour
-  183,183,183,		// flat		line with no floor/ceiling changes
-  119,255,111,		// sprt		general sprite colour
-  255,255,255,		// hair		crosshair colour
-  255,255,255,		// sngl		single player arrow colour
-  119,255,111,		// plyr_0
-  183,183,183,		// plyr_1
-  191,123,75,		// plyr_2
-  255,0,0,		// plyr_3
-  0,0,11,		// plyr_invis
-  207,0,207,		// friends of player
-  243,115,23,		// monster
-  0,0,255,		// ammo
-  79,0,0,		// body
-  79,0,0,		// dead
-  191,123,75,		// bonus
-  255,123,255,		// special
-  75,55,27,		// pillar
-  75,55,27,		// tree
-  79,0,0,		// light
-  103,0,0,		// blood
-  103,0,0		// skull
-};
-
-//-----------------------------------------------------------------------------
-
-/* MUST be in the same order as above... */
 typedef struct
 {
   unsigned char back;
@@ -142,59 +99,47 @@ typedef struct
   unsigned char skull;
 } mapcolour_t;
 
-static mapcolour_t mapcolour;
-
-// #define BUILD_COLOUR_DEFS
-#ifdef BUILD_COLOUR_DEFS
-
-typedef struct
+static mapcolour_t mapcolour =
 {
-  char name [11];
-  unsigned char palette_num;
-} default_doom_colours_t;
-
-/* MUST be in the same order as above... */
-static const default_doom_colours_t default_doom_colours [] =
-{
-  {"back", 247},
-  {"grid", 104},
-  {"wall", 181},
-  {"fchg",  64},
-  {"cchg", 162},
-  {"clsd", 152},
-  {"rkey", 175},
-  {"bkey", 204},
-  {"ykey", 231},
-  {"rdor", 175},
-  {"bdor", 204},
-  {"ydor", 231},
-  {"tele", 119},
-  {"secr", 252},
-  {"exit", 112},
-  {"unsn", 104},
-  {"flat",  88},
-  {"sprt", 112},
-  {"hair", 208},
-  {"sngl", 208},
-  {"plyr_0", 112},
-  {"plyr_1", 88},
-  {"plyr_2", 64},
-  {"plyr_3", 176},
-  {"plyr_invis", 246},
-  {"frnd", 252},
-  {"monster", 216},
-  {"ammo", 200},
-  {"body", 190},
-  {"dead", 190},
-  {"bonus", 64},
-  {"special", 250},
-  {"pillar", 76},
-  {"tree",   76},
-  {"light", 190},
-  {"blood", 188},
-  {"skull", 188}
+  /* back */ 247,
+  /* grid */ 104,
+  /* wall */ 181,
+  /* fchg */  64,
+  /* cchg */ 162,
+  /* clsd */ 152,
+  /* rkey */ 175,
+  /* bkey */ 204,
+  /* ykey */ 231,
+  /* rdor */ 175,
+  /* bdor */ 204,
+  /* ydor */ 231,
+  /* tele */ 119,
+  /* secr */ 252,
+  /* exit */ 112,
+  /* unsn */ 104,
+  /* flat */  88,
+  /* sprt */ 112,
+  /* hair */ 208,
+  /* sngl */ 208,
+  /* plyr_0 */ 112,
+  /* plyr_1 */ 88,
+  /* plyr_2 */ 64,
+  /* plyr_3 */ 176,
+  /* plyr_invis */ 246,
+  /* frnd */ 252,
+  /* monster */ 216,
+  /* ammo */ 200,
+  /* body */ 190,
+  /* dead */ 190,
+  /* bonus */ 64,
+  /* special */ 250,
+  /* pillar */ 76,
+  /* tree */   76,
+  /* light */ 190,
+  /* blood */ 188,
+  /* skull */ 188
 };
-#endif
+
 /* ---------------------------------------------------------------------- */
 // drawing stuff
 #define FB	      0
@@ -474,16 +419,6 @@ static int d_cheating;
 static int k_cheating;
 
 /* ---------------------------------------------------------------------- */
-
-#ifdef BUILD_COLOUR_DEFS
-static void show_colour (const char * name, unsigned int num, unsigned char * palette)
-{
-  palette += (num * 3);
-  printf ("  %u,%u,%u,\t// %s\n", palette[0],palette[1],palette[2],name);
-}
-#endif
-
-/* ---------------------------------------------------------------------- */
 /*
    Find the best match in the palette table for this colour
 */
@@ -520,38 +455,22 @@ unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char 
 
 void AM_LoadColours (int palette_lump)
 {
-  unsigned char c0,c1,c2;
   unsigned int count;
   unsigned char * colnum;
   unsigned char * palette;
-  const unsigned char * colsptr;
+  const byte * q;
 
-  palette = W_CacheLumpNum (palette_lump, PU_CACHE);
-
-#ifdef BUILD_COLOUR_DEFS
+  palette = W_CacheLumpNum (palette_lump, PU_STATIC);
+  if (memcmp (PLAYPAL, palette, sizeof (PLAYPAL)))
   {
-    const default_doom_colours_t * ptr;
-
-    ptr = default_doom_colours;
-    count = ARRAY_SIZE (default_doom_colours);
+    colnum = &mapcolour.back;
+    count = sizeof(mapcolour);
     do
     {
-      show_colour (ptr -> name, ptr -> palette_num, palette);
-      ptr++;
+      q = &PLAYPAL [*colnum * 3];
+      *colnum++ = AM_load_colour (q[0], q[1], q[2], palette);
     } while (--count);
   }
-#endif
-
-  colsptr = colour_init_tab;
-  colnum = &mapcolour.back;
-  count = (ARRAY_SIZE(colour_init_tab))/3;
-  do
-  {
-    c0 = *colsptr++;
-    c1 = *colsptr++;
-    c2 = *colsptr++;
-    *colnum++ = AM_load_colour (c0, c1, c2, palette);
-  } while (--count);
 }
 
 /* ---------------------------------------------------------------------- */
