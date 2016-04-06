@@ -2636,7 +2636,7 @@ static void save_patch (patch_t * patch, int ascii)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static int V_Load_Font (const unsigned char * charset[], const char * lumpname)
+static int V_Load_Font (const unsigned char * charset[], const char * lumpname, byte * palette)
 {
   int lump;
   unsigned int first;
@@ -2656,10 +2656,11 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname)
   unsigned char * fontlump;
   unsigned char * ptr;
   unsigned char * red_char;
-  unsigned char * palette;
   unsigned char * colnum;
   unsigned char char_widths [256];
   unsigned char colours [256];
+
+  last = 0;
 
   lump = W_CheckNumForName (lumpname);
   if (lump != -1)
@@ -2704,7 +2705,6 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname)
 
 
 	/* Read palette info */
-        palette = W_CacheLumpName ("PLAYPAL", PU_CACHE);
         colnum = colours;
         *colnum++ = 0;
         ptr += 3;			// Miss out 1st one which is the transparent colour
@@ -2817,7 +2817,7 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname)
       Z_Free (fontlump);
     }
   }
-  return (lump);
+  return (last);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -2871,25 +2871,23 @@ void V_LoadFonts (void)
   int dopal;
   byte * palette;
 
+  palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
   dopal = 0;
-  if (V_Load_Font (red_charset, "DBIGFONT") == -1)
+
+  if (V_Load_Font (red_charset, "DBIGFONT", palette) == 0)
     dopal |= 1;
 
-  if (V_Load_Font (wilv_charset, "DBIGFONT") == -1)
+  if (V_Load_Font (wilv_charset, "DBIGFONT", palette) == 0)
     dopal |= 2;
 
-  if (dopal)
+  if ((dopal)
+   && (memcmp (PLAYPAL, palette, sizeof (PLAYPAL))))
   {
-    palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
+    if (dopal & 1)
+      V_SetFontPalette (red_charset, palette);
 
-    if (memcmp (PLAYPAL, palette, sizeof (PLAYPAL)))
-    {
-      if (dopal & 1)
-	V_SetFontPalette (red_charset, palette);
-
-      if (dopal & 2)
-	V_SetFontPalette (wilv_charset, palette);
-    }
+    if (dopal & 2)
+      V_SetFontPalette (wilv_charset, palette);
   }
 }
 
