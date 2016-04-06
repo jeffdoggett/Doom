@@ -841,6 +841,8 @@ static boolean IsEntryPresent (FILE * fin, char * name,
   	   2 = doom.wad
   	   3 = doomu.wad
   	   4 = doom2.wad
+
+	Bits 8-15 = pack type (doom, doom2, plutonia, tnt)
 */
 
 static unsigned int IdentifyWad (const char * filename, unsigned int magic)
@@ -850,9 +852,11 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
   unsigned int cat_size;
   unsigned int p;
   unsigned int rc;
-  char catname [16];
+  unsigned int pack;
+  char catname [20];
 
   rc = 0;
+  pack = (none << 8);
   fin = fopen (filename, "rb");
   if (fin)
   {
@@ -867,12 +871,8 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
       fseek (fin, (long int) cat_pos, SEEK_SET);
       do
       {
-	p = 0;
-	do
-	{
-	  catname [p] = fgetc (fin);
-	  p++;
-	} while (p < 16);
+	fread (catname, 1, 16, fin);
+	catname [16] = 0;
 
 	if ((catname [0+8] == 'E')
 	 && (catname [2+8] == 'M')
@@ -881,15 +881,14 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
 	 && (catname [3+8] <= '9')
 	 && (catname [1+8] >= '0'))
 	{
+	  if (pack == (none << 8))
+	    pack = (doom << 8);
 	  if (rc == 0) rc = 1;
 	  if (catname [1+8] > '1')
 	  {
 	    if (rc < 2) rc = 2;
 	    if (catname [1+8] > '3')
-	    {
-	      rc = 3;
-	      break;
-	    }
+	      if (rc < 3) rc = 3;
 	  }
 	}
 	else
@@ -901,8 +900,13 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
 	 && (catname [4+8] <= '9'))
 	{
 	  rc = 4;
-	  break;
+	  if (pack == (none << 8))
+	    pack = (doom2 << 8);
 	}
+	else if (strcmp (catname+8, "REDTNT2") == 0)
+	  pack = (pack_tnt << 8);
+	else if (strcmp (catname+8, "CAMO1") == 0)
+	  pack = (pack_plut << 8);
 	cat_size--;
       } while (cat_size);
     }
@@ -910,14 +914,18 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
   }
 
   // printf ("WAD File %s identified as type %u\n", filename, rc);
-  return (rc);
+
+  return (rc | pack);
 }
 
 //-----------------------------------------------------------------------------
 
 static void IdentifyIwad (const char * name)
 {
-  switch (IdentifyWad (name, IWAD_MAGIC))
+  unsigned int game;
+
+  game = IdentifyWad (name, IWAD_MAGIC);
+  switch (game & 255)
   {
     case 1:
       gamemode = shareware;
@@ -933,16 +941,25 @@ static void IdentifyIwad (const char * name)
 
     case 4:
       gamemode = commercial;
-      gamemission = doom2;
+#ifdef IDENTIFY_PACKS_BY_CONTENTS
+      gamemission = game >> 8;
+#else
+      {
+	const char * leaf;
 
-      /* Need to differentiate plutonia and tnt here */
-      /* For now just use the filename */
+	gamemission = doom2;
 
-      if (dh_instr (name, "plutonia"))
-	gamemission = pack_plut;
+	/* Need to differentiate plutonia and tnt here */
+	/* For now just use the filename */
 
-      if (dh_instr (name, "tnt"))
-	gamemission = pack_tnt;
+	leaf = leafname (name);
+	if (strncasecmp (leaf, "plutonia", 8) == 0)
+	  gamemission = pack_plut;
+
+	else if (strncasecmp (leaf, "tnt", 3) == 0)
+	  gamemission = pack_tnt;
+     }
+#endif
       break;
 
     default:
@@ -964,6 +981,7 @@ static void IdentifyIwad (const char * name)
       break;
     case commercial:
       printf ("IWAD file is commercial\n");
+      printf ("Pack is %d\n", gamemission);
       break;
   }
 #endif
@@ -1052,7 +1070,7 @@ static int search_for_iwad (char * wad_filename, const char *doomwaddir, const c
 	 || (strcasecmp (iwadname, dp -> d_name) == 0))
 	{
 	  sprintf (buffer, "%s"DIRSEP"%s", doomwaddir, dp -> d_name);
-	  this_iwad = IdentifyWad (buffer, IWAD_MAGIC);
+	  this_iwad = IdentifyWad (buffer, IWAD_MAGIC) & 255;
 	  if (this_iwad)
 	  {
 	    if (verbose)
@@ -1552,13 +1570,13 @@ static void IdentifyVersion (void)
 	sprintf (wad_filename, "%s"DIRSEP"%s", myargv[q+1],f);
 	f = wad_filename;
       }
-      reqd_pwad = IdentifyWad (f, PWAD_MAGIC);
+      reqd_pwad = IdentifyWad (f, PWAD_MAGIC) & 255;
       if (reqd_pwad)
       {
 	// printf ("Required WAD for %s is type %u\n", f, reqd_pwad);
 	break;
       }
-      if (IdentifyWad (f, IWAD_MAGIC))
+      if (IdentifyWad (f, IWAD_MAGIC) & 255)
       {					// Ooops, the user has specified an IWAD in the -file
 	IdentifyIwad (f);
 	return;
