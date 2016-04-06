@@ -56,15 +56,15 @@ void R_InitPatches(void)
 
 typedef struct
 {
-    unsigned short      patches;
-    unsigned short      posts;
-    unsigned short      posts_used;
+    dushort_t patches;
+    dushort_t posts;
+    dushort_t posts_used;
 }
 count_t;
 
 static void switchPosts(rpost_t *post1, rpost_t *post2)
 {
-    rpost_t     dummy;
+    rpost_t dummy;
 
     dummy.topdelta = post1->topdelta;
     dummy.length = post1->length;
@@ -78,7 +78,7 @@ static void removePostFromColumn(rcolumn_t *column, int post)
 {
     if (post < column->numPosts)
     {
-	int     i;
+	int i;
 
 	for (i = post; i < column->numPosts - 1; ++i)
 	{
@@ -266,7 +266,7 @@ static void createTextureCompositePatch(int id)
 		    }
 		}
 		else
-		    oy = 0;     // with a single patch only negative y origins are wrong
+		    oy = 0;	// with a single patch only negative y origins are wrong
 
 		// set up the post's data
 		post->topdelta = top + oy;
@@ -311,7 +311,7 @@ static void createTextureCompositePatch(int id)
 
     for (x = 0; x < texture->width; ++x)
     {
-	rcolumn_t       *column;
+	rcolumn_t *column;
 
 	if (countsInColumn[x].patches <= 1)
 	    continue;
@@ -330,7 +330,7 @@ static void createTextureCompositePatch(int id)
 
 	    if (post1->topdelta + post1->length >= post2->topdelta)
 	    {
-		int     length = (post1->length + post2->length) - ((post1->topdelta
+		int length = (post1->length + post2->length) - ((post1->topdelta
 		    + post1->length) - post2->topdelta);
 
 		if (post1->length < length)
@@ -425,7 +425,19 @@ rcolumn_t *R_GetPatchColumnWrapped(rpatch_t *patch, int columnIndex)
 
 rcolumn_t *R_GetPatchColumnClamped(rpatch_t *patch, int columnIndex)
 {
-    return &patch->columns[BETWEEN(0, columnIndex, patch->width - 1)];
+  int lim;
+
+  if (columnIndex < 0)
+  {
+    columnIndex = 0;
+  }
+  else
+  {
+    lim = patch->width - 1;
+    if (columnIndex > lim)
+      columnIndex = lim;
+  }
+  return (&patch->columns [columnIndex]);
 }
 
 rcolumn_t *R_GetPatchColumn(rpatch_t *patch, int columnIndex)

@@ -56,10 +56,13 @@ int MIN (int a, int b)
   return (b + (a & (a >> 31)));
 }
 
+#if 0
+// Not currently used
 int BETWEEN(int a, int b, int c)
 {
     return MAX(a, MIN(b, c));
 }
+#endif
 
 int SIGN (int a)
 {
