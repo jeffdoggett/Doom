@@ -101,43 +101,43 @@ typedef struct
 
 static mapcolour_t mapcolour =
 {
-  /* back */ 247,
-  /* grid */ 104,
-  /* wall */ 181,
-  /* fchg */  64,
-  /* cchg */ 162,
-  /* clsd */ 152,
-  /* rkey */ 175,
-  /* bkey */ 204,
-  /* ykey */ 231,
-  /* rdor */ 175,
-  /* bdor */ 204,
-  /* ydor */ 231,
-  /* tele */ 119,
-  /* secr */ 252,
-  /* exit */ 112,
-  /* unsn */ 104,
-  /* flat */  88,
-  /* sprt */ 112,
-  /* hair */ 208,
-  /* sngl */ 208,
-  /* plyr_0 */ 112,
-  /* plyr_1 */ 88,
-  /* plyr_2 */ 64,
-  /* plyr_3 */ 176,
-  /* plyr_invis */ 246,
-  /* frnd */ 252,
-  /* monster */ 216,
-  /* ammo */ 200,
-  /* body */ 190,
-  /* dead */ 190,
-  /* bonus */ 64,
-  /* special */ 250,
-  /* pillar */ 76,
-  /* tree */   76,
-  /* light */ 190,
-  /* blood */ 188,
-  /* skull */ 188
+  247,		// back		map background
+  104,		// grid		grid lines colour
+  181,		// wall		normal 1s wall colour (23)
+  64,		// fchg		line at floor height change colour
+  162,		// cchg		line at ceiling height change colour
+  152,		// clsd		line at sector with floor=ceiling colour
+  175,		// rkey		red key colour
+  204,		// bkey		blue key colour
+  231,		// ykey		yellow key colour
+  175,		// rdor		red door colour  (diff from keys to allow option)
+  204,		// bdor		blue door colour (of enabling one but not other)
+  231,		// ydor		yellow door colour
+  119,		// tele		teleporter line colour
+  252,		// secr		secret sector boundary colour
+  112,		// exit		jff 4/23/98 add exit line colour
+  104,		// unsn		computer map unseen line colour
+  88,		// flat		line with no floor/ceiling changes
+  112,		// sprt		general sprite colour
+  208,		// hair		crosshair colour
+  208,		// sngl		single player arrow colour
+  112,		// plyr_0
+  88,		// plyr_1
+  64,		// plyr_2
+  176,		// plyr_3
+  246,		// plyr_invis
+  252,		// friends of player
+  216,		// monster
+  200,		// ammo
+  190,		// body
+  190,		// dead
+  64,		// bonus
+  250,		// special
+  76,		// pillar
+  76,		// tree
+  190,		// light
+  188,		// blood
+  188		// skull
 };
 
 /* ---------------------------------------------------------------------- */
