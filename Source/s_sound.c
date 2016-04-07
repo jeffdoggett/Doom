@@ -89,26 +89,9 @@ typedef struct
 } channel_t;
 
 
-// Dummy struct so that we can remember where
-// a mobj object was before it was removed.
-// Needs to match the start part of mobj_t
-
-typedef struct
-{
-    // List: thinker links.
-    thinker_t		thinker;
-
-    // Info for drawing: position.
-    fixed_t		x;
-    fixed_t		y;
-    fixed_t		z;
-
-} sound_mobj_t;
-
-
 // the set of channels available
 static channel_t*	channels;
-static sound_mobj_t*	sound_origin;
+static degenmobj_t*	sound_origin;
 
 // These are not used, but should be (menu).
 // Maximum volume of a sound effect.
@@ -220,7 +203,7 @@ void S_Init
   // (the maximum numer of sounds rendered
   // simultaneously) within zone memory.
   channels = (channel_t *) Z_Calloc (numChannels*sizeof(channel_t), PU_STATIC, 0);
-  sound_origin = (sound_mobj_t *) Z_Calloc (numChannels*sizeof(sound_mobj_t), PU_STATIC, 0);
+  sound_origin = (degenmobj_t *) Z_Calloc (numChannels*sizeof(degenmobj_t), PU_STATIC, 0);
 
   // Free all channels for use
 //for (i=0 ; i<numChannels ; i++)
@@ -559,7 +542,7 @@ void S_RemoveSoundOrigin (void *origin)
 {
     int cnum;
     mobj_t* mobj;
-    sound_mobj_t * sorigin;
+    degenmobj_t * sorigin;
 
     for (cnum=0 ; cnum<numChannels ; cnum++)
     {
