@@ -2654,6 +2654,7 @@ static void save_patch (patch_t * patch, int ascii)
 
 static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const byte * palette)
 {
+  unsigned int pos;
   unsigned int char_height;
   unsigned int char_width;
   unsigned int run_length;
@@ -2662,6 +2663,8 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
   unsigned int bytes_req;
   byte * buffer;
   byte * bptr;
+  byte * chardef;
+  unsigned char colours [256];
 
   char_width  = ptr [4] | (ptr [5] << 8);
   char_height = ptr [6] | (ptr [7] << 8);
@@ -2672,6 +2675,16 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
   buffer = malloc (bytes_req);
   if (buffer == NULL)
     return (0);
+
+  /* The data is a grey scale */
+				// TRNP ???
+  colours [0] = 0;		// Miss out 1st one which is the transparent colour
+  count = 1;
+  do
+  {
+    colours [count] = AM_load_colour (count, count, count, palette);
+  } while (++count < 256);
+
 
   /* And finally the RLE encoded info. */
   /* 1st byte =	0-127	= use next 1-128 data bytes */
@@ -2685,7 +2698,12 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
     {
       run_length++;
       /* Use the next n bytes */
-      memcpy (bptr, ptr, run_length);
+//    memcpy (bptr, ptr, run_length);
+      count = 0;
+      do
+      {
+	bptr [count] = colours [ptr [count]];
+      } while (++count < run_length);
       ptr += run_length;
     }
     else
@@ -2693,7 +2711,7 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
       run_length = 257 - run_length;
       the_char = *ptr++;
       /* Use this byte n times */
-      memset (bptr, the_char, run_length);
+      memset (bptr, colours [the_char], run_length);
     }
 
     bptr += run_length;
@@ -2703,9 +2721,30 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
     bytes_req -= run_length;
   } while (bytes_req);
 
+  /* Now copy to the correct place */
+  pos = 0;  
+  bptr = buffer;
+  bytes_req = char_height * char_width;
+  do
+  {
+    if ((pos >= '!')	// Hard code range for now!
+     && (pos <= 0x7F))
+    {
+      chardef = malloc (bytes_req + 3);
+      if (chardef)
+      {
+	chardef [0] = char_width;
+	chardef [1] = char_height;
+	chardef [2] = 0;
+	memcpy (chardef+3, bptr, bytes_req);
+	charset [pos-0x21] = chardef;
+      }
+    }
+    bptr += bytes_req;
+  } while (++pos < 256);
   
   free (buffer);
-  return (0);		// Return 0 for the time being since we're not actually using it!
+  return (1);
 }
 
 /* -------------------------------------------------------------------------------------------- */

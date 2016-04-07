@@ -446,6 +446,7 @@ static void WI_drawLF (void)
       h = V_drawWILV (y, ltext_last) + 2;
     }
 
+    if (h < 12) h = 12;
     y += (5*h)/4;
 
     // draw "Finished!"
