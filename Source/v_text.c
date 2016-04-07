@@ -2636,12 +2636,10 @@ static void save_patch (patch_t * patch, int ascii)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static int V_Load_Font (const unsigned char * charset[], const char * lumpname, byte * palette)
+static void V_Load_FON2 (const unsigned char * charset[], const byte * ptr, const byte * palette)
 {
-  int lump;
   unsigned int first;
   unsigned int last;
-  unsigned int length;
   unsigned int char_height;
   unsigned int char_width;
   unsigned int palette_size;
@@ -2653,14 +2651,163 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname, 
   unsigned int bytes_req;
   unsigned int colour_number;
   unsigned char c0,c1,c2;
-  unsigned char * fontlump;
-  unsigned char * ptr;
   unsigned char * red_char;
   unsigned char * colnum;
   unsigned char char_widths [256];
   unsigned char colours [256];
 
-  last = 0;
+
+  char_height = ptr [4] | (ptr [5] << 8);
+  first = ptr [6];			// First ascii character
+  last  = ptr [7];			// and the last
+
+  memset (char_widths, 0, sizeof (char_widths));
+  constant_width = ptr [8];
+  palette_size = ptr [10];
+  ptr += 11;
+  if (*ptr++ & 1)
+  {
+    ptr += 2;
+  }
+
+  if (constant_width)
+  {
+    char_width = ptr [0] | (ptr [1] << 8);
+    memset (char_widths + first, char_width, (last - first) + 1);
+    ptr += 2;
+  }
+  else
+  {
+    char_num = first;
+    do
+    {
+      char_widths [char_num] = ptr [0] | (ptr [1] << 8);
+      ptr += 2;
+    } while (++char_num <= last);
+  }
+
+
+  /* Read palette info */
+  colnum = colours;
+  *colnum++ = 0;
+  ptr += 3;			// Miss out 1st one which is the transparent colour
+  colour_number = 1;
+  if (palette_size)
+  {
+    do
+    {
+      c0 = *ptr++;
+      c1 = *ptr++;
+      c2 = *ptr++;
+      *colnum++ = AM_load_colour (c0, c1, c2, palette);
+      colour_number++;
+    } while (--palette_size);
+  }
+
+  if (colour_number < sizeof (colours))	// Did we fill the whole table?
+  {
+    do					// No - fill the rest.
+    {
+      *colnum++ = colour_number;
+    } while (++colour_number < sizeof (colours));
+  }
+
+#if 0
+
+  colour_number = 0;			// A bit of debug!
+  colnum = colours;
+  do
+  {
+    printf ("Colour table number %u = %u\n", colour_number, *colnum++);
+  } while (++colour_number < sizeof (colours));
+
+#endif
+
+// ptr += (palette_size + 1) * 3;
+
+  /* And finally the RLE encoded info. */
+  /* 1st byte =	0-127	= use next 1-128 data bytes */
+  /*		128-255	= use next byte 2-132 times (where 255 = 2) */
+
+  char_num = first;
+  do
+  {
+    if (char_widths [char_num])
+    {
+      bytes_req = char_widths [char_num] * char_height;
+
+      red_char = malloc (bytes_req + 3);
+      if (red_char)
+      {
+	if ((char_num >= 0x21)
+	 && (char_num <= 0x7F))
+	{
+	  charset [char_num-0x21] = red_char;
+
+	  /* If the other case is not present */
+	  /* then copy this one across. */
+
+	  if ((char_num >= 'A')
+	   && (char_num <= 'Z')
+	   && (char_widths [char_num+0x20] == 0))
+	    charset [char_num-0x01] = red_char;
+
+	  if ((char_num >= 'a')
+	   && (char_num <= 'z')
+	   && (char_widths [char_num-0x20] == 0))
+	    charset [char_num-0x41] = red_char;
+	}
+
+	*red_char++ = char_widths [char_num];
+	*red_char++ = char_height;
+	*red_char++ = 0;
+
+//	printf ("%X size %u x %u (%u)\n", char_num, char_widths [char_num], char_height, bytes_req);
+	do
+	{
+	  run_length = *ptr++;
+	  if (run_length < 0x80)
+	  {
+	    run_length++;
+	    /* Use the next n bytes */
+	    // memcpy (red_char, ptr, run_length);
+	    count = 0;
+	    do
+	    {
+	      red_char [count] = colours [ptr [count]];
+	    } while (++count < run_length);
+	    ptr += run_length;
+	  }
+	  else
+	  {
+	    run_length = 257 - run_length;
+	    the_char = *ptr++;
+	    /* Use this byte n times */
+	    memset (red_char, colours [the_char], run_length);
+	  }
+
+	  red_char += run_length;
+
+//	  printf ("Run length = %u, char = %X, left = %d\n", run_length, the_char, bytes_req-run_length);
+
+	  bytes_req -= run_length;
+	} while (bytes_req);
+      }
+    }
+  } while (++char_num <= last);
+//printf ("Bytes used = %X\n", ptr - fontlump);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+static int V_Load_Font (const unsigned char * charset[], const char * lumpname, const byte * palette)
+{
+  int rc;
+  int lump;
+  unsigned int length;
+  byte * fontlump;
+
+  rc = 0;
 
   lump = W_CheckNumForName (lumpname);
   if (lump != -1)
@@ -2668,156 +2815,24 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname, 
     length = W_LumpLength (lump);
     if (length)
     {
-      ptr = fontlump = W_CacheLumpNum (lump, PU_STATIC);
-      if ((ptr [0] == 'F')
-       && (ptr [1] == 'O')
-       && (ptr [2] == 'N')
-       && (ptr [3] == '2'))
+      fontlump = W_CacheLumpNum (lump, PU_STATIC);
+      if ((fontlump [0] == 'F')
+       && (fontlump [1] == 'O')
+       && (fontlump [2] == 'N'))
       {
-	char_height = ptr [4] | (ptr [5] << 8);
-	first = ptr [6];			// First ascii character
-	last  = ptr [7];			// and the last
-
-	memset (char_widths, 0, sizeof (char_widths));
-	constant_width = ptr [8];
-	palette_size = ptr [10];
-	ptr += 11;
-	if (*ptr++ & 1)
+	switch (fontlump [3])
 	{
-	  ptr += 2;
+	  case '2':
+	    V_Load_FON2 (charset, fontlump, palette);
+	    rc = 2;
+	    break;
 	}
-
-	if (constant_width)
-	{
-	  char_width = ptr [0] | (ptr [1] << 8);
-	  memset (char_widths + first, char_width, (last - first) + 1);
-	  ptr += 2;
-	}
-	else
-	{
-	  char_num = first;
-	  do
-	  {
-	    char_widths [char_num] = ptr [0] | (ptr [1] << 8);
-	    ptr += 2;
-	  } while (++char_num <= last);
-	}
-
-
-	/* Read palette info */
-        colnum = colours;
-        *colnum++ = 0;
-        ptr += 3;			// Miss out 1st one which is the transparent colour
-	colour_number = 1;
-        if (palette_size)
-	{
-	  do
-	  {
-	    c0 = *ptr++;
-	    c1 = *ptr++;
-	    c2 = *ptr++;
-	    *colnum++ = AM_load_colour (c0, c1, c2, palette);
-	    colour_number++;
-	  } while (--palette_size);
-	}
-
-	if (colour_number < sizeof (colours))	// Did we fill the whole table?
-	{
-	  do					// No - fill the rest.
-	  {
-	    *colnum++ = colour_number;
-	  } while (++colour_number < sizeof (colours));
-	}
-
-#if 0
-
-	colour_number = 0;			// A bit of debug!
-        colnum = colours;
-	do
-	{
-	  printf ("Colour table number %u = %u\n", colour_number, *colnum++);
-	} while (++colour_number < sizeof (colours));
-
-#endif
-
-//	ptr += (palette_size + 1) * 3;
-
-	/* And finally the RLE encoded info. */
-	/* 1st byte =	0-127	= use next 1-128 data bytes */
-	/*		128-255	= use next byte 2-132 times (where 255 = 2) */
-
-	char_num = first;
-	do
-	{
-	  if (char_widths [char_num])
-	  {
-	    bytes_req = char_widths [char_num] * char_height;
-
-	    red_char = malloc (bytes_req + 3);
-	    if (red_char)
-	    {
-	      if ((char_num >= 0x21)
-	       && (char_num <= 0x7F))
-	      {
-		charset [char_num-0x21] = red_char;
-
-		/* If the other case is not present */
-		/* then copy this one across. */
-
-		if ((char_num >= 'A')
-		 && (char_num <= 'Z')
-		 && (char_widths [char_num+0x20] == 0))
-		  charset [char_num-0x01] = red_char;
-
-		if ((char_num >= 'a')
-		 && (char_num <= 'z')
-		 && (char_widths [char_num-0x20] == 0))
-		  charset [char_num-0x41] = red_char;
-	      }
-
-	      *red_char++ = char_widths [char_num];
-	      *red_char++ = char_height;
-	      *red_char++ = 0;
-
-//	      printf ("%X size %u x %u (%u)\n", char_num, char_widths [char_num], char_height, bytes_req);
-	      do
-	      {
-		run_length = *ptr++;
-		if (run_length < 0x80)
-		{
-		  run_length++;
-		  /* Use the next n bytes */
-		  // memcpy (red_char, ptr, run_length);
-		  count = 0;
-		  do
-		  {
-		    red_char [count] = colours [ptr [count]];
-		  } while (++count < run_length);
-		  ptr += run_length;
-		}
-		else
-		{
-		  run_length = 257 - run_length;
-		  the_char = *ptr++;
-		  /* Use this byte n times */
-		  memset (red_char, colours [the_char], run_length);
-		}
-
-		red_char += run_length;
-
-//		printf ("Run length = %u, char = %X, left = %d\n", run_length, the_char, bytes_req-run_length);
-
-		bytes_req -= run_length;
-	      } while (bytes_req);
-	    }
-	  }
-	} while (++char_num <= last);
-//	printf ("Bytes used = %X\n", ptr - fontlump);
       }
       Z_Free (fontlump);
     }
   }
-  return (last);
+
+  return (rc);
 }
 
 /* -------------------------------------------------------------------------------------------- */

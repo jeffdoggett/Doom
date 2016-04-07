@@ -106,7 +106,7 @@ static const byte general [256] =
 
 /* ------------------------------------------------------------------------------------------------ */
 
-static byte *GenerateTintTable (byte *palette, int percent, const byte * filter, int colours)
+static byte *GenerateTintTable (const byte *palette, int percent, const byte * filter, int colours)
 {
     byte *result = Z_Malloc (65536, PU_STATIC, NULL);
     int	 foreground, background;

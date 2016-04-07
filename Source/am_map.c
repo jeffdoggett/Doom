@@ -423,7 +423,7 @@ static int k_cheating;
    Find the best match in the palette table for this colour
 */
 
-unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char c2, unsigned char * palette)
+unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char c2, const byte * palette)
 {
   unsigned char colnum;
   unsigned char rc;
