@@ -195,6 +195,8 @@ static int prev_snd_config [6];
 static int prev_snd_voice [MAX_SFX_CHAN + 1];
 static int last_snd_channel = MIN_SFX_CHAN - 1;
 
+extern char * music_names_copy [];
+
 /* ------------------------------------------------------------ */
 
 /* Info about music playing */
@@ -1062,6 +1064,21 @@ static int I_Validate_MusName (const char * musname)
     sptr++;
   } while (sptr -> name);
 
+#if 0
+  /* Failed to find it in the standard tables - try the original in case it has been dehacked */
+  {
+    char ** mcopy;
+    mcopy = music_names_copy;
+    mcopy++;		// 1st one is empty.
+    do
+    {
+      if (strcasecmp (*mcopy, musname) == 0)
+        return (0);
+      mcopy++;
+    } while (*mcopy);
+  }
+#endif
+
   /* Failed to find it in the standard tables - try the map table */
 
   i = 0;
@@ -1148,7 +1165,8 @@ static void I_InitMusicDirectory (void)
 	bptr [pos-1] = 0;
 	if (I_Validate_MusName (bptr))
 	{
-	  fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
+	  if (M_CheckParm ("-showunknown"))
+	    fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
 	}
 	else
 	{
@@ -1160,7 +1178,8 @@ static void I_InitMusicDirectory (void)
 
 	  if (access (filename, R_OK))
 	  {
-	    fprintf (stderr, "Directory line %u: Sound file %s not found\n", line, filename);
+	    if (M_CheckParm ("-showunknown"))
+	      fprintf (stderr, "Directory line %u: Sound file %s not found\n", line, filename);
 	  }
 	  else
 	  {
