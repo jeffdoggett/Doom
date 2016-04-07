@@ -2552,14 +2552,21 @@ static unsigned int V_drawWILVchar (int x, int y, int i)
 }
 
 /* ---------------------------------------------------------------------------- */
+/*
+   Returns height of characters.
+*/
 
 unsigned int V_drawWILV (int y, const char *str)
 {
   unsigned char cc;
+  unsigned int c;
+  unsigned int h;
   unsigned int i;
   unsigned int j;
   unsigned int x;
   unsigned int w;
+  unsigned int highest;
+  const unsigned char * p;
 
   w = V_textwidth (str, wilv_charset, w_kern);
 
@@ -2568,6 +2575,7 @@ unsigned int V_drawWILV (int y, const char *str)
   else
     x = (320 - w - 1) / 2;
 
+  highest = 0;
   i = 0;
   do
   {
@@ -2582,13 +2590,21 @@ unsigned int V_drawWILV (int y, const char *str)
       if (cc == '\'' && (!i || (i > 0 && str[i - 1] == ' ')))
 	cc = 0x7F;
 
-      j = (V_drawWILVchar (x, y, cc - '!') - 2) - gen_kern (cc, str[i+1], w_kern);
+      c = cc - '!';
+      if ((c < ARRAY_SIZE (wilv_charset))
+       && ((p = wilv_charset [c]) != NULL))
+      {
+	h = p [1] + p [2];
+	if (h > highest)
+	  highest = h;
+	j = (V_drawWILVchar (x, y, cc - '!') - 2) - gen_kern (cc, str[i+1], w_kern);
+      }
     }
     x += j;
     i++;
   } while (x < 320);
 
-  return (wilv_charset [0][1]);
+  return (highest);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2636,7 +2652,65 @@ static void save_patch (patch_t * patch, int ascii)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static void V_Load_FON2 (const unsigned char * charset[], const byte * ptr, const byte * palette)
+static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const byte * palette)
+{
+  unsigned int char_height;
+  unsigned int char_width;
+  unsigned int run_length;
+  unsigned int the_char;
+  unsigned int count;
+  unsigned int bytes_req;
+  byte * buffer;
+  byte * bptr;
+
+  char_width  = ptr [4] | (ptr [5] << 8);
+  char_height = ptr [6] | (ptr [7] << 8);
+
+  ptr += 8;
+
+  bytes_req = char_height * char_width * 256;
+  buffer = malloc (bytes_req);
+  if (buffer == NULL)
+    return (0);
+
+  /* And finally the RLE encoded info. */
+  /* 1st byte =	0-127	= use next 1-128 data bytes */
+  /*		128-255	= use next byte 2-132 times (where 255 = 2) */
+
+  bptr = buffer;
+  do
+  {
+    run_length = *ptr++;
+    if (run_length < 0x80)
+    {
+      run_length++;
+      /* Use the next n bytes */
+      memcpy (bptr, ptr, run_length);
+      ptr += run_length;
+    }
+    else
+    {
+      run_length = 257 - run_length;
+      the_char = *ptr++;
+      /* Use this byte n times */
+      memset (bptr, the_char, run_length);
+    }
+
+    bptr += run_length;
+
+//  printf ("Run length = %u, char = %X, left = %d\n", run_length, the_char, bytes_req-run_length);
+
+    bytes_req -= run_length;
+  } while (bytes_req);
+
+  
+  free (buffer);
+  return (0);		// Return 0 for the time being since we're not actually using it!
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+static int V_Load_FON2 (const unsigned char * charset[], const byte * ptr, const byte * palette)
 {
   unsigned int first;
   unsigned int last;
@@ -2689,7 +2763,7 @@ static void V_Load_FON2 (const unsigned char * charset[], const byte * ptr, cons
 
   /* Read palette info */
   colnum = colours;
-  *colnum++ = 0;
+  *colnum++ = 0;		// TRNP ???
   ptr += 3;			// Miss out 1st one which is the transparent colour
   colour_number = 1;
   if (palette_size)
@@ -2796,6 +2870,7 @@ static void V_Load_FON2 (const unsigned char * charset[], const byte * ptr, cons
     }
   } while (++char_num <= last);
 //printf ("Bytes used = %X\n", ptr - fontlump);
+  return (2);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -2822,9 +2897,12 @@ static int V_Load_Font (const unsigned char * charset[], const char * lumpname, 
       {
 	switch (fontlump [3])
 	{
+	  case '1':
+	    rc = V_Load_FON1 (charset, fontlump, palette);
+	    break;
+
 	  case '2':
-	    V_Load_FON2 (charset, fontlump, palette);
-	    rc = 2;
+	    rc = V_Load_FON2 (charset, fontlump, palette);
 	    break;
 	}
       }
@@ -2888,6 +2966,8 @@ void V_LoadFonts (void)
 
   palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
   dopal = 0;
+
+//V_Load_Font (NULL, "CONFONT", palette);	// Test code
 
   if (V_Load_Font (red_charset, "DBIGFONT", palette) == 0)
     dopal |= 1;

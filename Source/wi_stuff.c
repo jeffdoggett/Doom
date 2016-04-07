@@ -439,13 +439,14 @@ static void WI_drawLF (void)
       else
 	V_DrawPatchScaled (x, y, FB, lpatch_last);
 
-      y += (5*SHORT(lpatch_last->height))/4;
+      h = SHORT(lpatch_last->height);
     }
     else if (ltext_last)
     {
-      h = V_drawWILV (y, ltext_last);
-      y += (h+1);
+      h = V_drawWILV (y, ltext_last) + 2;
     }
+
+    y += (5*h)/4;
 
     // draw "Finished!"
 
