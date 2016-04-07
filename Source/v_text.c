@@ -6,6 +6,9 @@
 
 #define TRNP 0x20		// Transparent
 
+#define FONT_START	0x21
+#define FONT_END	0x7F
+
 /* ---------------------------------------------------------------------------- */
 /* In these tables the first character is the width in pixels, */
 /* the second character is the number of rows, and the third */
@@ -2225,6 +2228,10 @@ static const unsigned char * wilv_charset [] =
 
 /* ---------------------------------------------------------------------------- */
 
+static patch_t * big_font [ARRAY_SIZE (wilv_charset)];
+
+/* ---------------------------------------------------------------------------- */
+
 typedef struct
 {
   char char1;
@@ -2410,6 +2417,7 @@ static unsigned int V_textwidth (const char * str, const unsigned char * const *
   unsigned int w;
   unsigned int j;
   unsigned char cc;
+  patch_t * patch;
   const unsigned char * p;
 
   w = 0;
@@ -2420,14 +2428,25 @@ static unsigned int V_textwidth (const char * str, const unsigned char * const *
       break;
 
     j = 6;			// Assume unused character
-    if (cc >= '!')
+    if (cc >= FONT_START)
     {
-      cc -= '!';
+      cc -= FONT_START;
       if (cc < ARRAY_SIZE (wilv_charset))
       {
-	p = charset [cc];
-	if (p != NULL)
-	  j = (*p - 2) - gen_kern (cc+'!', *str, kern);
+#if 0
+	if ((charset == red_charset)
+	 && ((patch = big_font[cc]) != NULL))
+#else
+	if ((patch = big_font[cc]) != NULL)
+#endif
+	{
+	  j = SHORT(patch->width);
+	  j -= gen_kern (cc+FONT_START, *str, kern);
+	}
+	else if ((p = charset [cc]) != NULL)
+	{
+	  j = (*p - 2) - gen_kern (cc+FONT_START, *str, kern);
+	}
       }
     }
     w += j;
@@ -2444,9 +2463,20 @@ static unsigned int V_drawMenuchar (int x, int y, int i)
   unsigned int cols;
   unsigned int blank_lines;
   const unsigned char * p;
+  patch_t * patch;
 
-  if ((i >= ARRAY_SIZE (red_charset))
-   || ((p = red_charset [i]) == NULL))
+  if ((i < FONT_START)
+   || (((i-=FONT_START) >= ARRAY_SIZE (red_charset))))
+    return (6);
+
+  patch = big_font[i];
+  if (patch)
+  {
+    V_DrawPatchScaled (x, y, 0, patch);
+    return (SHORT(patch->width));
+  }
+
+  if ((p = red_charset [i]) == NULL)
     return (6);
 
   width = *p++;
@@ -2463,7 +2493,7 @@ static unsigned int V_drawMenuchar (int x, int y, int i)
     y++;
   } while (--height);
 
-  return (width);
+  return (width - 2);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2479,14 +2509,8 @@ unsigned int V_drawMenuText (int x, int y, const char *str)
     if (cc == 0)
       break;
 
-    if (cc < '!')
-    {
-      j = 6;
-    }
-    else
-    {
-      j = (V_drawMenuchar (x, y, cc - '!') - 2) - gen_kern (cc, *str, m_kern);
-    }
+    j = V_drawMenuchar (x, y, cc);
+    j -= gen_kern (cc, *str, m_kern);
     x += j;
     if (x > 320)
       return (0);
@@ -2503,8 +2527,6 @@ unsigned int V_MenuTextWidth (const char * str)
 }
 
 /* ---------------------------------------------------------------------------- */
-
-
 #if 0
 void V_drawMenuTextCentered (int y, const char *str)
 {
@@ -2528,10 +2550,21 @@ static unsigned int V_drawWILVchar (int x, int y, int i)
   unsigned int width,height;
   unsigned int cols;
   unsigned int blank_lines;
+  patch_t * patch;
   const unsigned char * p;
 
-  if ((i >= ARRAY_SIZE (wilv_charset))
-   || ((p = wilv_charset [i]) == NULL))
+  if ((i < FONT_START)
+   || (((i-=FONT_START) >= ARRAY_SIZE (wilv_charset))))
+    return (6);
+
+  patch = big_font[i];
+  if (patch)
+  {
+    V_DrawPatchScaled (x, y, 0, patch);
+    return (SHORT(patch->width));
+  }
+
+  if ((p = wilv_charset [i]) == NULL)
     return (6);
 
   width = *p++;
@@ -2548,7 +2581,7 @@ static unsigned int V_drawWILVchar (int x, int y, int i)
     y++;
   } while (--height);
 
-  return (width);
+  return (width - 2);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2566,6 +2599,7 @@ unsigned int V_drawWILV (int y, const char *str)
   unsigned int x;
   unsigned int w;
   unsigned int highest;
+  patch_t * patch;
   const unsigned char * p;
 
   w = V_textwidth (str, wilv_charset, w_kern);
@@ -2585,20 +2619,30 @@ unsigned int V_drawWILV (int y, const char *str)
 
     j = 6;			// Assume unused character
 
-    if (cc >= '!')
+    if (cc >= FONT_START)
     {
       if (cc == '\'' && (!i || (i > 0 && str[i - 1] == ' ')))
 	cc = 0x7F;
 
-      c = cc - '!';
-      if ((c < ARRAY_SIZE (wilv_charset))
-       && ((p = wilv_charset [c]) != NULL))
+      c = cc - FONT_START;
+      if ((c < ARRAY_SIZE (wilv_charset)))
       {
-	h = p [1] + p [2];
+	h = 0;
+	patch = big_font [c];
+	if (patch)
+	{
+	  h = SHORT(patch->height);
+	}
+	else if ((p = wilv_charset [c]) != NULL)
+	{
+	  h = p [1] + p [2];
+	}
 	if (h > highest)
 	  highest = h;
-	j = (V_drawWILVchar (x, y, cc - '!') - 2) - gen_kern (cc, str[i+1], w_kern);
       }
+
+      j = V_drawWILVchar (x, y, cc);
+      j -= gen_kern (cc, str[i+1], w_kern);
     }
     x += j;
     i++;
@@ -2722,13 +2766,13 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
   } while (bytes_req);
 
   /* Now copy to the correct place */
-  pos = 0;  
+  pos = 0;
   bptr = buffer;
   bytes_req = char_height * char_width;
   do
   {
-    if ((pos >= '!')	// Hard code range for now!
-     && (pos <= 0x7F))
+    if ((pos >= FONT_START)	// Hard code range for now!
+     && (pos <= FONT_END))
     {
       chardef = malloc (bytes_req + 3);
       if (chardef)
@@ -2742,7 +2786,7 @@ static int V_Load_FON1 (const unsigned char * charset[], const byte * ptr, const
     }
     bptr += bytes_req;
   } while (++pos < 256);
-  
+
   free (buffer);
   return (1);
 }
@@ -3000,8 +3044,34 @@ static void V_SetFontPalette (const unsigned char * const * charset, byte * pale
 
 void V_LoadFonts (void)
 {
+  int i,j;
   int dopal;
   byte * palette;
+  patch_t * patch;
+  char buffer [12];
+
+  i = 0;
+  j = FONT_START;
+  do
+  {
+    sprintf (buffer, "BIGFN%.3d", j);
+    patch = (patch_t *) W_CacheLumpName0 (buffer, PU_STATIC);
+
+    if ((j >= 'a') && (j <= 'z'))// If we are missing upper/lower case then point to the other case.
+    {
+      if (patch == NULL)
+      {
+	patch = big_font[i-0x20];
+      }
+      else if (big_font[i-0x20] == NULL)
+      {
+	big_font[i-0x20] = patch;
+      }
+    }
+    big_font[i] = patch;
+//  printf ("big_font[%c] = %lX\n", j, big_font[i]);
+    j++;
+  } while (++i < ARRAY_SIZE(big_font));
 
   palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
   dopal = 0;

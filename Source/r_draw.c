@@ -117,8 +117,8 @@ static byte *GenerateTintTable (const byte *palette, int percent, const byte * f
 	{
 	    for (background = 0; background < 256; ++background)
 	    {
-		byte    *colour1 = palette + background * 3;
-		byte    *colour2 = palette + foreground * 3;
+		const byte *colour1 = palette + background * 3;
+		const byte *colour2 = palette + foreground * 3;
 		int     r, g, b;
 
 		if (percent == ADDITIVE)
