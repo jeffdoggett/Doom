@@ -1111,13 +1111,23 @@ static void I_InitMusicDirectory (void)
   prefix = "Doom1";
   if (gamemode == commercial)
   {
-    prefix = "Doom2";
-    if (gamemission == pack_plut)
-      prefix = "Plutonia";
-    else if (gamemission == pack_tnt)
-      prefix = "Tnt";
-    else if (gamemission == pack_hacx)
-      prefix = "Hacx";
+    switch (gamemission)
+    {
+      case pack_plut:
+	prefix = "Plutonia";
+	break;
+
+      case pack_tnt:
+	prefix = "Tnt";
+	break;
+
+      case pack_hacx:
+	prefix = "Hacx";
+	break;
+
+      default:
+	prefix = "Doom2";
+    }
   }
 
   line = 0;
