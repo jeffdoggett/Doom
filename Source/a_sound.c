@@ -1116,6 +1116,8 @@ static void I_InitMusicDirectory (void)
       prefix = "Plutonia";
     else if (gamemission == pack_tnt)
       prefix = "Tnt";
+    else if (gamemission == pack_hacx)
+      prefix = "Hacx";
   }
 
   line = 0;

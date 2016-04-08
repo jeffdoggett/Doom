@@ -128,7 +128,7 @@ static int		nosfx;
 static int S_getChannel (sfxinfo_t* sfxinfo);
 
 
-int
+static int
 S_AdjustSoundParams
 ( mobj_t*	listener,
   mobj_t*	source,
@@ -540,7 +540,6 @@ void S_StopSound(void *origin)
 	if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
 	{
 	    S_StopChannel(cnum);
-	    break;
 	}
     }
 }
@@ -563,7 +562,6 @@ void S_RemoveSoundOrigin (void *origin)
 	    sorigin -> y = mobj -> y;
 	    sorigin -> z = mobj -> z;
 	    channels[cnum].origin = sorigin;
-	    break;
 	}
     }
 }
@@ -845,7 +843,7 @@ static void S_StopChannel(int cnum)
 // If the sound is not audible, returns a 0.
 // Otherwise, modifies parameters and returns 1.
 //
-int
+static int
 S_AdjustSoundParams
 ( mobj_t*	listener,
   mobj_t*	source,
