@@ -291,19 +291,6 @@ void I_SetSfxVolume(int volume)
 
 /* ------------------------------------------------------------ */
 
-//
-// Retrieve the raw data lump index
-//  for a given SFX name.
-//
-int I_GetSfxLumpNum(sfxinfo_t* sfx)
-{
-    char namebuf[9];
-    sprintf(namebuf, "ds%s", sfx->name);
-    return W_GetNumForName(namebuf);
-}
-
-/* ------------------------------------------------------------ */
-
 static unsigned int read_32 (unsigned char * ptr)
 {
   unsigned int rc;
@@ -540,23 +527,11 @@ void I_StopSound (int handle)
 
 int I_SoundIsPlaying (int handle)
 {
-  int rc;
   _kernel_swi_regs regs;
 
   regs.r[0] = handle;
   _kernel_swi (DataVox_ReadAddress, &regs, &regs);
-  rc = regs.r[1];
-  if (rc)
-  {
-    // We treat "nearly finished" as done otherwise the menu
-    // sounds get truncated when starting a new level. */
-    regs.r[0] = handle;
-    _kernel_swi (DataVox_ReadMemory, &regs, &regs);
-    rc = regs.r[2] - rc;
-    if (rc < 8000)
-      rc = 0;
-  }
-  return (rc);
+  return (regs.r[1]);
 }
 
 /* ------------------------------------------------------------ */

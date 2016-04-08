@@ -71,19 +71,6 @@ void I_SetMusicVolume(int volume)
 
 /* ------------------------------------------------------------ */
 
-//
-// Retrieve the raw data lump index
-//  for a given SFX name.
-//
-int I_GetSfxLumpNum(sfxinfo_t* sfx)
-{
-    char namebuf[9];
-    sprintf(namebuf, "ds%s", sfx->name);
-    return W_GetNumForName(namebuf);
-}
-
-/* ------------------------------------------------------------ */
-
 static unsigned int read_32 (unsigned char * ptr)
 {
   unsigned int rc;

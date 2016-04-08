@@ -452,17 +452,6 @@ void I_SetMusicVolume(int volume)
 
 
 //
-// Retrieve the raw data lump index
-//  for a given SFX name.
-//
-int I_GetSfxLumpNum(sfxinfo_t* sfx)
-{
-    char namebuf[9];
-    sprintf(namebuf, "ds%s", sfx->name);
-    return W_GetNumForName(namebuf);
-}
-
-//
 // Starting a sound means adding it
 //  to the current list of active sounds
 //  in the internal channels.

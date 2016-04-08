@@ -63,15 +63,6 @@ S_StartSound
   int		sound_id );
 
 
-
-// Will start a sound at a given volume.
-void
-S_StartSoundAtVolume
-( void*		origin,
-  int		sound_id,
-  int		volume );
-
-
 // Stop sound for thing at <origin>
 void S_StopSound(void* origin);
 void S_RemoveSoundOrigin (void *origin);

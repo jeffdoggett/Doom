@@ -115,6 +115,7 @@ static musicinfo_t*	mus_playing=0;
 //  by the defaults code in M_misc:
 // number of channels available
 int			numChannels;
+int			nextChannel = 0;
 
 static int		nextcleanup;
 
@@ -124,10 +125,7 @@ static int		nosfx;
 //
 // Internals.
 //
-int
-S_getChannel
-( void*		origin,
-  sfxinfo_t*	sfxinfo );
+static int S_getChannel (sfxinfo_t* sfxinfo);
 
 
 int
@@ -138,7 +136,7 @@ S_AdjustSoundParams
   int*		sep,
   int*		pitch );
 
-void S_StopChannel(int cnum);
+static void S_StopChannel(int cnum);
 
 /* ------------------------------------------------------------ */
 
@@ -227,7 +225,7 @@ static const unsigned int spmus[]=
   mus_e3m2,	// Romero	e4m2
   mus_e3m3,	// Shawn	e4m3
   mus_e1m5,	// American	e4m4
-  mus_e2m7,	// Tim 	e4m5
+  mus_e2m7,	// Tim		e4m5
   mus_e2m4,	// Romero	e4m6
   mus_e2m6,	// J.Anderson	e4m7 CHIRON.WAD
   mus_e2m5,	// Shawn	e4m8
@@ -252,8 +250,7 @@ void S_Start(void)
   // kill all playing sounds at start of level
   //  (trust me - a good idea)
   for (cnum=0 ; cnum<numChannels ; cnum++)
-    if (channels[cnum].sfxinfo)
-      S_StopChannel(cnum);
+    channels[cnum].origin = NULL;
 
   // start new music for the level
   mus_paused = false;
@@ -298,21 +295,29 @@ void S_Start(void)
 }
 
 /* ------------------------------------------------------------ */
-
-void
-S_StartSoundAtVolume
-( void*		origin_p,
-  int		sfx_id,
-  int		volume )
+//
+// Retrieve the raw data lump index
+//  for a given SFX name.
+//
+static int S_GetSfxLumpNum (sfxinfo_t* sfx)
 {
+    char namebuf[9];
+    sprintf(namebuf, "ds%s", sfx->name);
+    return W_GetNumForName(namebuf);
+}
 
+/* ------------------------------------------------------------ */
+
+static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
+{
   int		rc;
   int		sep;
   int		pitch;
   int		priority;
   sfxinfo_t*	sfx;
+  channel_t*	c;
   int		cnum;
-
+  int		next;
   mobj_t*	origin = (mobj_t *) origin_p;
 
 
@@ -366,7 +371,7 @@ S_StartSoundAtVolume
     if ( origin->x == players[consoleplayer].mo->x
 	 && origin->y == players[consoleplayer].mo->y)
     {
-      sep 	= NORM_SEP;
+      sep = NORM_SEP;
     }
 
     if (!rc)
@@ -399,14 +404,18 @@ S_StartSoundAtVolume
       pitch = 255;
   }
 
-  // kill old sound
-  S_StopSound(origin);
-
   // try to find a channel
-  cnum = S_getChannel(origin, sfx);
+  cnum = S_getChannel (sfx);
 
-  if (cnum<0)
-    return;
+  next = cnum + 1;
+  if (next >= numChannels)
+    next = 0;
+  nextChannel = next;
+
+  c = &channels[cnum];
+  c->sfxinfo = sfx;
+  c->origin = origin;
+
 
   //
   // This is supposed to handle the loading/caching.
@@ -416,7 +425,7 @@ S_StartSoundAtVolume
 
   // get lumpnum if necessary
   if (sfx->lumpnum < 0)
-    sfx->lumpnum = I_GetSfxLumpNum(sfx);
+    sfx->lumpnum = S_GetSfxLumpNum(sfx);
 
 #ifndef SNDSRV
   // cache data if necessary
@@ -425,7 +434,7 @@ S_StartSoundAtVolume
     // fprintf( stderr,  "S_StartSoundAtVolume: 16bit and not pre-cached - wtf?\n");
 
     // DOS remains, 8bit handling
-    sfx->data = (void *) W_CacheLumpNum(sfx->lumpnum, PU_MUSIC);
+    sfx->data = (void *) W_CacheLumpNum(sfx->lumpnum, PU_SOUND);
     // fprintf( stderr,
     //	     "S_StartSoundAtVolume: loading %d (lump %d) : 0x%x\n",
     //       sfx_id, sfx->lumpnum, (int)sfx->data );
@@ -439,7 +448,7 @@ S_StartSoundAtVolume
 
   // Assigns the handle to one of the channels in the
   //  mix/output buffer.
-  channels[cnum].handle = I_StartSound(sfx_id,
+  c->handle = I_StartSound(sfx_id,
 				       /*sfx->data,*/
 				       volume,
 				       sep,
@@ -736,8 +745,9 @@ void S_ChangeMusic (int musicnum, int looping)
   if (nomusic)
     return;
 
-  if ( (musicnum <= mus_None)
-   || (musicnum >= NUMMUSIC) )
+  if ((musicnum <= mus_None)
+   || (musicnum >= NUMMUSIC)
+   || ((music = &S_music[musicnum])->name == NULL))
   {
     fprintf (stderr, "Bad music number %d\n", musicnum);
     if (gamemode == commercial)
@@ -745,7 +755,6 @@ void S_ChangeMusic (int musicnum, int looping)
     else
       musicnum = mus_doom;
   }
-  music = &S_music[musicnum];
 
   if (mus_playing == music)
     return;
@@ -793,7 +802,7 @@ void S_StopMusic(void)
 
 /* ------------------------------------------------------------ */
 
-void S_StopChannel(int cnum)
+static void S_StopChannel(int cnum)
 {
 
     int		i;
@@ -917,54 +926,23 @@ S_AdjustSoundParams
 // S_getChannel :
 //   If none available, return -1.  Otherwise channel #.
 //
-int
-S_getChannel
-( void*		origin,
-  sfxinfo_t*	sfxinfo )
+static int S_getChannel (sfxinfo_t* sfxinfo)
 {
-    // channel number to use
-    int		cnum;
+  // channel number to use
+  int cnum;
 
-    channel_t*	c;
+  // Find an open channel
+  for (cnum=0 ; cnum<numChannels ; cnum++)
+    if (!channels[cnum].sfxinfo)
+      return (cnum);
 
-    // Find an open channel
-    for (cnum=0 ; cnum<numChannels ; cnum++)
-    {
-	if (!channels[cnum].sfxinfo)
-	    break;
-	else if (origin &&  channels[cnum].origin ==  origin)
-	{
-	    S_StopChannel(cnum);
-	    break;
-	}
-    }
+  // None available
+  // Look for lower priority
+  for (cnum=0 ; cnum<numChannels ; cnum++)
+    if (channels[cnum].sfxinfo->priority >= sfxinfo->priority)
+      return (cnum);
 
-    // None available
-    if (cnum == numChannels)
-    {
-	// Look for lower priority
-	for (cnum=0 ; cnum<numChannels ; cnum++)
-	    if (channels[cnum].sfxinfo->priority >= sfxinfo->priority) break;
-
-	if (cnum == numChannels)
-	{
-	    // FUCK!  No lower priority.  Sorry, Charlie.
-	    return -1;
-	}
-	else
-	{
-	    // Otherwise, kick out lower priority.
-	    S_StopChannel(cnum);
-	}
-    }
-
-    c = &channels[cnum];
-
-    // channel is decided to be cnum.
-    c->sfxinfo = sfxinfo;
-    c->origin = origin;
-
-    return cnum;
+  return (nextChannel);
 }
 
 /* ------------------------------------------------------------ */
