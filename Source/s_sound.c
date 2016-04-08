@@ -115,7 +115,7 @@ static musicinfo_t*	mus_playing=0;
 //  by the defaults code in M_misc:
 // number of channels available
 int			numChannels;
-int			nextChannel = 0;
+static int		nextChannel = 0;
 
 static int		nextcleanup;
 
@@ -934,6 +934,11 @@ static int S_getChannel (sfxinfo_t* sfxinfo)
   // Find an open channel
   for (cnum=0 ; cnum<numChannels ; cnum++)
     if (!channels[cnum].sfxinfo)
+      return (cnum);
+
+  // Find a channel that we are not tracking
+  for (cnum=0 ; cnum<numChannels ; cnum++)
+    if (!channels[cnum].origin)
       return (cnum);
 
   // None available
