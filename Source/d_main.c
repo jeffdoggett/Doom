@@ -961,7 +961,7 @@ static void IdentifyIwad (const char * name)
 	else if (strncasecmp (leaf, "tnt", 3) == 0)
 	  gamemission = pack_tnt;
 
-	else if (strncasecmp (leaf, "hacx", 3) == 0)
+	else if (strncasecmp (leaf, "hacx", 4) == 0)
 	  gamemission = pack_hacx;
      }
 #endif
