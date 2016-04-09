@@ -119,6 +119,7 @@ typedef struct clusterdefs_s
   char * exittext;
   char * flat;
   char * pic;
+  char * music;
 } clusterdefs_t;
 
 clusterdefs_t * F_Access_ClusterDef (unsigned int num);

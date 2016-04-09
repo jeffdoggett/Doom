@@ -4118,6 +4118,10 @@ void DH_remove_duplicate_mapinfos (void)
 	  printf ("Exit = NULL\n");
 	else
 	  printf ("Exit = %s\n", cp->exittext);
+	if (cp->music == 0)
+	  printf ("Music = NULL\n");
+	else
+	  printf ("Music = %s\n", cp->music);
 	cp = cp -> next;
       } while (cp);
     }
@@ -4179,7 +4183,7 @@ void DH_remove_duplicate_mapinfos (void)
 
 /* ---------------------------------------------------------------------------- */
 
-static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int intertext)
+static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int intertext, unsigned int islump)
 {
   char cc;
   unsigned int l;
@@ -4233,39 +4237,39 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 //printf ("length = %d, ptr = (%s)\n", length, ptr);
   if (length)
   {
-    source = DH_Find_language_text (ptr, false);
-    if (source)
+    if ((length < 9)
+     && ((lump = W_CheckNumForName (ptr)) != -1))
     {
-      newtext = *source;
-    }
-    else if (length < 9)
-    {
-      if ((lump = W_CheckNumForName (ptr)) != -1)
+      length = W_LumpLength (lump);
+      if (length)
       {
-	length = W_LumpLength (lump);
-	if (length)
+	// printf ("Lump is %u bytes\n", length);
+	lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
+	// length = split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
+	newtext = malloc (length + 20);
+	if (newtext)
 	{
-	  // printf ("Lump is %u bytes\n", length);
-	  lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
-	  // length = split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
-	  newtext = malloc (length + 20);
-	  if (newtext)
-	  {
-	    strncpy (newtext, lump_ptr, length);
-	    newtext [length] = 0;
-	    dh_remove_americanisms (newtext);
-	  }
-	  Z_Free (lump_ptr);
+	  strncpy (newtext, lump_ptr, length);
+	  newtext [length] = 0;
+	  dh_remove_americanisms (newtext);
 	}
+	Z_Free (lump_ptr);
       }
     }
-    else if (lookup == 0)
+    else if (islump == 0)
     {
-      newtext = malloc (length + 20);
-      if (newtext)
+      if ((source = DH_Find_language_text (ptr, false)) != NULL)
       {
-	strcpy (newtext, ptr);
-	dh_remove_americanisms (newtext);
+	newtext = *source;
+      }
+      else if (lookup == 0)
+      {
+	newtext = malloc (length + 20);
+	if (newtext)
+	{
+	  strcpy (newtext, ptr);
+	  dh_remove_americanisms (newtext);
+	}
       }
     }
   }
@@ -4814,8 +4818,54 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "music ", 6) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      ptr = replace_map_text (&mdest_ptr -> music, ptr + 6);
+      ptr += 6;
+      if (intertext == -1)
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	ptr = replace_map_text (&mdest_ptr -> music, ptr);
+	// printf ("Map Music = %s for %u/%u\n", mdest_ptr -> music, episode, map);
+      }
+      else
+      {
+	if (*ptr == '=') ptr++;
+	while (*ptr == ' ') ptr++;
+	if (*ptr == '\"') ptr++;
+	j = dh_inchar (ptr, ' ');
+	if (j) ptr [j-1] = 0;
+	j = dh_inchar (ptr, '"');
+	if (j) ptr [j-1] = 0;
+
+	if (*ptr == '$')
+	{
+	  char ** source;
+	  ptr++;
+	  source = DH_Find_language_text (ptr, false);
+	  if (source)
+	    newtext = *source;
+	  else
+	    newtext = NULL;
+	}
+	else
+	{
+	  l = strlen (ptr);
+	  newtext = malloc (l+1);
+	  if (newtext)
+	    strcpy (newtext, ptr);
+	}
+
+	if (newtext)
+	{
+	  if (intertext != -1)
+	  {
+	    cp = F_Create_ClusterDef (intertext);
+	    if (cp)
+	    {
+	      cp->music = newtext;
+	      // printf ("Cluster Music %u = \'%s\'\n", intertext, newtext);
+	    }
+	  }
+	}
+      }
     }
     else if (strncasecmp (ptr, "sky1 ", 5) == 0)
     {
@@ -5023,7 +5073,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }				// Also jenesis.wad sets it AFTER the entertext.
     else if (strncasecmp (ptr, "entertext", 9) == 0)
     {
-      ptr = set_enter_exit_text (ptr+9, 0, intertext);
+      ptr = set_enter_exit_text (ptr+9, 0, intertext, textislump & 1);
     }
     else if (strncasecmp (ptr, "exittextislump", 14) == 0)
     {
@@ -5031,7 +5081,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "exittext", 8) == 0)
     {
-      ptr = set_enter_exit_text (ptr+8, 1, intertext);
+      ptr = set_enter_exit_text (ptr+8, 1, intertext, textislump & 2);
     }
     else if (strncasecmp (ptr, "flat ", 5) == 0)
     {
@@ -5271,7 +5321,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	intertext = (episode*10)+map;
 
       mdest_ptr -> cluster = intertext;
-      ptr = set_enter_exit_text (ptr+9, 1, intertext);
+      ptr = set_enter_exit_text (ptr+9, 1, intertext, 0);
     }
     else if (strncasecmp (ptr, "inter-backdrop", 14) == 0)
     {

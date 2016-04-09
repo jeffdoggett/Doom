@@ -707,7 +707,6 @@ void S_SetMusicVolume(int volume)
 		volume);
     }
 
-    I_SetMusicVolume(127);
     I_SetMusicVolume(volume);
     snd_MusicVolume = volume;
 }
@@ -737,6 +736,7 @@ void S_StartMusic (int m_id)
 
 void S_ChangeMusic (int musicnum, int looping)
 {
+  int lumpnum;
   musicinfo_t*	music;
   char		namebuf[9];
 
@@ -754,30 +754,40 @@ void S_ChangeMusic (int musicnum, int looping)
       musicnum = mus_doom;
   }
 
-  if (mus_playing == music)
+  if ((musicnum != mus_extra)
+   && (mus_playing == music))
     return;
 
+  sprintf (namebuf, "d_%s", music->name);
+  lumpnum = W_CheckNumForName (namebuf);
+  if (lumpnum == -1)
+  {
+    // shutdown old music
+    S_StopMusic ();
+    return;
+  }
+
+  if ((lumpnum != music->lumpnum)	// May have changed when using mus_extra
+   || (music->data == NULL))
+  {
+    music->lumpnum = lumpnum;
+    music->data = (void *) W_CacheLumpNum (music->lumpnum, PU_MUSIC);
+  }
+  else if (mus_playing == music)
+  {
+    return;
+  }
+
   // shutdown old music
-  S_StopMusic();
+  S_StopMusic ();
 
-  // get lumpnum if neccessary
-  if (music->lumpnum == 0)
-  {
-    sprintf (namebuf, "d_%s", music->name);
-    music->lumpnum = W_CheckNumForName (namebuf);
-  }
+  // load & register it
+  music->handle = I_RegisterSong (music);
 
-  if (music->lumpnum != -1)
-  {
-    // load & register it
-    music->data = (void *) W_CacheLumpNum(music->lumpnum, PU_MUSIC);
-    music->handle = I_RegisterSong (music);
+  // play it
+  I_PlaySong (music->handle, looping);
 
-    // play it
-    I_PlaySong(music->handle, looping);
-
-    mus_playing = music;
-  }
+  mus_playing = music;
 }
 
 /* ------------------------------------------------------------ */

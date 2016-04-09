@@ -196,6 +196,7 @@ static int prev_snd_voice [MAX_SFX_CHAN + 1];
 static int last_snd_channel = MIN_SFX_CHAN - 1;
 
 extern char * music_names_copy [];
+extern clusterdefs_t * finale_clusterdefs_head;
 
 /* ------------------------------------------------------------ */
 
@@ -954,7 +955,9 @@ static unsigned int Mus_AMP_load (const char * filename)
   regs.r[1] = (int) filename;
   rc = _kernel_swi (AMPlayer_Play, &regs, &regs);
 #ifdef DEBUG_MUSIC
-  if (rc)
+  if (rc == NULL)
+    printf ("AMP is playing %s\n", filename);
+  else
     printf ("AMP Load:%s (%s)\n", rc -> errmess, filename);
 #endif
   return ((unsigned int) rc);
@@ -1018,6 +1021,30 @@ static int Mus_AMP_info (void)
   return (regs.r[0]);
 }
 
+static int Mus_AMP_playing (void)
+{
+  int ampinfo;
+  unsigned int time_started;
+  _kernel_swi_regs regs;
+
+  _kernel_swi (OS_ReadMonotonicTime, &regs, &regs);
+  time_started = regs.r [0];
+
+  do
+  {
+    regs.r[0] = 0;
+    _kernel_swi (AMPlayer_Info, &regs, &regs);
+    ampinfo = regs.r[0];
+
+    if (ampinfo == 0)
+      break;
+
+    _kernel_swi (OS_ReadMonotonicTime, &regs, &regs);
+  } while ((regs.r [0] - time_started) < 50);
+
+  return (ampinfo);
+}
+
 /* ------------------------------------------------------------ */
 
 static int I_Validate_MusName (const char * musname)
@@ -1025,6 +1052,7 @@ static int I_Validate_MusName (const char * musname)
   unsigned int i;
   musicinfo_t * sptr;
   map_dests_t * map_ptr;
+  clusterdefs_t * cluster;
 
   if (strncasecmp (musname, "D_", 2))
     return (1);
@@ -1048,13 +1076,13 @@ static int I_Validate_MusName (const char * musname)
     do
     {
       if (strcasecmp (*mcopy, musname) == 0)
-        return (0);
+	return (0);
       mcopy++;
     } while (*mcopy);
   }
 #endif
 
-  /* Failed to find it in the standard tables - try the map table */
+  /* Failed to find it in the standard tables - try the map tables */
 
   i = 0;
   map_ptr = G_Access_MapInfoTab_E (1,0);
@@ -1076,6 +1104,18 @@ static int I_Validate_MusName (const char * musname)
     map_ptr++;
   } while (++i < 100);
 
+  cluster = finale_clusterdefs_head;
+  if (cluster)
+  {
+    do
+    {
+      if ((cluster -> music)
+       && (strcasecmp (cluster -> music, musname) == 0))
+	return (0);
+      cluster = cluster -> next;
+    } while (cluster);
+  }
+
   return (1);
 }
 
@@ -1092,9 +1132,9 @@ static void I_InitMusicDirectory (void)
   char buffer [200];
   char filename [100];
 
-  if ((Mus_AMP_set_volume (127))
+  if ((Mus_AMP_set_volume (music_ampvol))
    && ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer"))
-    || (Mus_AMP_set_volume (127))))
+    || (Mus_AMP_set_volume (music_ampvol))))
   {
     printf ("Failed to initialise AMPlayer\n");
     return;
@@ -1150,10 +1190,10 @@ static void I_InitMusicDirectory (void)
       if (pos)
       {
 	bptr [pos-1] = 0;
-	if (I_Validate_MusName (bptr))
+	if ((I_Validate_MusName (bptr))
+	 && (M_CheckParm ("-showunknown")))
 	{
-	  if (M_CheckParm ("-showunknown"))
-	    fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
+	  fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
 	}
 	else
 	{
@@ -1181,9 +1221,9 @@ static void I_InitMusicDirectory (void)
 	    strcpy (mptr -> filename, filename);
 
   	    if (M_CheckParm ("-showmusdir"))
-              printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
-          }
-        }
+	      printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
+	  }
+	}
       }
     }
   } while (!feof (fin));
@@ -1251,25 +1291,29 @@ static int I_PlayMusicFile (const char * lumpname)
   mus_dir_t * ptr;
 
   ptr = music_directory_head;
-  if (ptr == NULL)
-    return (1);
-
-  do
+  if (ptr != NULL)
   {
-//  printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
-    if (strcasecmp (ptr -> musname, lumpname) == 0)
+    do
     {
-      if (Mus_AMP_load (ptr -> filename) == 0)
+//    printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
+      if (strcasecmp (ptr -> musname, lumpname) == 0)
       {
-	amp_current = ptr;
-//	printf ("Playing %s\n", ptr -> filename);
-	music_available |= AMP_PLAYING;
-	return (0);
+	if ((Mus_AMP_load (ptr -> filename) == 0)
+	 && (Mus_AMP_playing () == 3))		// 3 = magic number from AMPlayer_Info
+	{
+	  amp_current = ptr;
+//	  printf ("Playing %s\n", ptr -> filename);
+	  music_available |= AMP_PLAYING;
+	  return (0);
+	}
+	break;
       }
-      break;
-    }
-    ptr = ptr -> next;
-  } while (ptr);
+      ptr = ptr -> next;
+    } while (ptr);
+  }
+
+  if (M_CheckParm ("-showunknown"))
+    fprintf (stderr, "Failed to find music %s\n", lumpname);
 
   amp_current = NULL;
   return (1);
@@ -1341,12 +1385,13 @@ int I_RegisterSong (musicinfo_t * music)
   }
 
 
-  if (((Mus_AMP_set_volume (127) == 0)	// Is Amplayer loaded?
+  if (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
    || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
-    && (Mus_AMP_set_volume (127) == 0)))
+    && (Mus_AMP_set_volume (music_ampvol) == 0)))
    && (I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0))
   {
-    if (Mus_AMP_load (MUS_TEMP_FILE) == 0)
+    if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
+     && (Mus_AMP_playing () == 3))
     {
       amp_current = (mus_dir_t *) &wimp_temp;
 //    printf ("Playing %s\n", ptr -> filename);
@@ -1614,7 +1659,7 @@ void I_StopSong (int handle)
       i = I_GetTime ();
       do
       {
-        j = Mus_AMP_info ();
+	j = Mus_AMP_info ();
       } while ((j) && ((I_GetTime () - i) < 100));
       remove (amp_current -> filename);
     }

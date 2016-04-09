@@ -130,9 +130,11 @@ clusterdefs_t * finale_clusterdefs_head = 0;
 static char* finaletext;
 static char* finaleflat;
 static char* finalepic;
+static char* finalemusic;
 static char* nextfinaletext;
 static char* nextfinaleflat;
 static char* nextfinalepic;
+static char* nextfinalemusic;
 
 static void F_StartCast (void);
 void	F_CastTicker (void);
@@ -180,6 +182,34 @@ clusterdefs_t * F_Access_ClusterDef (unsigned int num)
 
 // --------------------------------------------------------------------------------------------
 
+static void F_StartMusic (char * music)
+{
+  int musnum;
+  musicinfo_t*	musinfo;
+
+  if ((music == NULL)
+   || (music [0] == 0))
+  {
+    if (gamemode == commercial)
+      musnum = mus_read_m;
+    else
+      musnum = mus_victor;
+  }
+  else
+  {
+    if (strncasecmp (music, "D_", 2) == 0)
+      music += 2;
+
+    musnum = mus_extra;
+    musinfo = &S_music[musnum];
+    musinfo->name = music;
+  }
+
+  S_ChangeMusic (musnum, true);
+}
+
+// --------------------------------------------------------------------------------------------
+
 static void F_DetermineIntermissionTexts (void)
 {
   int i,j;
@@ -192,6 +222,8 @@ static void F_DetermineIntermissionTexts (void)
 
   finaletext = NULL;
   nextfinaletext = NULL;
+  finalemusic = NULL;
+  nextfinalemusic = NULL;
   finaleflat = NULL;
   nextfinaleflat = NULL;
   nextfinalepic = finalepic = finale_backdrops[BG_BOSSBACK];
@@ -244,6 +276,7 @@ static void F_DetermineIntermissionTexts (void)
       {
 	finaletext = cp_p -> exittext;
 	finaleflat = cp_p -> flat;
+	finalemusic = cp_p -> music;
 	if ((cp_p -> pic)
 	 && (W_CheckNumForName (cp_p -> pic) != -1))
 	  finalepic = cp_p -> pic;
@@ -261,6 +294,7 @@ static void F_DetermineIntermissionTexts (void)
       {
 	nextfinaletext = cp_n -> entertext;
 	nextfinaleflat = cp_n -> flat;
+	nextfinalemusic = cp_p -> music;
 	if ((cp_n -> pic)
 	 && (W_CheckNumForName (cp_n -> pic) != -1))
 	  nextfinalepic = cp_n -> pic;
@@ -282,11 +316,16 @@ static void F_DetermineIntermissionTexts (void)
 	finaletext = nextfinaletext;
 	finaleflat = nextfinaleflat;
 	finalepic  = nextfinalepic;
+	finalemusic = nextfinalemusic;
 	nextfinaletext = NULL;
 	nextfinaleflat = NULL;
 	nextfinalepic = NULL;
+	nextfinalemusic = NULL;
       }
     }
+
+    if (finaletext)
+      F_StartMusic (finalemusic);
   }
   else
   {
@@ -517,11 +556,14 @@ void F_Ticker (void)
 	  finaletext = nextfinaletext;
 	  finaleflat = nextfinaleflat;
 	  finalepic  = nextfinalepic;
+	  finalemusic = nextfinalemusic;
 	  nextfinaletext = NULL;
 	  nextfinaleflat = NULL;
 	  nextfinalepic  = NULL;
+	  nextfinalemusic = NULL;
 	  finalestage = 0;
 	  finalecount = 0;
+	  F_StartMusic (finalemusic);
 	  return;
 	}
 
@@ -568,9 +610,12 @@ void F_Ticker (void)
 	finaletext = nextfinaletext;
 	finaleflat = nextfinaleflat;
 	finalepic  = nextfinalepic;
+	finalemusic = nextfinalemusic;
 	nextfinaletext = NULL;
 	nextfinaleflat = NULL;
 	nextfinalepic  = NULL;
+	nextfinalemusic = NULL;
+	F_StartMusic (finalemusic);
       }
       else
       {

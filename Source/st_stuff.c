@@ -700,18 +700,28 @@ ST_Responder (event_t* ev)
 	  musnum = mus_runnin + (buf[0]-'0')*10 + buf[1]-'0' - 1;
 
 	  if (((buf[0]-'0')*10 + buf[1]-'0') > 35)
+	  {
+	    S_StopMusic ();
 	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
+	  }
 	  else
+	  {
 	    S_ChangeMusic(musnum, 1);
+	  }
 	}
 	else
 	{
 	  musnum = mus_e1m1 + (buf[0]-'1')*9 + (buf[1]-'1');
 
 	  if (((buf[0]-'1')*9 + buf[1]-'1') > 31)
+	  {
+	    S_StopMusic ();
 	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
+	  }
 	  else
+	  {
 	    S_ChangeMusic(musnum, 1);
+	  }
 	}
       }
       // Simplified, accepting both "noclip" and "idspispopd".
