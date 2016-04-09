@@ -197,10 +197,8 @@ static void createTextureCompositePatch(int id)
 
 	for (x = 0; x < SHORT(oldPatch->width); ++x)
 	{
-	    int		 top = -1;
-	    int		 tx = texpatch->originx + x;
-	    const column_t *oldPrevColumn;
-	    const column_t *oldNextColumn;
+	    int	 top = -1;
+	    int	 tx = texpatch->originx + x;
 
 	    if (tx < 0)
 		continue;
@@ -208,21 +206,6 @@ static void createTextureCompositePatch(int id)
 		break;
 
 	    oldColumn = (const column_t *)((const byte *)oldPatch + LONG(oldPatch->columnofs[x]));
-
-	    {
-		// tiling
-		int     prevColumnIndex = x - 1;
-		int     nextColumnIndex = x + 1;
-
-		while (prevColumnIndex < 0)
-		    prevColumnIndex += SHORT(oldPatch->width);
-		while (nextColumnIndex >= SHORT(oldPatch->width))
-		    nextColumnIndex -= SHORT(oldPatch->width);
-		oldPrevColumn = (const column_t *)((const byte *)oldPatch
-		    + LONG(oldPatch->columnofs[prevColumnIndex]));
-		oldNextColumn = (const column_t *)((const byte *)oldPatch
-		    + LONG(oldPatch->columnofs[nextColumnIndex]));
-	    }
 
 	    while (oldColumn->topdelta != 0xFF)
 	    {
