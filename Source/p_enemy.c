@@ -27,29 +27,7 @@
 static const char rcsid[] = "$Id: p_enemy.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 #endif
 
-#include <stdlib.h>
-
-#ifdef __riscos
-#include "acorn.h"
-#endif
-
-#include "m_random.h"
-#include "i_system.h"
-
-#include "doomdef.h"
-#include "p_local.h"
-
-#include "s_sound.h"
-#include "f_finale.h"
-#include "g_game.h"
-#include "p_enemy.h"
-
-// State.
-#include "doomstat.h"
-#include "r_state.h"
-
-// Data.
-#include "sounds.h"
+#include "includes.h"
 
 //-----------------------------------------------------------------------------
 
@@ -1501,9 +1479,7 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 		      corpsehit->lastenemy = NULL;
 #endif
 		      // [BH] remove one from killcount since monster is to be resurrected
-		      if ((corpsehit->flags & MF_COUNTKILL)
-		       && (actor->target->player->killcount))
-			actor->target->player->killcount--;
+		      P_AdjustKillCount (corpsehit, actor, -1);
 		    }
 		    return;
 		}

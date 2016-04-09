@@ -34,6 +34,7 @@ boolean P_GiveBody (player_t* player, int num);
 char * P_GiveCard (player_t* player, card_t card);
 void P_NoMoreSectorDamage (sector_t* sector);
 void P_MakeSuitPerm (void);
+void P_AdjustKillCount (mobj_t*	target, mobj_t*	source, int amount);
 
 
 

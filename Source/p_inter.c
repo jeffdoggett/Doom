@@ -617,8 +617,8 @@ P_TouchSpecialThing
       player->message = got_messages [P_GOTBERSERK];
       if (player->readyweapon != wp_fist)
       {
-        if ((netgame)
-         || (M_CheckParm ("-noautoweaponchange") == 0))
+	if ((netgame)
+	 || (M_CheckParm ("-noautoweaponchange") == 0))
 	  player->pendingweapon = wp_fist;
       }
       sound = sfx_getpow;
@@ -1029,6 +1029,38 @@ static char * find_obit_msg (mobj_t* killer, mobj_t* victim)
 }
 
 //-----------------------------------------------------------------------------
+
+void P_AdjustKillCount (mobj_t* target, mobj_t* source, int amount)
+{
+  if (source && source->player)
+  {
+    // count for intermission
+    // killough 7/20/98: don't count friends
+    if ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
+    {
+      if ((amount > 0)
+       || (source->player->killcount))
+	source->player->killcount += amount;
+    }
+
+    if (target->player)
+    {
+      if ((amount > 0)
+       || (source->player->frags[target->player-players]))
+	source->player->frags[target->player-players] += amount;
+    }
+  }
+  else if (!netgame && ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL))
+  {
+    // count all monster deaths,
+    // even those caused by other monsters
+    if ((amount > 0)
+     || (players[0].killcount))
+      players[0].killcount += amount;
+  }
+}
+
+//-----------------------------------------------------------------------------
 //
 // KillMobj
 //
@@ -1107,24 +1139,7 @@ P_KillMobj
      armour in Wolfendoom */
 
   if ((flags & MF_COUNTKILL) == 0)
-  {
-    if (source && source->player)
-    {
-      // count for intermission
-      // killough 7/20/98: don't count friends
-      if ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
-	  source->player->killcount++;
-
-      if (target->player)
-	  source->player->frags[target->player-players]++;
-    }
-    else if (!netgame && ((target->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL))
-    {
-      // count all monster deaths,
-      // even those caused by other monsters
-      players[0].killcount++;
-    }
-  }
+    P_AdjustKillCount (target, source, 1);
 
   if (target->player)
   {
@@ -1239,7 +1254,7 @@ P_DamageMobj
   fixed_t	thrust;
   int		temp;
   int		damagecount;
-  boolean	justhit;          // killough 11/98
+  boolean	justhit;	  // killough 11/98
 
   if (gamecompletedtimer)
     return;
@@ -1403,8 +1418,8 @@ P_DamageMobj
       target->target = source;		// killough 11/98
       target->threshold = BASETHRESHOLD;
       if (target->state == &states[target->info->spawnstate]
-          && target->info->seestate != S_NULL)
-        P_SetMobjState (target, (statenum_t) target->info->seestate);
+	  && target->info->seestate != S_NULL)
+	P_SetMobjState (target, (statenum_t) target->info->seestate);
     }
 
   // killough 11/98: Don't attack a friend, unless hit by that friend.
