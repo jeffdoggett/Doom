@@ -1130,6 +1130,9 @@ EV_DoFloor
 
 void T_MoveFloor( floormove_t* floor);
 
+void EV_DoGoobers (void);
+
+
 //
 // P_TELEPT
 //

@@ -528,6 +528,11 @@ unsigned char	cheat_massacre_seq[] =
     0xb2, 0x26, 0xf2, 0xb2, 0x36, 0x36, 0xff		// idkill
 };
 
+unsigned char	cheat_goobers_seq[] =
+{
+    0xE6, 0xF6, 0xF6, 0x62, 0xA6, 0x6A, 0xEA, 0xFF	// goobers
+};
+
 // Now what?
 cheatseq_t	cheat_mus = { cheat_mus_seq, 0 };
 cheatseq_t	cheat_god = { cheat_god_seq, 0 };
@@ -552,6 +557,7 @@ cheatseq_t	cheat_choppers = { cheat_choppers_seq, 0 };
 cheatseq_t	cheat_clev = { cheat_clev_seq, 0 };
 cheatseq_t	cheat_mypos = { cheat_mypos_seq, 0 };
 cheatseq_t	cheat_massacre = { cheat_massacre_seq, 0 };
+cheatseq_t	cheat_goobers = { cheat_goobers_seq, 0 };
 
 
 //
@@ -740,7 +746,13 @@ ST_Responder (event_t* ev)
       {
 	P_Massacre ();
       }
-      // 'behold?' power-up cheats
+      // [crispy] implement Crispy Doom's "goobers" cheat, ne easter egg
+      else if (cht_CheckCheat(&cheat_goobers, ev->data1))
+      {
+	EV_DoGoobers ();
+	plyr->message = "Get Psyched!";
+      }
+       // 'behold?' power-up cheats
       for (i=0;i<6;i++)
       {
 	if (cht_CheckCheat(&cheat_powerup[i], ev->data1))
