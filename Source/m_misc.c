@@ -121,24 +121,24 @@ unsigned int M_ReadFile (char const*name, byte**buffer)
   FILE * handle;
 
   length = filesize (name);
-  if (length == 0)
-    I_Error ("Couldn't read file %s", name);
+  if (length)
+  {
+    handle = fopen (name, "rb");
+    if (handle == NULL)
+    {
+      length = 0;
+    }
+    else
+    {
+      buf = Z_Malloc (length, PU_STATIC, NULL);
+      length = fread (buf, 1, length, handle);
+      fclose (handle);
+      *buffer = buf;
+    }
+  }
 
-  handle = fopen (name, "rb");
-  if (handle == NULL)
-    I_Error ("Couldn't read file %s", name);
-
-  buf = Z_Malloc (length, PU_STATIC, NULL);
-  count = fread (buf, 1, length, handle);
-  fclose (handle);
-
-  if (count < length)
-    I_Error ("Couldn't read file %s", name);
-
-  *buffer = buf;
-  return length;
+  return (length);
 }
-
 
 //-----------------------------------------------------------------------------
 //

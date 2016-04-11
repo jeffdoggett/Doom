@@ -1886,6 +1886,8 @@ void G_DoLoadGame (void)
   gameaction = ga_nothing;
 
   length = M_ReadFile (savename, &loadbuffer);
+  if (length < SAVESTRINGSIZE)
+    return;
   save_p = loadbuffer + SAVESTRINGSIZE;
 
   // skip the description field
@@ -2348,7 +2350,11 @@ void G_DoPlayDemo (void)
   {
     dlump = W_CheckNumForName (lumpname);
     if (dlump != -1)
+    {
+      if (W_LumpLength (dlump) < 20)
+        return;
       demobuffer = demo_p = W_CacheLumpNum (dlump, PU_STATIC);
+    }
   }
 
   if (dlump == -1)
@@ -2361,8 +2367,11 @@ void G_DoPlayDemo (void)
     }
 
     i = M_ReadFile (lumpname, &demobuffer);
-    if (i == 0)
-      I_Error ("Cannot open demo file %s", defdemoname);
+    if (i < 20)
+    {
+      printf ("Cannot open demo file %s\n", defdemoname);
+      return;
+    }
 
     demo_p = demobuffer;
   }
