@@ -1014,6 +1014,7 @@ void    T_MoveCeiling (ceiling_t* ceiling);
 void    P_AddActiveCeiling(ceiling_t* c);
 void    P_RemoveActiveCeiling(ceiling_t* c);
 int	EV_CeilingCrushStop(line_t* line);
+ceiling_t* P_NewCeilingAction (sector_t* sec, ceiling_e type);
 
 
 //

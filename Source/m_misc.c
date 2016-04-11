@@ -115,7 +115,6 @@ boolean M_WriteFile (char const* name, void*source, int length)
 //
 unsigned int M_ReadFile (char const*name, byte**buffer)
 {
-  unsigned int count;
   unsigned int length;
   byte *buf;
   FILE * handle;

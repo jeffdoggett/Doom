@@ -194,6 +194,28 @@ void T_MoveCeiling (ceiling_t* ceiling)
 }
 
 //-----------------------------------------------------------------------------
+
+ceiling_t* P_NewCeilingAction (sector_t* sec, ceiling_e type)
+{
+  ceiling_t*	ceiling;
+
+  ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVSPEC, 0);
+  P_AddThinker (&ceiling->thinker, (actionf_p1)T_MoveCeiling);
+  sec->ceilingdata = ceiling;
+  ceiling->sector = sec;
+  ceiling->crush = false;
+  ceiling->secspecial = sec;
+  ceiling->direction = 1;
+  ceiling->speed = CEILSPEED;
+  ceiling->topheight = sec->ceilingheight;
+  ceiling->bottomheight = sec->floorheight;
+  ceiling->tag = sec->tag;
+  ceiling->type = type;
+  P_AddActiveCeiling (ceiling);
+  return (ceiling);
+}
+
+//-----------------------------------------------------------------------------
 //
 // EV_DoCeiling
 // Move a ceiling up/down and all around!
@@ -244,19 +266,7 @@ EV_DoCeiling
 #endif
     // new ceiling thinker
     rtn = 1;
-    ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVSPEC, 0);
-    P_AddThinker (&ceiling->thinker, (actionf_p1)T_MoveCeiling);
-    sec->ceilingdata = ceiling;
-    ceiling->sector = sec;
-    ceiling->crush = false;
-    ceiling->secspecial = sec;
-    ceiling->direction = 1;
-    ceiling->speed = CEILSPEED;
-    ceiling->topheight = sec->ceilingheight;
-    ceiling->bottomheight = sec->floorheight;
-    ceiling->tag = sec->tag;
-    ceiling->type = type;
-    P_AddActiveCeiling (ceiling);
+    ceiling = P_NewCeilingAction (sec, type);
 
     switch(type)
     {

@@ -329,7 +329,7 @@ static void queue_change_texture_or_special (floormove_t* floor, int secnum, uns
   Init a floor movement structure to some safe defaults.
 */
 
-static floormove_t* get_floor_block (sector_t* sec)
+static floormove_t* P_NewFloorAction (sector_t* sec)
 {
   floormove_t* floor;
 
@@ -382,7 +382,7 @@ EV_DoFloor
 #endif
     // new floor thinker
     rtn = 1;
-    floor = get_floor_block (sec);
+    floor = P_NewFloorAction (sec);
 //  floor->type = floortype;
 
     switch(floortype)
@@ -667,7 +667,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
     // new floor thinker
     if (sec -> floordata == NULL)
     {
-      floor = get_floor_block (sec);
+      floor = P_NewFloorAction (sec);
       floor->direction = direction;
       floor->speed = speed;
       floor->floordestheight = height;
@@ -727,7 +727,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
 	sec = tsec;
 
 	// new floor thinker
-	floor = get_floor_block (sec);
+	floor = P_NewFloorAction (sec);
 	floor->direction = direction;
 	floor->speed = speed;
 	floor->floordestheight = height;
@@ -816,7 +816,7 @@ int EV_DoDonut(line_t*	line)
 	continue;
 
       //	Spawn rising slime
-      floor = get_floor_block (s2);
+      floor = P_NewFloorAction (s2);
 //    floor->type = donutRaise;
       floor->speed = FLOORSPEED / 2;
       floor->newtexture = s3->floorpic;
@@ -824,7 +824,7 @@ int EV_DoDonut(line_t*	line)
       floor->floordestheight = s3->floorheight;
 
       //	Spawn lowering donut-hole
-      floor = get_floor_block (s1);
+      floor = P_NewFloorAction (s1);
 //    floor->type = lowerFloor;
       floor->direction = -1;
       floor->speed = FLOORSPEED / 2;
@@ -1020,45 +1020,19 @@ void T_MoveElevator (elevator_t* elevator)
 }
 
 //-----------------------------------------------------------------------------
-
-// [crispy] easter egg: homage to an old friend (thinker)
-void T_MoveGoobers (floormove_t *floor)
-{
-  result_e res1, res2;
-
-  res1 = T_MovePlane(floor->sector, 2 * FLOORSPEED, 0,
-			true, 0, (floor->direction &  1) * 2 - 1);
-  res2 = T_MovePlane(floor->sector, 2 * FLOORSPEED, floor->floordestheight,
-			true, 1, (floor->direction >> 1) * 2 - 1);
-
-  if (!(leveltime & 7))
-  {
-    S_StartSound(&floor->sector->soundorg, sfx_stnmov);
-  }
-
-  if ((res1 & res2) == pastdest)
-  {
-    floor->sector->floordata = NULL;
-    floor->sector->ceilingdata = NULL;
-    P_RemoveThinker(&floor->thinker);
-    S_StartSound(&floor->sector->soundorg, sfx_pstop);
-  }
-}
-
-//-----------------------------------------------------------------------------
 // [crispy] easter egg: homage to an old friend
+
 void EV_DoGoobers (void)
 {
   int i;
+  sector_t* sec;
+  floormove_t* floor;
+  ceiling_t*	ceiling;
 
-  for (i = 0; i < numsectors; i++)
+  sec = sectors;
+  i = numsectors;
+  do
   {
-    sector_t* sec;
-    floormove_t* floor;
-    ceiling_t*	ceiling;
-
-    sec = &sectors[i];
-
     if ((floor = sec->floordata) != NULL)
     {
       P_RemoveThinker(&floor->thinker);
@@ -1071,16 +1045,23 @@ void EV_DoGoobers (void)
       sec->ceilingdata = NULL;
     }
 
-    floor = Z_Calloc(sizeof(*floor), PU_LEVSPEC, 0);
-    P_AddThinker(&floor->thinker, (actionf_p1) T_MoveGoobers);
+    /* Move the floor */
+    floor = P_NewFloorAction (sec);
+    floor->floordestheight = 0;
+    if (floor->floordestheight < sec->floorheight)
+      floor->direction = -1;		// Down
 
-    sec->ceilingdata = sec->floordata = floor;
-    floor->sector = sec;
-    floor->floordestheight = (!sec->tag &&
+    /* And move the ceiling */
+    ceiling = P_NewCeilingAction (sec, raiseToHighest);
+    ceiling->bottomheight = ceiling->topheight = (!sec->tag &&
 	sec->ceilingheight == sec->floorheight) ? 0 : 128 * FRACUNIT;
-    floor->direction = (sec->floorheight < 0) |
-			(sec->ceilingheight < floor->floordestheight) << 1;
-  }
+    if (ceiling->topheight < sec->ceilingheight)
+    {
+      ceiling->direction = -1;		// Down
+      ceiling->type = lowerToFloor;
+    }
+    sec++;
+  } while (--i);
 }
 
 //-----------------------------------------------------------------------------
