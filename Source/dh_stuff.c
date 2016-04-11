@@ -4212,7 +4212,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   {
     lookup = 1;
     ptr += 6;
-    while (*ptr == ' ') ptr++;
+    while (((cc = *ptr) == ' ') || (cc == ',')) ptr++;
   }
 
   if (*ptr == '\"')
