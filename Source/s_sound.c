@@ -301,9 +301,10 @@ void S_Start(void)
 //
 static int S_GetSfxLumpNum (sfxinfo_t* sfx)
 {
-    char namebuf[9];
-    sprintf(namebuf, "ds%s", sfx->name);
-    return W_GetNumForName(namebuf);
+  char namebuf[9];
+
+  sprintf (namebuf, "ds%s", sfx->name);
+  return W_CheckNumForName (namebuf);
 }
 
 /* ------------------------------------------------------------ */
@@ -318,6 +319,7 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
   channel_t*	c;
   int		cnum;
   int		next;
+  int		lumpnum;
   mobj_t*	origin = (mobj_t *) origin_p;
 
 
@@ -424,8 +426,20 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
   //
 
   // get lumpnum if necessary
-  if (sfx->lumpnum < 0)
-    sfx->lumpnum = S_GetSfxLumpNum(sfx);
+  if ((lumpnum = sfx->lumpnum) < 0)
+  {
+    lumpnum = S_GetSfxLumpNum (sfx);
+    if (lumpnum < 0)
+    {
+      /* If the wad does not have the DSSECRET lump */
+      /* then we use GETPOW instead. */
+
+      lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);
+      if (lumpnum < 0)
+	return;
+    }
+    sfx->lumpnum = lumpnum;
+  }
 
 #ifndef SNDSRV
   // cache data if necessary
@@ -434,10 +448,10 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
     // fprintf( stderr,  "S_StartSoundAtVolume: 16bit and not pre-cached - wtf?\n");
 
     // DOS remains, 8bit handling
-    sfx->data = (void *) W_CacheLumpNum(sfx->lumpnum, PU_SOUND);
+    sfx->data = (void *) W_CacheLumpNum (lumpnum, PU_SOUND);
     // fprintf( stderr,
     //	     "S_StartSoundAtVolume: loading %d (lump %d) : 0x%x\n",
-    //       sfx_id, sfx->lumpnum, (int)sfx->data );
+    //       sfx_id, lumpnum, (int)sfx->data );
 
   }
 #endif

@@ -2058,7 +2058,7 @@ void P_PlayerInSpecialSector (player_t* player)
       if (player == &players[consoleplayer])
       {
 	player->message = special_effects_messages [PS_FOUND_SECRET];
-	S_StartSound (NULL, sfx_getpow);
+	S_StartSound (NULL, sfx_secret);
       }
       break;
 
@@ -2130,7 +2130,7 @@ void P_PlayerInSpecialSector (player_t* player)
     if (player == &players[consoleplayer])
     {
       player->message = special_effects_messages [PS_FOUND_SECRET];
-      S_StartSound (NULL, sfx_getpow);
+      S_StartSound (NULL, sfx_secret);
     }
   }
 

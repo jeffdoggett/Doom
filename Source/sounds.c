@@ -232,6 +232,7 @@ sfxinfo_t S_sfx[] =
   { "dgact",  false,  120, 0, -1, -1, 0 },
   { "dgdth",  false,   70, 0, -1, -1, 0 },
   { "dgpain", false,   96, 0, -1, -1, 0 },
+  { "secret", false,   60, 0, -1, -1, 0 },
   { 0, false, 0, 0, 0, 0, 0 }
 };
 
@@ -270,6 +271,7 @@ char * sound_names_copy [ARRAY_SIZE(S_sfx)];
   "keenpn", "keendt", "skeact", "skesit", "skeatk", "radio",
   // killough 11/98: dog sounds
   "dgsit", "dgatk", "dgact", "dgdth", "dgpain",
+  "secret",
   NULL
 };
 #endif
