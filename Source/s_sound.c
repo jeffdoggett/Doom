@@ -75,20 +75,6 @@ extern int snd_DesiredSfxDevice;
 extern void I_FillMusBuffer (int handle);
 
 
-typedef struct
-{
-    // sound information (if null, channel avail.)
-    sfxinfo_t*	sfxinfo;
-
-    // origin of sound
-    void*	origin;
-
-    // handle of the sound being played
-    int		handle;
-
-} channel_t;
-
-
 // the set of channels available
 static channel_t*	channels;
 static degenmobj_t*	sound_origin;
@@ -686,7 +672,7 @@ void S_UpdateSounds(void* listener_p)
 			S_StopChannel(cnum);
 		    }
 		    else
-			I_UpdateSoundParams(c->handle, volume, sep, pitch);
+			I_UpdateSoundParams(c, volume, sep, pitch);
 		}
 	    }
 	    else
@@ -961,6 +947,10 @@ static int S_getChannel (sfxinfo_t* sfxinfo)
   // Find a channel that we are not tracking
   for (cnum=0 ; cnum<numChannels ; cnum++)
     if (!channels[cnum].origin)
+      return (cnum);
+
+  for (cnum=0 ; cnum<numChannels ; cnum++)
+    if (channels[cnum].origin == players[consoleplayer].mo)
       return (cnum);
 
   // None available

@@ -292,7 +292,18 @@ void I_SetSfxVolume(int volume)
 
 /* ------------------------------------------------------------ */
 
-static unsigned int read_32 (unsigned char * ptr)
+static unsigned int read_16 (byte * ptr)
+{
+  unsigned int rc;
+
+  rc = *ptr++;
+  rc |= (*ptr << 8);
+  return (rc);
+}
+
+/* ------------------------------------------------------------ */
+
+static unsigned int read_32 (byte * ptr)
 {
   unsigned int rc;
 
@@ -305,15 +316,24 @@ static unsigned int read_32 (unsigned char * ptr)
 
 /* ------------------------------------------------------------ */
 
-static void write_32 (unsigned char * ptr, unsigned int data)
+static void write_16 (byte * ptr, unsigned int data)
 {
-  *ptr++ = (unsigned char) data;
+  *ptr++ = (byte) data;
   data >>= 8;
-  *ptr++ = (unsigned char) data;
+  *ptr = (byte) data;
+}
+
+/* ------------------------------------------------------------ */
+
+static void write_32 (byte * ptr, unsigned int data)
+{
+  *ptr++ = (byte) data;
   data >>= 8;
-  *ptr++ = (unsigned char) data;
+  *ptr++ = (byte) data;
   data >>= 8;
-  *ptr = (unsigned char) data;
+  *ptr++ = (byte) data;
+  data >>= 8;
+  *ptr = (byte) data;
 }
 
 /* ------------------------------------------------------------ */
@@ -322,55 +342,110 @@ static void write_32 (unsigned char * ptr, unsigned int data)
    Some WAD files use RIFF files.
 */
 
-static void I_FindData (unsigned int * start, unsigned int * end, unsigned int * data, unsigned int length)
+static int I_FindData (unsigned int * start, sfxinfo_t * sfx)
 {
+  unsigned int chan;
   unsigned int type;
-  unsigned int newlength;
-  unsigned char * ptr_1;
-  unsigned char * ptr_2;
+  unsigned int bits;
+  unsigned int bytes;
+  unsigned int length;
+  unsigned int value;
+  unsigned int hlength;
+  unsigned int channels;
+  byte * data;
+  byte * sdata;
+  byte * ptr_1;
+  byte * ptr_2;
 
-  type = read_32 ((unsigned char *) data);
+  length = 0;
+
+  sdata = sfx->data;
+  type = read_32 (sdata);
   if ((type & 0xFFFF) == 0x0003)			// Standard doom lump
   {
-    data++;
-    length -= 8;
-    newlength = read_32 ((unsigned char *) data);
-    data++;
-    if (newlength < length)
-      length = newlength;
+    length = read_32 (sdata + 4);
+    data = sdata + 8;
+    sfx->samplerate = type >> 16;
   }
   else if (type == 0x46464952)				// RIFF
   {
-    data += 8;
-    type = read_32 ((unsigned char *) data);
-    if (type == 0x00100002)				// 16 bit data?
+    /* Four bytes 'Riff'				0x00 */
+    /* Four bytes filesize not counting this or prev	0x04 */
+    /* Four bytes 'WAVE'				0x08 */
+    /* Four bytes 'fmt '				0x0C */
+    /* Four bytes size of block				0x10 */
+    /* Two bytes Wave type format			0x14 */
+    /* Two bytes mono/stereo				0x16 */
+    /* Four bytes sample rate				0x18 */
+    /* Four bytes bytes per second			0x1C */
+    /* Two bytes Block alignment			0x20 */
+    /* Two bytes bits per sample			0x22 */
+
+    sfx->samplerate = read_32 (sdata + 0x18);
+
+    hlength = read_32 (sdata + 0x10);
+    data = sdata + (hlength + 0x14);
+
+    /* We need to find the 'data' section */
+
+    if (read_32 (data) != 0x61746164)			 // data?
     {
-      write_32 ((unsigned char *) data, 0x00080001);	// Yes. Convert to 8 bit.
-      data += 2;
-      newlength = read_32 ((unsigned char *) data);
-      newlength >>= 1;
-      write_32 ((unsigned char *) data, newlength);
-      ptr_1 = ((unsigned char *) data) + 4;
-      ptr_2 = ptr_1 + 1;
       do
       {
-	*ptr_1++ = *ptr_2 + 0x80;
-	ptr_2 += 2;
-      } while (--newlength);
+	data += read_32 (data + 4) + 8;
+	if (data >= sdata + W_LumpLength (sfx->lumpnum))
+	  return (length);				// Failed to find data section.
+      } while (read_32 (data) != 0x61746164);
+
+      /* Adjust the offset so that we do not */
+      /* have to do this again. */
+      write_32 (sdata + 0x10, (data - sdata) - 0x14);
     }
-    else
+
+    length = read_32 (data + 4);
+    data += 8;
+
+    bits = read_16 (sdata + 0x22);
+    if (bits == 0x0010)					// 16 bit data?
     {
-      data += 2;
-      length -= (11 * 4);
+      write_16 (sdata + 0x22, bits >> 1 /* 0x0008 */);	// Yes. Convert to 8 bit.
+      length >>= 1;
+      write_32 (data - 4, length);
+      bytes = length;
+      ptr_1 = data;
+      ptr_2 = ptr_1 + 1;
+      do
+      {							// 16 bit data is -32768 -> +32767
+	*ptr_1++ = *ptr_2 + 0x80;			// 8 bit data is 0 -> 255
+	ptr_2 += 2;
+      } while (--bytes);
     }
-    newlength = read_32 ((unsigned char *) data);
-    data++;
-    if (newlength < length)
-      length = newlength;
+
+    channels = read_16 (sdata + 0x16);
+    if (channels > 1)					// More than 1 channel?
+    {
+      write_16 (sdata + 0x16, 1);			// Yes. Convert to mono.
+      length = length / channels;
+      write_32 (data - 4, length);
+
+      bytes = length;
+      ptr_1 = data;
+      ptr_2 = data;
+      do
+      {
+	value = 0;
+	chan = channels;
+	do
+	{
+	  value += *ptr_2++;
+	} while (--chan);
+	*ptr_1++ = value / channels;
+      } while (--bytes);
+    }
   }
 
-  *start = (int)data;
-  *end = (int)(((unsigned char *) data) + length);
+  *start = (int) data;
+  return (length);
 }
 
 /* ------------------------------------------------------------ */
@@ -463,15 +538,20 @@ I_StartSound
   // printf ("Playing sound %s\n", sfx->name);
   // printf ("Using sound channel %d\n", channel);
 
-  regs.r[0] = channel;
-  length = W_LumpLength (sfx->lumpnum);
-  I_FindData ((unsigned int*)&regs.r[1], (unsigned int*)&regs.r[2], sfx->data, length);
+  length = I_FindData ((unsigned int*)&regs.r[1], sfx);
+
+  if (length == 0)
+    return (channel);
+
   // R1 = Start of data
   // R2 = End of data
+
+  regs.r[0] = channel;
+  regs.r[2] = regs.r[1] + length;
   _kernel_swi (DataVox_SetMemory, &regs, &regs);
 
 #if 0
-  I_Save_MusFile (sfx->name, sfx->data, regs.r[2] - (unsigned int) sfx->data);
+  I_Save_MusFile (sfx->name, sfx->data, regs.r[2] - (int) sfx->data);
 #endif
 
   regs.r[0] = channel;
@@ -485,8 +565,12 @@ I_StartSound
   if (pitch > 255) pitch = 255;
   if (pitch < 0)   pitch = 0;
 
+  regs.r[0] = 1000000 / sfx->samplerate;
+  regs.r[1] = 0;
+  _kernel_swi (DataVox_SampleToPitch, &regs, &regs);
+
+  regs.r[1] = (pitch-128) + regs.r[0];
   regs.r[0] = channel;
-  regs.r[1] = pitch + 0x1580;  /* Seems about right to me.... */
   _kernel_swi (DataVox_Pitch, &regs, &regs);
 
   if (sep < 1) sep = 1;
@@ -574,18 +658,24 @@ I_SubmitSound(void)
 
 void
 I_UpdateSoundParams
-( int   channel,
+( channel_t* c,
   int   vol,
   int   sep,
   int   pitch)
 {
+  int channel;
   _kernel_swi_regs regs;
 
   if (pitch > 255) pitch = 255;
   if (pitch < 0)   pitch = 0;
 
+  regs.r[0] = 1000000 / c->sfxinfo->samplerate;
+  regs.r[1] = 0;
+  _kernel_swi (DataVox_SampleToPitch, &regs, &regs);
+
+  channel = c->handle;
+  regs.r[1] = (pitch-128) + regs.r[0];
   regs.r[0] = channel;
-  regs.r[1] = pitch + 0x1580;  /* Seems about right to me.... */
   _kernel_swi (DataVox_Pitch, &regs, &regs);
 
   if (sep < 1) sep = 1;

@@ -669,7 +669,7 @@ I_SubmitSound(void)
 
 void
 I_UpdateSoundParams
-( int	handle,
+( channel_t* c,
   int	vol,
   int	sep,
   int	pitch)
@@ -680,7 +680,8 @@ I_UpdateSoundParams
   //  and resetting the channel parameters.
 
   // UNUSED.
-  handle = vol = sep = pitch = 0;
+  c = NULL;
+  vol = sep = pitch = 0;
 }
 
 

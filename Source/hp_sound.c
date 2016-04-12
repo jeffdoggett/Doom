@@ -375,7 +375,7 @@ I_SubmitSound(void)
 
 void
 I_UpdateSoundParams
-( int   handle,
+( channel_t* c,
   int   vol,
   int   sep,
   int   pitch)

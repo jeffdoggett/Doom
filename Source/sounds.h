@@ -59,6 +59,9 @@ struct sfxinfo_struct
 
     // lump number of sfx
     int		lumpnum;
+
+    // sample rate - usually 11025
+    int		samplerate;
 };
 
 
@@ -84,6 +87,18 @@ typedef struct
 } musicinfo_t;
 
 
+typedef struct
+{
+    // sound information (if null, channel avail.)
+    sfxinfo_t*	sfxinfo;
+
+    // origin of sound
+    void*	origin;
+
+    // handle of the sound being played
+    int		handle;
+
+} channel_t;
 
 
 // the complete set of sound effects

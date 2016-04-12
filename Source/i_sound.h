@@ -77,7 +77,8 @@ int I_SoundIsPlaying(int handle);
 //  and pitch of a sound channel.
 void
 I_UpdateSoundParams
-( int		handle,
+(
+  channel_t*	c,
   int		vol,
   int		sep,
   int		pitch );
