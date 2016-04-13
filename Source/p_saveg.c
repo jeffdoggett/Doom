@@ -639,7 +639,7 @@ static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
   p_save_32 (mobj->momx);
   p_save_32 (mobj->momy);
   p_save_32 (mobj->momz);
-  p_save_32 (mobj->validcount);
+  p_save_32 (0);					// SPARE
   p_save_32 (mobj->type);
   p_save_32 (mobj->flags2);
   p_save_32 (mobj->tics);
@@ -718,7 +718,7 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->momx = p_load_32 (save_32_p); save_32_p++;
   mobj->momy = p_load_32 (save_32_p); save_32_p++;
   mobj->momz = p_load_32 (save_32_p); save_32_p++;
-  mobj->validcount = p_load_32 (save_32_p); save_32_p++;
+  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE
   mobj->type = (mobjtype_t) p_load_32 (save_32_p); save_32_p++;
   mobj->flags2 = p_load_32 (save_32_p); save_32_p++;
   mobj->tics = p_load_32 (save_32_p); save_32_p++;
