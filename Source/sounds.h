@@ -101,6 +101,23 @@ typedef struct
 } channel_t;
 
 
+typedef struct muschange_s
+{
+  int episode;
+  int map;
+  int musnum;
+  char music [12];
+  struct muschange_s * next;
+} muschange_t;
+
+typedef struct
+{
+  mobj_t *mapthing;
+  int	  tics;
+  muschange_t* head;
+} muschangeinfo_t;
+
+
 // the complete set of sound effects
 extern sfxinfo_t	S_sfx[];
 

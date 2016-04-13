@@ -3718,7 +3718,7 @@ void DH_parse_hacker_wad_file (const char * wadname, boolean do_it)
 
 /* ---------------------------------------------------------------------------- */
 
-static char * next_line (char * ptr, char * top)
+char * dh_next_line (char * ptr, char * top)
 {
   char cc;
 
@@ -3741,7 +3741,7 @@ static char * next_line (char * ptr, char * top)
 
 /* ---------------------------------------------------------------------------- */
 
-static char * split_lines (char * ptr, char * top)
+char * dh_split_lines (char * ptr, char * top)
 {
   char cc;
   char * ptr_2;
@@ -4245,7 +4245,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
       {
 	// printf ("Lump is %u bytes\n", length);
 	lump_ptr = W_CacheLumpNum (lump, PU_STATIC);
-	// length = split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
+	// length = dh_split_lines (lump_ptr, lump_ptr + length) - lump_ptr;
 	newtext = malloc (length + 20);
 	if (newtext)
 	{
@@ -4552,7 +4552,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
   *top = 0;
   clusterdefpresent = dh_instr (ptr, "clusterdef");
 
-  top = split_lines (ptr, top);
+  top = dh_split_lines (ptr, top);
 
   episode = 9;
   map = 9;
@@ -5159,7 +5159,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	}
       }
     }
-    ptr = next_line (ptr,top);
+    ptr = dh_next_line (ptr,top);
   } while (ptr < top);
 }
 
@@ -5174,7 +5174,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
   clusterdefs_t * cp;
   map_dests_t * mdest_ptr;
 
-  top = split_lines (ptr, top);
+  top = dh_split_lines (ptr, top);
 
   intertext = -1;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
@@ -5364,7 +5364,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       // printf ("Parsing %s\n", ptr);
     }
 
-    ptr = next_line (ptr,top);
+    ptr = dh_next_line (ptr,top);
   } while (ptr < top);
 }
 
@@ -5544,7 +5544,7 @@ void DH_parse_language_file_f (FILE * fin, size_t filesize)
       top = ptr + filesize;
       *top = 0;
 
-      top = split_lines (ptr, top);
+      top = dh_split_lines (ptr, top);
 
       do
       {

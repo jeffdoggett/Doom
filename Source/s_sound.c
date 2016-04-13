@@ -103,11 +103,14 @@ static musicinfo_t*	mus_playing=0;
 int			numChannels;
 static int		nextChannel = 0;
 
-static int		nextcleanup;
+//static int		nextcleanup;
 
 static int		nomusic;
 static int		nosfx;
 
+muschangeinfo_t		muschangeinfo;
+
+/* ------------------------------------------------------------ */
 //
 // Internals.
 //
@@ -123,6 +126,7 @@ S_AdjustSoundParams
   int*		pitch );
 
 static void S_StopChannel(int cnum);
+static void S_ReadMUSINFO (void);
 
 /* ------------------------------------------------------------ */
 
@@ -143,6 +147,8 @@ void S_InitSound (void)
     if (M_CheckParm ("-nosfx"))
       nosfx = true;
   }
+
+  S_ReadMUSINFO ();
 
   if (!nomusic)
     I_InitMusic ();
@@ -219,24 +225,13 @@ static const unsigned int spmus[]=
 };
 
 /* ------------------------------------------------------------ */
-//
-// Per level startup code.
-// Kills playing sounds at start of level,
-//  determines music if any, changes music.
-//
-void S_Start(void)
+
+static void S_StartLevelMusic (void)
 {
-  int cnum;
   int mnum;
   unsigned int gm;
   char * music;
   map_dests_t * map_ptr;
-  musicinfo_t*	musinfo;
-
-  // kill all playing sounds at start of level
-  //  (trust me - a good idea)
-  for (cnum=0 ; cnum<numChannels ; cnum++)
-    channels[cnum].origin = NULL;
 
   // start new music for the level
   mus_paused = false;
@@ -245,12 +240,8 @@ void S_Start(void)
   music = map_ptr -> music;
   if (music)
   {
-    if (strncasecmp (music, "D_", 2) == 0)
-      music += 2;
-
+    S_music[mus_extra].name = music;
     mnum = mus_extra;
-    musinfo = &S_music[mnum];
-    musinfo->name = music;
   }
   else if (gamemode == commercial)
   {
@@ -277,7 +268,25 @@ void S_Start(void)
 
   S_ChangeMusic (mnum, true);
 
-  nextcleanup = 15;
+//nextcleanup = 15;
+}
+
+/* ------------------------------------------------------------ */
+//
+// Per level startup code.
+// Kills playing sounds at start of level,
+//  determines music if any, changes music.
+//
+void S_Start(void)
+{
+  int cnum;
+
+  // kill all playing sounds at start of level
+  //  (trust me - a good idea)
+  for (cnum=0 ; cnum<numChannels ; cnum++)
+    channels[cnum].origin = NULL;
+
+  S_StartLevelMusic ();
 }
 
 /* ------------------------------------------------------------ */
@@ -738,7 +747,7 @@ void S_ChangeMusic (int musicnum, int looping)
 {
   int lumpnum;
   musicinfo_t*	music;
-  char		namebuf[9];
+  char		namebuf[12];
 
   if (nomusic)
     return;
@@ -754,11 +763,19 @@ void S_ChangeMusic (int musicnum, int looping)
       musicnum = mus_doom;
   }
 
-  if ((musicnum != mus_extra)
-   && (mus_playing == music))
-    return;
+  if (musicnum == mus_extra)
+  {
+    strcpy (namebuf, music->name);
+  }
+  else
+  {
+    if (mus_playing == music)
+      return;
+    sprintf (namebuf, "d_%s", music->name);
+  }
 
-  sprintf (namebuf, "d_%s", music->name);
+//printf ("Starting music %s\n", namebuf);
+
   lumpnum = W_CheckNumForName (namebuf);
   if (lumpnum == -1)
   {
@@ -960,6 +977,142 @@ static int S_getChannel (sfxinfo_t* sfxinfo)
       return (cnum);
 
   return (nextChannel);
+}
+
+/* ------------------------------------------------------------ */
+
+static void Parse_Musinfo (char * ptr, char * top)
+{
+  char cc;
+  int map;
+  int episode;
+  int musnum;
+  muschange_t * musc_ptr;
+
+  top = dh_split_lines (ptr, top);
+  episode = 255;
+  map = 0;
+
+  do
+  {
+    while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
+
+    //printf ("Parse_Mapinfo (%s)\n", ptr);
+
+    if (strncasecmp (ptr, "MAP", 3) == 0)
+    {
+      ptr += 3;
+      while (*ptr == ' ') ptr++;
+      map = atoi (ptr);
+    }
+    else if (((cc = *ptr) == 'E') || (cc == 'e'))
+    {
+      episode = ptr [1] - '0';
+      map = ptr [3] - '0';
+    }
+    else if ((cc >= '0') && (cc <= '9'))
+    {
+      musnum = atoi (ptr);
+      while (*ptr != ' ') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (M_CheckParm ("-showmusinfo"))
+	printf ("Music %d for episode %d, map %d is '%s'\n", musnum, episode, map, ptr);
+      musc_ptr = malloc (sizeof (*musc_ptr));
+      if (musc_ptr)
+      {
+	musc_ptr->episode = episode;
+	musc_ptr->map = map;
+	musc_ptr->musnum = musnum;
+	strncpy (musc_ptr->music, ptr, sizeof (musc_ptr->music));
+	musc_ptr->next = muschangeinfo.head;
+	muschangeinfo.head = musc_ptr;	
+      }
+    }
+
+    ptr = dh_next_line (ptr,top);
+  } while (ptr < top);
+}
+
+/* ------------------------------------------------------------ */
+
+static void S_ReadMUSINFO (void)
+{
+  int lump;
+  char * ptr;
+  char * top;
+
+  memset (&muschangeinfo, 0, sizeof (muschangeinfo));
+
+  lump = W_CheckNumForName ("MUSINFO");
+  if (lump != -1)
+  {
+    ptr = malloc (W_LumpLength (lump) + 4); 	// Allow extra because some mapinfos lack a trailing CR/LF
+    if (ptr)
+    {
+      W_ReadLump (lump, ptr);
+      top = ptr + W_LumpLength (lump);
+      *top++ = '\n';
+      Parse_Musinfo (ptr, top);
+      free (ptr);
+    }
+  }
+}
+
+/* ------------------------------------------------------------ */
+
+void S_MusInfoThinker (mobj_t *thing)
+{
+  int tics;
+  int mnum;
+  int episode;
+  muschange_t * musc_ptr;
+
+#if 0
+  if (thing->subsector->sector == players[displayplayer].mo->subsector->sector)
+    printf ("Player has entered sector with music changer %d\n", thing->spawnpoint.type);
+#endif
+
+  if ((muschangeinfo.mapthing != thing)
+   && (thing->subsector->sector == players[displayplayer].mo->subsector->sector))
+  {
+    muschangeinfo.mapthing = thing;
+    muschangeinfo.tics = 30;
+    return;
+  }
+
+  if (((tics = muschangeinfo.tics) == 0)
+   || ((muschangeinfo.tics = tics - 1) != 0))
+    return;
+
+  mnum = thing->spawnpoint.type - 14100;
+  if (mnum == 0)			// Return to default?
+  {
+    S_StartLevelMusic ();
+    return;
+  }
+
+  musc_ptr = muschangeinfo.head;
+  if (musc_ptr == NULL)
+    return;
+
+  if (gamemode == commercial)
+    episode = 255;
+  else
+    episode = gameepisode;
+
+  do
+  {
+    if ((musc_ptr->episode == episode)
+     && (musc_ptr->map == gamemap)
+     && (musc_ptr->musnum == mnum))
+    {
+      S_music[mus_extra].name = musc_ptr->music;
+      S_ChangeMusic (mus_extra, true);
+      break;
+    }
+
+    musc_ptr = musc_ptr -> next;
+  } while (musc_ptr);
 }
 
 /* ------------------------------------------------------------ */

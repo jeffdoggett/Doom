@@ -197,6 +197,7 @@ static int last_snd_channel = MIN_SFX_CHAN - 1;
 
 extern char * music_names_copy [];
 extern clusterdefs_t * finale_clusterdefs_head;
+extern muschangeinfo_t		muschangeinfo;
 
 /* ------------------------------------------------------------ */
 
@@ -1142,35 +1143,35 @@ static int I_Validate_MusName (const char * musname)
   unsigned int i;
   musicinfo_t * sptr;
   map_dests_t * map_ptr;
+  muschange_t * musc_ptr;
   clusterdefs_t * cluster;
 
-  if (strncasecmp (musname, "D_", 2))
-    return (1);
-
-  sptr = S_music;
-  sptr++;		// 1st one is empty.
-  musname += 2;
-  do
+  if (strncasecmp (musname, "D_", 2) == 0)
   {
-    if (strcasecmp (sptr -> name, musname) == 0)
-      return (0);
-    sptr++;
-  } while (sptr -> name);
-
-#if 0
-  /* Failed to find it in the standard tables - try the original in case it has been dehacked */
-  {
-    char ** mcopy;
-    mcopy = music_names_copy;
-    mcopy++;		// 1st one is empty.
+    sptr = S_music;
+    sptr++;		// 1st one is empty.
     do
     {
-      if (strcasecmp (*mcopy, musname) == 0)
+      if (strcasecmp (sptr -> name, musname+2) == 0)
 	return (0);
-      mcopy++;
-    } while (*mcopy);
-  }
+      sptr++;
+    } while (sptr -> name);
+
+#if 0
+    /* Failed to find it in the standard tables - try the original in case it has been dehacked */
+    {
+      char ** mcopy;
+      mcopy = music_names_copy;
+      mcopy++;		// 1st one is empty.
+      do
+      {
+	if (strcasecmp (*mcopy, musname+2) == 0)
+	  return (0);
+	mcopy++;
+      } while (*mcopy);
+    }
 #endif
+  }
 
   /* Failed to find it in the standard tables - try the map tables */
 
@@ -1204,6 +1205,17 @@ static int I_Validate_MusName (const char * musname)
 	return (0);
       cluster = cluster -> next;
     } while (cluster);
+  }
+
+  musc_ptr = muschangeinfo.head;
+  if (musc_ptr)
+  {
+    do
+    {
+      if (strcasecmp (musc_ptr->music, musname) == 0)
+	return (0);
+      musc_ptr = musc_ptr -> next;
+    } while (musc_ptr);
   }
 
   return (1);
@@ -1282,37 +1294,33 @@ static void I_InitMusicDirectory (void)
 	bptr [pos-1] = 0;
 	if ((I_Validate_MusName (bptr))
 	 && (M_CheckParm ("-showunknown")))
-	{
 	  fprintf (stderr, "Directory line %u: %s is not a valid sound name\n", line, bptr);
+
+	if ((bptr [pos] == '<')		// Assume full path if starts with '<'
+	 || (dh_inchar (bptr+pos,'$')))	// or if $ present
+	  strcpy (filename, bptr+pos);
+	else
+	  sprintf (filename,"<DoomMusDir>.%s", bptr+pos);
+
+	if (access (filename, R_OK))
+	{
+	  if (M_CheckParm ("-showunknown"))
+	    fprintf (stderr, "Directory line %u: Sound file %s not found\n", line, filename);
 	}
 	else
 	{
-	  if ((bptr [pos] == '<')		// Assume full path if starts with '<'
-	   || (dh_inchar (bptr+pos,'$')))	// or if $ present
-	    strcpy (filename, bptr+pos);
-	  else
-	    sprintf (filename,"<DoomMusDir>.%s", bptr+pos);
+	  mptr = malloc (sizeof (mus_dir_t));
+	  if (mptr == NULL)
+	    break;
 
-	  if (access (filename, R_OK))
-	  {
-	    if (M_CheckParm ("-showunknown"))
-	      fprintf (stderr, "Directory line %u: Sound file %s not found\n", line, filename);
-	  }
-	  else
-	  {
-	    mptr = malloc (sizeof (mus_dir_t));
-	    if (mptr == NULL)
-	      break;
+	  mptr -> next = music_directory_head;
+	  music_directory_head = mptr;
 
-	    mptr -> next = music_directory_head;
-	    music_directory_head = mptr;
+	  strcpy (mptr -> musname, bptr);
+	  strcpy (mptr -> filename, filename);
 
-	    strcpy (mptr -> musname, bptr);
-	    strcpy (mptr -> filename, filename);
-
-  	    if (M_CheckParm ("-showmusdir"))
-	      printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
-	  }
+  	  if (M_CheckParm ("-showmusdir"))
+	    printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
 	}
       }
     }

@@ -5824,7 +5824,7 @@ mobjinfo_t mobjinfo[] =
   },
 
   {								// MT_MUSICSOURCE
-    14164,							// doomednum
+    14100,							// doomednum
     S_TNT1,							// spawnstate
     1000,							// spawnhealth
     -1000,							// gibhealth

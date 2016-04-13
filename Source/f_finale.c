@@ -197,9 +197,6 @@ static void F_StartMusic (char * music)
   }
   else
   {
-    if (strncasecmp (music, "D_", 2) == 0)
-      music += 2;
-
     musnum = mus_extra;
     musinfo = &S_music[musnum];
     musinfo->name = music;

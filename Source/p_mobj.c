@@ -539,6 +539,12 @@ P_NightmareRespawn (mobj_t* mobj)
 //
 void P_MobjThinker (mobj_t* mobj)
 {
+  if (mobj->type == MT_MUSICSOURCE)
+  {
+    S_MusInfoThinker (mobj);
+    return;
+  }
+
     // momentum movement
     if (mobj->momx
 	|| mobj->momy
@@ -750,6 +756,34 @@ void P_RemoveMobj (mobj_t* mobj)
 }
 
 /* -------------------------------------------------------------------------------------------- */
+
+static int P_FindDoomedNum (unsigned int type)
+{
+  int i;
+  int j;
+  mobjinfo_t* ptr;
+
+  // find which type to spawn
+  i = 0;
+  ptr = mobjinfo;
+  do
+  {
+    if (ptr -> doomednum == type)
+      return (i);
+
+    ptr++;
+  } while (++i < NUMMOBJTYPES);
+
+  if ((type >= 14100)
+   && (type <= 14164)
+   && ((j = mobjinfo [MT_MUSICSOURCE].doomednum) >= 14100) // If not been dehacked
+   && (j <= 14164))
+    i = MT_MUSICSOURCE;
+
+  return (i);
+}
+
+/* -------------------------------------------------------------------------------------------- */
 //
 // P_RespawnSpecials
 //
@@ -788,11 +822,7 @@ void P_RespawnSpecials (void)
     S_StartSound (mo, sfx_itmbk);
 
     // find which type to spawn
-    for (i=0 ; i< NUMMOBJTYPES ; i++)
-    {
-	if (mthing->type == mobjinfo[i].doomednum)
-	    break;
-    }
+    i = P_FindDoomedNum (mthing->type);
 
     // spawn it
     if (mobjinfo[i].flags & MF_SPAWNCEILING)
@@ -951,23 +981,17 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	return (0);
 
     // find which type to spawn
-    i = 0;
-    ptr = mobjinfo;
-    do
+    i = P_FindDoomedNum (type);
+    if ((unsigned) i >= NUMMOBJTYPES)
     {
-      if (ptr -> doomednum == type)
-	break;
+      if (M_CheckParm ("-showunknown"))
+	printf ("P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
+	      type, mthing->x, mthing->y);
+      mthing->options &= ~31;
+      return (0);
+    }
 
-      ptr++;
-      if (++i >= NUMMOBJTYPES)
-      {
-	if (M_CheckParm ("-showunknown"))
-	  printf ("P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
-		type, mthing->x, mthing->y);
-	mthing->options &= ~31;
-	return (0);
-      }
-    } while (1);
+    ptr = &mobjinfo [i];
 
     // don't spawn keycards and players in deathmatch
     if (deathmatch && (ptr -> flags & MF_NOTDMATCH))
