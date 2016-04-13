@@ -1085,34 +1085,31 @@ void S_MusInfoThinker (mobj_t *thing)
     return;
 
   mnum = thing->spawnpoint.type - 14100;
-  if (mnum == 0)			// Return to default?
+  musc_ptr = muschangeinfo.head;
+  if (musc_ptr)
   {
-    S_StartLevelMusic ();
-    return;
+    if (gamemode == commercial)
+      episode = 255;
+    else
+      episode = gameepisode;
+
+    do
+    {
+      if ((musc_ptr->episode == episode)
+       && (musc_ptr->map == gamemap)
+       && (musc_ptr->musnum == mnum))
+      {
+	S_music[mus_extra].name = musc_ptr->music;
+	S_ChangeMusic (mus_extra, true);
+	return;
+      }
+
+      musc_ptr = musc_ptr -> next;
+    } while (musc_ptr);
   }
 
-  musc_ptr = muschangeinfo.head;
-  if (musc_ptr == NULL)
-    return;
-
-  if (gamemode == commercial)
-    episode = 255;
-  else
-    episode = gameepisode;
-
-  do
-  {
-    if ((musc_ptr->episode == episode)
-     && (musc_ptr->map == gamemap)
-     && (musc_ptr->musnum == mnum))
-    {
-      S_music[mus_extra].name = musc_ptr->music;
-      S_ChangeMusic (mus_extra, true);
-      break;
-    }
-
-    musc_ptr = musc_ptr -> next;
-  } while (musc_ptr);
+  if (mnum == 0)			// Return to default?
+    S_StartLevelMusic ();
 }
 
 /* ------------------------------------------------------------ */
