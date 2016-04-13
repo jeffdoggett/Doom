@@ -225,19 +225,19 @@ static animdef2_t * Read_ANIMATED_Lump (void)
 	/* See whether this anim is a duplicate of an existing one. */
 	/* If it is, then just overwrite it, otherwise create a new */
 	/* entity in the temporary linked list. */
-        an_ptr = find_existing_anim (lumphead, name_1, name_2);
-        if (an_ptr == NULL)
-        {
-          thisanim = malloc (sizeof (animdef2_t));
-          if (thisanim == NULL)
-            break;
+	an_ptr = find_existing_anim (lumphead, name_1, name_2);
+	if (an_ptr == NULL)
+	{
+	  thisanim = malloc (sizeof (animdef2_t));
+	  if (thisanim == NULL)
+	    break;
 
 	  *lastanim = thisanim;
 	  lastanim = &thisanim -> next;
 	  *lastanim = NULL;
 
-          an_ptr = (animdef_t *) thisanim;
-        }
+	  an_ptr = (animdef_t *) thisanim;
+	}
 
 //	printf ("Anim %d %d: %s %s %d %d\n", i, an_ptr -> istexture, name_1, name_2, istexture, speed);
 	an_ptr -> istexture = (boolean) istexture;
@@ -338,8 +338,8 @@ void P_InitPicAnims (void)
       thisanim = read_anim ((animdef_t*) lumphead);
       if (thisanim)
       {
-        *prevanim = thisanim;
-        prevanim = &thisanim -> next;
+	*prevanim = thisanim;
+	prevanim = &thisanim -> next;
       }
       next = lumphead -> next;
       free (lumphead);
@@ -2362,28 +2362,28 @@ void P_SpawnSpecials (void)
 	    sectors[s].ceilinglightsec = sec;
 	  break;
 
-        // killough 10/98:
-        //
-        // Support for sky textures being transferred from sidedefs.
-        // Allows scrolling and other effects (but if scrolling is
-        // used, then the same sector tag needs to be used for the
-        // sky sector, the sky-transfer linedef, and the scroll-effect
-        // linedef). Still requires user to use F_SKY1 for the floor
-        // or ceiling texture, to distinguish floor and ceiling sky.
+	// killough 10/98:
+	//
+	// Support for sky textures being transferred from sidedefs.
+	// Allows scrolling and other effects (but if scrolling is
+	// used, then the same sector tag needs to be used for the
+	// sky sector, the sky-transfer linedef, and the scroll-effect
+	// linedef). Still requires user to use F_SKY1 for the floor
+	// or ceiling texture, to distinguish floor and ceiling sky.
 
       case 271:   // Regular sky
       case 272:   // Same, only flipped
-        /* Valiant.wad uses tag 0 to get everything! */
-        /* So we cannot use my hacked version of P_FindSectorFromLineTag */
+	/* Valiant.wad uses tag 0 to get everything! */
+	/* So we cannot use my hacked version of P_FindSectorFromLineTag */
 #if 0
 	for (s = -1; (s = P_FindSectorFromLineTag(line,s)) >= 0;)
 	  sectors[s].sky = i | PL_SKYFLAT;
 #else
 	for (sector=sectors,s=0 ; s<numsectors ; s++, sector++)
-        {
-          if (line->tag == sector->tag)
+	{
+	  if (line->tag == sector->tag)
 	    sector->sky = i | PL_SKYFLAT;
-        }
+	}
 #endif
 	break;
       }
@@ -2582,19 +2582,23 @@ void T_Scroll(scroll_t *s)
       mov_waterheight = waterheight;
       P_MoveAllNearThings (sec);
 #endif
-#if 0
-      for (node = sec->touching_thinglist; node; node = node->m_snext)
-
-	if ((((thing=node->m_thing)->flags & MF_NOCLIP) == 0)
-	 && ((thing->flags & MF_NOGRAVITY) == 0)
-	 && ((thing->flags & MF_SLIDE) || (thing->z <= height) || (thing->z < waterheight)))
+#ifdef USE_BOOM_P_ChangeSector
+      {
+	struct msecnode_s *node;
+	for (node = sec->touching_thinglist; node; node = node->m_snext)
 	{
-	  /* Move objects only if on floor or underwater, */
-	  /* non-floating, and clipped. */
-	  thing->momx += dx;
-	  thing->momy += dy;
-	  thing->flags |= MF_SLIDE;
+	  if ((((thing=node->m_thing)->flags & MF_NOCLIP) == 0)
+	   && ((thing->flags & MF_NOGRAVITY) == 0)
+	   && ((thing->flags & MF_SLIDE) || (thing->z <= height) || (thing->z < waterheight)))
+	  {
+	    /* Move objects only if on floor or underwater, */
+	    /* non-floating, and clipped. */
+	    thing->momx += dx;
+	    thing->momy += dy;
+	    thing->flags |= MF_SLIDE;
+	  }
 	}
+      }
 #endif
       /* Once I find out whether teleport landings should */
       /* also get carried along on conveyors, I'll know */
@@ -2633,7 +2637,8 @@ void T_Scroll(scroll_t *s)
 	  }
 	}
       }
-#else
+#endif
+#ifndef USE_BOOM_P_ChangeSector
       /* This follows the linked list of things in this sector and */
       /* does not include stuff like teleport landings. */
       thing = sec->thinglist;

@@ -197,7 +197,7 @@ static int last_snd_channel = MIN_SFX_CHAN - 1;
 
 extern char * music_names_copy [];
 extern clusterdefs_t * finale_clusterdefs_head;
-extern muschangeinfo_t		muschangeinfo;
+extern muschangeinfo_t	muschangeinfo;
 
 /* ------------------------------------------------------------ */
 
@@ -1421,13 +1421,12 @@ static int I_PlayMusicFile (const char * lumpname)
 /* Song has been loaded, and placed at 'data'.
    If music is ready, get ready to play.
    Return a dummy handle */
-int I_RegisterSong (musicinfo_t * music)
+int I_RegisterSong (musicinfo_t * music, const char * lumpname)
 {
   unsigned int size;
   unsigned int offset;
   byte * data;
   void * vdata;
-  char namebuf[9];
 
   I_UnRegisterSong (1);
 
@@ -1438,8 +1437,7 @@ int I_RegisterSong (musicinfo_t * music)
   if ((mp3priority == 0)
    && (M_CheckParm ("-mp3")))
   {
-    sprintf (namebuf, "d_%s", music->name);
-    if (I_PlayMusicFile (namebuf) == 0)
+    if (I_PlayMusicFile (lumpname) == 0)
       return 1;
   }
 
@@ -1461,8 +1459,7 @@ int I_RegisterSong (musicinfo_t * music)
     if ((mp3priority)
      && (M_CheckParm ("-mp3")))
     {
-      sprintf (namebuf, "d_%s", music->name);
-      if (I_PlayMusicFile (namebuf) == 0)
+      if (I_PlayMusicFile (lumpname) == 0)
 	return 1;
     }
 
@@ -1482,6 +1479,10 @@ int I_RegisterSong (musicinfo_t * music)
     return (timplayer_handle);
   }
 
+  if (((int*)data)[0]==0x6468544D)	// 'MThd'
+  {
+    return 0;
+  }
 
   if (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
    || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
@@ -1505,8 +1506,7 @@ int I_RegisterSong (musicinfo_t * music)
   if ((mp3priority)
    && (M_CheckParm ("-mp3")))
   {
-    sprintf (namebuf, "d_%s", music->name);
-    if (I_PlayMusicFile (namebuf) == 0)
+    if (I_PlayMusicFile (lumpname) == 0)
       return 1;
   }
 

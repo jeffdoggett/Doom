@@ -889,7 +889,7 @@ void I_UnRegisterSong(int handle)
   handle = 0;
 }
 
-int I_RegisterSong(musicinfo_t*	music)
+int I_RegisterSong(musicinfo_t*	music, const char * lumpname)
 {
   return 1;
 }

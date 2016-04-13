@@ -279,6 +279,7 @@ void P_XYMovement (mobj_t* mo)
     stopspeed = STOPSPEED;
     sector = mo->subsector->sector;
 
+#ifndef USE_BOOM_P_ChangeSector
     /* Allow things being carried to fall off the edge. */
     if (flags & MF_SLIDE)
     {
@@ -294,6 +295,7 @@ void P_XYMovement (mobj_t* mo)
       /* onto a teleport line. */
       stopspeed = 1;
     }
+#endif
 
     if (mo->momx > -stopspeed
 	&& mo->momx < stopspeed

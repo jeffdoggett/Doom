@@ -799,7 +799,7 @@ void S_ChangeMusic (int musicnum, int looping)
   S_StopMusic ();
 
   // load & register it
-  music->handle = I_RegisterSong (music);
+  music->handle = I_RegisterSong (music, namebuf);
 
   // play it
   I_PlaySong (music->handle, looping);
@@ -1025,7 +1025,7 @@ static void Parse_Musinfo (char * ptr, char * top)
 	musc_ptr->musnum = musnum;
 	strncpy (musc_ptr->music, ptr, sizeof (musc_ptr->music));
 	musc_ptr->next = muschangeinfo.head;
-	muschangeinfo.head = musc_ptr;	
+	muschangeinfo.head = musc_ptr;
       }
     }
 

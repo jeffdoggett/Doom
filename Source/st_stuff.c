@@ -31,6 +31,7 @@ static const char rcsid[] = "$Id: st_stuff.c,v 1.6 1997/02/03 22:45:13 b1 Exp $"
 #include "includes.h"
 
 extern void P_Massacre (void);
+extern muschangeinfo_t	muschangeinfo;
 
 /* ----------------------------------------------------------------- */
 
@@ -694,9 +695,14 @@ ST_Responder (event_t* ev)
       // 'mus' cheat for changing music
       else if (cht_CheckCheat(&cheat_mus, ev->data1))
       {
-
 	char	buf[3];
-	int		musnum;
+	int	musnum;
+	mobj_t * mobj;
+
+	/* Only clear this if we are not standing on it. */
+	if (((mobj = muschangeinfo.mapthing) != NULL)
+	 && (mobj->subsector->sector != players[displayplayer].mo->subsector->sector))
+	  muschangeinfo.mapthing = NULL;
 
 	plyr->message = stat_bar_messages [ST_STSTR_MUS];
 	cht_GetParam(&cheat_mus, buf);
