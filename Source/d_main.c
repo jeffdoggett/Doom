@@ -861,7 +861,7 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
   if (fin)
   {
     p = Read_32 (fin);
-    if (p == magic)
+    if ((magic == 0) || (p == magic))
     {
       cat_size = Read_32 (fin);
       cat_pos  = Read_32 (fin);
@@ -1993,6 +1993,57 @@ static void D_ShowStartupMessage (void)
 }
 
 //-----------------------------------------------------------------------------
+/*
+  Change the name of the savegame file to match the wad being played.
+*/
+static void D_SetSaveGameFilename (void)
+{
+  int p,q;
+  char cc;
+  char * newtext;
+  const char * leaf;
+  char gamename [40];
+
+  if (strcasecmp (save_game_messages [GG_SAVEGAMENAME], save_game_messages_orig [GG_SAVEGAMENAME]) == 0)
+  {
+    p = 0;
+    newtext = NULL;
+    while (wadfiles[p])
+    {
+      if (IdentifyWad (wadfiles[p], 0) & 255)
+	newtext = wadfiles[p];
+      p++;
+    }
+
+    if (newtext)
+    {
+      leaf = leafname (newtext);
+      q = 0;
+      do
+      {
+	cc = *leaf++;
+	cc = tolower (cc);
+	if ((cc == '/') || (cc == '.') || (q > 35))
+	  cc = 0;
+	gamename [q++] = cc;
+      } while (cc);
+
+      if ((strcmp (gamename, "doom1"))
+       && (strcmp (gamename, "doom"))
+       && (strcmp (gamename, "doomu")))
+      {
+	newtext = strdup (gamename);
+	if (newtext)
+	  save_game_messages [GG_SAVEGAMENAME] = newtext;
+      }
+    }
+  }
+
+  if (M_CheckParm("-showsavegamename"))
+    printf ("savegame filename = %s\n", save_game_messages [GG_SAVEGAMENAME]);
+}
+
+//-----------------------------------------------------------------------------
 
 static void D_LoadGameFile (void)
 {
@@ -2398,6 +2449,7 @@ void D_DoomMain (void)
       return;
   }
 
+  D_SetSaveGameFilename ();
   D_LoadGameFile ();
 
   if ( gameaction != ga_loadgame )
