@@ -541,12 +541,6 @@ P_NightmareRespawn (mobj_t* mobj)
 //
 void P_MobjThinker (mobj_t* mobj)
 {
-  if (mobj->type == MT_MUSICSOURCE)
-  {
-    S_MusInfoThinker (mobj);
-    return;
-  }
-
     // momentum movement
     if (mobj->momx
 	|| mobj->momy
@@ -707,7 +701,10 @@ P_SpawnMobj
     else
 	mobj->z = z;
 
-    P_AddThinker (&mobj->thinker, (actionf_p1)P_MobjThinker);
+    if (info->doomednum == 14100)	// MT_MUSICSOURCE
+      P_AddThinker (&mobj->thinker, (actionf_p1)S_MusInfoThinker);
+    else
+      P_AddThinker (&mobj->thinker, (actionf_p1)P_MobjThinker);
 
     return mobj;
 }

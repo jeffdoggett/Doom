@@ -691,10 +691,6 @@ static byte * P_UnArchiveMobj (byte * save_p)
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   thinker = p_load_32 (save_32_p); save_32_p++;
-  if (thinker)
-    P_AddThinker (&mobj->thinker, (actionf_p1)P_MobjThinker);
-  else
-    P_AddThinker (&mobj->thinker, NULL);
 
   mobj->x = p_load_32 (save_32_p); save_32_p++;
   mobj->y = p_load_32 (save_32_p); save_32_p++;
@@ -758,6 +754,13 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->floorz = mobj->subsector->sector->floorheight;
   mobj->ceilingz = mobj->subsector->sector->ceilingheight;
 
+  if (thinker == 0)
+    P_AddThinker (&mobj->thinker, NULL);
+  else if (mobj->info->doomednum == 14100)		// MT_MUSICSOURCE
+    P_AddThinker (&mobj->thinker, (actionf_p1)S_MusInfoThinker);
+  else
+    P_AddThinker (&mobj->thinker, (actionf_p1)P_MobjThinker);
+
 #ifdef VERBOSE_LOAD
   printf ("P_UnarchiveMobj (%d)\n", ((byte *) save_32_p) - save_p);
 #endif
@@ -775,7 +778,8 @@ byte * P_ArchiveThinkers (byte * save_p)
   // save off the current thinkers
   for (th = thinker_head ; th != NULL ; th=th->next)
   {
-    if (th->function.acp1 == (actionf_p1)P_MobjThinker)
+    if ((th->function.acp1 == (actionf_p1)P_MobjThinker)
+     || (th->function.acp1 == (actionf_p1)S_MusInfoThinker))
     {
       save_p = P_ArchiveMobj (save_p, (mobj_t*) th);
       continue;
@@ -806,7 +810,8 @@ byte * P_UnArchiveThinkers (byte * save_p)
   {
     next = currentthinker->next;
 
-    if (currentthinker->function.acp1 == (actionf_p1)P_MobjThinker)
+    if ((currentthinker->function.acp1 == (actionf_p1)P_MobjThinker)
+     || (currentthinker->function.acp1 == (actionf_p1)S_MusInfoThinker))
     {
       mobj = (mobj_t *)currentthinker;
       mobj->flags &= ~MF_SPECIAL;	// Ensure does not get added to the respawn queue
@@ -1712,7 +1717,8 @@ byte * P_ArchiveSpecials (byte * save_p)
       continue;
     }
 
-    if (th->function.acp1 == (actionf_p1)P_MobjThinker)	// Done already
+    if ((th->function.acp1 == (actionf_p1)P_MobjThinker)	// Done already
+     || (th->function.acp1 == (actionf_p1)S_MusInfoThinker))
       continue;
 
     if (th->function.aci == -1)				// Idle....
@@ -1726,7 +1732,6 @@ byte * P_ArchiveSpecials (byte * save_p)
   *save_p++ = tc_endspecials;
   return (save_p);
 }
-
 
 //-----------------------------------------------------------------------------
 //
