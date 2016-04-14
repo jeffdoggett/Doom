@@ -591,19 +591,20 @@ byte * P_UnArchiveWorld (byte * save_p)
 typedef enum
 {
   tc_end,
-  tc_mobj
+  tc_mobj,
+  tc_music
 } thinkerclass_t;
 
 //-----------------------------------------------------------------------------
 
-static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
+static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj, thinkerclass_t class)
 {
   unsigned int t32;
   unsigned int thinker;
   unsigned int * save_32_p;
   unsigned short* put;
 
-  *save_p++ = tc_mobj;
+  *save_p++ = class;
   PADSAVEP();
 
   save_32_p = (unsigned int *) save_p;
@@ -675,7 +676,7 @@ static byte * P_ArchiveMobj (byte * save_p, mobj_t* mobj)
 
 //-----------------------------------------------------------------------------
 
-static byte * P_UnArchiveMobj (byte * save_p)
+static byte * P_UnArchiveMobj (byte * save_p, actionf_p1 func)
 {
   mobj_t* mobj;
   unsigned int t32;
@@ -691,6 +692,10 @@ static byte * P_UnArchiveMobj (byte * save_p)
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
   thinker = p_load_32 (save_32_p); save_32_p++;
+  if (thinker)
+    P_AddThinker (&mobj->thinker, func);
+  else
+    P_AddThinker (&mobj->thinker, NULL);
 
   mobj->x = p_load_32 (save_32_p); save_32_p++;
   mobj->y = p_load_32 (save_32_p); save_32_p++;
@@ -754,13 +759,6 @@ static byte * P_UnArchiveMobj (byte * save_p)
   mobj->floorz = mobj->subsector->sector->floorheight;
   mobj->ceilingz = mobj->subsector->sector->ceilingheight;
 
-  if (thinker == 0)
-    P_AddThinker (&mobj->thinker, NULL);
-  else if (mobj->info->doomednum == 14100)		// MT_MUSICSOURCE
-    P_AddThinker (&mobj->thinker, (actionf_p1)S_MusInfoThinker);
-  else
-    P_AddThinker (&mobj->thinker, (actionf_p1)P_MobjThinker);
-
 #ifdef VERBOSE_LOAD
   printf ("P_UnarchiveMobj (%d)\n", ((byte *) save_32_p) - save_p);
 #endif
@@ -778,12 +776,10 @@ byte * P_ArchiveThinkers (byte * save_p)
   // save off the current thinkers
   for (th = thinker_head ; th != NULL ; th=th->next)
   {
-    if ((th->function.acp1 == (actionf_p1)P_MobjThinker)
-     || (th->function.acp1 == (actionf_p1)S_MusInfoThinker))
-    {
-      save_p = P_ArchiveMobj (save_p, (mobj_t*) th);
-      continue;
-    }
+    if (th->function.acp1 == (actionf_p1)P_MobjThinker)
+      save_p = P_ArchiveMobj (save_p, (mobj_t*) th, tc_mobj);
+    else if (th->function.acp1 == (actionf_p1)S_MusInfoThinker)
+      save_p = P_ArchiveMobj (save_p, (mobj_t*) th, tc_music);
 
     // I_Error ("P_ArchiveThinkers: Unknown thinker function");
   }
@@ -838,7 +834,11 @@ byte * P_UnArchiveThinkers (byte * save_p)
 	  return (save_p); 	// end of list
 
 	case tc_mobj:
-	  save_p = P_UnArchiveMobj (save_p);
+	  save_p = P_UnArchiveMobj (save_p, (actionf_p1)P_MobjThinker);
+	  break;
+
+	case tc_music:
+	  save_p = P_UnArchiveMobj (save_p, (actionf_p1)S_MusInfoThinker);
 	  break;
 
 	default:
