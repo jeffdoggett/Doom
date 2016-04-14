@@ -1441,7 +1441,6 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
       return 1;
   }
 
-
   if (Mus_QTM_load (data) == 0)		// Did QTM recognise it?
   {
     music_available |= QTM_PLAYING;
@@ -1479,27 +1478,25 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
     return (timplayer_handle);
   }
 
-  if (((int*)data)[0]==0x6468544D)	// 'MThd'
+  if (((int*)data)[0]!=0x6468544D)	// 'MThd'
   {
-    return 0;
-  }
-
-  if (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
-   || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
-    && (Mus_AMP_set_volume (music_ampvol) == 0)))
-   && (I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0))
-  {
-    if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
-     && (Mus_AMP_playing () == 3))
+    if (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
+     || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
+      && (Mus_AMP_set_volume (music_ampvol) == 0)))
+     && (I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0))
     {
-      amp_current = (mus_dir_t *) &wimp_temp;
-//    printf ("Playing %s\n", ptr -> filename);
-      music_available |= AMP_PLAYING;
-	return 1;
-    }
-    else
-    {
-      remove (MUS_TEMP_FILE);
+      if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
+       && (Mus_AMP_playing () == 3))
+      {
+	amp_current = (mus_dir_t *) &wimp_temp;
+//	printf ("Playing %s\n", ptr -> filename);
+	music_available |= AMP_PLAYING;
+	  return 1;
+      }
+      else
+      {
+	remove (MUS_TEMP_FILE);
+      }
     }
   }
 

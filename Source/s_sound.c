@@ -784,27 +784,37 @@ void S_ChangeMusic (int musicnum, int looping)
     return;
   }
 
+ //printf ("Music %d/%d %X %X %X\n", lumpnum, music->lumpnum,music->data,mus_playing, music);
+
   if ((lumpnum != music->lumpnum)	// May have changed when using mus_extra
    || (music->data == NULL))
   {
-    music->lumpnum = lumpnum;
-    music->data = (void *) W_CacheLumpNum (music->lumpnum, PU_MUSIC);
+    // shutdown old music
+    S_StopMusic ();
+    music->data = (void *) W_CacheLumpNum (music->lumpnum = lumpnum, PU_MUSIC);
   }
   else if (mus_playing == music)
   {
     return;
   }
-
-  // shutdown old music
-  S_StopMusic ();
+  else
+  {
+    // shutdown old music
+    S_StopMusic ();
+  }
 
   // load & register it
-  music->handle = I_RegisterSong (music, namebuf);
-
-  // play it
-  I_PlaySong (music->handle, looping);
-
-  mus_playing = music;
+  if ((music->handle = I_RegisterSong (music, namebuf)) == 0)
+  {
+    Z_ChangeTag (music->data, PU_CACHE);
+    music->data = NULL;
+  }
+  else
+  {
+    // play it
+    I_PlaySong (music->handle, looping);
+    mus_playing = music;
+  }
 }
 
 /* ------------------------------------------------------------ */
@@ -818,9 +828,6 @@ void S_StopMusic(void)
 
 	I_StopSong(mus_playing->handle);
 	I_UnRegisterSong(mus_playing->handle);
-	Z_ChangeTag(mus_playing->data, PU_CACHE);
-
-	mus_playing->data = 0;
 	mus_playing = 0;
     }
 }
