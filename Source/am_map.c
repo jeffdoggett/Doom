@@ -308,7 +308,7 @@ static const mline_t keyshaped_guy[] = {
     { { (fixed_t)(.9*R), (fixed_t)(0*R) }, { (fixed_t)(.9*R), (fixed_t)(-.4*R) } },
     { { (fixed_t)(.9*R), (fixed_t)(-.4*R) }, { (fixed_t)(.6*R), (fixed_t)(-.2*R) } },
     { { (fixed_t)(.6*R), (fixed_t)(-.2*R) }, { (fixed_t)(.3*R), (fixed_t)(-.4*R) } },
-    { { (fixed_t)(.3*R), (fixed_t)(-.4*R) }, { (fixed_t)(.3*R), (fixed_t)(0*R) } },
+    { { (fixed_t)(.3*R), (fixed_t)(-.4*R) }, { (fixed_t)(.3*R), (fixed_t)(0*R) } }
 };
 #undef R
 #define NUMKEYSHAPEDGUYLINES (sizeof(keyshaped_guy)/sizeof(mline_t))
@@ -326,16 +326,30 @@ static const mline_t skullkeyshaped_guy[] = {
     { { (fixed_t)(-.9*R), (fixed_t)0 }, { (fixed_t)(-.9*R), (fixed_t)(-.4*R) } },
     { { (fixed_t)(-.9*R), (fixed_t)(-.4*R) }, { (fixed_t)(-.6*R), (fixed_t)(-.2*R) } },
     { { (fixed_t)(-.6*R), (fixed_t)(-.2*R) }, { (fixed_t)(-.3*R), (fixed_t)(-.4*R) } },
-    { { (fixed_t)(-.3*R), (fixed_t)(-.4*R) }, { (fixed_t)(-.3*R), (fixed_t)0 } },
+    { { (fixed_t)(-.3*R), (fixed_t)(-.4*R) }, { (fixed_t)(-.3*R), (fixed_t)0 } }
 };
 #undef R
 #define NUMSKULLKEYSHAPEDGUYLINES (sizeof(skullkeyshaped_guy)/sizeof(mline_t))
+
+#define R (FRACUNIT)
+static const mline_t musicshaped_guy[] =
+{
+  {{ (fixed_t)(.2*R), (fixed_t)(.2*R) }, { (fixed_t)(.0*R), (fixed_t)(.4*R) }},
+  {{ (fixed_t)(.0*R), (fixed_t)(.4*R) }, { (fixed_t)(.0*R), (fixed_t)(-.4*R) }},
+  {{ (fixed_t)(.0*R), (fixed_t)(-.4*R) }, { (fixed_t)(-.2*R), (fixed_t)(-.4*R) }},
+  {{ (fixed_t)(-.2*R), (fixed_t)(-.4*R) }, { (fixed_t)(-.2*R), (fixed_t)(-.2*R) }},
+  {{ (fixed_t)(-.2*R), (fixed_t)(-.2*R) }, { (fixed_t)(.0*R), (fixed_t)(-.2*R) }}
+};
+#undef R
+#define NUMMUSICSHAPEDGUYLINES (sizeof(musicshaped_guy)/sizeof(mline_t))
+
 
 static const mshape_t thintriangle_shape = { NUMTHINTRIANGLEGUYLINES, thintriangle_guy };
 static const mshape_t pentacle_shape = { NUMPENTACLEGUYLINES, pentacle_guy };
 static const mshape_t hexagon_shape = { NUMHEXAGONGUYLINES, hexagon_guy };
 static const mshape_t key_shape = { NUMKEYSHAPEDGUYLINES, keyshaped_guy };
 static const mshape_t skullkey_shape = { NUMSKULLKEYSHAPEDGUYLINES, skullkeyshaped_guy };
+static const mshape_t music_shape = { NUMMUSICSHAPEDGUYLINES, musicshaped_guy };
 
 
 static int      grid = 0;
@@ -2128,6 +2142,10 @@ AM_drawThingsDifferently (void)
 	      case 27: case 28: case 29: case 42:
 		colour = mapcolour.skull;
 		shape = &hexagon_shape;
+		break;
+	      // Music changer
+	      case 14100:
+		shape = &music_shape;
 		break;
 	      default:
 		angle = t->angle;
