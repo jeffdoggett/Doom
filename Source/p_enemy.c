@@ -2554,7 +2554,8 @@ void A_SpawnFly (mobj_t* mo, pspdef_t* psp)
 	P_TeleportMove (newmobj, newmobj->x, newmobj->y, newmobj->z, true); // telefrag anything in this spot
 
       // [BH] increase totalkills
-      totalkills++;
+      if ((newmobj->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
+	totalkills++;
     }
   }
 
@@ -2653,12 +2654,25 @@ void A_Mushroom(mobj_t *actor, pspdef_t* psp)
 //
 void A_Spawn (mobj_t *mo, pspdef_t* psp)
 {
+  mobjtype_t type;
   mobj_t *newmobj;
 
-  if (mo->state->misc1)
+  type = (mobjtype_t)(mo->state->misc1);
+  if (type)
   {
-    newmobj = P_SpawnMobj(mo->x, mo->y, (fixed_t)(mo->state->misc2 << FRACBITS) + mo->z, (mobjtype_t)(mo->state->misc1 - 1));
-    newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (mo->flags & MF_FRIEND);
+    type--;
+
+    /* If we're in massacre mode then don't spawn anything killable. */  
+
+    if (((mo->flags2 & MF2_MASSACRE) == 0)
+     || ((mobjinfo[type].flags & MF_COUNTKILL) == 0))
+    {
+      newmobj = P_SpawnMobj(mo->x, mo->y, (fixed_t)(mo->state->misc2 << FRACBITS) + mo->z, type);
+      newmobj->flags = (newmobj->flags & ~MF_FRIEND) | (mo->flags & MF_FRIEND);
+
+      if ((newmobj->flags & (MF_COUNTKILL|MF_FRIEND)) == MF_COUNTKILL)
+	totalkills++;
+    }
   }
 }
 
