@@ -2660,9 +2660,9 @@ void A_Spawn (mobj_t *mo, pspdef_t* psp)
   type = (mobjtype_t)(mo->state->misc1);
   if (type)
   {
-    type--;
+    type = (mobjtype_t) ((int) type - 1);
 
-    /* If we're in massacre mode then don't spawn anything killable. */  
+    /* If we're in massacre mode then don't spawn anything killable. */
 
     if (((mo->flags2 & MF2_MASSACRE) == 0)
      || ((mobjinfo[type].flags & MF_COUNTKILL) == 0))
