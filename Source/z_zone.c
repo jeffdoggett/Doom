@@ -25,8 +25,7 @@
 static const char rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 #endif
 
-#include "z_zone.h"
-#include "i_system.h"
+#include "includes.h"
 
 // Tunables
 

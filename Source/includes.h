@@ -2,11 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 
 #ifdef NORMALUNIX
 #include <unistd.h>
@@ -14,7 +16,6 @@
 #endif
 #ifdef __riscos
 #include "acorn.h"
-#include <stdint.h>
 #endif
 
 

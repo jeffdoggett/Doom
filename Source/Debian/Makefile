@@ -18,7 +18,7 @@ CFLAGS=-g -DMORELIGHTLEVELS -DPADDED_STRUCTS -DNORMALUNIX -DHAVE_ALLOCA
 AFLAGS=
 LDFLAGS=
 
-LIBS=-lXext -lX11
+LIBS=-lXext -lX11 -lm
 
 HDRS=		am_map.h dh_stuff.h doomdata.h doomdef.h doomstat.h doomtype.h dstrings.h d_englsh.h \
 		d_event.h d_french.h d_items.h d_main.h d_net.h d_player.h d_textur.h d_think.h d_ticcmd.h \

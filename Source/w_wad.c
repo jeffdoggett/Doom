@@ -26,39 +26,7 @@
 static const char rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #endif
 
-#ifdef NORMALUNIX
-#include <ctype.h>
-#include <sys/types.h>
-#include <string.h>
-#include <unistd.h>
-#include <malloc.h>
-#include <fcntl.h>
-#endif
-
-#if defined(LINUX) || defined(HAVE_ALLOCA)
-#include <alloca.h>
-#else
-extern void * alloca (unsigned int);
-#endif
-
-#ifdef __riscos
-#include <ctype.h>
-#include "acorn.h"
-#endif
-
-#include "doomtype.h"
-#include "m_swap.h"
-#include "i_system.h"
-#include "z_zone.h"
-#include "doomstat.h"
-#include "g_game.h"
-
-#ifdef __GNUG__
-#pragma implementation "w_wad.h"
-#endif
-#include "w_wad.h"
-
-#include <sys/stat.h>
+#include "includes.h"
 
 /* ---------------------------------------------------------------------------- */
 //
