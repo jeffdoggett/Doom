@@ -588,6 +588,7 @@ void I_FinishUpdate (void)
       break;
 
     case 24:
+    case 32:
       I_Do_24 ();
       break;
   }
@@ -1025,6 +1026,15 @@ static void I_FindVisual (void)
     I_Error ("24 bit DirectColor mode is not available");
   }
 
+  if (M_CheckParm ("-Visual32"))
+  {
+    if (XMatchVisualInfo(X_display, X_screen, 32, DirectColor, &X_visualinfo))
+      return;
+     if (XMatchVisualInfo(X_display, X_screen, 32, TrueColor, &X_visualinfo))
+      return;
+   I_Error ("32 bit DirectColor/TrueColor mode is not available");
+  }
+
   if (M_CheckParm ("-Visual8"))
   {
     if (XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo))
@@ -1041,11 +1051,17 @@ static void I_FindVisual (void)
   if (XMatchVisualInfo(X_display, X_screen, 24, DirectColor, &X_visualinfo))
     return;
 
+  if (XMatchVisualInfo(X_display, X_screen, 32, TrueColor, &X_visualinfo))
+    return;
+
+  if (XMatchVisualInfo(X_display, X_screen, 32, DirectColor, &X_visualinfo))
+    return;
+
   if (XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo))
     return;
 
   I_Error("xdoom currently only supports 256-color PseudoColor\n"
-	  "screens or 24 bit True/DirectColor screens.");
+	  "screens or 24/32 bit True/DirectColor screens.");
 }
 
 /***************************************************************************/
@@ -1204,6 +1220,7 @@ void I_InitGraphics (void)
       break;
 
     case 24:
+    case 32:
       X_cmap = XCreateColormap(X_display, RootWindow(X_display,
 					X_screen), X_visual, AllocNone);
       break;
@@ -1330,6 +1347,7 @@ void I_InitGraphics (void)
       	break;
 
       case 24:
+      case 32:
 	mem = malloc(X_width * X_height * 4);
 	if (mem == NULL)
 	  I_Error ("Failed to claim memory");
