@@ -85,6 +85,7 @@ void S_StopMusic(void);
 void S_PauseSound(void);
 void S_ResumeSound(void);
 
+int S_FindSoundData (unsigned int * start, sfxinfo_t * sfx);
 
 //
 // Updates music & sounds
