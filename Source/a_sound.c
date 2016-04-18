@@ -1261,6 +1261,34 @@ static int I_PlayMusicFile (const char * lumpname)
 }
 
 /* ------------------------------------------------------------ */
+/*
+   See if the lump appears to be something that Amplayer might
+   recognise.
+*/
+
+int I_AmPlayer (byte * data, size_t length)
+{
+  if (length < 4)
+    return (0);
+
+  if (strncmp((char*)data, "ID3", 3) == 0) // MP3 file with an ID3v2 tag
+    return (1);
+
+  if (strncmp ((char*)data,"RIFF",4) == 0) // Wav file
+    return (1);
+
+  if ((data[0] & 0xff) == 0xff		// MP3 file without an ID3 tag or with an ID3v1 tag
+   && (data[1] & 0xf0) == 0xf0
+   && (data[2] & 0xf0) != 0x00
+   && (data[2] & 0xf0) != 0xf0
+   && (data[2] & 0x0c) != 0x0c
+   && (data[1] & 0x06) != 0x00)
+    return (1);
+
+  return (0);
+}
+
+/* ------------------------------------------------------------ */
 /* Song has been loaded, and placed at 'data'.
    If music is ready, get ready to play.
    Return a dummy handle */
@@ -1269,12 +1297,10 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
   unsigned int size;
   unsigned int offset;
   byte * data;
-  void * vdata;
 
   I_UnRegisterSong (1);
 
-  vdata = music->data;
-  data = (byte*) vdata;
+  data = (byte*) music->data;
   size = W_LumpLength (music->lumpnum);
 
   if ((mp3priority == 0)
@@ -1321,25 +1347,26 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
     return (timplayer_handle);
   }
 
-  if (((int*)data)[0]!=0x6468544D)	// 'MThd'
+//if (((int*)data)[0] == 0x6468544D)	// 'MThd'
+//{
+//}
+  if ((I_AmPlayer (data, size))
+  && (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
+   || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
+    && (Mus_AMP_set_volume (music_ampvol) == 0)))
+   && (I_Save_MusFile (MUS_TEMP_FILE, data, size) == 0)))
   {
-    if (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
-     || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
-      && (Mus_AMP_set_volume (music_ampvol) == 0)))
-     && (I_Save_MusFile (MUS_TEMP_FILE, vdata, size) == 0))
+    if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
+     && (Mus_AMP_playing () == 3))
     {
-      if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
-       && (Mus_AMP_playing () == 3))
-      {
-	amp_current = (mus_dir_t *) &wimp_temp;
-//	printf ("Playing %s\n", ptr -> filename);
-	music_available |= AMP_PLAYING;
-	  return 1;
-      }
-      else
-      {
-	remove (MUS_TEMP_FILE);
-      }
+      amp_current = (mus_dir_t *) &wimp_temp;
+//    printf ("Playing %s\n", ptr -> filename);
+      music_available |= AMP_PLAYING;
+      return 1;
+    }
+    else
+    {
+      remove (MUS_TEMP_FILE);
     }
   }
 
