@@ -1023,7 +1023,7 @@ static void write_32 (byte * ptr, unsigned int data)
    Some WAD files use RIFF files.
 */
 
-int S_FindSoundData (unsigned int * start, sfxinfo_t * sfx)
+int S_FindSoundData (sfxinfo_t * sfx)
 {
   unsigned int chan;
   unsigned int type;
@@ -1125,11 +1125,9 @@ int S_FindSoundData (unsigned int * start, sfxinfo_t * sfx)
     }
   }
 
-  *start = (int) data;
+  sfx -> adata = data;
   return (length);
 }
-
-/* ------------------------------------------------------------ */
 
 /* ------------------------------------------------------------ */
 

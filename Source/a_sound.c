@@ -381,7 +381,7 @@ I_StartSound
   // printf ("Playing sound %s\n", sfx->name);
   // printf ("Using sound channel %d\n", channel);
 
-  length = S_FindSoundData ((unsigned int*)&regs.r[1], sfx);
+  length = S_FindSoundData (sfx);
 
   if (length == 0)
     return (channel);
@@ -390,6 +390,7 @@ I_StartSound
   // R2 = End of data
 
   regs.r[0] = channel;
+  regs.r[1] = (int) sfx->adata;
   regs.r[2] = regs.r[1] + length;
   _kernel_swi (DataVox_SetMemory, &regs, &regs);
 

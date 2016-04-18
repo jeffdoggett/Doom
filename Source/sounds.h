@@ -62,6 +62,7 @@ struct sfxinfo_struct
 
     // sample rate - usually 11025
     int		samplerate;
+    void*	adata;		// The actual address of the audio data
 };
 
 
