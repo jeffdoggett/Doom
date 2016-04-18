@@ -28,6 +28,12 @@ static const char rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
 #include "includes.h"
 
+#if defined(LINUX) || defined(HAVE_ALLOCA)
+#include  <alloca.h>
+#else
+extern void * alloca (unsigned int);
+#endif
+
 /* ---------------------------------------------------------------------------- */
 //
 // GLOBALS

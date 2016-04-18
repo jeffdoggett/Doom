@@ -30,11 +30,6 @@ static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #endif
 
 #include "includes.h"
-#if defined(LINUX) || defined(HAVE_ALLOCA)
-#include  <alloca.h>
-#else
-extern void * alloca (unsigned int);
-#endif
 
 //-----------------------------------------------------------------------------
 // #define MIN_SIZE_LUMP	12

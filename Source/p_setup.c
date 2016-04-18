@@ -29,12 +29,6 @@ static const char rcsid[] = "$Id: p_setup.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "includes.h"
 #include <math.h>
 
-#if defined(LINUX) || defined(HAVE_ALLOCA)
-#include  <alloca.h>
-#else
-extern void * alloca (unsigned int);
-#endif
-
 extern unsigned int P_SpawnMapThing (mapthing_t* mthing);
 extern void A_Activate_Death_Sectors (unsigned int monsterbits);
 extern void P_Init_Intercepts (void);
@@ -247,7 +241,6 @@ void P_LoadSegs (int lump)
   line_t*	ldef;
   unsigned int	linedef;
   unsigned int	side;
-//  byte*		vertchanged;
 
 #ifdef PADDED_STRUCTS
   numsegs = W_LumpLength (lump) / 12;
@@ -257,13 +250,6 @@ void P_LoadSegs (int lump)
   segs = Z_Calloc (numsegs*sizeof(seg_t),PU_LEVEL,0);
   data = W_CacheLumpNum (lump,PU_STATIC);
 
-#if 0
-  i = (numvertexes+7)>>3;
-  vertchanged = (byte *) alloca (i);
-  if (vertchanged)
-      memset(vertchanged, 0, i);
-#endif
-
   ml = (mapseg_t *)data;
   li = segs;
   for (i=0 ; i<numsegs ; i++, li++)
@@ -271,47 +257,6 @@ void P_LoadSegs (int lump)
     unsigned int v1,v2;
 
     li->angle = (SHORT(ml->angle))<<16;
-
-#if 0
-    {
-      // Now done later in P_RemoveSlimeTrails
-      int	ptp_angle;
-      int	delta_angle;
-
-      /* firelines fix -- taken from Boom source */
-      ptp_angle = R_PointToAngle2(li->v1->x,li->v1->y,li->v2->x,li->v2->y);
-      delta_angle = (abs(ptp_angle-li->angle)>>ANGLETOFINESHIFT)*360/8192;
-
-      if ((delta_angle != 0) && (vertchanged != NULL))
-      {
-	int dis, dx, dy, vnum1, vnum2;
-
-	dx = (li->v1->x - li->v2->x)>>FRACBITS;
-	dy = (li->v1->y - li->v2->y)>>FRACBITS;
-	dx = dx * dx;
-	dy = dy * dy;
-	dx = dx + dy;
-	dis = ((int) sqrt(dx))<<FRACBITS;
-	dx = finecosine[li->angle>>ANGLETOFINESHIFT];
-	dy = finesine[li->angle>>ANGLETOFINESHIFT];
-	vnum1 = li->v1 - vertexes;
-	vnum2 = li->v2 - vertexes;
-	if ((vnum2 > vnum1) && ((vertchanged[vnum2>>3] & (1 << (vnum2&7))) == 0))
-	{
-	    li->v2->x = li->v1->x + FixedMul(dis,dx);
-	    li->v2->y = li->v1->y + FixedMul(dis,dy);
-	    vertchanged[vnum2>>3] |= 1 << (vnum2&7);
-	}
-	else if ((vertchanged[vnum1>>3] & (1 << (vnum1&7))) == 0)
-	{
-	    li->v1->x = li->v2->x - FixedMul(dis,dx);
-	    li->v1->y = li->v2->y - FixedMul(dis,dy);
-	    vertchanged[vnum1>>3] |= 1 << (vnum1&7);
-	}
-      }
-    }
-#endif
-
     li->offset = (SHORT(ml->offset))<<16;
     linedef = USHORT(ml->linedef);
     if (linedef >= numlines)
