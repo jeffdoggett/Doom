@@ -540,21 +540,6 @@ S_StartSound
 
 /* ------------------------------------------------------------ */
 
-void S_StopSound(void *origin)
-{
-    int cnum;
-
-    for (cnum=0 ; cnum<numChannels ; cnum++)
-    {
-	if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
-	{
-	    S_StopChannel(cnum);
-	}
-    }
-}
-
-/* ------------------------------------------------------------ */
-
 void S_RemoveSoundOrigin (void *origin)
 {
     int cnum;
