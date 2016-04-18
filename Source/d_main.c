@@ -1354,9 +1354,23 @@ static void IdentifyVersion (void)
     doomwaddir = getenv("DOOMWADDIR");
     if (!doomwaddir)
     {
-      dirname (wad_dirname, myargv [0]);
+      dirname (wad_filename, myargv [0]);
+      sprintf (wad_dirname, "%s/iwads", wad_filename);
+      if (is_a_directory (wad_dirname) != 0)
+      {
+	sprintf (wad_dirname, "%s/../lib/iwads", wad_filename);
+	if (is_a_directory (wad_dirname) != 0)
+	{
+	  sprintf (wad_dirname, "%s/../lib/Doom/iwads", wad_filename);
+	  if (is_a_directory (wad_dirname) != 0)
+	  {
+	    sprintf (wad_dirname, "%s/iwads", wad_filename);
+	  }
+	}
+      }
+
       doomwaddir = wad_dirname;
-      // printf ("doomwaddir = %s\n", doomwaddir);
+      printf ("DOOMWADDIR env not set - using %s\n", doomwaddir);
     }
   }
 
