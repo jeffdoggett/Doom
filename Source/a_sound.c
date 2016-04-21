@@ -1337,7 +1337,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
       music_data=data+offset;
       return 1;
     }
-    return (0);
+    return (-1);
   }
 
   if ((Mus_Load_TimPlayer () == 0)	// Have we now loaded TimPlayer?
@@ -1377,7 +1377,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
       return 1;
   }
 
-  return 0;
+  return -1;
 }
 
 /* ------------------------------------------------------------ */

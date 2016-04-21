@@ -892,7 +892,7 @@ void I_UnRegisterSong(int handle)
 
 int I_RegisterSong(musicinfo_t*	music, const char * lumpname)
 {
-  return 1;
+  return -1;
 }
 
 /* Keep scheduler buffer full */

@@ -789,7 +789,7 @@ void S_ChangeMusic (int musicnum, int looping)
   }
 
   // load & register it
-  if ((music->handle = I_RegisterSong (music, namebuf)) == 0)
+  if ((music->handle = I_RegisterSong (music, namebuf)) < 0)
   {
     Z_ChangeTag (music->data, PU_CACHE);
     music->data = NULL;
