@@ -4262,7 +4262,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
       {
 	newtext = *source;
       }
-      else if (lookup == 0)
+      else if ((lookup == 0) && (length > 10))
       {
 	newtext = malloc (length + 20);
 	if (newtext)
