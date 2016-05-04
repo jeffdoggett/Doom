@@ -251,24 +251,18 @@ void T_MoveFloor(floormove_t* floor)
 }
 
 //-----------------------------------------------------------------------------
-
-static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum)
-{
-  int min_text_num;
-  unsigned int	i;
-  unsigned int	offset;
-  side_t*	side;
-
 /*
   Map 25 of Memento Mori 2 relies on the buggy behavior of this function.
   Line 1289, Action 30, operates sector 274 and raises it too high if this
   function is corrected.
+  Whereas Map 23 of Jenesis requires the corrected behavior for line 1547.
 */
-#if 1
-  min_text_num = 0;
-#else
-  min_text_num = 1;
-#endif
+
+static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum, int min_text_num)
+{
+  unsigned int	i;
+  unsigned int	offset;
+  side_t*	side;
 
   offset = ~0;
   for (i = 0; i < sec->linecount; i++)
@@ -463,7 +457,7 @@ EV_DoFloor
       case raiseToTexture:
 //	floor->direction = 1;
 //	floor->speed = FLOORSPEED;
-	floor->floordestheight = floor->sector->floorheight + find_shortest_lower_texture (sec, secnum);
+	floor->floordestheight = floor->sector->floorheight + find_shortest_lower_texture (sec, secnum, 0);
       break;
 
       case raiseToCeiling:
@@ -549,7 +543,7 @@ EV_DoFloor
 	      newheight = sec->ceilingheight;
 	      break;
 	    case FbyST:
-	      offset = find_shortest_lower_texture (sec, secnum);
+	      offset = find_shortest_lower_texture (sec, secnum, 1);
 	      newheight = floor->sector->floorheight;
 	      break;
 	    case Fby24:						// 24
