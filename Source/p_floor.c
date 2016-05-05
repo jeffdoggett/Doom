@@ -256,6 +256,8 @@ void T_MoveFloor(floormove_t* floor)
   Line 1289, Action 30, operates sector 274 and raises it too high if this
   function is corrected.
   Whereas Map 23 of Jenesis requires the corrected behavior for line 1547.
+  (Unless you've also included the jenefix.wad which has a modified map 23
+  to allow for this.)
 */
 
 static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum, int min_text_num)
