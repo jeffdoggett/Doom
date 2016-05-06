@@ -2301,7 +2301,7 @@ void G_BeginRecording (void)
   byte*	p;
 
   p = demobuffer;
-  *p++ = SAVE_GAME_VERSION;
+  *p++ = DEMO_VERSION;
   *p++ = gameskill;
   *p++ = gameepisode;
   *p++ = gamemap;
@@ -2380,13 +2380,12 @@ void G_DoPlayDemo (void)
 
   p = demo_p;
   i = *p++;			/* Version number of program that made the recording */
-  if ((i / 100) != (GAME_ENGINE_VERSION / 100))  /* Assume that we can have a stab at */
-  {				       /* playing this if the major number agrees */
+  if ((i / 100) != (DEMO_VERSION / 100))  /* Assume that we can have a stab at */
+  {					  /* playing this if the major number agrees */
 #ifdef NORMALUNIX
-    fprintf( stderr, "Demo is from a different game version! (%d)\n", demo_p[-1]);
+    fprintf( stderr, "Demo is from a different game version! (%d)\n", i);
 #endif
-    i = M_CheckParm ("-forcedemo");
-    if (i == 0)
+    if (M_CheckParm ("-forcedemo") == 0)
     {
       // gameaction = ga_nothing;
       return;

@@ -34,6 +34,7 @@
 //
 // DOOM version
 enum { SAVE_GAME_VERSION = 110 };	// Will never change!!!
+enum { DEMO_VERSION = 110 };
 enum { NET_PROTOCOL_VERSION = 110 };
 enum { GAME_ENGINE_VERSION = 111 };
 
