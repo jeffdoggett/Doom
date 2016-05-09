@@ -15,6 +15,7 @@
 #define OS_ScreenMode			0x65
 #define ColourTrans_ReturnColourNumber	0x40744
 #define ColourTrans_WritePalette	0x4075D
+#define ColourTrans_SetColour		0x4075E
 
 
 // Blocky mode,
@@ -465,6 +466,39 @@ static void construct_screen_mode_block (int mode_num)
 
 /* -------------------------------------------------------------------------- */
 
+static void I_RestoreDefaultColours (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0x00000000;
+  _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
+
+  // regs.r[0] = colour;
+  regs.r[1] = 0;
+  regs.r[2] = 0;
+  regs.r[3] = 0x280;	// Bit 9 = Text colour, Bit 7 = Background.
+  regs.r[4] = 0;	// Plot_Style;
+  regs.r[5] = 0;
+  regs.r[6] = 0;
+  regs.r[7] = 0;
+  _kernel_swi (ColourTrans_SetColour, &regs, &regs);
+
+  regs.r[0] = (int) 0xFFFFFF00;
+  _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
+
+  // regs.r[0] = colour;
+  regs.r[1] = 0;
+  regs.r[2] = 0;
+  regs.r[3] = 0x200;	// Bit 9 = Text colour, Bit 7 = Background.
+  regs.r[4] = 0;	// Plot_Style;
+  regs.r[5] = 0;
+  regs.r[6] = 0;
+  regs.r[7] = 0;
+  _kernel_swi (ColourTrans_SetColour, &regs, &regs);
+}
+
+/* -------------------------------------------------------------------------- */
+
 void I_ShutdownGraphics(void)
 {
   /* Flush keyboard buffer */
@@ -478,6 +512,8 @@ void I_ShutdownGraphics(void)
 
   /* Restore clip rectangles to full screen */
   _kernel_oswrch (26);
+
+  I_RestoreDefaultColours ();
 }
 
 /* -------------------------------------------------------------------------- */
