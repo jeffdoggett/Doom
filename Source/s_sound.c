@@ -887,7 +887,7 @@ S_AdjustSoundParams
     // but I feel that it is a bad idea! JAD 1/5/99
     if (approx_dist > S_CLIPPING_DIST)
     {
-        // if (gamemap != 8)
+	// if (gamemap != 8)
 	  return 0;
 	// if (modifiedgame)
 	//  return 0;
@@ -1234,8 +1234,10 @@ void S_MusInfoThinker (mobj_t *thing)
   }
 
   if (((tics = muschangeinfo.tics) == 0)
-   || (muschangeinfo.gametic == gametic)
-   || ((muschangeinfo.tics = tics - 1) != 0))
+   || (muschangeinfo.gametic == gametic))
+    return;
+
+  if ((muschangeinfo.tics = tics - 1) != 0)
   {
     muschangeinfo.gametic = gametic;
     return;
