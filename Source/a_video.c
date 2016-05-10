@@ -466,9 +466,11 @@ static void construct_screen_mode_block (int mode_num)
 
 /* -------------------------------------------------------------------------- */
 
-static void I_RestoreDefaultColours (void)
+static void I_SetDefaultTextColours (void)
 {
   _kernel_swi_regs regs;
+
+  I_SetPalette (W_CacheLumpName ("PLAYPAL",PU_CACHE));
 
   regs.r[0] = 0x00000000;
   _kernel_swi (ColourTrans_ReturnColourNumber, &regs, &regs);
@@ -512,8 +514,6 @@ void I_ShutdownGraphics(void)
 
   /* Restore clip rectangles to full screen */
   _kernel_oswrch (26);
-
-  I_RestoreDefaultColours ();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1410,6 +1410,8 @@ void I_InitGraphics (void)
     _kernel_oswrch (0);
     _kernel_oswrch (0);
     _kernel_oswrch (0);
+
+    I_SetDefaultTextColours ();
 }
 
 /* -------------------------------------------------------------------------- */
