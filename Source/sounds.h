@@ -114,6 +114,8 @@ typedef struct muschange_s
 typedef struct
 {
   mobj_t *mapthing;
+  int	  musnum;
+  int	  gametic;
   int	  tics;
   muschange_t* head;
 } muschangeinfo_t;

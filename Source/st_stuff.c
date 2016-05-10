@@ -700,9 +700,9 @@ ST_Responder (event_t* ev)
 	mobj_t * mobj;
 
 	/* Only clear this if we are not standing on it. */
-	if (((mobj = muschangeinfo.mapthing) != NULL)
-	 && (mobj->subsector->sector != players[displayplayer].mo->subsector->sector))
-	  muschangeinfo.mapthing = NULL;
+	if (((mobj = muschangeinfo.mapthing) == NULL)
+	 || (mobj->subsector->sector != players[displayplayer].mo->subsector->sector))
+	  muschangeinfo.musnum = 0;
 
 	plyr->message = stat_bar_messages [ST_STSTR_MUS];
 	cht_GetParam(&cheat_mus, buf);

@@ -1217,24 +1217,31 @@ void S_MusInfoThinker (mobj_t *thing)
   int episode;
   muschange_t * musc_ptr;
 
-#if 0
+  /* Is this music changer in the players sector? */
   if (thing->subsector->sector == players[displayplayer].mo->subsector->sector)
-    printf ("Player has entered sector with music changer %d\n", thing->spawnpoint.type);
-#endif
-
-  if ((muschangeinfo.mapthing != thing)
-   && (thing->subsector->sector == players[displayplayer].mo->subsector->sector))
   {
-    muschangeinfo.mapthing = thing;
-    muschangeinfo.tics = 30;
-    return;
+    muschangeinfo.mapthing = thing;		// Yes.
+    mnum = thing->spawnpoint.type;
+    // printf ("Player has entered sector with music changer %d\n", mnum);
+    if (muschangeinfo.musnum != mnum)		// Different from the last one?
+    {
+      muschangeinfo.musnum = mnum;
+      muschangeinfo.gametic = gametic;
+      muschangeinfo.tics = TICRATE;
+      // printf ("Start music change to %d at gametic %d\n", mnum, gametic);
+      return;
+    }
   }
 
   if (((tics = muschangeinfo.tics) == 0)
+   || (muschangeinfo.gametic == gametic)
    || ((muschangeinfo.tics = tics - 1) != 0))
+  {
+    muschangeinfo.gametic = gametic;
     return;
+  }
 
-  mnum = thing->spawnpoint.type - 14100;
+  mnum = muschangeinfo.musnum - 14100;
   musc_ptr = muschangeinfo.head;
   if (musc_ptr)
   {
@@ -1250,6 +1257,7 @@ void S_MusInfoThinker (mobj_t *thing)
        && (musc_ptr->musnum == mnum))
       {
 	S_music[mus_extra].name = musc_ptr->music;
+	// printf ("Music change to %d at gametic %d\n", mnum, gametic);
 	S_ChangeMusic (mus_extra, true);
 	return;
       }
