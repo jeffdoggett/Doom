@@ -37,6 +37,7 @@ static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 */
 static boolean wrong_endian;
 extern int numflats;
+extern muschangeinfo_t       muschangeinfo;
 
 //-----------------------------------------------------------------------------
 #if 0
@@ -593,7 +594,7 @@ typedef enum
 {
   tc_end,
   tc_mobj,
-  tc_music
+  tc_musicchanger
 } thinkerclass_t;
 
 //-----------------------------------------------------------------------------
@@ -780,7 +781,7 @@ byte * P_ArchiveThinkers (byte * save_p)
     if (th->function.acp1 == (actionf_p1)P_MobjThinker)
       save_p = P_ArchiveMobj (save_p, (mobj_t*) th, tc_mobj);
     else if (th->function.acp1 == (actionf_p1)S_MusInfoThinker)
-      save_p = P_ArchiveMobj (save_p, (mobj_t*) th, tc_music);
+      save_p = P_ArchiveMobj (save_p, (mobj_t*) th, tc_musicchanger);
 
     // I_Error ("P_ArchiveThinkers: Unknown thinker function");
   }
@@ -838,7 +839,7 @@ byte * P_UnArchiveThinkers (byte * save_p)
 	  save_p = P_UnArchiveMobj (save_p, (actionf_p1)P_MobjThinker);
 	  break;
 
-	case tc_music:
+	case tc_musicchanger:
 	  save_p = P_UnArchiveMobj (save_p, (actionf_p1)S_MusInfoThinker);
 	  break;
 
@@ -865,7 +866,8 @@ enum
   tc_scroll,
   tc_elevator,
   tc_fireflicker,
-  tc_button
+  tc_button,
+  tc_music
 } specials_e;
 
 //-----------------------------------------------------------------------------
@@ -1603,6 +1605,44 @@ static byte * P_UnArchiveButton (byte * save_p)
 }
 
 //-----------------------------------------------------------------------------
+
+static byte * P_ArchiveMusic (byte * save_p)
+{
+  int mnum;
+  unsigned int * save_32_p;
+
+  /* Have we stepped on a music changer? */
+
+  if ((mnum = muschangeinfo.musnum) != 0)
+  {
+    *save_p++ = tc_music;
+    PADSAVEP();
+
+    save_32_p = (unsigned int *) save_p;
+    p_save_32 (mnum);
+    save_p = (byte *) save_32_p;
+  }
+
+  return (save_p);
+}
+
+//-----------------------------------------------------------------------------
+
+static byte * P_UnArchiveMusic (byte * save_p)
+{
+  unsigned int * save_32_p;
+
+  PADSAVEP();
+  save_32_p = (unsigned int *) save_p;
+
+  muschangeinfo.musnum = p_load_32 (save_32_p); save_32_p++;
+  muschangeinfo.gametic = gametic;
+  muschangeinfo.tics = TICRATE;
+
+  return ((byte *) save_32_p);
+}
+
+//-----------------------------------------------------------------------------
 //
 // Things to handle:
 //
@@ -1729,6 +1769,8 @@ byte * P_ArchiveSpecials (byte * save_p)
       I_Error ("P_ArchiveSpecials: Unknown thinker %X\n", th->function.aci);
   }
 
+  save_p = P_ArchiveMusic (save_p);
+
   // add a terminating marker
   *save_p++ = tc_endspecials;
   return (save_p);
@@ -1794,6 +1836,10 @@ byte * P_UnArchiveSpecials (byte * save_p)
 
       case tc_button:
 	save_p = P_UnArchiveButton (save_p);
+	break;
+
+      case tc_music:
+	save_p = P_UnArchiveMusic (save_p);
 	break;
 
       default:
