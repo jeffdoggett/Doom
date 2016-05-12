@@ -37,6 +37,7 @@ extern boolean finale_message_changed;
 //  0 = text, 1 = art screen, 2 = character cast
 static int	finalestage;
 static int	finalecount;
+static int	finaleendgame;
 static int	finalexpos = 10;
 static int	finaleypos = 10;
 static int	finaleydy;
@@ -217,6 +218,7 @@ static void F_DetermineIntermissionTexts (void)
   map_dests_t * map_info_p;
   map_dests_t * map_info_n;
 
+  finaleendgame = 0;
   finaletext = NULL;
   nextfinaletext = NULL;
   finalemusic = NULL;
@@ -249,6 +251,7 @@ static void F_DetermineIntermissionTexts (void)
 
   if (G_MapLump (i, j) == -1)
   {
+    finaleendgame = i;
     map_info_n = NULL;
     cp_n = NULL;
   }
@@ -475,6 +478,8 @@ static void F_DetermineIntermissionTexts (void)
 //
 void F_StartFinale (int always)
 {
+    map_dests_t * map_ptr;
+
     F_DetermineIntermissionTexts ();
     if (finaletext == NULL)
     {
@@ -489,18 +494,33 @@ void F_StartFinale (int always)
 
 	//finaleflat = finale_backdrops [BG_F_SKY1]; // Not used anywhere else.
 	//finaletext = finale_messages[c1text];  // FIXME - other text, music?
-	if (gamemode == commercial)
+
+	map_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
+	if (G_MapLump (map_ptr -> normal_exit_to_episode, map_ptr -> normal_exit_to_map) == -1)
 	{
-	  map_dests_t * map_ptr;
-	  map_ptr = G_Access_MapInfoTab_E (255, gamemap);
-	  if (G_MapLump (255, map_ptr -> normal_exit_to_map) == -1)
-	    F_StartCast ();
-	  else
-	    gameaction = ga_worlddone;
+	  switch (finaleendgame)
+	  {
+	    case 1:
+	    case 2:
+	    case 3:
+	    case 4:
+	      finalestage = 1;
+	      break;
+
+	    case 10:
+	      F_StartCast ();
+	      break;
+
+	    default:
+	      if (gamemode == commercial)
+		F_StartCast ();
+	      else
+		finalestage = 1;
+	  }
 	}
 	else
 	{
-	  finalestage = 1;
+	  gameaction = ga_worlddone;
 	}
       }
       return;
@@ -566,9 +586,26 @@ void F_Ticker (void)
 
 	map_ptr = G_Access_MapInfoTab_E (255, gamemap);
 	if (G_MapLump (255, map_ptr -> normal_exit_to_map) == -1)
-	  F_StartCast ();
+	{
+	  switch (finaleendgame)
+	  {
+	    case 3:
+	      S_StartMusic (mus_bunny);
+
+	    case 1:
+	    case 2:
+	    case 4:
+	      finalestage = 1;
+	      break;
+
+	    default:
+	      F_StartCast ();
+	  }
+	}
 	else
+	{
 	  G_WorldDone2 ();
+	}
       }
     }
 
@@ -618,8 +655,26 @@ void F_Ticker (void)
       {
 	finalestage = 1;
 	wipegamestate = (gamestate_t) -1;		// force a wipe
-	if (gameepisode == 3)
-	  S_StartMusic (mus_bunny);
+
+	switch (finaleendgame)
+	{
+	  case 1:
+	  case 2:
+	  case 4:
+	    break;
+
+	  case 3:
+	    S_StartMusic (mus_bunny);
+	    break;
+
+	  case 10:
+	    F_StartCast ();
+	    break;
+
+	  default:
+	    if (gameepisode == 3)
+	      S_StartMusic (mus_bunny);
+	}
       }
     }
 }
@@ -1244,6 +1299,7 @@ F_DrawPatchCol
   byte*	source;
   byte*	dest;
   byte*	desttop;
+  byte* scrnlimit;
   column_t* column;
 
   xscale = (SCREENWIDTH << FRACBITS) / 320;
@@ -1270,6 +1326,7 @@ F_DrawPatchCol
     xiscale = FixedDiv (FRACUNIT, xscale);
 
   desttop = screens[0] + x + (y*SCREENWIDTH);
+  scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
 
   colm = 0;
   do
@@ -1297,7 +1354,12 @@ F_DrawPatchCol
       row = 0;
       do
       {
-	*dest = source [row >> FRACBITS];
+	if (dest > scrnlimit)
+	  break;
+
+	if (dest >= screens[0])
+	  *dest = source [row >> FRACBITS];
+
 	dest += SCREENWIDTH;
 	row += yiscale;
       } while ((row >> FRACBITS) < lastlength);
@@ -1376,6 +1438,8 @@ static void F_BunnyScroll (void)
 //
 void F_Drawer (void)
 {
+  int endmode;
+
     switch (finalestage)
     {
       case 0:
@@ -1392,7 +1456,12 @@ void F_Drawer (void)
 	break;
 
       default:
-	switch (gameepisode)
+	endmode = finaleendgame;
+        if ((endmode < 1)
+	 || (endmode > 10))
+	  endmode = gameepisode;
+
+	switch (endmode)
 	{
 	  case 1:
 	    if ( gamemode == retail )
@@ -1411,6 +1480,11 @@ void F_Drawer (void)
 
 	  default:
 	    D_PageDrawer (finale_backdrops[BG_ENDPIC]);
+	    break;
+
+	  case 10:
+	    D_PageDrawer (finalepic);
+	    F_CastDrawer ();
 	    break;
 	}
     }
