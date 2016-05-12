@@ -286,6 +286,7 @@ void S_Start(void)
   for (cnum=0 ; cnum<numChannels ; cnum++)
     channels[cnum].origin = NULL;
 
+  muschangeinfo.musnum = 0;
   S_StartLevelMusic ();
 }
 
