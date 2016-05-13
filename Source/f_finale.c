@@ -1464,7 +1464,7 @@ void F_Drawer (void)
 	switch (endmode)
 	{
 	  case 1:
-	    if ( gamemode == retail )
+	    if (W_CheckNumForName (finale_backdrops[BG_HELP2]) == -1)
 	      D_PageDrawer (finale_backdrops[BG_CREDIT]);
 	    else
 	      D_PageDrawer (finale_backdrops[BG_HELP2]);
