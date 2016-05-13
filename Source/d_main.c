@@ -626,44 +626,42 @@ void D_PageTicker (void)
 }
 
 //-----------------------------------------------------------------------------
+
+static int D_PageDraw (const char * page)
+{
+  int lump;
+  patch_t * patch;
+
+  lump = W_CheckNumForName (page);
+
+  /* FreeDoom daily build has a couple of corrupt patches */
+  /* CREDIT is only 13 bytes and VICTORY2 is only 2538.   */
+
+  if ((lump != -1)
+   && (W_LumpLength (lump) >= 4096)
+   && (SHORT((patch = W_CacheLumpNum (lump, PU_CACHE))->width) >= 320)
+   && (SHORT(patch->height) >= 200))
+  {
+    V_DrawPatchScaled (0, 0, 0, patch);
+    return (0);
+  }
+
+  return (1);
+}
+
+//-----------------------------------------------------------------------------
 //
 // D_PageDrawer
 //
 void D_PageDrawer (const char * page)
 {
-  int lump;
-  int attempts;
-  patch_t * patch;
-
-  attempts = 3;
-
-  do
+  if ((D_PageDraw (page))
+   && (D_PageDraw (finale_backdrops[BG_TITLEPIC]))
+   && (D_PageDraw (enterpic_2)))
   {
-    lump = W_CheckNumForName (page);
-
-    /* FreeDoom daily build has a couple of corrupt patches */
-    /* CREDIT is only 13 bytes and VICTORY2 is only 2538.   */
-
-    if ((lump != -1)
-     && (W_LumpLength (lump) >= 4096)
-     && (SHORT((patch = W_CacheLumpNum (lump, PU_CACHE))->width) >= 320)
-     && (SHORT(patch->height) >= 200))
-    {
-      V_DrawPatchScaled (0, 0, 0, patch);
-      return;
-    }
-
-    // printf ("Patch %s does not exist or is too small\n", page);
-
-    if (page == finale_backdrops[BG_TITLEPIC])
-      page = enterpic_2;
-    else
-      page = finale_backdrops[BG_TITLEPIC];
-
-  } while (--attempts);
-
-  /* Cannot find a usable graphic, give up. */
-  F_DrawBackgroundFlat (NULL);
+    /* Cannot find a usable graphic, give up. */
+    F_DrawBackgroundFlat (NULL);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -675,7 +673,6 @@ void D_AdvanceDemo (void)
 {
     advancedemo = true;
 }
-
 
 //-----------------------------------------------------------------------------
 //
