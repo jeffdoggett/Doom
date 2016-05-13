@@ -1511,6 +1511,52 @@ static boolean door_closed (line_t* line)
 }
 
 /* ---------------------------------------------------------------------- */
+
+static boolean is_exit_line (int special)
+{
+  if (mapcolour.exit
+   && (special==11
+    || special==52
+    || special==197
+    || special==51
+    || special==124
+    || special==198))
+    return (true);
+
+  return (false);
+}
+
+/* ---------------------------------------------------------------------- */
+
+static boolean is_teleport_line (int special)
+{
+  if (mapcolour.tele
+   && (special == 39
+    || special == 97
+    || special == 125
+    || special == 126
+    || special == 174
+    || special == 195
+    || special == 207
+    || special == 208
+    || special == 209
+    || special == 210
+    || special == 243
+    || special == 244
+    || special == 262
+    || special == 263
+    || special == 264
+    || special == 265
+    || special == 266
+    || special == 267
+    || special == 268
+    || special == 269))
+    return (true);
+
+  return (false);
+}
+
+/* ---------------------------------------------------------------------- */
 // Determines visible lines, draws them.
 // This is LineDef based, not LineSeg based.
 //
@@ -1536,18 +1582,9 @@ static void AM_drawWalls(void)
 	 continue;
       if (!line->backsector)
       {
-	if					//jff 4/23/98 add exit lines to automap
-	(
-	  mapcolour.exit &&
-	  (
-	    line->special==11 ||
-	    line->special==52 ||
-	    line->special==197 ||
-	    line->special==51  ||
-	    line->special==124 ||
-	    line->special==198
-	  )
-	)
+	if (is_teleport_line (line->special))
+	  AM_drawMline(&l, mapcolour.tele);
+	else if (is_exit_line (line->special))		//jff 4/23/98 add exit lines to automap
 	  AM_drawMline(&l, mapcolour.exit);	// exit line
 	else if ((dcol = AM_DoorColour(line->special)) != -1)
 	  AM_drawMline(&l, dcol);
@@ -1565,27 +1602,9 @@ static void AM_drawWalls(void)
 	 || (moving_sector (line->backsector)))
 	  AM_drawMline(&l, mapcolour.unsn);
 	// jff 1/10/98 add colour change for all teleporter types
-	else if
-	(
-	    mapcolour.tele && !(line->flags & ML_SECRET) &&
-	    (line->special == 39 || line->special == 97 ||
-	    line->special == 125 || line->special == 126)
-	)
-	{ // teleporters
+	else if (is_teleport_line (line->special))
 	  AM_drawMline(&l, mapcolour.tele);
-	}
-	else if //jff 4/23/98 add exit lines to automap
-	(
-	  mapcolour.exit &&
-	  (
-	    line->special==11 ||
-	    line->special==52 ||
-	    line->special==197 ||
-	    line->special==51  ||
-	    line->special==124 ||
-	    line->special==198
-	  )
-	)
+	else if (is_exit_line (line->special)) //jff 4/23/98 add exit lines to automap
 	  AM_drawMline(&l, mapcolour.exit);	// exit line
 	else if //jff 1/5/98 this clause implements showing keyed doors
 	(
