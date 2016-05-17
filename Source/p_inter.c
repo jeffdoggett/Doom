@@ -255,6 +255,8 @@ P_GiveWeapon
 	  P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
 
       if ((netgame)
+       || (demoplayback)
+       || (demorecording)
        || (M_CheckParm ("-noautoweaponchange") == 0))
 	player->pendingweapon = weapon;
 
@@ -282,6 +284,8 @@ P_GiveWeapon
       gaveweapon = true;
       player->weaponowned[weapon] = true;
       if ((netgame)
+       || (demoplayback)
+       || (demorecording)
        || (M_CheckParm ("-noautoweaponchange") == 0))
 	player->pendingweapon = weapon;
   }
@@ -618,6 +622,8 @@ P_TouchSpecialThing
       if (player->readyweapon != wp_fist)
       {
 	if ((netgame)
+	 || (demoplayback)
+	 || (demorecording)
 	 || (M_CheckParm ("-noautoweaponchange") == 0))
 	  player->pendingweapon = wp_fist;
       }
