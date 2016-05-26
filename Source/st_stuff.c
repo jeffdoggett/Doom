@@ -609,12 +609,13 @@ void ST_ClearSbarSides (void)
 
   padsize = DX(0);
 
-  if (padsize)
+  if (padsize > 0)
   {
     width = SHORT(sbar->width);
     if (width > 320)
     {
-      padsize -= ((width - 320) / 2);
+      width = ((sbarscale*width)>>FRACBITS);
+      padsize = ((SCREENWIDTH - width) / 2);
       if (padsize <= 0)
 	return;
     }
