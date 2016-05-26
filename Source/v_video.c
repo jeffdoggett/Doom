@@ -244,13 +244,10 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 
   if ((xpos = x) < 0)
   {
-    do
-    {
-      col += xiscale;
-    } while (++xpos < 0);
-
+    col = xiscale * -xpos;
     if ((col >> FRACBITS) >= w)
       return;
+    xpos = 0;
   }
 
   desttop = screens[scrn]+(y*SCREENWIDTH)+xpos;
