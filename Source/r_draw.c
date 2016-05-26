@@ -1039,37 +1039,6 @@ R_InitBuffer
 }
 
 /* ------------------------------------------------------------------------------------------------ */
-#define DX(a)			(SCREENWIDTH/2)-((160*sbarscale)>>FRACBITS)+((sbarscale*a)>>FRACBITS)
-
-// If we're at full screen size then we need to clear the screen memory at either
-// side of the status bar which has just appeared.
-
-void R_ClearSbarSides (void)
-{
-  byte*	dest;
-  int	padsize;
-  int	yheight;
-  int	x;
-  int	y;
-
-  padsize = DX(0);
-
-  if (padsize)
-  {
-    yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
-    dest = screens[0]+((SCREENHEIGHT-yheight)*SCREENWIDTH);
-    for (y = 0; y < yheight; y++, dest += SCREENWIDTH)
-    {
-      for (x = 0; x < padsize; x++)
-      {
-	dest [x] = 0;
-	dest [SCREENWIDTH-x-1] = 0;
-      }
-    }
-  }
-}
-
-/* ------------------------------------------------------------------------------------------------ */
 //
 // R_FillBackScreen
 // Fills the back screen with a pattern
@@ -1092,7 +1061,7 @@ void R_FillBackScreen (void)
     // printf ("Fill Back Screen - scaled view = %d,%d\n", scaledviewwidth,viewheight);
 
     if (viewheight <= (SCREENHEIGHT-sbarheight))
-      R_ClearSbarSides ();
+      ST_ClearSbarSides ();
 
     if (scaledviewwidth == SCREENWIDTH)
       return;

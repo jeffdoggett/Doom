@@ -218,6 +218,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
   fixed_t yiscale;
   fixed_t col;
   fixed_t row;
+  int xpos;
   int td;
   int topdelta;
   int lastlength;
@@ -239,11 +240,26 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
   }
 
   w = SHORT(patch->width);
-  desttop = screens[scrn]+(y*SCREENWIDTH)+x;
-  scrnlimit = (screens[scrn] + (SCREENHEIGHT*SCREENWIDTH)) -1;
   col = 0;
+
+  if ((xpos = x) < 0)
+  {
+    do
+    {
+      col += xiscale;
+    } while (++xpos < 0);
+
+    if ((col >> FRACBITS) >= w)
+      return;
+  }
+
+  desttop = screens[scrn]+(y*SCREENWIDTH)+xpos;
+  scrnlimit = (screens[scrn] + (SCREENHEIGHT*SCREENWIDTH)) -1;
   do
   {
+    if (xpos >= SCREENWIDTH)
+      break;
+
     if (drawstyle & 1)
       column = (column_t *)((byte *)patch + LONG(patch->columnofs[w-1-(col>>FRACBITS)]));
     else
@@ -351,6 +367,7 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 
       column = (column_t *)((byte *)column + lastlength + 4);
     }
+    xpos++;
     desttop++;
     col += xiscale;
   } while ((col >> FRACBITS) < w);

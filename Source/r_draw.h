@@ -104,10 +104,6 @@ R_InitBuffer
 void	R_InitTranslationTables (void);
 
 
-// Clear the two rectangular areas either side of the status
-// bar when using a screen resolution of x > 320.
-void R_ClearSbarSides (void);
-
 // Rendering function.
 void R_FillBackScreen (void);
 

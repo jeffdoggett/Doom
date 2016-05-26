@@ -55,6 +55,9 @@ void ST_Start (void);
 void ST_Init (void);
 void ST_createWidgets(void);
 
+// Clear the two rectangular areas either side of the status
+// bar when using a screen resolution of x > 320.
+void ST_ClearSbarSides (void);
 
 
 // States for status bar code.

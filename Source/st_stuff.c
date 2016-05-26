@@ -309,6 +309,7 @@ static const unsigned char * const keypatches [] =
 #define ST_MAPTITLEY		0
 #define ST_MAPHEIGHT		1
 
+#define SBARHEIGHT		32
 #define DX(a)			(SCREENWIDTH/2)-((160*sbarscale)>>FRACBITS)+((sbarscale*a)>>FRACBITS)
 #define DY(a)			(SCREENHEIGHT-(((200-a)*sbarscale)>>FRACBITS))
 #define DW(a)			((sbarscale*a)>>FRACBITS)
@@ -566,12 +567,16 @@ cheatseq_t	cheat_goobers = { cheat_goobers_seq, 0 };
 //
 void ST_Stop(void);
 
+/* ---------------------------------------------------------------------------- */
+
 void ST_refreshBackground(void)
 {
+  int w;
   int x;
+
   if (st_statusbaron)
   {
-    R_ClearSbarSides ();
+    ST_ClearSbarSides ();
 
     x = DX(ST_X);
     STlib_drawPatch (x, 0, ST_BG, sbar);
@@ -579,11 +584,55 @@ void ST_refreshBackground(void)
     if (netgame)
       STlib_drawPatch (DX(ST_FX), 0, ST_BG, faceback);
 
-    V_CopyRect (x, 0, ST_BG, ST_WIDTH, ST_HEIGHT, x, ST_Y, ST_FG);
+    x -= ((SHORT(sbar->leftoffset) * sbarscale) >> FRACBITS);
+    if (x < 0)
+      x = 0;
+
+    w = (SHORT(sbar->width)*sbarscale) >> FRACBITS;
+    V_CopyRect (x, 0, ST_BG, w, ST_HEIGHT, x, ST_Y, ST_FG);
   }
 }
 
 /* ---------------------------------------------------------------------------- */
+
+// If we're at full screen size then we need to clear the screen memory at either
+// side of the status bar which has just appeared.
+
+void ST_ClearSbarSides (void)
+{
+  byte*	dest;
+  int	padsize;
+  int	yheight;
+  int	width;
+  int	x;
+  int	y;
+
+  padsize = DX(0);
+
+  if (padsize)
+  {
+    width = SHORT(sbar->width);
+    if (width > 320)
+    {
+      padsize -= ((width - 320) / 2);
+      if (padsize <= 0)
+	return;
+    }
+
+    yheight = ((sbarscale*SBARHEIGHT)>>FRACBITS);
+    dest = screens[0]+((SCREENHEIGHT-yheight)*SCREENWIDTH);
+    for (y = 0; y < yheight; y++, dest += SCREENWIDTH)
+    {
+      for (x = 0; x < padsize; x++)
+      {
+	dest [x] = 0;
+	dest [SCREENWIDTH-x-1] = 0;
+      }
+    }
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 
 // Respond to keyboard input events,
 //  intercept cheats.

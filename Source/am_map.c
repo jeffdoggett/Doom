@@ -1043,7 +1043,7 @@ void AM_Ticker (void)
     // AM_updateLightLev();
 
     // Clear the screen either side of the status bar.
-    R_ClearSbarSides ();
+    ST_ClearSbarSides ();
 }
 
 /* ---------------------------------------------------------------------- */

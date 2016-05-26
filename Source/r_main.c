@@ -612,15 +612,10 @@ void R_ExecuteSetViewSize (void)
     int		j;
     int		level;
     int		startmap;
-    int		width;
-    patch_t *	sbar;
 
     if (setsizeneeded)
     {
-      sbar = (patch_t *) W_CacheLumpName("STBAR", PU_STATIC);
-      width = SHORT(sbar->width);
-
-      sbarscale = (FRACUNIT*SCREENWIDTH)/width;
+      sbarscale = (FRACUNIT*SCREENWIDTH)/320;
       if ((stbar_scale < 2) && (SCREENWIDTH > 320))
 	sbarscale = sbarscale / 2;
 
