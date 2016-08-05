@@ -84,7 +84,7 @@ fixed_t			yoffs;
 
 
 extern int numflats;
-extern int * flatlumps;
+extern flatinfo_t * flatinfo;
 
 #define PMARKER	0xFFFF
 #define VISPLANETOPSIZE		(SCREENWIDTH+2)
@@ -599,7 +599,7 @@ void R_DrawPlanes(void)
 	 }
 	 else
 	 {
-	   i = flatlumps [flattranslation [picnum]];
+	   i = flatinfo[flatinfo[picnum].translation].lump;
 	 }
 
 	 ds_source = W_CacheLumpNum (i, PU_STATIC);

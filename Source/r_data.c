@@ -42,13 +42,12 @@ int		numtextures;
 texture_t**	textures;
 
 // needed for texture pegging
-fixed_t*		textureheight;
+fixed_t*	textureheight;
 
 // for global animation
-int*		flattranslation;
 int*		texturetranslation;
 
-int*		flatlumps;
+flatinfo_t*	flatinfo;
 
 // needed for pre rendering
 fixed_t*	spritewidth;
@@ -573,19 +572,18 @@ static void R_InitFlats (void)
   unsigned int	lump;
   unsigned int	loading;
   lumpinfo_t*	lump_ptr;
+  flatinfo_t*   flatinfo_ptr;
 
   numflats = R_CountEntities ("F_START", "F_END", 0);
 
   // Create translation table for global animation.
-  flattranslation = Z_Calloc ((numflats+1)*sizeof(*flattranslation), PU_STATIC, 0);
-
-  // Create translation table for flat lumps.
-  flatlumps = Z_Calloc ((numflats+1)*sizeof(*flatlumps), PU_STATIC, 0);
+  flatinfo = Z_Calloc ((numflats+1)*sizeof(*flatinfo), PU_STATIC, 0);
 
   i = 0;
   lump = 0;
   loading = 0;
   lump_ptr = lumpinfo;
+  flatinfo_ptr = flatinfo;
   do
   {
     if (loading == 0)
@@ -608,8 +606,11 @@ static void R_InitFlats (void)
 	putchar ('.');
       if (i < numflats)
       {
-	flattranslation[i] = i;
-	flatlumps[i] = lump;
+	memcpy (flatinfo_ptr->name, lump_ptr->name, sizeof (flatinfo_ptr->name));
+	flatinfo_ptr->lump = lump;
+	flatinfo_ptr->translation = i;
+	memset (lump_ptr -> name, 0, sizeof (lump_ptr -> name));
+	flatinfo_ptr++;
       }
       i++;
     }
@@ -750,10 +751,10 @@ void R_InitData (void)
     R_CheckStructs ();
 #endif
     W_Find_Start_Ends ();
+    printf ("\nInitFlats");		// Must be first.
+    R_InitFlats ();
     printf ("\nInitTextures");
     R_InitTextures ();
-    printf ("\nInitFlats");
-    R_InitFlats ();
     printf ("\nInitSprites");
     R_InitSpriteLumps ();
     //printf ("\nInitColormaps");
@@ -780,7 +781,7 @@ int R_CheckFlatNumForName (const char* name)
     unsigned int p,cc;
     char *	ptr_d;
 
-    lumpinfo_t* lump_p;
+    flatinfo_t* flatinfo_p;
 
     // make the name into two integers for easy compares
 
@@ -802,15 +803,16 @@ int R_CheckFlatNumForName (const char* name)
     v2 = name8.x[1];
 
     c = 0;
+    flatinfo_p = flatinfo;
     do
     {
-	lump_p = &lumpinfo[flatlumps[c]];
 	/* printf ("  Comparing %s %X %X with %X %X %s (%d, %d)\n", name8.s, v1, v2, *(int *) lump_p->name, *(int *) &lump_p->name[4], lump_p->name, c, flatlumps[c]);	*/
-	if ( *(int *)lump_p->name == v1
-	     && *(int *)&lump_p->name[4] == v2)
+	if ( *(int *)flatinfo_p->name == v1
+	     && *(int *)&flatinfo_p->name[4] == v2)
 	{
 	    return c;
 	}
+	flatinfo_p++;
     }
     while (++c < numflats);
 
@@ -918,7 +920,7 @@ void R_PrecacheLevel (void)
   {
     if (hitlist[i])
     {
-      lump = flatlumps [i];
+      lump = flatinfo [i].lump;
       W_CacheLumpNum(lump, PU_CACHE);
     }
   }

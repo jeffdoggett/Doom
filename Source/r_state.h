@@ -65,7 +65,6 @@ extern int		scaledviewwidth;
 extern int		viewheight;
 
 // for global animation
-extern int*		flattranslation;
 extern int*		texturetranslation;
 extern int		numtextures;
 

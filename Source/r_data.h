@@ -117,6 +117,12 @@ typedef struct
 
 
 
+typedef struct
+{
+  char name [8];
+  int  lump;
+  int  translation;
+} flatinfo_t;
 
 
 // Retrieve column data for span blitting.

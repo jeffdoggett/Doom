@@ -31,6 +31,8 @@ static const char rcsid[] = "$Id: p_spec.c,v 1.6 1997/02/03 22:45:12 b1 Exp $";
 
 #include "includes.h"
 
+extern flatinfo_t* flatinfo;
+
 /* ---------------------------------------------------------------- */
 
 char * special_effects_messages_orig [] =
@@ -2186,7 +2188,7 @@ void P_UpdateSpecials (void)
       if (anim->istexture)
 	texturetranslation[i] = pic;
       else
-	flattranslation[i] = pic;
+	flatinfo[i].translation = pic;
     }
   }
 
