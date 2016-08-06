@@ -568,7 +568,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 //
 static void R_InitFlats (void)
 {
-  unsigned int	i;
+  int		i;
   unsigned int	lump;
   unsigned int	loading;
   lumpinfo_t*	lump_ptr;
@@ -609,6 +609,7 @@ static void R_InitFlats (void)
 	memcpy (flatinfo_ptr->name, lump_ptr->name, sizeof (flatinfo_ptr->name));
 	flatinfo_ptr->lump = lump;
 	flatinfo_ptr->translation = i;
+	flatinfo_ptr->index = -1;
 	memset (lump_ptr -> name, 0, sizeof (lump_ptr -> name));
 	flatinfo_ptr++;
       }
@@ -622,6 +623,15 @@ static void R_InitFlats (void)
     printf ("\nnumflats = %u, found = %u\n", numflats, i);
     if (i < numflats)
       numflats = i;
+  }
+
+  while (--i >= 0)
+  {
+	int j;
+
+	j = W_LumpNameHash(flatinfo[i].name) % (unsigned int)numflats;
+	flatinfo[i].next = flatinfo[j].index; // Prepend to chain
+	flatinfo[j].index = i;
   }
 }
 
@@ -770,54 +780,13 @@ void R_InitData (void)
 
 int R_CheckFlatNumForName (const char* name)
 {
-    union {
-	char	s[8];
-	int	x[2];
-    } name8;
+  int 	i;
 
-    int 	v1;
-    int 	v2;
-    unsigned int c;
-    unsigned int p,cc;
-    char *	ptr_d;
+  i = flatinfo[W_LumpNameHash(name) % (unsigned int)numflats].index;
+  while (i >= 0 && strncasecmp(flatinfo[i].name, name, 8))
+    i = flatinfo[i].next;
 
-    flatinfo_t* flatinfo_p;
-
-    // make the name into two integers for easy compares
-
-    name8.x[0] = 0;
-    name8.x[1] = 0;
-
-    p = 8;
-    ptr_d = name8.s;
-    do
-    {
-      cc = *name++;
-      if (cc == 0)
-	break;
-      cc = toupper (cc);	// case insensitive
-      *ptr_d++ = cc;
-    } while (--p);
-
-    v1 = name8.x[0];
-    v2 = name8.x[1];
-
-    c = 0;
-    flatinfo_p = flatinfo;
-    do
-    {
-	/* printf ("  Comparing %s %X %X with %X %X %s (%d, %d)\n", name8.s, v1, v2, *(int *) lump_p->name, *(int *) &lump_p->name[4], lump_p->name, c, flatlumps[c]);	*/
-	if ( *(int *)flatinfo_p->name == v1
-	     && *(int *)&flatinfo_p->name[4] == v2)
-	{
-	    return c;
-	}
-	flatinfo_p++;
-    }
-    while (++c < numflats);
-
-    // TFB. Not found.
-    return -1;
+  return i;
 }
 
 /* ------------------------------------------------------------------------------------------------ */

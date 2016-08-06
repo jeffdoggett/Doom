@@ -122,6 +122,12 @@ typedef struct
   char name [8];
   int  lump;
   int  translation;
+
+  // Index in flat list
+  int  index;
+
+  // Next in hash table chain
+  int  next;
 } flatinfo_t;
 
 

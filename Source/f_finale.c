@@ -32,6 +32,7 @@ static const char rcsid[] = "$Id: f_finale.c,v 1.5 1997/02/03 21:26:34 b1 Exp $"
 extern unsigned int secretexit;
 extern	patch_t *hu_font[HU_FONTSIZE];
 extern boolean finale_message_changed;
+extern flatinfo_t* flatinfo;
 
 // Stage of animation:
 //  0 = text, 1 = art screen, 2 = character cast
@@ -681,6 +682,25 @@ void F_Ticker (void)
 
 // --------------------------------------------------------------------------------------------
 
+static int F_CheckNumForName (const char * name)
+{
+  int c;
+
+  c = W_CheckNumForName (name);
+  if (c == -1)
+  {
+    c = R_CheckFlatNumForName (name);
+    if (c != -1)
+    {
+      c = flatinfo[c].lump;
+    }
+  }
+
+  return (c);
+}
+
+// --------------------------------------------------------------------------------------------
+
 void F_DrawBackgroundFlat (const char * flat)
 {
   int c;
@@ -690,9 +710,9 @@ void F_DrawBackgroundFlat (const char * flat)
 
   if (((flat == NULL)
    || (flat [0] == 0)
-   || ((c = W_CheckNumForName (flat)) == -1))
-   && ((c = W_CheckNumForName (finale_backdrops [BG_F_SKY1])) == -1)
-   && ((c = W_CheckNumForName (finale_backdrops_orig [BG_F_SKY1])) == -1))
+   || ((c = F_CheckNumForName (flat)) == -1))
+   && ((c = F_CheckNumForName (finale_backdrops [BG_F_SKY1])) == -1)
+   && ((c = F_CheckNumForName (finale_backdrops_orig [BG_F_SKY1])) == -1))
   {
     memset (screens[0], 0x00, SCREENWIDTH * SCREENHEIGHT);
   }
