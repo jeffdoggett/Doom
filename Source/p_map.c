@@ -556,6 +556,11 @@ P_CheckPosition
 		return false;
 
     // check lines
+    tmradius = tmthing->info->pickupradius;
+    tmbbox[BOXTOP] = y + tmradius;
+    tmbbox[BOXBOTTOM] = y - tmradius;
+    tmbbox[BOXRIGHT] = x + tmradius;
+    tmbbox[BOXLEFT] = x - tmradius;
     xl = (tmbbox[BOXLEFT] - bmaporgx)>>MAPBLOCKSHIFT;
     xh = (tmbbox[BOXRIGHT] - bmaporgx)>>MAPBLOCKSHIFT;
     yl = (tmbbox[BOXBOTTOM] - bmaporgy)>>MAPBLOCKSHIFT;
