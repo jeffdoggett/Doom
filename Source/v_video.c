@@ -277,91 +277,93 @@ void V_DrawPatchScaleFlip (int x, int y, int scrn,
 	topdelta = td;
       }
       lastlength = column->length;
-      //dest = desttop + (topdelta*SCREENWIDTH*(scale>>FRACBITS));
-      dest = desttop + (SCREENWIDTH*((topdelta * yscale) >> FRACBITS));
-#if 0
-      if (y+((topdelta+lastlength)*xscale) > SCREENHEIGHT)
+      if (lastlength)
       {
-	if (SCREENHEIGHT <= (y+topdelta))
-	  count = 0;
+	//dest = desttop + (topdelta*SCREENWIDTH*(scale>>FRACBITS));
+	dest = desttop + (SCREENWIDTH*((topdelta * yscale) >> FRACBITS));
+#if 0
+	if (y+((topdelta+lastlength)*xscale) > SCREENHEIGHT)
+	{
+	  if (SCREENHEIGHT <= (y+topdelta))
+	    count = 0;
+	  else
+	    count = (SCREENHEIGHT - (y+topdelta)) / xscale;
+	}
+#endif
+
+	row = 0;
+
+#if 0
+	if (drawstyle & 4)				// Shadow?
+                  shadow = dest + SCREENWIDTH + 2;
+                  if (!flag || (*shadow != 47 && *shadow != 191))
+                  *shadow = tinttab50[*shadow];
+#endif
+
+	if (drawstyle & 2)				// Fuzzy?
+	{
+	  do
+	  {
+	    if (dest > scrnlimit)
+	      break;
+
+	    if (dest >= screens[scrn])
+	    {
+	      // Lookup framebuffer, and retrieve
+	      //  a pixel that is either one column
+	      //  left or right of the current one.
+	      // Add index from colormap to index.
+	      source = dest+(fuzzoffset[fuzzpos]*SCREENWIDTH);
+	      if (source < screens[scrn])
+		source = screens[scrn];
+	      if (source > scrnlimit)
+		source = scrnlimit;
+
+	      *dest = colormaps[6*256+*source];
+
+	      // Clamp table lookup index.
+	      if (++fuzzpos >= ARRAY_SIZE (fuzzoffset))
+		fuzzpos = 0;
+	    }
+
+	    dest += SCREENWIDTH;
+	    row += yiscale;
+          } while ((row >> FRACBITS) < lastlength);
+	}
+	else if (drawstyle & 4)				// Translucent?
+	{
+	  translucent = (x + y) & 1;
+	  source = (byte *)column + 3;
+	  do
+	  {
+	    if (dest > scrnlimit)
+	      break;
+	    if (dest >= screens[scrn])
+	    {
+	      if (tinttab)
+		*dest = tinttab[(*dest << 8) + source [row >> FRACBITS]];
+	      else if (translucent == 0)
+		*dest = source [row >> FRACBITS];
+	    }
+	    translucent ^= 1;
+	    dest += SCREENWIDTH;
+	    row += yiscale;
+          } while ((row >> FRACBITS) < lastlength);
+	}
 	else
-	  count = (SCREENHEIGHT - (y+topdelta)) / xscale;
-      }
-#endif
-
-      row = 0;
-
-#if 0
-      if (drawstyle & 4)				// Shadow?
-                shadow = dest + SCREENWIDTH + 2;
-                if (!flag || (*shadow != 47 && *shadow != 191))
-                *shadow = tinttab50[*shadow];
-#endif
-
-      if (drawstyle & 2)				// Fuzzy?
-      {
-	do
 	{
-	  if (dest > scrnlimit)
-	    break;
-
-	  if (dest >= screens[scrn])
+	  source = (byte *)column + 3;
+	  do
 	  {
-	    // Lookup framebuffer, and retrieve
-	    //  a pixel that is either one column
-	    //  left or right of the current one.
-	    // Add index from colormap to index.
-	    source = dest+(fuzzoffset[fuzzpos]*SCREENWIDTH);
-	    if (source < screens[scrn])
-	      source = screens[scrn];
-	    if (source > scrnlimit)
-	      source = scrnlimit;
-
-	    *dest = colormaps[6*256+*source];
-
-	    // Clamp table lookup index.
-	    if (++fuzzpos >= ARRAY_SIZE (fuzzoffset))
-	      fuzzpos = 0;
-	  }
-
-	  dest += SCREENWIDTH;
-	  row += yiscale;
-        } while ((row >> FRACBITS) < lastlength);
-      }
-      else if (drawstyle & 4)				// Translucent?
-      {
-	translucent = (x + y) & 1;
-	source = (byte *)column + 3;
-	do
-	{
-	  if (dest > scrnlimit)
-	    break;
-	  if (dest >= screens[scrn])
-	  {
-	    if (tinttab)
-	      *dest = tinttab[(*dest << 8) + source [row >> FRACBITS]];
-	    else if (translucent == 0)
+	    if (dest > scrnlimit)
+	      break;
+	    if (dest >= screens[scrn])
 	      *dest = source [row >> FRACBITS];
-	  }
-	  translucent ^= 1;
-	  dest += SCREENWIDTH;
-	  row += yiscale;
-        } while ((row >> FRACBITS) < lastlength);
-      }
-      else
-      {
-	source = (byte *)column + 3;
-	do
-	{
-	  if (dest > scrnlimit)
-	    break;
-	  if (dest >= screens[scrn])
-	    *dest = source [row >> FRACBITS];
-	  dest += SCREENWIDTH;
-	  row += yiscale;
-        } while ((row >> FRACBITS) < lastlength);
-      }
-
+	    dest += SCREENWIDTH;
+	    row += yiscale;
+          } while ((row >> FRACBITS) < lastlength);
+	}
+      }      
       column = (column_t *)((byte *)column + lastlength + 4);
     }
     xpos++;

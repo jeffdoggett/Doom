@@ -1799,11 +1799,12 @@ static void ST_ConvPatchColours (patch_t * patch, byte * palette)
 	length = column->length;
 	source = (byte *)column + 3;
 	column = (column_t *)((byte *)column + length + 4);
-	do
+	while (length)
 	{
 	  q = &PLAYPAL [*source * 3];
 	  *source++ = AM_load_colour (q[0], q[1], q[2], palette);
-        } while (--length);
+	  length--;
+        }
       }
     } while (++x < SHORT(patch->width));
   }

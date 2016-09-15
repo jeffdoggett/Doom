@@ -1368,22 +1368,24 @@ F_DrawPatchCol
       }
 
       lastlength = column->length;
-      source = (byte *)column + 3;
-      dest = desttop + (topdelta*SCREENWIDTH);
-
-      row = 0;
-      do
+      if (lastlength)
       {
-	if (dest > scrnlimit)
-	  break;
+	source = (byte *)column + 3;
+	dest = desttop + (topdelta*SCREENWIDTH);
 
-	if (dest >= screens[0])
-	  *dest = source [row >> FRACBITS];
+	row = 0;
+	do
+	{
+	  if (dest > scrnlimit)
+	    break;
 
-	dest += SCREENWIDTH;
-	row += yiscale;
-      } while ((row >> FRACBITS) < lastlength);
+	  if (dest >= screens[0])
+	    *dest = source [row >> FRACBITS];
 
+	  dest += SCREENWIDTH;
+	  row += yiscale;
+	} while ((row >> FRACBITS) < lastlength);
+      }      
       column = (column_t *)(  (byte *)column + lastlength + 4 );
     }
     desttop++;
