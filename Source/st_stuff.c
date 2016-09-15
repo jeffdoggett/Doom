@@ -32,6 +32,7 @@ static const char rcsid[] = "$Id: st_stuff.c,v 1.6 1997/02/03 22:45:13 b1 Exp $"
 
 extern void P_Massacre (void);
 extern muschangeinfo_t	muschangeinfo;
+extern const unsigned char PLAYPAL [3*256];
 
 /* ----------------------------------------------------------------- */
 
@@ -1774,6 +1775,58 @@ void ST_Init (void)
     ST_loadData();
     /* Allow max size for dynamic resize of status bar */
     screens[4] = (byte *) Z_Malloc(SCREENWIDTH*ST_HEIGHT*((SCREENWIDTH+319)/320), PU_STATIC, 0);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void ST_ConvPatchColours (patch_t * patch, byte * palette)
+{
+  int x;
+  int length;
+  byte* source;
+  const byte * q;
+  column_t* column;
+
+  if (SHORT(patch->width))
+  {
+    x = 0;
+    do
+    {
+      column = (column_t *)((byte *)patch + LONG(patch->columnofs[x]));
+      // step through the posts in a column
+      while (column->topdelta != 0xff)
+      {
+	length = column->length;
+	source = (byte *)column + 3;
+	column = (column_t *)((byte *)column + length + 4);
+	do
+	{
+	  q = &PLAYPAL [*source * 3];
+	  *source++ = AM_load_colour (q[0], q[1], q[2], palette);
+        } while (--length);
+      }
+    } while (++x < SHORT(patch->width));
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+/*
+   If we are using a non-standard palette then we need to update
+   the patches for the keys.
+*/
+
+void ST_SetPalette (byte * palette)
+{
+  int keynum;
+  patch_t * patch;
+
+  keynum = 0;
+  do
+  {
+    patch = (patch_t *) keypatches [keynum];
+    if (patch)
+      ST_ConvPatchColours (patch, palette);
+  } while (++keynum < ARRAY_SIZE (keypatches));
 }
 
 /* ---------------------------------------------------------------------------- */

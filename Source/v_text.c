@@ -3084,14 +3084,15 @@ void V_LoadFonts (void)
   if (V_Load_Font (wilv_charset, "DBIGFONT", palette) == 0)
     dopal |= 2;
 
-  if ((dopal)
-   && (memcmp (PLAYPAL, palette, sizeof (PLAYPAL))))
+  if (memcmp (PLAYPAL, palette, sizeof (PLAYPAL)))
   {
     if (dopal & 1)
       V_SetFontPalette (red_charset, palette);
 
     if (dopal & 2)
       V_SetFontPalette (wilv_charset, palette);
+
+    ST_SetPalette (palette);
   }
 }
 

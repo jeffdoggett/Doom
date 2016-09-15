@@ -88,6 +88,8 @@ extern int hutext_scale;
 extern fixed_t sbarscale;
 extern fixed_t hutextscale;
 
+extern void ST_SetPalette (byte * palette);
+
 #endif
 //-----------------------------------------------------------------------------
 //
