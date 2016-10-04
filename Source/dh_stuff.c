@@ -4611,6 +4611,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  // printf ("Episode %u name is \'%s\'\n", episode, newtext);
 	}
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "picname ", 8) == 0)
     {
@@ -4634,6 +4635,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	M_SetEpiName (episode, ptr, l);
 //	printf ("Set menu name(patch) for episode %u to %s\n", episode, ptr);
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "key ", 4) == 0)
     {
@@ -4646,6 +4648,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  // printf ("Set menu key for episode %u to %c\n", episode, ptr [l]);
 	}
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "map ", 4) == 0)
     {
@@ -4727,6 +4730,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       mdest_ptr -> normal_exit_to_episode = i;
       mdest_ptr -> normal_exit_to_map = j;
       // printf ("Map %u %u has exit to %u %u\n", episode, map, i, j);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "secretnext ", 11) == 0)
     {
@@ -4767,11 +4771,13 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	mdest_ptr -> this_is_a_secret_level = 0x80;
       }
 #endif
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "nointermission", 14) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> nointermission = 1;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "par ", 4) == 0)
     {
@@ -4782,6 +4788,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       mdest_ptr -> par_time_5 = l;
       par_changed = (boolean)((int)par_changed|(int)dh_changing_pwad);
       // printf ("Map %u %u par time %u\n", episode, map, l);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "sucktime ", 9) == 0)
     {
@@ -4790,34 +4797,42 @@ static void Parse_Mapinfo (char * ptr, char * top)
       if (l > 255) l = 255;
       mdest_ptr -> time_sucks = l;
       // printf ("Map %u %u sucks time %u\n", episode, map, l);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "resethealth", 11) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> reset_kit_etc_on_entering |= 1;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "resetinventory", 14) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> reset_kit_etc_on_entering |= 2;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "allowmonstertelefrags", 21) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> allow_monster_telefrags = 1;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "NoInfighting", 12) == 0)
     {
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "NormalInfighting", 16) == 0)
     {
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "TotalInfighting", 15) == 0)
     {
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "titlepatch", 10) == 0)
     {
       ptr = replace_titletext (ptr+11, episode, map);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "enterpic ", 9) == 0)
     {
@@ -4825,16 +4840,19 @@ static void Parse_Mapinfo (char * ptr, char * top)
       /* If starts with a $ then the lump is an 'intermission script' */
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       ptr = replace_map_text (&mdest_ptr -> enterpic, ptr+10);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "exitpic ", 8) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       ptr = replace_map_text (&mdest_ptr -> exitpic, ptr+9);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "bordertexture ", 14) == 0)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       ptr = replace_map_text (&mdest_ptr -> bordertexture, ptr + 15);
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "music ", 6) == 0)
     {
@@ -4942,6 +4960,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	mdest_ptr -> skydelta = skydelta;
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "map07special", 12) == 0)
     {
@@ -4962,6 +4981,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  bd_ptr -> action = raiseToTexture;
 	}
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "baronspecial", 12) == 0)
     {
@@ -4969,6 +4989,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_BRUISER;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "cyberdemonspecial", 17) == 0)
     {
@@ -4976,6 +4997,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_CYBORG;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "spidermastermindspecial", 23) == 0)
     {
@@ -4983,6 +5005,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_SPIDER;
+      intertext = -1;
     }
 #if 0
     else if (strncasecmp (ptr, "ironlichspecial", 15) == 0)
@@ -4990,18 +5013,21 @@ static void Parse_Mapinfo (char * ptr, char * top)
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_???;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "minotaurspecial", 15) == 0)
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_???;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "dsparilspecial", 14) == 0)
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
 	bd_ptr -> monsterbits |= 1<<MT_???;
+      intertext = -1;
     }
 #endif
     else if (strncasecmp (ptr, "specialaction_", 14) == 0)
@@ -5033,6 +5059,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  bd_ptr -> tag = read_int (ptr);
 	}
       }
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "specialaction ", 14) == 0)
     {
@@ -5065,6 +5092,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	}
       }
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
+      intertext = -1;
     }
     else if (strncasecmp (ptr, "cluster ", 8) == 0)
     {
