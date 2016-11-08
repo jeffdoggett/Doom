@@ -296,7 +296,7 @@ void M_SetupNextMenu(menu_t *menudef);
 void M_DrawThermo(int x,int y,int thermWidth,int thermDot);
 void M_DrawEmptyCell(menu_t *menu,int item);
 void M_DrawSelCell(menu_t *menu,int item);
-void M_WriteText(int x, int y, char *string);
+int M_WriteText(int x, int y, char *string);
 unsigned int M_StringWidth(char *string);
 unsigned int M_StringHeight(char *string);
 void M_StartControlPanel(void);
@@ -838,20 +838,24 @@ void M_LoadGame (int choice)
 //
 void M_DrawSave(void)
 {
-  int i;
+  int i,x,y;
 
   V_DrawPatchScaled (72,28,0,W_CacheLumpName("M_SAVEG",PU_CACHE));
-  for (i = 0;i < load_end; i++)
+  
+  y = LoadDef.y;
+  i = 0;
+  do
   {
-      M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i);
-      M_WriteText(LoadDef.x,LoadDef.y+LINEHEIGHT*i,savegamestrings[i]);
-  }
+    M_DrawSaveLoadBorder (LoadDef.x, y);
+    x = M_WriteText (LoadDef.x, y, savegamestrings[i]);
 
-  if (saveStringEnter)
-  {
-      i = M_StringWidth(savegamestrings[saveSlot]);
-      M_WriteText(LoadDef.x + i,LoadDef.y+LINEHEIGHT*saveSlot,"_");
-  }
+    /* Append the flashing cursor if typing */
+
+    if ((saveStringEnter) && (i == saveSlot) && ((whichSkull & 1) == 0))
+      M_WriteText (x, y, "_");
+
+    y += LINEHEIGHT;
+  } while (++i < load_end);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1675,7 +1679,7 @@ unsigned int M_StringHeight (char* string)
 //
 //      Write a string using the hu_font
 //
-void
+int
 M_WriteText
 ( int		x,
   int		y,
@@ -1718,6 +1722,8 @@ M_WriteText
 	w -= HUlib_Kern (c+HU_FONTSTART, toupper(*ch));
 	cx+=w;
     }
+    
+    return (cx);
 }
 
 /* ----------------------------------------------------------------------- */
