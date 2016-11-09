@@ -182,7 +182,6 @@ void    (*messageRoutine)(int response);
 // we are going to be entering a savegame string
 static int		saveStringEnter;
 static int		saveSlot;	// which slot to save in
-static int		saveCharIndex;	// which char we're editing
 // old save description before edit
 static char		saveOldString[SAVESTRINGSIZE];
 
@@ -193,7 +192,7 @@ boolean			menuactive;
 #define LINEHEIGHT		16
 
 extern boolean		sendpause;
-static char		savegamestrings[10][SAVESTRINGSIZE];
+static char		savegamestrings[6][SAVESTRINGSIZE];
 
 static char		tempstring[160];
 
@@ -233,7 +232,6 @@ typedef struct menu_s
 } menu_t;
 
 static dushort_t	itemOn;			// menu item skull is on
-static dshort_t		skullAnimCounter;	// skull animation counter
 static dushort_t	whichSkull;		// which skull to draw
 
 // graphic name of skulls
@@ -851,7 +849,7 @@ void M_DrawSave(void)
 
     /* Append the flashing cursor if typing */
 
-    if ((saveStringEnter) && (i == saveSlot) && ((whichSkull & 1) == 0))
+    if ((saveStringEnter) && (i == saveSlot) && (((whichSkull >> 3) & 1) == 0))
       M_WriteText (x, y, "_");
 
     y += LINEHEIGHT;
@@ -886,7 +884,6 @@ void M_SaveSelect(int choice)
     strcpy(saveOldString,savegamestrings[choice]);
     if (!strcmp(savegamestrings[choice],menu_messages [MM_EMPTYSTRING]))
 	savegamestrings[choice][0] = 0;
-    saveCharIndex = strlen(savegamestrings[choice]);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1738,6 +1735,7 @@ boolean M_Responder (event_t* ev)
 {
     int		ch;
     int		i;
+    int		saveCharIndex;
     static int	joywait = 0;
     static int	mousewait = 0;
     static int	mousey = 0;
@@ -1840,6 +1838,7 @@ boolean M_Responder (event_t* ev)
     // Save Game string input
     if (saveStringEnter)
     {
+	saveCharIndex = strlen(savegamestrings[saveSlot]);
 	switch(ch)
 	{
 	  case KEY_BACKSPACE:
@@ -2230,7 +2229,7 @@ void M_Drawer (void)
     // DRAW SKULL
     if (currentMenu->numitems > 1)
     {
-      patch = W_CacheLumpName(skullName[whichSkull],PU_CACHE);
+      patch = W_CacheLumpName(skullName[whichSkull>>3],PU_CACHE);
       i = (SHORT(patch->width)) - SKULLXOFF;
       if (i < 0) i = 0;
       x -= i;
@@ -2277,11 +2276,7 @@ void M_SetupNextMenu(menu_t *menudef)
 //
 void M_Ticker (void)
 {
-  if (--skullAnimCounter <= 0)
-  {
-    whichSkull ^= 1;
-    skullAnimCounter = 8;
-  }
+  whichSkull = (whichSkull + 1) & 15;
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2388,7 +2383,6 @@ void M_Init (void)
   menuactive = false;
   itemOn = currentMenu->lastOn;
   whichSkull = 0;
-  skullAnimCounter = 10;
   screenSize = screenblocks - 3;
   messageToPrint = 0;
   messageString = NULL;
