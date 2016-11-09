@@ -849,7 +849,7 @@ void M_DrawSave(void)
 
     /* Append the flashing cursor if typing */
 
-    if ((saveStringEnter) && (i == saveSlot) && (((whichSkull >> 3) & 1) == 0))
+    if ((saveStringEnter) && (i == saveSlot) && ((whichSkull & 8) == 0))
       M_WriteText (x, y, "_");
 
     y += LINEHEIGHT;
