@@ -437,12 +437,14 @@ static int k_cheating;
    Find the best match in the palette table for this colour
 */
 
-unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char c2, const byte * palette)
+unsigned char AM_load_colour (unsigned char r1, unsigned char g1, unsigned char b1, const byte * palette)
 {
   unsigned char colnum;
   unsigned char rc;
   unsigned int best;
-  unsigned int d0,d1,d2;
+  unsigned int rmean;
+  unsigned int r,g,b;
+  unsigned int r2,g2,b2;
   unsigned int diff;
 
   best = ~0;
@@ -451,10 +453,17 @@ unsigned char AM_load_colour (unsigned char c0, unsigned char c1, unsigned char 
 
   do
   {
-    d0 = c0 - *palette++;
-    d1 = c1 - *palette++;
-    d2 = c2 - *palette++;
-    diff = (d0 * d0) + (d1 * d1) + (d2 * d2);
+    r2 = *palette++;
+    g2 = *palette++;
+    b2 = *palette++;
+
+    // From http://www.compuphase.com/cmetric.htm
+    rmean = (r1 + r2) / 2;
+    r = r1 - r2;
+    g = g1 - g2;
+    b = b1 - b2;
+    diff = (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+
     if (diff <= best)		// Use <= to find highest numbered....
     {
       best = diff;
@@ -1070,37 +1079,37 @@ static boolean AM_clipMline (const mline_t* ml, fline_t* fl)
 {
     enum
     {
-        LEFT   = 1,
-        RIGHT  = 2,
-        TOP    = 4,
-        BOTTOM = 8
+	LEFT   = 1,
+	RIGHT  = 2,
+	TOP    = 4,
+	BOTTOM = 8
     };
 
-    unsigned int        outcode1 = 0;
-    unsigned int        outcode2 = 0;
+    unsigned int outcode1 = 0;
+    unsigned int outcode2 = 0;
 
     fl->a.x = CXMTOF(ml->a.x);
     if (fl->a.x < -1)
-        outcode1 = LEFT;
+	outcode1 = LEFT;
     else if (fl->a.x >= (int)f_w)
-        outcode1 = RIGHT;
+	outcode1 = RIGHT;
     fl->b.x = CXMTOF(ml->b.x);
     if (fl->b.x < -1)
-        outcode2 = LEFT;
+	outcode2 = LEFT;
     else if (fl->b.x >= (int)f_w)
-        outcode2 = RIGHT;
+	outcode2 = RIGHT;
     if (outcode1 & outcode2)
-        return false;
+	return false;
     fl->a.y = CYMTOF(ml->a.y);
     if (fl->a.y < -1)
-        outcode1 |= TOP;
+	outcode1 |= TOP;
     else if (fl->a.y >= (int)f_h)
-        outcode1 |= BOTTOM;
+	outcode1 |= BOTTOM;
     fl->b.y = CYMTOF(ml->b.y);
     if (fl->b.y < -1)
-        outcode2 |= TOP;
+	outcode2 |= TOP;
     else if (fl->b.y >= (int)f_h)
-        outcode2 |= BOTTOM;
+	outcode2 |= BOTTOM;
     return (boolean)(!(outcode1 & outcode2));
 }
 
@@ -1302,8 +1311,8 @@ static void AM_drawFline (const fline_t* fl, int colour)
     {
       if (fraction >= 0)
       {
-        y0 += stepy;
-        fraction -= dx;
+	y0 += stepy;
+	fraction -= dx;
       }
       x0 += stepx;
       fraction += dy;
@@ -1317,8 +1326,8 @@ static void AM_drawFline (const fline_t* fl, int colour)
     {
       if (fraction >= 0)
       {
-        x0 += stepx;
-        fraction -= dy;
+	x0 += stepx;
+	fraction -= dy;
       }
       y0 += stepy;
       fraction += dx;
