@@ -556,11 +556,19 @@ P_CheckPosition
 		return false;
 
     // check lines
-    tmradius = tmthing->info->pickupradius;
-    tmbbox[BOXTOP] = y + tmradius;
-    tmbbox[BOXBOTTOM] = y - tmradius;
-    tmbbox[BOXRIGHT] = x + tmradius;
-    tmbbox[BOXLEFT] = x - tmradius;
+    // Use the pickup radius (usually larger) if the thing
+    // is moving horizontally.
+    // i.e. use the smaller radius when movement is vertical.
+    // Test: Going Down, Map 15, Red skull key next to Cyberdemon.
+    if ((thing->x != x) || (thing->y != y))
+    {
+      tmradius = tmthing->info->pickupradius;
+      tmbbox[BOXTOP] = y + tmradius;
+      tmbbox[BOXBOTTOM] = y - tmradius;
+      tmbbox[BOXRIGHT] = x + tmradius;
+      tmbbox[BOXLEFT] = x - tmradius;
+    }
+
     xl = (tmbbox[BOXLEFT] - bmaporgx)>>MAPBLOCKSHIFT;
     xh = (tmbbox[BOXRIGHT] - bmaporgx)>>MAPBLOCKSHIFT;
     yl = (tmbbox[BOXBOTTOM] - bmaporgy)>>MAPBLOCKSHIFT;
