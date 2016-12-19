@@ -2242,7 +2242,7 @@ void D_DoomMain (void)
   autostart = false;
 
   map_info_p = G_Access_MapStartTab (1);
-  startmap     = map_info_p -> start_map;
+  startmap = map_info_p -> start_map;
   if (gamemode != commercial)
     startepisode = map_info_p -> start_episode;
 
@@ -2275,19 +2275,6 @@ void D_DoomMain (void)
   p = M_CheckParm ("-avg");
   if (p && p < myargc-1 && deathmatch)
       printf("Austin Virtual Gaming: Levels will end after 20 minutes\n");
-
-  p = M_CheckParm ("-warp");
-  if (p && p < myargc-1)
-  {
-      if (gamemode == commercial)
-	  startmap = atoi (myargv[p+1]);
-      else
-      {
-	  startepisode = myargv[p+1][0]-'0';
-	  startmap = myargv[p+2][0]-'0';
-      }
-      autostart = true;
-  }
 
   // init subsystems
   // printf ("V_Init: allocate screens.\n");
@@ -2365,6 +2352,69 @@ void D_DoomMain (void)
       // Ouch.
       break;
   }
+
+  p = M_CheckParm ("-warp");
+  if (p)
+  {
+    char cc;
+    if ((p >= myargc-1)
+     || (((cc = myargv[p+1][0])) < '0')
+     || (cc > '9'))
+    {
+      /* No start level given, use the first valid map in a pwad */
+      if (gamemode == commercial)
+      {
+	int l,m;
+	m = 0;
+	do
+	{
+	  l = G_MapLump (255, m);
+	  if ((l != -1)
+	   && (lumpinfo[l].handle != lumpinfo[0].handle))
+	  {
+	    startmap = m;
+	    break;
+	  }
+	} while (++m < 100);
+      }
+      else
+      {
+	int l,e,m;
+	e = 0;
+	m = 0;
+	do
+	{
+	  l = G_MapLump (e, m);
+	  if ((l != -1)
+	   && (lumpinfo[l].handle != lumpinfo[0].handle))
+	  {
+	    startepisode = e;
+	    startmap = m;
+	    break;
+	  }
+	  if (++m > 9)
+	  {
+	    m = 0;
+	    e++;
+	  }
+	} while (e < 10);
+      }
+    }
+    else
+    {
+      if (gamemode == commercial)
+      {
+	  startmap = atoi (myargv[p+1]);
+      }
+      else
+      {
+	  startepisode = myargv[p+1][0]-'0';
+	  startmap = myargv[p+2][0]-'0';
+      }
+    }
+    autostart = true;
+  }
+
 
   // printf ("R_Init: Init DOOM refresh daemon - ");
   R_Init ();
