@@ -306,12 +306,18 @@ R_RenderMaskedSegRange
     int		texnum;
     unsigned int tex;
     rpatch_t    *patch;
+    void  (*oldcolfunc) (void);
 
     // Calculate light table.
     // Use different light tables
     //   for horizontal / vertical / diagonal. Diagonal?
     // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
     curline = ds->curline;
+
+    oldcolfunc = colfunc;
+    if (curline->linedef->tranlump != -1)
+      colfunc = R_DrawTranslucent50Column;
+
     frontsector = curline->frontsector;
     backsector = curline->backsector;
     tex = curline->sidedef->midtexture;
@@ -407,6 +413,7 @@ R_RenderMaskedSegRange
     }
     R_UnlockTextureCompositePatchNum(texnum);
     curline = NULL;
+    colfunc = oldcolfunc;
 }
 
 

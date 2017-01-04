@@ -2356,6 +2356,62 @@ void P_SpawnSpecials (void)
 	    sectors[s].floorlightsec = sec;
 	  break;
 
+	case 260:				// killough 4/11/98: translucent 2s textures
+	  {
+	    int lump;
+
+	    if (line->tag == 0)
+	    {
+	      lump = W_CheckNumForName ("TRANMAP");
+	      if (lump == -1)
+	      {
+		R_InitTranslucencyTables ();
+		lump = numlumps;
+	      }
+	      line->tranlump = lump;		// affect this linedef only
+	    }
+	    else
+	    {
+	      int j, lumpnum;
+	      byte* data;
+	      mapsidedef_t* msd;
+
+	      lumpnum = G_MapLump (gameepisode, gamemap) + ML_SIDEDEFS;
+	      data = W_CacheLumpNum (lumpnum, PU_STATIC);
+
+#ifdef PADDED_STRUCTS
+	      data += (*line->sidenum * 30);
+#else
+	      data += (*line->sidenum * sizeof(mapsidedef_t));
+#endif
+
+	      msd = (mapsidedef_t *) data;
+
+	      if ((R_CheckTextureNumForName (msd->midtexture) != -1)
+	       || ((lump = W_CheckNumForName (msd->midtexture)) == -1)
+	       || (W_LumpLength (lump) != 65536))
+	      {
+		lump = W_CheckNumForName ("TRANMAP");
+		if (lump == -1)
+		{
+		  R_InitTranslucencyTables ();
+		  lump = numlumps;
+		}
+	      }
+
+	      for (j = 0; j < numlines; j++)
+	      {
+		if (lines[j].tag == line->tag)	// affect all matching linedefs
+		{
+		  lines[j].tranlump = lump;
+		}
+	      }
+
+	      W_ReleaseLumpNum (lumpnum);
+	    }
+	  }
+	  break;
+
 	/* killough 4/11/98: Add support for setting */
 	/* ceiling lighting independently */
 	case 261:

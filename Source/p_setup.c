@@ -934,6 +934,8 @@ void P_LoadLineDefs (int lump)
 	ld->dx = v2->x - v1->x;
 	ld->dy = v2->y - v1->y;
 
+	ld->tranlump = -1;	// killough 4/11/98: no translucency by default
+
 	if (!ld->dx)
 	    ld->slopetype = ST_VERTICAL;
 	else if (!ld->dy)

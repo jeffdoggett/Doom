@@ -238,6 +238,8 @@ typedef struct line_s
     sector_t*	frontsector;
     sector_t*	backsector;
 
+    int		tranlump;	// killough 4/11/98: translucency filter, -1 == none
+
     // if == validcount, already checked
     int		validcount;
     int		firsttag;

@@ -60,7 +60,9 @@ int		viewwindowy;
 //
 byte*		dc_translation;
 byte*		translationtables;
+
 byte*		tinttab = NULL;
+byte*		tinttab50 = NULL;
 
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
@@ -155,12 +157,26 @@ static byte *GenerateTintTable (const byte *palette, int percent, const byte * f
 
 /* ------------------------------------------------------------------------------------------------ */
 
+void R_InitTranslucencyTables (void)
+{
+  byte * palette;
+
+  if (tinttab50 == NULL)
+  {
+    // printf ("\nBuilding Translucency tables\n");
+    palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
+    tinttab50 = GenerateTintTable (palette, 50, general, ALL);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+
 static void R_InitTintTables (void)
 {
   byte * palette;
 
   // printf ("\nBuilding Tint tables\n");
-  palette = W_CacheLumpName("PLAYPAL", PU_STATIC);
+  palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
   tinttab = GenerateTintTable (palette, ADDITIVE, general, ALL);
 }
 
@@ -633,6 +649,92 @@ void R_DrawTranslucentColumn (void)
 	{
 #ifdef USE_TINT_TABLES
 	  *dest = tinttab[(*dest << 8) + dc_colormap[dc_source[frac >> FRACBITS]]];
+#else
+	  if (translucent == 0)
+	    *dest = dc_colormap[dc_source[frac>>FRACBITS]];
+#endif
+	}
+
+#ifndef USE_TINT_TABLES
+	translucent ^= 1;
+#endif
+	dest += SCREENWIDTH;
+	frac += fracstep;
+
+	if ((unsigned) frac >= (unsigned) dc_ylim)
+	  frac -= dc_ylim;
+
+    } while (--count);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+
+void R_DrawTranslucent50Column (void)
+{
+    int			count;
+    byte*		dest;
+    byte*		scrnlimit;
+    fixed_t		frac;
+    fixed_t		fracstep;
+#ifndef USE_TINT_TABLES
+    int			translucent;
+#else
+    int			lump;
+    byte*		tranmap;
+
+
+    lump = curline->linedef->tranlump;
+    if ((unsigned)lump >= numlumps)
+    {
+      if ((tranmap = tinttab50) == NULL)	// Just in case!
+      {
+	R_InitTranslucencyTables ();
+	tranmap = tinttab50;
+      }
+    }
+    else
+    {
+      tranmap = W_CacheLumpNum (lump, PU_LEVEL);
+    }
+#endif
+
+    count = (dc_yh - dc_yl) + 1;
+
+    // Zero length, column does not exceed a pixel.
+    if (count < 1)
+	return;
+
+#ifdef RANGECHECK
+    if ((unsigned)dc_x >= SCREENWIDTH)
+    {
+	printf ("R_DrawColumn: %i to %i at %i\n", dc_yl, dc_yh, dc_x);
+	return;
+    }
+#endif
+
+    dest = R_ADDRESS(0, dc_x, dc_yl);
+    scrnlimit = (screens[0] + (SCREENHEIGHT*SCREENWIDTH)) -1;
+
+    // Determine scaling,
+    //  which is the only mapping to be done.
+    fracstep = dc_iscale;
+    frac = dc_texturefrac;
+
+#ifndef USE_TINT_TABLES
+    translucent = (dc_x + dc_yl) & 1;
+#endif
+
+    // Inner loop that does the actual texture mapping,
+    //  e.g. a DDA-lile scaling.
+    do
+    {
+	if (dest > scrnlimit)
+	  break;
+
+	if (dest >= screens[0])
+	{
+#ifdef USE_TINT_TABLES
+	  *dest = tranmap[(*dest << 8) + dc_colormap[dc_source[frac >> FRACBITS]]];
 #else
 	  if (translucent == 0)
 	    *dest = dc_colormap[dc_source[frac>>FRACBITS]];

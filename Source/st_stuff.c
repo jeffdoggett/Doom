@@ -1826,9 +1826,7 @@ void ST_SetPalette (byte * palette)
   {
     patch = (patch_t *) keypatches [keynum];
     if (patch)
-    {
       ST_ConvPatchColours (patch, palette);
-    }
   } while (++keynum < ARRAY_SIZE (keypatches));
 }
 
