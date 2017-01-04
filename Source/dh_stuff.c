@@ -4220,9 +4220,17 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 
   l = dh_inchar (ptr, '"');
   if (l == 0)
+  {
     l = dh_inchar (ptr, '\n');
+    if (l == 0)
+    {
+      l = strlen (ptr);
+    }
+  }
 
-  ptr [l-1] = 0;
+  if (l)
+    ptr [l-1] = 0;
+
   rc = ptr + l;
 
   if (*ptr == '$')
