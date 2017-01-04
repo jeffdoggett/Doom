@@ -56,6 +56,7 @@ int XShmGetEventBase( Display* dpy ); // problems with g++?
 #include "m_argv.h"
 #include "d_main.h"
 #include "am_map.h"
+#include "m_swap.h"
 
 #include "doomdef.h"
 
