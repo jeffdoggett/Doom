@@ -4224,13 +4224,11 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
     l = dh_inchar (ptr, '\n');
     if (l == 0)
     {
-      l = strlen (ptr);
+      l = strlen (ptr) + 1;
     }
   }
 
-  if (l)
-    ptr [l-1] = 0;
-
+  ptr [l-1] = 0;
   rc = ptr + l;
 
   if (*ptr == '$')
