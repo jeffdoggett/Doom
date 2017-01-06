@@ -26,16 +26,9 @@ static const char rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 #endif
 
 #include "includes.h"
+#include <stddef.h>				// For the offsetof() macro
 
-// Tunables
-
-// Minimum chunk size at which blocks are allocated
-#define CHUNK_SIZE	32
-
-// signature for block header
-#define ZONEID		0x931d4a11
-
-// End Tunables
+/* ------------------------------------------------------------------------------------------------ */
 
 typedef struct memblock
 {
@@ -45,16 +38,14 @@ typedef struct memblock
   size_t		size;
   void			**user;
   uint32_t		tag;
+  byte			data [4];		// Must be the last element.
 } memblock_t;
 
+// signature for block header
+#define ZONEID		0x931d4a11
+#define HEADER_SIZE	(offsetof(memblock_t,data))
+
 /* ------------------------------------------------------------------------------------------------ */
-//
-// size of block header
-// cph - base on sizeof(memblock_t), which can be larger than CHUNK_SIZE on
-// 64bit architectures
-//
-static const size_t	HEADER_SIZE = (sizeof(memblock_t) + CHUNK_SIZE - 1)
-					& ~(CHUNK_SIZE - 1);
 
 static memblock_t	*blockbytag[PU_MAX];
 
@@ -113,62 +104,64 @@ static void remove_from_list (memblock_t *block)
 }
 
 /* ------------------------------------------------------------------------------------------------ */
-//
-// Z_Malloc
-// You can pass a NULL user if the tag is < PU_PURGELEVEL.
-//
-// cph - the algorithm here was a very simple first-fit round-robin
-//  one - just keep looping around, freeing everything we can until
-//  we get a large enough space
-//
-// This has been changed now; we still do the round-robin first-fit,
-// but we only free the blocks we actually end up using; we don't
-// free all the stuff we just pass on the way.
-//
+
 static void * zone_malloc (size_t size, uint32_t tag, void **user)
 {
-  size_t psize;
-  unsigned char * rc;
+  byte * rc;
   memblock_t *block;
 
-  if (!size)
-    return (user ? (*user = NULL) : NULL);		// malloc(0) returns NULL
+  rc = NULL;
 
-  psize = (size + CHUNK_SIZE - 1) & ~(CHUNK_SIZE - 1);	// round to chunk size
-
-#if 0
-  if (memory_size > 0
-    && free_memory + memory_size < (uint32_t)(psize + HEADER_SIZE))
+  if (size)				// malloc(0) returns NULL
   {
-    while ((block = blockbytag[PU_CACHE]) != NULL)
+    do
     {
-      // printf ("Free tag %d %X\n", block->tag, block);
-      Z_Free ((char *)block + HEADER_SIZE);
-      if ((free_memory + memory_size) >= (uint32_t)(psize + HEADER_SIZE))
+      block = (memblock_t *) malloc (size + HEADER_SIZE);
+      if (block)
+      {
+	//  free_memory -= size;
+	block->zoneid = ZONEID;
+	block->size = size;
+	block->tag = tag;		// tag
+	block->user = user;		// user
+	add_to_list (block);
+
+	rc = block->data;
 	break;
-    }
+      }
+
+      /* failed to claim memory, can we release some from the cache? */
+
+      if (!blockbytag[PU_CACHE])
+	break;
+
+      Z_FreeTags (PU_CACHE, PU_CACHE);	// Yes.
+    } while (1);
   }
-#endif
 
-  while ((block = ((memblock_t *)malloc(psize + HEADER_SIZE))) == NULL)
-  {
-    if (!blockbytag[PU_CACHE])
-      return (NULL);
-    Z_FreeTags (PU_CACHE, PU_CACHE);
-  }
-
-//  free_memory -= size;
-  block->zoneid = ZONEID;
-  block->size = size;
-  block->tag = tag;			// tag
-  block->user = user;			// user
-  add_to_list (block);
-
-  rc = (unsigned char *)block + HEADER_SIZE;
   if (user)				// if there is a user
     *user = rc;				// set user to point to new block
 
   return (rc);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+
+static void block_free (memblock_t *block)
+{
+  void **user;
+
+  if (block->zoneid != ZONEID)
+    I_Error ("Z_Free: Attempt to free invalid memory");
+
+  // printf ("Z_Free %d %X\n", block->tag, block);
+
+  if ((user = block->user) != NULL)	// Nullify user if one exists
+    *user = NULL;
+
+  remove_from_list (block);
+//free_memory += block->size;
+  free (block);
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -187,24 +180,15 @@ void * Z_Malloc (size_t size, uint32_t tag, void **user)
 
 /* ------------------------------------------------------------------------------------------------ */
 
-void Z_Free (void *p)
+void Z_Free (void *ptr)
 {
-  memblock_t *block = (memblock_t *)((char *)p - HEADER_SIZE);
+  memblock_t * block;
 
-  if (!p)
-    return;
-
-  if (block->zoneid != ZONEID)
-    I_Error ("Z_Free: Attempt to free invalid memory");
-
-  // printf ("Z_Free %d %X\n", block->tag, block);
-
-  if (block->user)			// Nullify user if one exists
-    *block->user = NULL;
-
-  remove_from_list (block);
-//free_memory += block->size;
-  free (block);
+  if (ptr)
+  {
+    block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+    block_free (block);
+  }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -223,7 +207,7 @@ void Z_FreeTags (uint32_t lowtag, uint32_t hightag)
     while ((block = blockbytag[lowtag]) != NULL)
     {
       // printf ("Free tag %d %X\n", block->tag, block);
-      Z_Free ((char *)block + HEADER_SIZE);
+      block_free (block);
     }
   }
 }
@@ -235,20 +219,20 @@ void Z_ChangeTag (void *ptr, uint32_t tag)
   memblock_t *block;
 
   // proff - added sanity check, this can happen when an empty lump is locked
-  if (!ptr)
-      return;
+  if (ptr)
+  {
+    block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+    if (block->zoneid != ZONEID)
+      I_Error ("Z_ChangeTag: Attempt to change invalid memory");
 
-  block = (memblock_t *)((char *)ptr - HEADER_SIZE);
-  if (block->zoneid != ZONEID)
-    I_Error ("Z_ChangeTag: Attempt to change invalid memory");
-
-  // proff - do nothing if tag doesn't differ
-  if (tag == block->tag)
-      return;
-
-  remove_from_list (block);
-  block->tag = tag;
-  add_to_list (block);
+    // proff - do nothing if tag doesn't differ
+    if (tag != block->tag)
+    {
+      remove_from_list (block);
+      block->tag = tag;
+      add_to_list (block);
+    }
+  }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
