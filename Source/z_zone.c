@@ -33,11 +33,11 @@ static const char rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 typedef struct memblock
 {
   uint32_t		zoneid;
+  uint32_t		tag;
+  size_t		size;
   struct memblock	*next;
   struct memblock	*prev;
-  size_t		size;
   void			**user;
-  uint32_t		tag;
   byte			data [4];		// Must be the last element.
 } memblock_t;
 

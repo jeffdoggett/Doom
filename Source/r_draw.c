@@ -62,7 +62,9 @@ byte*		dc_translation;
 byte*		translationtables;
 
 byte*		tinttab = NULL;
-byte*		tinttab50 = NULL;
+byte*		transtab = NULL;
+
+int		translucency;
 
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
@@ -161,11 +163,18 @@ void R_InitTranslucencyTables (void)
 {
   byte * palette;
 
-  if (tinttab50 == NULL)
+  if (transtab == NULL)
   {
     // printf ("\nBuilding Translucency tables\n");
     palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
-    tinttab50 = GenerateTintTable (palette, 50, general, ALL);
+
+    if (translucency < 0)
+      translucency = 0;
+
+    if (translucency > 100)
+      translucency = 100;
+
+    transtab = GenerateTintTable (palette, translucency, general, ALL);
   }
 }
 
@@ -686,10 +695,10 @@ void R_DrawTranslucent50Column (void)
     lump = curline->linedef->tranlump;
     if ((unsigned)lump >= numlumps)
     {
-      if ((tranmap = tinttab50) == NULL)	// Just in case!
+      if ((tranmap = transtab) == NULL)		// Just in case!
       {
 	R_InitTranslucencyTables ();
-	tranmap = tinttab50;
+	tranmap = transtab;
       }
     }
     else

@@ -201,6 +201,8 @@ char*		mousetype;
 char*		mousedev;
 #endif
 
+extern int	translucency;
+
 extern char*	chat_macros[];
 
 //-----------------------------------------------------------------------------
@@ -279,6 +281,7 @@ default_t	defaults[] =
 
   {"usegamma",&usegamma, sizeof(int), 0},
   {"lightscaleshift",&lightScaleShift, sizeof(int), (char *) LIGHTSCALESHIFT},
+  {"translucency",&translucency, sizeof(int), (char *) 50},
 
 #ifdef __riscos
 #ifdef RCOMP
