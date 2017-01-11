@@ -4869,11 +4869,6 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	j = dh_instr (ptr, "$MUSIC_");
 	if (j)
 	{					// Bodge for now...
-	  ptr [j-1] = ' ';
-	  ptr [j+0] = ' ';
-	  ptr [j+1] = ' ';
-	  ptr [j+2] = ' ';
-	  ptr [j+3] = ' ';
 	  ptr [j+4] = 'D';
 	  strcpy (ptr+(j-1), ptr+j+4);
 	}
