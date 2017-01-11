@@ -830,7 +830,6 @@ AM_Responder
     int rc;
     static int cheatstate=0;
     static int bigstate=0;
-    static char buffer[20];
 
     rc = false;
 
@@ -901,8 +900,7 @@ AM_Responder
 		am_map_messages [AM_AMSTR_GRIDON] : am_map_messages [AM_AMSTR_GRIDOFF];
 	    break;
 	  case AM_MARKKEY:
-	    sprintf(buffer, "%s %d", am_map_messages [AM_AMSTR_MARKEDSPOT], markpointnum);
-	    plr->message = buffer;
+	    plr->message = HU_printf ("%s %d", am_map_messages [AM_AMSTR_MARKEDSPOT], markpointnum);
 	    AM_addMark();
 	    break;
 	  case AM_CLEARMARKKEY:
@@ -1566,123 +1564,117 @@ static boolean is_teleport_line (int special)
 }
 
 /* ---------------------------------------------------------------------- */
+
+static int AM_line_colour (line_t * line)
+{
+  int dcol;
+
+  // if line has been seen or IDDT has been used
+  if (ddt_cheating || (line->flags & ML_MAPPED))
+  {
+    if ((line->flags & ML_DONTDRAW) && !ddt_cheating)
+     return (-1);
+
+    if (!line->backsector)
+    {
+      if (moving_sector (line->frontsector))
+	return (mapcolour.unsn);
+
+      if (is_teleport_line (line->special))
+	return (mapcolour.tele);
+
+      if (is_exit_line (line->special))		//jff 4/23/98 add exit lines to automap
+	return (mapcolour.exit);		// exit line
+
+      if ((dcol = AM_DoorColour (line->special)) != -1)
+	return (dcol);
+
+      // jff 1/10/98 add new colour for 1S secret sector boundary
+      if (secret_sector (line->frontsector))
+	return (mapcolour.secr);		// line bounding secret sector
+						//jff 2/16/98 fixed bug
+      return (mapcolour.wall);			// special was cleared
+    }
+
+    // Two sided line
+
+    if ((moving_sector (line->frontsector))
+     || (moving_sector (line->backsector)))
+      return (mapcolour.unsn);
+
+    // jff 1/10/98 add colour change for all teleporter types
+    if (is_teleport_line (line->special))
+      return (mapcolour.tele);
+
+    if (is_exit_line (line->special))		//jff 4/23/98 add exit lines to automap
+      return (mapcolour.exit);			// exit line
+
+    dcol = AM_DoorColour (line->special);	//jff 1/5/98 this clause implements showing keyed doors
+    if (dcol != -1)
+    {
+      if ((line->tag != 0)
+       || (door_closed (line)))
+	return (dcol);
+
+      return (mapcolour.cchg);			// open keyed door
+    }
+
+    if (line->flags & ML_SECRET)		// secret door
+      return (mapcolour.wall);			// wall colour
+
+    if (door_closed (line))
+      return (mapcolour.clsd);
+
+    //jff 1/6/98 show secret sector 2S lines
+    if ((secret_sector (line->frontsector)
+     || secret_sector (line->backsector)))
+      return (mapcolour.secr);			// line bounding secret sector
+
+    if (line->backsector->floorheight != line->frontsector->floorheight)
+      return (mapcolour.fchg);			// floor level change
+
+    if (line->backsector->ceilingheight != line->frontsector->ceilingheight)
+      return (mapcolour.cchg);			// ceiling level change
+
+    if (ddt_cheating)
+      return (mapcolour.flat);			// 2S lines that appear only in IDDT
+  }
+
+  // now draw the lines only visible because the player has computermap
+
+
+  if ((plr->powers[pw_allmap])			// computermap visible lines
+   && (!(line->flags & ML_DONTDRAW))		// invisible flag lines do not show
+   && (!line->backsector
+    || (line->backsector->floorheight != line->frontsector->floorheight)
+    || (line->backsector->ceilingheight != line->frontsector->ceilingheight)))
+     return (mapcolour.unsn);
+
+  return (-1);
+}
+
+/* ---------------------------------------------------------------------- */
 // Determines visible lines, draws them.
 // This is LineDef based, not LineSeg based.
 //
 static void AM_drawWalls(void)
 {
-  int i;
-  int dcol;
+  unsigned int i;
   line_t* line;
-  static mline_t l;
+  mline_t l;
 
 // draw the unclipped visible portions of all lines
   line = lines;
-  for (i=0;i<numlines;i++,line++)
+  i = numlines;
+  do
   {
     l.a.x = line->v1->x;
     l.a.y = line->v1->y;
     l.b.x = line->v2->x;
     l.b.y = line->v2->y;
-    // if line has been seen or IDDT has been used
-    if (ddt_cheating || (line->flags & ML_MAPPED))
-    {
-      if ((line->flags & ML_DONTDRAW) && !ddt_cheating)
-	 continue;
-      if (!line->backsector)
-      {
-	if (is_teleport_line (line->special))
-	  AM_drawMline(&l, mapcolour.tele);
-	else if (is_exit_line (line->special))		//jff 4/23/98 add exit lines to automap
-	  AM_drawMline(&l, mapcolour.exit);	// exit line
-	else if ((dcol = AM_DoorColour(line->special)) != -1)
-	  AM_drawMline(&l, dcol);
-	// jff 1/10/98 add new colour for 1S secret sector boundary
-	else if (mapcolour.secr && secret_sector (line->frontsector))
-	  AM_drawMline(&l, mapcolour.secr);	// line bounding secret sector
-	else if (moving_sector (line->frontsector))
-	  AM_drawMline(&l, mapcolour.unsn);
-	else					//jff 2/16/98 fixed bug
-	  AM_drawMline(&l, mapcolour.wall);	// special was cleared
-      }
-      else
-      {
-	if ((moving_sector (line->frontsector))
-	 || (moving_sector (line->backsector)))
-	  AM_drawMline(&l, mapcolour.unsn);
-	// jff 1/10/98 add colour change for all teleporter types
-	else if (is_teleport_line (line->special))
-	  AM_drawMline(&l, mapcolour.tele);
-	else if (is_exit_line (line->special)) //jff 4/23/98 add exit lines to automap
-	  AM_drawMline(&l, mapcolour.exit);	// exit line
-	else if //jff 1/5/98 this clause implements showing keyed doors
-	(
-	  ((dcol = AM_DoorColour(line->special)) != -1)
-	)
-	{
-	  if ((line->tag != 0)
-	   || (door_closed (line)))
-	  {
-	    AM_drawMline(&l, dcol);
-	  }
-	  else AM_drawMline(&l, mapcolour.cchg); // open keyed door
-	}
-	else if (line->flags & ML_SECRET)	// secret door
-	{
-	  AM_drawMline(&l, mapcolour.wall);	// wall colour
-	}
-	else if
-	(
-	    mapcolour.clsd &&
-	    !(line->flags & ML_SECRET)		// non-secret closed door
-	    && (door_closed (line))
-	)
-	{
-	  AM_drawMline(&l, mapcolour.clsd);	// non-secret closed door
-	}
-#if 1 //def BOOM
-	//jff 1/6/98 show secret sector 2S lines
-	else if (mapcolour.secr
-	 && (secret_sector (line->frontsector)
-	  || secret_sector (line->backsector)))
-	  AM_drawMline(&l, mapcolour.secr);	// line bounding secret sector
-#endif
-	else if (line->backsector->floorheight !=
-		  line->frontsector->floorheight)
-	{
-	  AM_drawMline(&l, mapcolour.fchg);	// floor level change
-	}
-	else if (line->backsector->ceilingheight !=
-		  line->frontsector->ceilingheight)
-	{
-	  AM_drawMline(&l, mapcolour.cchg);	// ceiling level change
-	}
-	else if (mapcolour.flat && ddt_cheating)
-	{
-	  AM_drawMline(&l, mapcolour.flat);	// 2S lines that appear only in IDDT
-	}
-      }
-    } // now draw the lines only visible because the player has computermap
-    else if (plr->powers[pw_allmap])		// computermap visible lines
-    {
-      if (!(line->flags & ML_DONTDRAW))		// invisible flag lines do not show
-      {
-	if
-	(
-	  mapcolour.flat
-	  ||
-	  !line->backsector
-	  ||
-	  line->backsector->floorheight
-	  != line->frontsector->floorheight
-	  ||
-	  line->backsector->ceilingheight
-	  != line->frontsector->ceilingheight
-	)
-	  AM_drawMline(&l, mapcolour.unsn);
-      }
-    }
-  }
+    AM_drawMline (&l, AM_line_colour (line));
+    line++;
+  } while (--i);
 }
 
 /* ---------------------------------------------------------------------- */
