@@ -1573,7 +1573,7 @@ static int AM_line_colour (line_t * line)
   if (ddt_cheating || (line->flags & ML_MAPPED))
   {
     if ((line->flags & ML_DONTDRAW) && !ddt_cheating)
-     return (-1);
+      return (-1);
 
     if (!line->backsector)
     {

@@ -4866,6 +4866,17 @@ static void Parse_Mapinfo (char * ptr, char * top)
       if (intertext == -1)
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	j = dh_instr (ptr, "$MUSIC_");
+	if (j)
+	{					// Bodge for now...
+	  ptr [j-1] = ' ';
+	  ptr [j+0] = ' ';
+	  ptr [j+1] = ' ';
+	  ptr [j+2] = ' ';
+	  ptr [j+3] = ' ';
+	  ptr [j+4] = 'D';
+	  strcpy (ptr+(j-1), ptr+j+4);
+	}
 	ptr = replace_map_text (&mdest_ptr -> music, ptr);
 	// printf ("Map Music = %s for %u/%u\n", mdest_ptr -> music, episode, map);
       }
