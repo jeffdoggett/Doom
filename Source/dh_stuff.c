@@ -5415,6 +5415,39 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	}
       }
     }
+    else if (strncasecmp (ptr, "music ", 6) == 0)
+    {
+      ptr += 6;
+      while (*ptr == ' ') ptr++;
+      while (*ptr == '=') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '\"')
+      {
+	ptr++;
+	l = dh_inchar (ptr, '"');
+	if (l) ptr[l-1] = 0;
+      }
+
+      if (strncasecmp (ptr, "$MUSIC_", 7) == 0)
+      {
+	ptr += 5;
+	*ptr = 'D';
+      }
+      else if (strncasecmp (ptr, "D_", 2) != 0)
+      {
+	*--ptr = '_';
+	*--ptr = 'D';
+      }
+
+      l = strlen (ptr);
+      newtext = malloc (l+1);
+      if (newtext)
+      {
+	strcpy (newtext, ptr);
+	mdest_ptr -> music = newtext;
+	// printf ("Map Music = %s for %u/%u\n", mdest_ptr -> music, episode, map);
+      }
+    }
     else if (strncasecmp (ptr, "killfinale = true", 17) == 0)
     {
       mdest_ptr -> intermission_text = 0;
