@@ -398,6 +398,7 @@ char * search_choices_path (char * buffer)
 //
 void M_SaveDefaults (void)
 {
+  char* w;
   int	i,v;
   FILE*	f;
   char*	defaultfile;
@@ -419,17 +420,24 @@ void M_SaveDefaults (void)
 
   if ((f = fopen (defaultfile, "w")) != NULL)
   {
+    fputs ("# Doom config file\n"
+	   "# Uncomment lines that you want to change\n\n", f);
+
     for (i=0 ; i<numdefaults ; i++)
     {
       switch (defaults[i].type)
       {
 	case 0:
-	  fprintf (f,"%s\t\t\"%s\"\n",defaults[i].name,
-		 * (char **) (defaults[i].location));
+	  w = * (char **) defaults[i].location;
+	  if (strcmp (w, defaults[i].defaultvalue) == 0)
+	    fputs ("# ", f);
+	  fprintf (f,"%s\t\t\"%s\"\n",defaults[i].name, w);
           break;
 
 	default: //case sizeof(int):
 	  v = *defaults[i].location;
+	  if (v == (intptr_t) defaults[i].defaultvalue)
+	    fputs ("# ", f);
 	  fprintf (f,"%s\t\t%i\n",defaults[i].name,v);
           break;
       }
