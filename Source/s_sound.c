@@ -204,7 +204,7 @@ void S_Init
 
   // Note that sounds have not been cached (yet).
   for (i=1 ; i<NUMSFX ; i++)
-    S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
+    S_sfx[i].lumpnum = -1;
 }
 
 /* ------------------------------------------------------------ */
@@ -429,10 +429,16 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
     lumpnum = S_GetSfxLumpNum (sfx);
     if (lumpnum < 0)
     {
-      /* If the wad does not have the DSSECRET lump */
-      /* then we use GETPOW instead. */
+      switch (sfx_id)
+      {
+	case sfx_secret:		// If the wad does not have the DSSECRET lump
+	  lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);// then we use GETPOW instead.
+	  break;
 
-      lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);
+	case sfx_pdiehi:		// Similarly for player die
+	  lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_pldeth]);
+	  break;
+      }
       if (lumpnum < 0)
 	return;
     }
@@ -453,10 +459,6 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
   }
 #endif
-
-  // increase the usefulness
-  if (sfx->usefulness++ < 0)
-    sfx->usefulness = 1;
 
   // Assigns the handle to one of the channels in the
   //  mix/output buffer.
@@ -602,28 +604,6 @@ void S_UpdateSounds(void* listener_p)
     channel_t*	c;
 
     mobj_t*	listener = (mobj_t*)listener_p;
-
-
-
-    // Clean up unused data.
-    // This is currently not done for 16bit (sounds cached static).
-    // DOS 8bit remains.
-    /*if (gametic > nextcleanup)
-    {
-	for (i=1 ; i<NUMSFX ; i++)
-	{
-	    if (S_sfx[i].usefulness < 1
-		&& S_sfx[i].usefulness > -1)
-	    {
-		if (--S_sfx[i].usefulness == -1)
-		{
-		    Z_ChangeTag(S_sfx[i].data, PU_CACHE);
-		    S_sfx[i].data = 0;
-		}
-	    }
-	}
-	nextcleanup = gametic + 15;
-    }*/
 
     for (cnum=0 ; cnum<numChannels ; cnum++)
     {
@@ -850,9 +830,6 @@ static void S_StopChannel(int cnum)
 		break;
 	    }
 	}
-
-	// degrade usefulness of sound data
-	c->sfxinfo->usefulness--;
 
 	c->sfxinfo = 0;
     }

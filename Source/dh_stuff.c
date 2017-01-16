@@ -1461,7 +1461,7 @@ static void write_all_sounds (FILE * fout)
     fprintf (fout, "%s = %d\n", dehack_sounds [1], (int) ptr -> singularity);
     fprintf (fout, "%s = %d\n", dehack_sounds [2], (int) ptr -> priority);
     fprintf (fout, "%s = %d\n", dehack_sounds [3], (int) ptr -> link);
-    fprintf (fout, "%s = %d\n", dehack_sounds [4], (int) ptr -> usefulness);
+    fprintf (fout, "%s = %d\n", dehack_sounds [4], -1 /*(int) ptr -> usefulness*/);
     fprintf (fout, "%s = %d\n", dehack_sounds [5], (int) ptr -> lumpnum);
     fprintf (fout, "%s = %d\n", dehack_sounds [6], (int) ptr -> data);
     fprintf (fout, "%s = %d\n", dehack_sounds [7], (int) ptr -> pitch);
@@ -1501,7 +1501,7 @@ static void dh_write_to_sound (unsigned int number, unsigned int record, unsigne
       break;
 
     case 4: //	"Zero 2",
-      ptr -> usefulness = value;
+      // ptr -> usefulness = value;
       break;
 
     case 5: //	"Zero 3",
