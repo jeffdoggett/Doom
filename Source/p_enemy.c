@@ -2580,14 +2580,17 @@ void A_SpawnSound (mobj_t* mo, pspdef_t* psp)
 void A_PlayerScream (mobj_t* mo, pspdef_t* psp)
 {
     // Default death sound.
-    int		sound = sfx_pldeth;
+    int	sound;
 
-    if ( (gamemode == commercial)
-	&& 	(mo->health < -50))
+    if (mo->health < -50)
     {
 	// IF THE PLAYER DIES
 	// LESS THAN -50% WITHOUT GIBBING
 	sound = sfx_pdiehi;
+    }
+    else
+    {
+    	sound = sfx_pldeth;
     }
 
     S_StartSound (mo, sound);

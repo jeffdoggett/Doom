@@ -821,7 +821,6 @@ static unsigned int P_LoadThings (int lump)
 {
     byte*		data;
     int			i;
-    int			type;
     mapthing_t*		mt;
     mapthing_t		mtl;
     int			numthings;
@@ -858,33 +857,17 @@ static unsigned int P_LoadThings (int lump)
 
 	G_Patch_Map_Things (i, &mtl);
 
-	// Do not spawn cool, new monsters if !commercial
-	if ((gamemode == commercial)
-	 || (((type = mtl.type) != 68)	// Arachnotron
-	  && (type != 64)		// Archvile
-	  && (type != 88)		// Boss Brain
-	  && (type != 89)		// Boss Shooter
-	  && (type != 69)		// Hell Knight
-	  && (type != 67)		// Mancubus
-	  && (type != 71)		// Pain Elemental
-	  && (type != 65)		// Former Human Commando
-	  && (type != 66)		// Revenant
-	  && (type != 84)))		// Wolf SS
-	{
-	  // Do spawn all other stuff.
-
 #if 0
-	  // [BH] change all wolfenstein ss' into zombiemen when using
-	  //  BFG Edition DOOM2.WAD as censorship broke them
-	  if ((mtl.type == 84) && (bfgedition))
-	    mtl.type = 65;
+	// [BH] change all wolfenstein ss' into zombiemen when using
+	//  BFG Edition DOOM2.WAD as censorship broke them
+	if ((mtl.type == 84) && (bfgedition))
+	  mtl.type = 65;
 #endif
-	  monsternotloaded = P_SpawnMapThing (&mtl);
-	  if ((monsternotloaded)		// Luckily the -nomonsters stuff that
-	   && (monsternotloaded < 32))		// we are interested in fits in 1 - 31
-	  {
-	    nomonsterbits |= (1 << monsternotloaded);
-	  }
+	monsternotloaded = P_SpawnMapThing (&mtl);
+	if ((monsternotloaded)		// Luckily the -nomonsters stuff that
+	 && (monsternotloaded < 32))		// we are interested in fits in 1 - 31
+	{
+	  nomonsterbits |= (1 << monsternotloaded);
 	}
 
 #ifdef PADDED_STRUCTS

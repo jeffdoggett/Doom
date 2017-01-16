@@ -525,9 +525,6 @@ P_TouchSpecialThing
       {
 	boolean mega_given;
 
-	if (gamemode != commercial)
-	  return;
-
 	mega_given = P_GiveArmour (player, BLUEARMOUR);
 
 	if (player->health < Megasphere_Health)
