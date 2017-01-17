@@ -49,14 +49,16 @@ struct sfxinfo_struct
     // volume if a link
     int		volume;
 
-    // sound data
-    void*	data;
-
     // lump number of sfx
     int		lumpnum;
 
+    /* Note - preinit table in sounds.c ends here */
+
     // sample rate - usually 11025
     int		samplerate;
+
+    // sound data
+    void*	data;
     void*	adata;		// The actual address of the audio data
 };
 

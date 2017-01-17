@@ -178,8 +178,6 @@ void S_Init
 ( int		sfxVolume,
   int		musicVolume )
 {
-  int		i;
-
   // fprintf( stderr, "S_Init: default sfx volume %d\n", sfxVolume);
 
   // Whatever these did with DMX, these are rather dummies now.
@@ -201,10 +199,6 @@ void S_Init
 
   // no sounds are playing, and they are not mus_paused
   mus_paused = false;
-
-  // Note that sounds have not been cached (yet).
-  for (i=1 ; i<NUMSFX ; i++)
-    S_sfx[i].lumpnum = -1;
 }
 
 /* ------------------------------------------------------------ */
