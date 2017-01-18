@@ -497,7 +497,6 @@ void W_Reload (void)
 //
 void W_InitMultipleFiles (char** filenames)
 {
-    int size;
     int	i;
 
     // open all the files, load headers, and count lumps
