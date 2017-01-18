@@ -43,7 +43,6 @@ extern void * alloca (unsigned int);
 lumpinfo_t*		lumpinfo;
 int			numlumps;
 
-void**			lumpcache;
 static int*		sortedlumps;
 static int		duplicates_removed = 0;
 
@@ -333,6 +332,7 @@ void W_AddFile (const char *filename)
 	lump_p->handle = storehandle;
 	lump_p->position = LONG(fileinfo->filepos);
 	lump_p->size = LONG(fileinfo->size);
+	lump_p->cache = NULL;
 	strncpy (lump_p->name, fileinfo->name, 8);
 #if 0
 	if (its_a_wad == 3)
@@ -471,8 +471,8 @@ void W_Reload (void)
 	 i<reloadlump+lumpcount ;
 	 i++,lump_p++, fileinfo++)
     {
-	if (lumpcache[i])
-	    Z_Free (lumpcache[i]);
+	if (lump_p->cache)
+	    Z_Free (lump_p->cache);
 
 	lump_p->position = LONG(fileinfo->filepos);
 	lump_p->size = LONG(fileinfo->size);
@@ -511,15 +511,6 @@ void W_InitMultipleFiles (char** filenames)
 
     if (!numlumps)
 	I_Error ("W_InitFiles: no files found");
-
-    // set up caching
-    size = numlumps * sizeof(*lumpcache);
-    lumpcache = malloc (size);
-
-    if (!lumpcache)
-	I_Error ("Couldn't allocate lumpcache");
-
-    memset (lumpcache,0, size);
 
     /* Now start sorting. */
     if ((sortedlumps = malloc(numlumps*sizeof(int))) == NULL)
@@ -947,26 +938,29 @@ W_CacheLumpNum
 ( int		lump,
   int		tag )
 {
-    byte*	ptr;
+    void * ptr;
+    lumpinfo_t*	lump_p;
 
     if ((unsigned)lump >= numlumps)
 	I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
 
-    if (!lumpcache[lump])
+    lump_p = &lumpinfo[lump];
+
+    if ((ptr = lump_p->cache) == NULL)
     {
 	// read the lump in
 
 	//printf ("cache miss on lump %i\n",lump);
-	ptr = Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
-	W_ReadLump (lump, lumpcache[lump]);
+	ptr = Z_Malloc (lump_p->size, tag, &lump_p->cache);
+	W_ReadLump (lump, ptr);
     }
     else
     {
 	//printf ("cache hit on lump %i\n",lump);
-	Z_ChangeTag (lumpcache[lump],tag);
+	Z_ChangeTag (ptr, tag);
     }
 
-    return lumpcache[lump];
+    return (ptr);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1011,10 +1005,13 @@ W_CacheLumpName0
 //
 void W_ReleaseLumpNum (unsigned int lumpnum)
 {
+  lumpinfo_t* lump_p;
+
   if (lumpnum >= numlumps)
       I_Error("W_ReleaseLumpNum: %i >= numlumps", lumpnum);
 
-  Z_ChangeTag (lumpcache[lumpnum], PU_CACHE);
+  lump_p = &lumpinfo[lumpnum];
+  Z_ChangeTag (lump_p->cache, PU_CACHE);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1039,7 +1036,7 @@ void W_Profile (void)
 
     for (i=0 ; i<numlumps ; i++)
     {
-	ptr = lumpcache[i];
+	ptr = lumpinfo[i].cache;
 	if (!ptr)
 	{
 	    ch = ' ';

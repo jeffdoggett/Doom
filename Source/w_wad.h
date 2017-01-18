@@ -59,10 +59,9 @@ typedef struct
     FILE* 	handle;
     int 	position;
     int 	size;
+    void*	cache;
 } lumpinfo_t;
 
-
-extern	void**		lumpcache;
 extern	lumpinfo_t*	lumpinfo;
 extern	int		numlumps;
 
