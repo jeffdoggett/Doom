@@ -96,64 +96,6 @@ static void write_32 (unsigned char * ptr, unsigned int data)
 }
 
 /* ------------------------------------------------------------ */
-/*
-   Find the location and size of the sound data in the file.
-   Some WAD files use RIFF files.
-*/
-
-static unsigned int I_FindData (unsigned int * start, unsigned int * data, unsigned int length)
-{
-  unsigned int type;
-  unsigned int newlength;
-  unsigned char * ptr_1;
-  unsigned char * ptr_2;
-
-  type = read_32 ((unsigned char *) data);
-  if ((type & 0xFFFF) == 0x0003)			// Standard doom lump
-  {
-    data++;
-    length -= 8;
-    newlength = read_32 ((unsigned char *) data);
-    data++;
-    if (newlength < length)
-      length = newlength;
-  }
-  else if (type == 0x46464952)				// RIFF
-  {
-    data += 8;
-    type = read_32 ((unsigned char *) data);
-    if (type == 0x00100002)				// 16 bit data?
-    {
-      write_32 ((unsigned char *) data, 0x00080001);	// Yes. Convert to 8 bit.
-      data += 2;
-      newlength = read_32 ((unsigned char *) data);
-      newlength >>= 1;
-      write_32 ((unsigned char *) data, newlength);
-      ptr_1 = ((unsigned char *) data) + 4;
-      ptr_2 = ptr_1 + 1;
-      do
-      {
-        *ptr_1++ = *ptr_2 + 0x80;
-        ptr_2 += 2;
-      } while (--newlength);
-    }
-    else
-    {
-      data += 2;
-      length -= (11 * 4);
-    }
-    newlength = read_32 ((unsigned char *) data);
-    data++;
-    if (newlength < length)
-      length = newlength;
-  }
-
-  *start = (int)data;
-  //*end = (int)(((unsigned char *) data) + length);
-  return (length);
-}
-
-/* ------------------------------------------------------------ */
 //#define SAVE_SOUND_LUMP
 
 #ifdef SAVE_SOUND_LUMP
@@ -194,7 +136,6 @@ I_StartSound
   int           priority )
 {
   sfxinfo_t*	sfx;
-  unsigned int length;
   unsigned int channel;
   unsigned int cs_id;
   unsigned int qty;
@@ -251,18 +192,21 @@ I_StartSound
 
   current_play_id [channel] = id;
   ch_volume [channel] = vol;
-  length = W_LumpLength (sfx->lumpnum);
 
 #if 1
-  length = I_FindData ((unsigned int*) play_ptr [channel], sfx->data, length);
 
-  ch_length [channel] = length;
+  if ((sfx->adata == NULL)
+   && (S_FindSoundData (sfx) == 0))
+    return (channel);
+
+  play_ptr [channel]  = sfx->adata;
+  ch_length [channel] = sfx->length;
 #else
-  ch_length [channel] = length;
+  ch_length [channel] = W_LumpLength (sfx->lumpnum);
   play_ptr  [channel] = sfx->data;
 #endif
 
-  // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, length, vol, sep);
+  // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, ch_length[channel], vol, sep);
   I_SubmitSound();
   return (channel);
 }

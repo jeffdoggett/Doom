@@ -328,7 +328,6 @@ I_StartSound
   int	   priority )
 {
   sfxinfo_t*	sfx;
-  unsigned int length;
   unsigned int channel;
   unsigned int qty;
   unsigned int max_sfx_chan;
@@ -381,9 +380,8 @@ I_StartSound
   // printf ("Playing sound %s\n", sfx->name);
   // printf ("Using sound channel %d\n", channel);
 
-  length = S_FindSoundData (sfx);
-
-  if (length == 0)
+  if ((sfx->adata == NULL)
+   && (S_FindSoundData (sfx) == 0))
     return (channel);
 
   // R1 = Start of data
@@ -391,7 +389,7 @@ I_StartSound
 
   regs.r[0] = channel;
   regs.r[1] = (int) sfx->adata;
-  regs.r[2] = regs.r[1] + length;
+  regs.r[2] = regs.r[1] + sfx->length;
   _kernel_swi (DataVox_SetMemory, &regs, &regs);
 
 #if 0
@@ -433,7 +431,7 @@ I_StartSound
   regs.r[3] = 1;
   _kernel_swi (Sound_Control, &regs, &regs);	// Start sound playing
 
-  // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, length, vol, sep);
+  // fprintf(stderr, "%s %X %X %d %d\n", sfx->name, sfx->data, sfx->length, vol, sep);
   return (channel);
 }
 

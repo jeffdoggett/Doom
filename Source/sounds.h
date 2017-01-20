@@ -60,6 +60,7 @@ struct sfxinfo_struct
     // sound data
     void*	data;
     void*	adata;		// The actual address of the audio data
+    unsigned int length;
 };
 
 

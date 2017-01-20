@@ -423,15 +423,26 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
     lumpnum = S_GetSfxLumpNum (sfx);
     if (lumpnum < 0)
     {
-      switch (sfx_id)
+      if (sfx->link)
       {
-	case sfx_secret:		// If the wad does not have the DSSECRET lump
-	  lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);// then we use GETPOW instead.
-	  break;
+	lumpnum = S_GetSfxLumpNum (sfx->link);
+      }
+      else
+      {
+	switch (sfx_id)
+	{
+	  case sfx_secret:		// If the wad does not have the DSSECRET lump
+	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);// then we use GETPOW instead.
+	    break;
 
-	case sfx_pdiehi:		// Similarly for player die
-	  lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_pldeth]);
-	  break;
+	  case sfx_pdiehi:		// Similarly for player die
+	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_pldeth]);
+	    break;
+
+	  case sfx_radio:
+	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_tink]);
+	    break;
+	}
       }
       if (lumpnum < 0)
 	return;
@@ -441,16 +452,12 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
 #ifndef SNDSRV
   // cache data if necessary
-  if (!sfx->data)
+  if ((sfx->data == NULL)
+   || (sfx->data != lumpinfo[lumpnum].cache))
   {
-    // fprintf( stderr,  "S_StartSoundAtVolume: 16bit and not pre-cached - wtf?\n");
-
-    // DOS remains, 8bit handling
     sfx->data = (void *) W_CacheLumpNum (lumpnum, PU_SOUND);
-    // fprintf( stderr,
-    //	     "S_StartSoundAtVolume: loading %d (lump %d) : 0x%x\n",
-    //       sfx_id, lumpnum, (int)sfx->data );
-
+    sfx->adata = NULL;
+    sfx->length = 0;
   }
 #endif
 
@@ -1100,6 +1107,7 @@ int S_FindSoundData (sfxinfo_t * sfx)
   }
 
   sfx -> adata = data;
+  sfx -> length = length;
   return (length);
 }
 

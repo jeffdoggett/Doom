@@ -1004,10 +1004,7 @@ void HU_Ticker(void)
 			    message_nottobefuckedwith = true;
 			    message_on = true;
 			    message_counter = HU_MSGTIMEOUT;
-			    if ( gamemode == commercial )
-			      S_StartSound(0, sfx_radio);
-			    else
-			      S_StartSound(0, sfx_tink);
+			    S_StartSound(0, sfx_radio);
 			}
 			HUlib_resetIText(&w_inputbuffer[i]);
 		    }
