@@ -172,7 +172,7 @@ sfxinfo_t S_sfx[] =
   { "claw",   false,  70, NULL, -1, -1, -1 },
   { "skeswg", false,  70, NULL, -1, -1, -1 },
   { "pldeth", false,  32, NULL, -1, -1, -1 },
-  { "pdiehi", false,  32, NULL, -1, -1, -1 },
+  { "pdiehi", false,  32, &S_sfx[sfx_pldeth], -1, -1, -1 },
   { "podth1", false,  70, NULL, -1, -1, -1 },
   { "podth2", false,  70, NULL, -1, -1, -1 },
   { "podth3", false,  70, NULL, -1, -1, -1 },
@@ -202,7 +202,7 @@ sfxinfo_t S_sfx[] =
   { "metal",  false,  70, NULL, -1, -1, -1 },
   { "chgun",  false,  64, &S_sfx[sfx_pistol], 150, 0, -1 },
   { "tink",   false,  60, NULL, -1, -1, -1 },
-  { "bdopn",  false,  00, NULL, -1, -1, -1 },
+  { "bdopn",  false, 100, NULL, -1, -1, -1 },
   { "bdcls",  false, 100, NULL, -1, -1, -1 },
   { "itmbk",  false, 100, NULL, -1, -1, -1 },
   { "flame",  false,  32, NULL, -1, -1, -1 },
@@ -222,14 +222,14 @@ sfxinfo_t S_sfx[] =
   { "skeact", false,  70, NULL, -1, -1, -1 },
   { "skesit", false,  70, NULL, -1, -1, -1 },
   { "skeatk", false,  70, NULL, -1, -1, -1 },
-  { "radio",  false,  60, NULL, -1, -1, -1 },
+  { "radio",  false,  60, &S_sfx[sfx_tink], -1, -1, -1 },
   // killough 11/98: dog sounds
   { "dgsit",  false,  98, NULL, -1, -1, -1 },
   { "dgatk",  false,  70, NULL, -1, -1, -1 },
   { "dgact",  false, 120, NULL, -1, -1, -1 },
   { "dgdth",  false,  70, NULL, -1, -1, -1 },
   { "dgpain", false,  96, NULL, -1, -1, -1 },
-  { "secret", false,  60, NULL, -1, -1, -1 },
+  { "secret", false,  60, &S_sfx[sfx_getpow], -1, -1, -1 },
   { NULL,     false,   0, NULL, -1, -1, -1 }
 };
 

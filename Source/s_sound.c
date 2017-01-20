@@ -51,7 +51,6 @@ const char snd_prefixen[]
 #define NORM_VOLUME    		snd_MaxVolume
 
 #define NORM_PITCH     		128
-#define NORM_PRIORITY		64
 #define NORM_SEP		128
 
 #define S_PITCH_PERTURB		1
@@ -206,7 +205,7 @@ void S_Init
 static const unsigned int spmus[]=
 {
   // Song - Who? - Where?
-
+  mus_e3m5,	//		e4m0
   mus_e3m4,	// American	e4m1
   mus_e3m2,	// Romero	e4m2
   mus_e3m3,	// Shawn	e4m3
@@ -223,6 +222,7 @@ static const unsigned int spmus[]=
 static void S_StartLevelMusic (void)
 {
   int mnum;
+  unsigned int ge;
   unsigned int gm;
   char * music;
   map_dests_t * map_ptr;
@@ -246,11 +246,15 @@ static void S_StartLevelMusic (void)
   }
   else if (gameepisode < 4)
   {
-    mnum = mus_e1m1 + (gameepisode-1)*9 + gamemap-1;
+    ge = gameepisode;
+    if (ge) ge--;
+    gm = gamemap;
+    if (gm) gm--;
+    mnum = mus_e1m1 + (ge*9) + gm;
   }
   else
   {
-    gm = gamemap-1;
+    gm = gamemap;
     while (gm >= ARRAY_SIZE (spmus))
       gm -= ARRAY_SIZE (spmus);
     mnum = spmus[gm];
@@ -306,7 +310,6 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
   int		rc;
   int		sep;
   int		pitch;
-  int		priority;
   sfxinfo_t*	sfx;
   channel_t*	c;
   int		cnum;
@@ -316,9 +319,7 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
 
   // Debug.
-  /* fprintf( stderr,
-  	   "S_StartSoundAtVolume: playing sound %d (%s)\n",
-  	   sfx_id, S_sfx[sfx_id].name );*/
+  // fprintf (stderr,"S_StartSoundAtVolume: %d (%s)\n", sfx_id, S_sfx[sfx_id].name );
 
   if (nosfx)
     return;
@@ -332,11 +333,33 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
   sfx = &S_sfx[sfx_id];
 
+  // get lumpnum if necessary
+  if ((lumpnum = sfx->lumpnum) < 0)
+  {
+    lumpnum = S_GetSfxLumpNum (sfx);
+    if (lumpnum >= 0)
+    {
+      sfx->link = NULL;			// We have the actual lump, so destroy the link.
+    }
+    else if (sfx->link == NULL)		// Alternative available?
+    {
+      return;				// No.
+    }
+    else
+    {
+      lumpnum = S_GetSfxLumpNum (sfx->link);
+      if (lumpnum < 0)
+	return;
+      if (sfx->pitch == -1)		// Do we want the different settings?
+	sfx->link = NULL;		// No. Destroy the link now that it has been used.
+    }
+    sfx->lumpnum = lumpnum;
+  }
+
   // Initialize sound parameters
+
   if (sfx->link)
   {
-    pitch = sfx->pitch;
-    priority = sfx->priority;
     volume += sfx->volume;
 
     if (volume < 1)
@@ -344,13 +367,15 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
     if (volume > snd_SfxVolume)
       volume = snd_SfxVolume;
+
+    pitch = sfx->pitch;
+    if (pitch < 0)
+      pitch = NORM_PITCH;
   }
   else
   {
     pitch = NORM_PITCH;
-    priority = NORM_PRIORITY;
   }
-
 
   // Check to see if it is audible,
   //  and if not, modify the params
@@ -362,14 +387,14 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 			     &sep,
 			     &pitch);
 
+    if (!rc)
+      return;
+
     if ( origin->x == players[consoleplayer].mo->x
 	 && origin->y == players[consoleplayer].mo->y)
     {
       sep = NORM_SEP;
     }
-
-    if (!rc)
-      return;
   }
   else
   {
@@ -410,46 +435,6 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
   c->sfxinfo = sfx;
   c->origin = origin;
 
-
-  //
-  // This is supposed to handle the loading/caching.
-  // For some odd reason, the caching is done nearly
-  //  each time the sound is needed?
-  //
-
-  // get lumpnum if necessary
-  if ((lumpnum = sfx->lumpnum) < 0)
-  {
-    lumpnum = S_GetSfxLumpNum (sfx);
-    if (lumpnum < 0)
-    {
-      if (sfx->link)
-      {
-	lumpnum = S_GetSfxLumpNum (sfx->link);
-      }
-      else
-      {
-	switch (sfx_id)
-	{
-	  case sfx_secret:		// If the wad does not have the DSSECRET lump
-	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_getpow]);// then we use GETPOW instead.
-	    break;
-
-	  case sfx_pdiehi:		// Similarly for player die
-	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_pldeth]);
-	    break;
-
-	  case sfx_radio:
-	    lumpnum = S_GetSfxLumpNum (&S_sfx[sfx_tink]);
-	    break;
-	}
-      }
-      if (lumpnum < 0)
-	return;
-    }
-    sfx->lumpnum = lumpnum;
-  }
-
 #ifndef SNDSRV
   // cache data if necessary
   if ((sfx->data == NULL)
@@ -463,12 +448,8 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
   // Assigns the handle to one of the channels in the
   //  mix/output buffer.
-  c->handle = I_StartSound(sfx_id,
-				       /*sfx->data,*/
-				       volume,
-				       sep,
-				       pitch,
-				       priority);
+  // printf ("I_StartSound (%d, %d, %d, %d, %d\n", sfx_id, volume, sep, pitch);
+  c->handle = I_StartSound (sfx_id, volume, sep, pitch);
 }
 
 /* ------------------------------------------------------------ */
@@ -617,12 +598,10 @@ void S_UpdateSounds(void* listener_p)
 	    {
 		// initialize parameters
 		volume = snd_SfxVolume;
-		pitch = NORM_PITCH;
 		sep = NORM_SEP;
 
 		if (sfx->link)
 		{
-		    pitch = sfx->pitch;
 		    volume += sfx->volume;
 		    if (volume < 1)
 		    {
@@ -633,6 +612,15 @@ void S_UpdateSounds(void* listener_p)
 		    {
 			volume = snd_SfxVolume;
 		    }
+		    pitch = sfx->pitch;
+		    if (pitch < 0)
+		    {
+			pitch = NORM_PITCH;
+		    }
+		}
+		else
+		{
+		    pitch = NORM_PITCH;
 		}
 
 		// check non-local sounds for distance clipping
@@ -650,7 +638,9 @@ void S_UpdateSounds(void* listener_p)
 			S_StopChannel(cnum);
 		    }
 		    else
+		    {
 			I_UpdateSoundParams(c, volume, sep, pitch);
+		    }
 		}
 	    }
 	    else
@@ -743,7 +733,7 @@ void S_ChangeMusic (int musicnum, int looping)
     sprintf (namebuf, "d_%s", music->name);
   }
 
-//printf ("Starting music %s\n", namebuf);
+  // printf ("Starting music %s\n", namebuf);
 
   lumpnum = W_CheckNumForName (namebuf);
   if (lumpnum == -1)
@@ -753,7 +743,7 @@ void S_ChangeMusic (int musicnum, int looping)
     return;
   }
 
- //printf ("Music %d/%d %X %X %X\n", lumpnum, music->lumpnum,music->data,mus_playing, music);
+  // printf ("Music %d/%d %X %X %X\n", lumpnum, music->lumpnum,music->data,mus_playing, music);
 
   if ((lumpnum != music->lumpnum)	// May have changed when using mus_extra
    || (music->data == NULL))

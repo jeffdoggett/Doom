@@ -469,13 +469,8 @@ I_StartSound
 ( int		id,
   int		vol,
   int		sep,
-  int		pitch,
-  int		priority )
+  int		pitch)
 {
-
-  // UNUSED
-  priority = 0;
-
 #ifdef SNDSERV
     if (sndserver)
     {

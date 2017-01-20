@@ -132,8 +132,7 @@ I_StartSound
 ( int           id,
   int           vol,
   int           sep,
-  int           pitch,
-  int           priority )
+  int           pitch)
 {
   sfxinfo_t*	sfx;
   unsigned int channel;
