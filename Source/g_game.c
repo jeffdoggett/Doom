@@ -1328,6 +1328,28 @@ void G_PlayerFinishLevel (int player)
 
 
 /* -------------------------------------------------------------------------------------------- */
+/* Usually we start with the pistol, but if the
+   initial_bullets has been set to zero by a DeHack patch
+   and the weapon actually requires ammo, then switch to the fists.
+*/
+static void G_SetInitialWeapon (player_t* p)
+{
+  int i;
+
+  p->weaponowned[wp_fist] = true;
+  p->weaponowned[wp_pistol] = true;
+
+  if (((p->ammo[am_clip] = Initial_Bullets) == 0)
+   && (weaponinfo[wp_pistol].ammo != am_noammo))
+    p->readyweapon = p->pendingweapon = wp_fist;
+  else
+    p->readyweapon = p->pendingweapon = wp_pistol;
+
+  for (i=0 ; i<NUMAMMO ; i++)
+      p->maxammo[i] = maxammo[i];
+}
+
+/* -------------------------------------------------------------------------------------------- */
 //
 // G_PlayerReborn
 // Called after a player dies
@@ -1336,7 +1358,6 @@ void G_PlayerFinishLevel (int player)
 void G_PlayerReborn (int player)
 {
   player_t*	p;
-  int		i;
   int		frags[MAXPLAYERS];
   int		killcount;
   int		itemcount;
@@ -1358,13 +1379,7 @@ void G_PlayerReborn (int player)
   p->usedown = p->attackdown = true;	// don't do anything immediately
   p->playerstate = PST_LIVE;
   p->health = Initial_Health;
-  p->readyweapon = p->pendingweapon = wp_pistol;
-  p->weaponowned[wp_fist] = true;
-  p->weaponowned[wp_pistol] = true;
-  p->ammo[am_clip] = Initial_Bullets;
-
-  for (i=0 ; i<NUMAMMO ; i++)
-      p->maxammo[i] = maxammo[i];
+  G_SetInitialWeapon (p);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -1374,8 +1389,6 @@ void G_PlayerReborn (int player)
 //
 static void G_ResetPlayer (player_t* p, int flags)
 {
-  int		i;
-
   if (flags & 1)				// reset health?
   {
     p->health = Initial_Health;
@@ -1389,14 +1402,7 @@ static void G_ResetPlayer (player_t* p, int flags)
     p->backpack = false;
     p->armourpoints = 0;
     p->armourtype = NOARMOUR;
-
-    p->readyweapon = p->pendingweapon = wp_pistol;
-    p->weaponowned[wp_fist] = true;
-    p->weaponowned[wp_pistol] = true;
-    p->ammo[am_clip] = Initial_Bullets;
-
-    for (i=0 ; i<NUMAMMO ; i++)
-      p->maxammo[i] = maxammo[i];
+    G_SetInitialWeapon (p);
   }
 }
 
