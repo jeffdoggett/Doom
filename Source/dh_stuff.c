@@ -995,6 +995,32 @@ unsigned int dh_inchar (const char * text, char search_char)
 }
 
 /* ---------------------------------------------------------------------------- */
+
+unsigned int dh_rinchar (const char * text, char search_char)
+{
+  char cc;
+  unsigned int i;
+  unsigned int j;
+
+  j = 0;
+  cc = *text++;
+  if (cc)
+  {
+    i = 0;
+    search_char = toupper (search_char);
+    do
+    {
+      i++;
+      if (toupper (cc) == search_char)
+	j = i;
+      cc = *text++;
+    } while (cc);
+  }
+
+  return (j);
+}
+
+/* ---------------------------------------------------------------------------- */
 /* Return qty of matching characters. */
 
 static unsigned int qty_match (const char * s1, const char * s2)
@@ -5658,6 +5684,220 @@ void DH_parse_language_file_f (FILE * fin, size_t filesize)
       } while (ptr < top);
 
       free (mem);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static door_keys_t door_keys [] =
+{
+  P_PD_REDC,
+  P_PD_BLUEC,
+  P_PD_YELLOWC,
+  P_PD_REDS,
+  P_PD_BLUES,
+  P_PD_YELLOWS,
+};
+
+static door_keys_t object_keys [] =
+{
+  P_PD_REDCO,
+  P_PD_BLUECO,
+  P_PD_YELLOWCO,
+  P_PD_REDSO,
+  P_PD_BLUESO,
+  P_PD_YELLOWSO,
+};
+
+static void SetKeyText (char ** new_key_messages, char * ptr, door_keys_t km)
+{
+  unsigned int pos1;
+  unsigned int pos2;
+  char ** source;
+
+  pos1 = dh_inchar (ptr, '=');
+  pos2 = dh_inchar (ptr, '\"');
+
+  if ((pos1 == 0) && (pos2 == 0))
+    return;
+
+  if (pos2 > pos1)
+    pos1 = pos2;
+
+  ptr += pos1;
+  while (*ptr == ' ') ptr++;
+
+  pos2 = dh_rinchar (ptr, '\"');
+  if (pos2) ptr [pos2-1] = 0;
+
+  if (*ptr == '$')
+  {
+    source = DH_Find_language_text (ptr+1, false);
+    if (source == NULL)
+    {
+      if (M_CheckParm ("-showunknown"))
+	printf ("Unknown lock text '%s'\n", ptr);
+    }
+    else
+    {
+      new_key_messages [km] = *source;
+    }
+  }
+  else
+  {
+    replace_text_string (&new_key_messages [km], ptr);
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+/*
+   Lock numbers: 1:Red card
+		 2:Blue card
+		 3:Yellow card
+		 4:Red skull
+		 5:Blue skull
+		 6:Yellow skull
+*/
+
+static void Parse_Lockdefs (char * ptr, char * top)
+{
+  char cc;
+  unsigned int locknum;
+  unsigned int keynum;
+  unsigned int r;
+  unsigned int g;
+  unsigned int b;
+  char * msg;
+  char * rmsg;
+  char * new_key_messages [P_PD_QTY];
+
+  memcpy (new_key_messages, door_messages, sizeof (new_key_messages));
+
+  *top = 0;
+  top = dh_split_lines (ptr, top);
+  locknum = 0;
+  keynum = 0;
+  r = g = b = ~0;
+  msg = NULL;
+  rmsg = NULL;
+
+  do
+  {
+    while (((cc = *ptr) <= ' ') || (cc == '{')) ptr++;
+
+    // printf ("Parse_Lockinfo (%s), %u,%u\n", ptr);
+
+    if (strncasecmp (ptr, "Lock ", 5) == 0)
+    {
+      if (dh_instr (ptr, "doom"))
+	locknum = atoi (ptr + 5);
+    }
+    else if (strncasecmp (ptr, "RedCard", 7) == 0)
+    {
+      keynum = 1;
+    }
+    else if (strncasecmp (ptr, "BlueCard", 8) == 0)
+    {
+      keynum = 2;
+    }
+    else if (strncasecmp (ptr, "YellowCard", 10) == 0)
+    {
+      keynum = 3;
+    }
+    else if (strncasecmp (ptr, "RedSkull", 8) == 0)
+    {
+      keynum = 4;
+    }
+    else if (strncasecmp (ptr, "BlueSkull", 9) == 0)
+    {
+      keynum = 5;
+    }
+    else if (strncasecmp (ptr, "YellowSkull", 11) == 0)
+    {
+      keynum = 6;
+    }
+    else if (strncasecmp (ptr, "Message", 7) == 0)
+    {
+      msg = ptr;
+    }
+    else if (strncasecmp (ptr, "RemoteMessage", 13) == 0)
+    {
+      rmsg = ptr;
+    }
+    else if (strncasecmp (ptr, "Mapcolor ", 9) == 0)
+    {
+      ptr += 9;
+      r = atoi (ptr);
+      while (((cc = *ptr++) != ' ') && (cc != ','));
+      g = atoi (ptr);
+      while (((cc = *ptr++) != ' ') && (cc != ','));
+      b = atoi (ptr);
+    }
+    else if (*ptr == '}')
+    {
+      if ((locknum >= 1) && (locknum <= 6) && (keynum >= 1) && (keynum <= 6))
+      {
+	if (r < 256)
+	{
+	  // printf ("Setting lock %d key %d to %d,%d,%d\n", locknum, keynum, r, g, b);
+	  AM_SetKeyColour (locknum, keynum, r, g, b);
+	}
+
+	if (msg)
+	  SetKeyText (new_key_messages, msg, door_keys [locknum - 1]);
+
+	if (rmsg)
+	  SetKeyText (new_key_messages, rmsg, object_keys [locknum - 1]);
+      }
+
+      locknum = 0;
+      keynum = 0;
+      r = g = b = ~0;
+      msg = NULL;
+      rmsg = NULL;
+    }
+
+    ptr = dh_next_line (ptr,top);
+  } while (ptr < top);
+
+#if 1
+  memcpy (door_messages, new_key_messages, sizeof (new_key_messages));
+#else
+  {
+    int pos;
+    pos = 0;
+    do
+    {
+      if (new_key_messages [pos] != door_messages [pos])
+      {
+	printf ("Door message %u changed to '%s'\nfrom '%s\n", pos, new_key_messages [pos], door_messages [pos]);
+	door_messages [pos] = new_key_messages [pos];
+      }
+    } while (++pos < ARRAY_SIZE (new_key_messages));
+  }
+#endif
+}
+
+/* ---------------------------------------------------------------------------- */
+
+void Load_Lockdefs (void)
+{
+  int lump;
+  char * ptr;
+  char * top;
+
+  lump = W_CheckNumForName ("LOCKDEFS");
+  if (lump != -1)
+  {
+    ptr = malloc (W_LumpLength (lump) + 4);
+    if (ptr)
+    {
+      W_ReadLump (lump, ptr);
+      top = ptr + W_LumpLength (lump);
+      *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
+      Parse_Lockdefs (ptr, top);
+      free (ptr);
     }
   }
 }

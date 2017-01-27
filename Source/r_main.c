@@ -770,6 +770,9 @@ void R_Init (void)
     if (M_CheckParm ("-nomapinfo") == 0)
       Load_Mapinfo ();
 
+    if (M_CheckParm ("-nolockdefs") == 0)
+      Load_Lockdefs ();
+
     xtoviewangle = calloc (SCREENWIDTH+1, sizeof (*xtoviewangle));
 
     R_InitData ();

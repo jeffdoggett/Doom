@@ -214,7 +214,8 @@ typedef enum
   P_PD_ALL3O,
   P_PD_ALL6,
   P_PD_ALL6O,
-  P_PD_ALLKEYS
+  P_PD_ALLKEYS,
+  P_PD_QTY
 } door_keys_t;
 
 

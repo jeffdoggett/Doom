@@ -45,6 +45,7 @@ void AM_Stop (void);
 
 void AM_Start (unsigned int restart);
 void AM_LevelInit(void);
+void AM_SetKeyColour (int locknum, int keynum, int r, int g, int b);
 
 #endif
 //-----------------------------------------------------------------------------

@@ -69,12 +69,18 @@ typedef struct
   unsigned char fchg;
   unsigned char cchg;
   unsigned char clsd;
-  unsigned char rkey;
-  unsigned char bkey;
-  unsigned char ykey;
-  unsigned char rdor;
-  unsigned char bdor;
-  unsigned char ydor;
+  unsigned char rcard;
+  unsigned char bcard;
+  unsigned char ycard;
+  unsigned char rskull;
+  unsigned char bskull;
+  unsigned char yskull;
+  unsigned char rcarddoor;
+  unsigned char bcarddoor;
+  unsigned char ycarddoor;
+  unsigned char rskulldoor;
+  unsigned char bskulldoor;
+  unsigned char yskulldoor;
   unsigned char tele;
   unsigned char secr;
   unsigned char exit;
@@ -107,12 +113,18 @@ static mapcolour_t mapcolour =
   64,		// fchg		line at floor height change colour
   162,		// cchg		line at ceiling height change colour
   152,		// clsd		line at sector with floor=ceiling colour
-  175,		// rkey		red key colour
-  204,		// bkey		blue key colour
-  231,		// ykey		yellow key colour
-  175,		// rdor		red door colour  (diff from keys to allow option)
-  204,		// bdor		blue door colour (of enabling one but not other)
-  231,		// ydor		yellow door colour
+  175,		// rcard	red card colour
+  204,		// bcard	blue card colour
+  231,		// ycard	yellow card colour
+  175,		// rskull	red skull colour
+  204,		// bskull	blue skull colour
+  231,		// yskull	yellow skull colour
+  175,		// rkeydoor	red door colour  (diff from keys to allow option)
+  204,		// bkeydoor	blue door colour (of enabling one but not other)
+  231,		// ykeydoor	yellow door colour
+  175,		// rskulldoor	red door colour
+  204,		// bskulldoor	blue door colour
+  231,		// yskulldoor	yellow door colour
   119,		// tele		teleporter line colour
   252,		// secr		secret sector boundary colour
   112,		// exit		jff 4/23/98 add exit line colour
@@ -1425,16 +1437,22 @@ static int AM_DoorColour(int type)
       switch (type)
       {
 	case RCard:
+	  return (mapcolour.rcarddoor);
+
 	case RSkull:
-	  return (mapcolour.rdor);
+	  return (mapcolour.rskulldoor);
 
 	case BCard:
+	  return (mapcolour.bcarddoor);
+
 	case BSkull:
-	  return (mapcolour.bdor);
+	  return (mapcolour.bskulldoor);
 
 	case YCard:
+	  return (mapcolour.ycarddoor);
+
 	case YSkull:
-	  return (mapcolour.ydor);
+	  return (mapcolour.yskulldoor);
 
 	default:
 	  return (mapcolour.clsd);
@@ -1443,15 +1461,17 @@ static int AM_DoorColour(int type)
 
     switch (type)	// closed keyed door
     {
-      case 26: case 32: case 99: case 133:
-	//bluekey
-	return (mapcolour.bdor);
-      case 27: case 34: case 136: case 137:
-	//yellowkey
-	return (mapcolour.ydor);
-      case 28: case 33: case 134: case 135:
-	//redkey
-	return (mapcolour.rdor);
+      case 26: case 32:			// Blue card or skull
+      case 99: case 133:
+	return (mapcolour.bcarddoor);
+
+      case 27: case 34:			// Yellow card or skull
+      case 136: case 137:
+	return (mapcolour.ycarddoor);
+
+      case 28: case 33:			// Red card or skull
+      case 134: case 135:
+	return (mapcolour.rcarddoor);
     }
   }
 
@@ -1858,7 +1878,7 @@ AM_drawkeys (void)
 	  case SPR_BKEY:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.bkey;
+	      colour = mapcolour.bcard;
 	      shape = &key_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -1868,7 +1888,7 @@ AM_drawkeys (void)
 	  case SPR_YKEY:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.ykey;
+	      colour = mapcolour.ycard;
 	      shape = &key_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -1878,7 +1898,7 @@ AM_drawkeys (void)
 	  case SPR_RKEY:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.rkey;
+	      colour = mapcolour.rcard;
 	      shape = &key_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -1889,7 +1909,7 @@ AM_drawkeys (void)
 	  case SPR_BSKU:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.bkey;
+	      colour = mapcolour.bskull;
 	      shape = &skullkey_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -1899,7 +1919,7 @@ AM_drawkeys (void)
 	  case SPR_YSKU:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.ykey;
+	      colour = mapcolour.yskull;
 	      shape = &skullkey_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -1909,7 +1929,7 @@ AM_drawkeys (void)
 	  case SPR_RSKU:
 	    if (t->info->flags & MF_SPECIAL)
 	    {
-	      colour = mapcolour.rkey;
+	      colour = mapcolour.rskull;
 	      shape = &skullkey_shape;
 	      AM_drawLineCharacter (shape->shape, shape->numlines, 16<<FRACBITS,
 				angle, colour, t->x, t->y);
@@ -2025,7 +2045,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_BKEY:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.bkey;
+		colour = mapcolour.bcard;
 		shape = &key_shape;
 	      }
 	      break;
@@ -2033,7 +2053,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_YKEY:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.ykey;
+		colour = mapcolour.ycard;
 		shape = &key_shape;
 	      }
 	      break;
@@ -2041,7 +2061,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_RKEY:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.rkey;
+		colour = mapcolour.rcard;
 		shape = &key_shape;
 	      }
 	      break;
@@ -2050,7 +2070,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_BSKU:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.bkey;
+		colour = mapcolour.bskull;
 		shape = &skullkey_shape;
 	      }
 	      break;
@@ -2058,7 +2078,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_YSKU:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.ykey;
+		colour = mapcolour.yskull;
 		shape = &skullkey_shape;
 	      }
 	      break;
@@ -2066,7 +2086,7 @@ AM_drawThingsDifferently (void)
 	    case SPR_RSKU:
 	      if (t->info->flags & MF_SPECIAL)
 	      {
-		colour = mapcolour.rkey;
+		colour = mapcolour.rskull;
 		shape = &skullkey_shape;
 	      }
 	      break;
@@ -2238,6 +2258,79 @@ void AM_Drawer (void)
     AM_drawMarks();
 
     V_MarkRect(f_x, f_y, f_w, f_h);
+}
+
+/* ---------------------------------------------------------------------- */
+
+void AM_SetKeyColour (int locknum, int keynum, int r, int g, int b)
+{
+  unsigned char colour;
+  unsigned char * palette;
+
+  palette = W_CacheLumpName ("PLAYPAL", PU_STATIC);
+  colour = AM_load_colour (r, g, b, palette);
+
+  switch (locknum)
+  {
+    case 1:
+      mapcolour.rcarddoor = colour;
+      break;
+
+    case 2:
+      mapcolour.bcarddoor = colour;
+      break;
+
+    case 3:
+      mapcolour.ycarddoor = colour;
+      break;
+
+    case 4:
+      mapcolour.rskulldoor = colour;
+      break;
+
+    case 5:
+      mapcolour.bskulldoor = colour;
+      break;
+
+    case 6:
+      mapcolour.yskulldoor = colour;
+      break;
+
+    default:
+      if (M_CheckParm ("-showunknown"))
+	printf ("Unknown locknumber %u\n", locknum);
+  }
+
+  switch (keynum)
+  {
+    case 1:
+      mapcolour.rcard = colour;
+      break;
+
+    case 2:
+      mapcolour.bcard = colour;
+      break;
+
+    case 3:
+      mapcolour.ycard = colour;
+      break;
+
+    case 4:
+      mapcolour.rskull = colour;
+      break;
+
+    case 5:
+      mapcolour.bskull = colour;
+      break;
+
+    case 6:
+      mapcolour.yskull = colour;
+      break;
+
+    default:
+      if (M_CheckParm ("-showunknown"))
+	printf ("Unknown keynumber %u\n", keynum);
+  }
 }
 
 /* ---------------------------------------------------------------------- */
