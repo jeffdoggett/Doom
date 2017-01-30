@@ -688,7 +688,8 @@ ST_Responder (event_t* ev)
 	  plyr->armourtype = IDFA_Armour_Class;
 
 	for (i=0;i<NUMWEAPONS;i++)
-	  plyr->weaponowned[i] = true;
+	  if ((gamemode == commercial) || (i != wp_supershotgun))
+	    plyr->weaponowned[i] = true;
 
 	for (i=0;i<NUMAMMO;i++)
 	  plyr->ammo[i] = plyr->maxammo[i];
@@ -716,7 +717,8 @@ ST_Responder (event_t* ev)
 	  plyr->armourtype = IDKFA_Armour_Class;
 
 	for (i=0;i<NUMWEAPONS;i++)
-	  plyr->weaponowned[i] = true;
+	  if ((gamemode == commercial) || (i != wp_supershotgun))
+	    plyr->weaponowned[i] = true;
 
 	for (i=0;i<NUMAMMO;i++)
 	  plyr->ammo[i] = plyr->maxammo[i];

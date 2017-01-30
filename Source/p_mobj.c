@@ -905,34 +905,6 @@ void P_SpawnPlayer (mapthing_t* mthing)
 }
 
 /* -------------------------------------------------------------------------------------------- */
-
-static int P_ThingValid (mobjinfo_t * mo)
-{
-  int spawnstate;
-  state_t * state;
-  spritenum_t sprite;
-
-  if (mo->flags & MF_COUNTKILL)
-  {
-    spawnstate = mo->spawnstate;
-    if (spawnstate < NUMSTATES)
-    {
-      state = &states [spawnstate];
-      sprite = state->sprite;
-      if ((sprite < NUMSPRITES)
-       && (sprites[sprite].numframes == 0))
-      {
-	if (M_CheckParm ("-showunknown"))
-	  printf ("P_ThingValid (%s) %d\n", sprnames [sprite], sprites[sprite].numframes);
-	return (0);
-      }
-    }
-  }
-
-  return (1);
-}
-
-//-----------------------------------------------------------------------------
 //
 // P_SpawnMapThing
 // The fields of the mapthing should
@@ -1020,8 +992,8 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 
     ptr = &mobjinfo [i];
 
-    if ((P_ThingValid (ptr) == 0)			// Ensure that a sprite exists for this thing
-     || (deathmatch && (ptr -> flags & MF_NOTDMATCH)))	// Don't spawn keycards and players in deathmatch
+    // don't spawn keycards and players in deathmatch
+    if (deathmatch && (ptr -> flags & MF_NOTDMATCH))
 	return (0);
 
     // don't spawn any monsters if -nomonsters

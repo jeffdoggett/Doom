@@ -190,8 +190,9 @@ static boolean P_CheckAmmo (player_t* player)
 	{
 	    player->pendingweapon = wp_plasma;
 	}
-	else if ((player->weaponowned[wp_supershotgun])
-		 && (player->ammo[am_shell]>=2))
+	else if (player->weaponowned[wp_supershotgun]
+		 && player->ammo[am_shell]>=2
+		 && (gamemode == commercial) )
 	{
 	    player->pendingweapon = wp_supershotgun;
 	}
