@@ -1460,6 +1460,31 @@ static void P_CreateBlockMap (void)
 
 //-----------------------------------------------------------------------------
 
+static void P_RemoveBlockMapheader (void)
+{
+  uint32_t i;
+  uint32_t bme;
+  uint32_t firstlist;
+
+  firstlist = 4 + bmapwidth * bmapheight;
+
+  // read blockmap index array
+  for (i = 4; i < firstlist; i++)		// for all entries in wad offset index
+  {
+    bme = blockmaphead [i];
+    if (blockmaphead [bme])
+      return;
+  }
+
+  /* So all of the offsets start with a zero... */
+  for (i = 4; i < firstlist; i++)
+  {
+    blockmaphead [i]++;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 static void P_ClearMobjChains (void)
 {
   unsigned int count;
@@ -1839,6 +1864,7 @@ P_SetupLevel
     P_LoadLineDefs (lumpnum+ML_LINEDEFS);
     if (P_LoadBlockMap (lumpnum+ML_BLOCKMAP))
       P_CreateBlockMap ();
+    P_RemoveBlockMapheader ();
     P_ClearMobjChains ();
 
 
