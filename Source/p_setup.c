@@ -1062,6 +1062,57 @@ void P_LoadSideDefs (int lump)
 
 //-----------------------------------------------------------------------------
 //
+// P_VerifyBlockMap
+//
+// haleyjd 03/04/10: do verification on validity of blockmap.
+//
+static int P_VerifyBlockMap (unsigned int count)
+{
+  int      x, y;
+  uint32_t *maxoffs = blockmaphead + count;
+
+  for (y = 0; y < bmapheight; y++)
+  {
+    for (x = 0; x < bmapwidth; x++)
+    {
+      uint32_t offset;
+      uint32_t block;
+      uint32_t *list;
+      uint32_t *blockoffset;
+
+      offset = (y * bmapwidth) + x;
+      blockoffset = blockmaphead + offset + 4;
+
+      // check that block offset is in bounds
+      if (blockoffset >= maxoffs)
+	return (0);
+
+      offset = *blockoffset;
+      list = blockmaphead + offset;
+
+      // scan forward for a -1 terminator before maxoffs
+      do
+      {
+	// we have overflowed the lump?
+	if (list >= maxoffs)
+	  return (0);
+
+	if (((int32_t) (block = *list)) == -1) // found -1
+	  break;
+
+	if (block >= numlines)
+	  return (0);
+
+	list++;
+      } while (1);
+    }
+  }
+
+  return (1);
+}
+
+//-----------------------------------------------------------------------------
+//
 // P_LoadBlockMap
 //
 static int P_LoadBlockMap (int lump)
@@ -1072,8 +1123,6 @@ static int P_LoadBlockMap (int lump)
   uint16_t *wadblockmaplump;	// blockmap lump temp
   uint32_t firstlist, lastlist;	// blockmap block list bounds
   uint32_t overflow_corr;
-  uint32_t prev_bme;		// for detecting overflow wrap
-
 
   blockmapsize = W_LumpLength (lump);
 //printf ("blockmap size = %u (0x%X) %u/%u\n", blockmapsize, blockmapsize, lump, numlumps);
@@ -1088,8 +1137,6 @@ static int P_LoadBlockMap (int lump)
 
   count = blockmapsize / 2;
   wadblockmaplump = W_CacheLumpNum(lump, PU_LEVEL);
-  overflow_corr = 0;
-  prev_bme = 0;
 
   // [WDJ] Do endian as read from blockmap lump temp
   blockmaphead = Z_Malloc(sizeof(*blockmaphead) * count, PU_LEVEL, NULL);
@@ -1119,6 +1166,13 @@ static int P_LoadBlockMap (int lump)
   printf ("bmapheight = %u\n", bmapheight);
 #endif
 
+#ifdef NORMALUNIX
+  if ((lastlist - firstlist) > 0x10000)
+    printf ("Very large blockmap %X\n", lastlist - firstlist);
+  else if (lastlist >= 0x10000)
+    printf ("Large blockmap %X\n", lastlist);
+#endif
+
   if (firstlist >= lastlist || bmapwidth < 1 || bmapheight < 1)
   {
 //  I_Error("Blockmap corrupt, must run node builder on wad.\n");
@@ -1127,46 +1181,63 @@ static int P_LoadBlockMap (int lump)
     return (1);
   }
 
+  overflow_corr = 0;
+
   // read blockmap index array
   for (i = 4; i < firstlist; i++)		// for all entries in wad offset index
   {
     uint32_t bme = USHORT(wadblockmaplump[i]);	// offset
 
-						// upon overflow, the bme will wrap to low values
-    if (bme < firstlist				// too small to be valid
-     && bme < 0x1000 && prev_bme > 0xf000)	// wrapped
-    {
-      // first or repeated overflow
-      overflow_corr += 0x00010000;
-    }
-    prev_bme = bme; // uncorrected
+    bme += overflow_corr;
 
-    // correct for overflow, or else try without correction
-    if (overflow_corr)
+    if (bme > lastlist)
     {
-      uint32_t bmec = bme + overflow_corr;
-
-      // First entry of list is 0, but high odds of hitting one randomly.
-      // Check for valid blockmap offset, and offset overflow
-      if (bmec <= lastlist
-       && wadblockmaplump[bmec] == 0		// valid start list
-       && bmec - blockmaphead[i - 1] < 1000)	// reasonably close sequentially
+      if (overflow_corr)
       {
-	bme = bmec;
+	overflow_corr -= 0x10000;
+	bme -= 0x10000;
       }
+    }
+    else if (bme < firstlist)
+    {
+      overflow_corr += 0x10000;
+      bme += 0x10000;
+    }
+
+    if (((lastlist - firstlist) > 0x10000)
+     && (wadblockmaplump [bme] != 0))
+    {
+      uint32_t bmec = bme & 0xFFFF;
+      do
+      {
+	if (bmec >= firstlist)
+	{
+	  if (wadblockmaplump [bmec] == 0)
+	  {
+	    bme = bmec;
+	    overflow_corr = bme & ~0xFFFF;
+	    break;
+	  }
+	}
+	bmec += 0x10000;
+      } while (bmec <= lastlist);
     }
 
     if ((bme > lastlist)
-     || (bme < firstlist)
-     || (wadblockmaplump[bme] != 0))		// not start list
+     || (bme < firstlist))
     {
 #ifdef NORMALUNIX
-      printf ("Invalid Blockmap offset[%u]= %u (%u-%u)\n", i, bme, firstlist, lastlist);
+      printf ("Invalid Blockmap offset[%u]= %u,%u (%u-%u)\n", i, bme, overflow_corr, firstlist, lastlist);
 #endif
       Z_Free (blockmaphead);
       Z_Free (wadblockmaplump);
       return (1);
     }
+
+#if 0
+    if (wadblockmaplump [bme])
+      printf ("Blockmap[0x%X] starts with 0x%X\n", bme, USHORT(wadblockmaplump [bme]));
+#endif
 
     blockmaphead[i] = bme;
   }
@@ -1182,6 +1253,16 @@ static int P_LoadBlockMap (int lump)
   }
 
   Z_Free (wadblockmaplump);
+
+  if (!P_VerifyBlockMap (count))
+  {
+#ifdef NORMALUNIX
+    printf ("Invalid Blockmap\n");
+#endif
+    Z_Free (blockmaphead);
+    return (1);
+  }
+
   return (0);			// All ok!
 }
 
@@ -1208,6 +1289,10 @@ static void P_CreateBlockMap (void)
   fixed_t	maxy = MININT;
   vertex_t*	vertex;
   fixed_t	j;
+
+#ifdef NORMALUNIX
+  printf ("Creating new blockmap\n");
+#endif
 
   // First find limits of map
   vertex = vertexes;
