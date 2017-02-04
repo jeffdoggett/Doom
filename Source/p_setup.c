@@ -1190,6 +1190,9 @@ static int P_LoadBlockMap (int lump)
 
     bme += overflow_corr;
 
+    // If the blockmap size (i.e. (lastlist - firstlist)) is <= 64k
+    // then although the offsets may wrap, they will still be unique.
+
     if (bme > lastlist)
     {
       if (overflow_corr)
@@ -1204,15 +1207,24 @@ static int P_LoadBlockMap (int lump)
       bme += 0x10000;
     }
 
+    // If the blockmap is > 64k then the offsets will wrap.
+    // A highly compressed map (e.g. Mek-valapax) has no sense
+    // of gradually increasing offsets - they are all over the place.
+    // So we look for 0xFFFF at the end of the preceeding map at
+    // pos[0], pos[64k], pos[128k] etc...
+    // (We would've used the 0 header word, but ZokumBSP ended all that)
+
     if (((lastlist - firstlist) > 0x10000)
-     && (wadblockmaplump [bme] != 0))
+     && (bme != firstlist)
+     && (wadblockmaplump [bme-1] != 0xFFFF))
     {
       uint32_t bmec = bme & 0xFFFF;
       do
       {
 	if (bmec >= firstlist)
 	{
-	  if (wadblockmaplump [bmec] == 0)
+	  if ((bmec == firstlist)
+	   || (wadblockmaplump [bmec-1] == 0xFFFF))
 	  {
 	    bme = bmec;
 	    overflow_corr = bme & ~0xFFFF;
@@ -1261,6 +1273,21 @@ static int P_LoadBlockMap (int lump)
 #endif
     Z_Free (blockmaphead);
     return (1);
+  }
+
+  // Remove the 0 header words.
+
+  for (i = 4; i < firstlist; i++)
+  {
+    uint32_t bme = blockmaphead [i];
+    if (blockmaphead [bme])
+      return (0);
+  }
+
+  /* So all of the offsets start with a zero... */
+  for (i = 4; i < firstlist; i++)
+  {
+    blockmaphead [i]++;
   }
 
   return (0);			// All ok!
@@ -1337,6 +1364,7 @@ static void P_CreateBlockMap (void)
       int n, nalloc, *list;
     } bmap_t;
 
+    unsigned int    count;
     unsigned int    tot = bmapwidth * bmapheight;	// size of blockmap
     bmap_t	    *bmap = calloc(sizeof(*bmap), tot);	// array of blocklists
 
@@ -1410,17 +1438,14 @@ static void P_CreateBlockMap (void)
 
     // Compute the total size of the blockmap.
     //
-    // Compression of empty blocks is performed by reserving two offset words
-    // at tot and tot+1.
-    //
     // 4 words, unused if this routine is called, are reserved at the start.
     {
-      int count = tot + 6;  // we need at least 1 word per block, plus reserved's
+      count = tot + 4;  // we need at least 1 word per block, plus reserved's
 
       for (i = 0; (unsigned int)i < tot; i++)
       {
 	if (bmap[i].n)
-	  count += bmap[i].n + 2;     // 1 header word + 1 trailer word + blocklist
+	  count += bmap[i].n + 1;     // 1 trailer word + blocklist
       }
 
       // Allocate blockmap lump with computed count
@@ -1432,14 +1457,11 @@ static void P_CreateBlockMap (void)
       int	ndx = tot += 4; // Advance index to start of linedef lists
       bmap_t	*bp = bmap;     // Start of uncompressed blockmap
 
-      blockmaphead[ndx++] = 0;    // Store an empty blockmap list at start
-      blockmaphead[ndx++] = -1;   // (Used for compression)
-
       for (i = 4; (unsigned int)i < tot; i++, bp++)
       {
 	if (bp->n)					// Non-empty blocklist
 	{
-	  blockmaphead[blockmaphead[i] = ndx++] = 0;	// Store index & header
+	  blockmaphead[i] = ndx;			// Store index
 	  do
 	    blockmaphead[ndx++] = bp->list[--bp->n];	// Copy linedef list
 	  while (bp->n);
@@ -1448,38 +1470,22 @@ static void P_CreateBlockMap (void)
 	}
 	else
 	{
-	  // Empty blocklist: point to reserved empty blocklist
-	  blockmaphead[i] = tot;
+	  // Empty blocklist: point to terminator of the final block
+	  blockmaphead[i] = count - 1;
 	}
       }
 
+#if 0
+      // Debug
+      if (ndx != count)					// If we've done it right
+        I_Error ("Blockmap build failed\n");		// these should match.
+
+      if (!P_VerifyBlockMap (count))
+        I_Error ("Blockmap build invalid\n");
+#endif
+
       free (bmap);					// Free uncompressed blockmap
     }
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-static void P_RemoveBlockMapheader (void)
-{
-  uint32_t i;
-  uint32_t bme;
-  uint32_t firstlist;
-
-  firstlist = 4 + bmapwidth * bmapheight;
-
-  // read blockmap index array
-  for (i = 4; i < firstlist; i++)		// for all entries in wad offset index
-  {
-    bme = blockmaphead [i];
-    if (blockmaphead [bme])
-      return;
-  }
-
-  /* So all of the offsets start with a zero... */
-  for (i = 4; i < firstlist; i++)
-  {
-    blockmaphead [i]++;
   }
 }
 
@@ -1491,8 +1497,7 @@ static void P_ClearMobjChains (void)
 
   // clear out mobj chains
   count = sizeof(*blocklinks) * bmapwidth * bmapheight;
-  blocklinks = Z_Malloc (count, PU_LEVEL, NULL);
-  memset (blocklinks, 0, count);
+  blocklinks = Z_Calloc (count, PU_LEVEL, NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -1862,9 +1867,9 @@ P_SetupLevel
     P_LoadSectors (lumpnum+ML_SECTORS);
     P_LoadSideDefs (lumpnum+ML_SIDEDEFS);
     P_LoadLineDefs (lumpnum+ML_LINEDEFS);
-    if (P_LoadBlockMap (lumpnum+ML_BLOCKMAP))
+    if ((M_CheckParm ("-rebuildblockmaps"))
+     || (P_LoadBlockMap (lumpnum+ML_BLOCKMAP)))
       P_CreateBlockMap ();
-    P_RemoveBlockMapheader ();
     P_ClearMobjChains ();
 
 
