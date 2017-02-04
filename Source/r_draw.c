@@ -69,6 +69,8 @@ int		translucency;
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
 
+extern flatinfo_t * flatinfo;
+
 #define USE_TINT_TABLES
 /* ------------------------------------------------------------------------------------------------ */
 #ifdef USE_TINT_TABLES
@@ -1162,6 +1164,7 @@ void R_FillBackScreen (void)
     byte*	dest;
     int		x;
     int		y;
+    int		lump;
     int		sbarheight;
     patch_t*	patch;
     const char*	name;
@@ -1179,17 +1182,18 @@ void R_FillBackScreen (void)
 
     map_info_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
     name = map_info_ptr -> bordertexture;
-    src = W_CacheLumpName0 (name, PU_CACHE);
-
-    if (src == NULL)				// Just in case!!
+    lump = R_CheckFlatNumForName (name);
+    if (lump == -1)
     {
       if (gamemode == commercial)
 	name = borderpatch_1;
       else
 	name = borderpatch_2;
 
-      src = W_CacheLumpName (name, PU_CACHE);
+      lump = R_FlatNumForName (name);
     }
+
+    src = W_CacheLumpNum (flatinfo[lump].lump, PU_CACHE);
 
     dest = screens[1];
 
