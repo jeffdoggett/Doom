@@ -678,9 +678,7 @@ static void R_DrawMaskedSpriteColumn(column_t *column)
 //
 static void
 R_DrawVisSprite
-( vissprite_t*		vis,
-  int			x1,
-  int			x2 )
+( vissprite_t*		vis)
 {
     column_t*		column;
     int 		texturecolumn;
@@ -754,6 +752,7 @@ static void R_ProjectSprite (mobj_t* thing)
   int x2;
   int lump;
   int index;
+  int heightsec;
   fixed_t tx;
   fixed_t tz;
   angle_t ang;
@@ -767,6 +766,7 @@ static void R_ProjectSprite (mobj_t* thing)
   fixed_t spritescale;
   boolean flip;
   unsigned int rot;
+  sector_t *sector;
   vissprite_t* vis;
   spritedef_t* sprdef;
   spriteframe_t* sprframe;
@@ -850,10 +850,42 @@ static void R_ProjectSprite (mobj_t* thing)
   if ((x2 < 0) || (x2 < x1))
     return;
 
+
+  // killough 3/27/98: exclude things totally separated
+  // from the viewer, by either water or fake ceilings
+  // killough 4/11/98: improve sprite clipping for underwater/fake ceilings
+  sector = thing->subsector->sector;
+  heightsec = sector->heightsec;
+
+  if (heightsec != -1)		// only clip things which are in special sectors
+  {
+    fixed_t fz;
+    fixed_t gzt;
+    int phs;
+
+    fz = thing->z;
+    gzt = fz + spritetopoffset[index];
+    phs = viewplayer->mo->subsector->sector->heightsec;
+
+    if (phs != -1 && (viewz < sectors[phs].floorheight ?
+     fz >= sectors[heightsec].floorheight :
+     gzt < sectors[heightsec].floorheight))
+	return;
+    if (phs != -1 && (viewz > sectors[phs].ceilingheight ?
+     gzt < sectors[heightsec].ceilingheight &&
+     viewz >= sectors[heightsec].ceilingheight :
+     fz >= sectors[heightsec].ceilingheight))
+	return;
+  }
+
+
   // store information in a vissprite
   vis = R_NewVisSprite (distance << detailshift);
   if (vis == NULL)
     return;
+
+  // killough 3/27/98: save sector for special clipping later
+  vis->heightsec = heightsec;
 
   xscale = FixedMul (distance, spritescale);
 
@@ -1072,7 +1104,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 	vis->colormap = spritelights[MAXLIGHTSCALE-1];
     }
 
-    R_DrawVisSprite (vis, vis->x1, vis->x2);
+    R_DrawVisSprite (vis);
 }
 
 
@@ -1130,7 +1162,10 @@ static void R_DrawSprite (vissprite_t* spr)
       return;
 
     for (x = spr->x1 ; x<=spr->x2 ; x++)
-	clipbot[x] = cliptop[x] = -2;
+    {
+	cliptop[x] = 0;
+	clipbot[x] = viewheight;
+    }
 
     // Scan drawsegs from end to start for obscuring segs.
     // The first drawseg that has a greater scale
@@ -1178,33 +1213,66 @@ static void R_DrawSprite (vissprite_t* spr)
 	// clip this piece of the sprite
 	// killough 3/27/98: optimized and made much shorter
 
-	if (ds->silhouette&SIL_BOTTOM && spr->gz < ds->bsilheight) //bottom sil
+	if (ds->silhouette & SIL_BOTTOM)
 	    for (x = r1; x <= r2; x++)
-		if (clipbot[x] == -2)
+		if (clipbot[x] > ds->sprbottomclip[x])
 		    clipbot[x] = ds->sprbottomclip[x];
 
-	if (ds->silhouette&SIL_TOP && spr->gzt > ds->tsilheight)   // top sil
+	if (ds->silhouette & SIL_TOP)
 	    for (x = r1; x <= r2; x++)
-		if (cliptop[x] == -2)
+		if (cliptop[x] < ds->sprtopclip[x])
 		    cliptop[x] = ds->sprtopclip[x];
+    }
 
+    // killough 3/27/98:
+    // Clip the sprite against deep water and/or fake ceilings.
+    // killough 4/9/98: optimize by adding mh
+    // killough 4/11/98: improve sprite clipping for underwater/fake ceilings
+    // killough 11/98: fix disappearing sprites
+    if (spr->heightsec != -1)  // only things in specially marked sectors
+    {
+	fixed_t	h, mh;
+	int	phs = viewplayer->mo->subsector->sector->heightsec;
+
+	if ((mh = sectors[spr->heightsec].floorheight) > spr->gz
+	    && (h = centeryfrac - FixedMul(mh -= viewz, spr->scale)) >= 0
+	    && (h >>= FRACBITS) < viewheight)
+	{
+	    if (mh <= 0 || (phs != -1 && viewz > sectors[phs].floorheight))
+	    {								// clip bottom
+		for (x = spr->x1; x <= spr->x2; x++)
+		    if (h < clipbot[x])
+			clipbot[x] = h;
+	    }
+	    else							// clip top
+		if (phs != -1 && viewz <= sectors[phs].floorheight)	// killough 11/98
+		    for (x = spr->x1; x <= spr->x2; x++)
+			if (h > cliptop[x])
+			    cliptop[x] = h;
+	}
+
+	if ((mh = sectors[spr->heightsec].ceilingheight) < spr->gzt
+	    && (h = centeryfrac - FixedMul(mh - viewz, spr->scale)) >= 0
+	    && (h >>= FRACBITS) < viewheight)
+	{
+	    if (phs != -1 && viewz >= sectors[phs].ceilingheight)
+	    {								// clip bottom
+		for (x = spr->x1; x <= spr->x2; x++)
+		    if (h < clipbot[x])
+			clipbot[x] = h;
+	    }
+	    else							// clip top
+		for (x = spr->x1; x <= spr->x2; x++)
+		    if (h > cliptop[x])
+			cliptop[x] = h;
+	}
     }
 
     // all clipping has been performed, so draw the sprite
 
-    // check for unclipped columns
-    for (x = spr->x1 ; x<=spr->x2 ; x++)
-    {
-	if (clipbot[x] == -2 || clipbot[x] > viewheight)
-	    clipbot[x] = viewheight;
-
-	if (cliptop[x] < 0)
-	    cliptop[x] = -1;
-    }
-
     mfloorclip = clipbot;
     mceilingclip = cliptop;
-    R_DrawVisSprite (spr, spr->x1, spr->x2);
+    R_DrawVisSprite (spr);
 }
 
 

@@ -739,8 +739,6 @@ void R_StoreWallRange(int start, int stop)
 	ds_p->silhouette = SIL_BOTH;
 	ds_p->sprtopclip = screenheightarray;
 	ds_p->sprbottomclip = negonearray;
-	ds_p->bsilheight = MAXINT;
-	ds_p->tsilheight = MININT;
     }
     else
     {
@@ -748,27 +746,13 @@ void R_StoreWallRange(int start, int stop)
 	ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
 	ds_p->silhouette = 0;
 
-	if (frontsector->floorheight > backsector->floorheight)
-	{
+	if ((frontsector->floorheight > backsector->floorheight)
+	 || (backsector->floorheight > viewz))
 	    ds_p->silhouette = SIL_BOTTOM;
-	    ds_p->bsilheight = frontsector->floorheight;
-	}
-	else if (backsector->floorheight > viewz)
-	{
-	    ds_p->silhouette = SIL_BOTTOM;
-	    ds_p->bsilheight = MAXINT;
-	}
 
-	if (frontsector->ceilingheight < backsector->ceilingheight)
-	{
+	if ((frontsector->ceilingheight < backsector->ceilingheight)
+	 || (backsector->ceilingheight < viewz))
 	    ds_p->silhouette |= SIL_TOP;
-	    ds_p->tsilheight = frontsector->ceilingheight;
-	}
-	else if (backsector->ceilingheight < viewz)
-	{
-	    ds_p->silhouette |= SIL_TOP;
-	    ds_p->tsilheight = MININT;
-	}
 
 	// killough 1/17/98: this test is required if the fix
 	// for the automap bug (r_bsp.c) is used, or else some
@@ -783,14 +767,12 @@ void R_StoreWallRange(int start, int stop)
 	    if (doorclosed || backsector->ceilingheight <= frontsector->floorheight)
 	    {
 		ds_p->sprbottomclip = negonearray;
-		ds_p->bsilheight = MAXINT;
 		ds_p->silhouette |= SIL_BOTTOM;
 	    }
 
 	    if (doorclosed || backsector->floorheight >= frontsector->ceilingheight)
 	    {
 		ds_p->sprtopclip = screenheightarray;
-		ds_p->tsilheight = MININT;
 		ds_p->silhouette |= SIL_TOP;
 	    }
 	}
@@ -1000,30 +982,25 @@ void R_StoreWallRange(int start, int stop)
 
     R_RenderSegLoop();
 
+    if (maskedtexture)
+    {
+	ds_p->silhouette |= SIL_BOTH;
+    }
+
     // save sprite clipping info
-    if (((ds_p->silhouette & SIL_TOP) || maskedtexture) && !ds_p->sprtopclip)
+    if ((ds_p->silhouette & SIL_TOP) && !ds_p->sprtopclip)
     {
 	memcpy(lastopening, ceilingclip + start, sizeof(*lastopening) * (rw_stopx - start));
 	ds_p->sprtopclip = lastopening - start;
 	lastopening += rw_stopx - start;
     }
 
-    if (((ds_p->silhouette & SIL_BOTTOM) || maskedtexture) && !ds_p->sprbottomclip)
+    if ((ds_p->silhouette & SIL_BOTTOM) && !ds_p->sprbottomclip)
     {
 	memcpy(lastopening, floorclip + start, sizeof(*lastopening) * (rw_stopx - start));
 	ds_p->sprbottomclip = lastopening - start;
 	lastopening += rw_stopx - start;
     }
 
-    if (maskedtexture && !(ds_p->silhouette & SIL_TOP))
-    {
-	ds_p->silhouette |= SIL_TOP;
-	ds_p->tsilheight = MININT;
-    }
-    if (maskedtexture && !(ds_p->silhouette & SIL_BOTTOM))
-    {
-	ds_p->silhouette |= SIL_BOTTOM;
-	ds_p->bsilheight = MAXINT;
-    }
     ++ds_p;
 }
