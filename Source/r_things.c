@@ -712,7 +712,7 @@ R_DrawVisSprite
     dc_iscale = abs(vis->xiscale)>>detailshift;
     dc_texturemid = vis->texturemid1;
     frac = vis->startfrac;
-    spryscale = vis->scale;
+    spryscale = vis->xscale;
     //sprydistance = vis->distance;
     //sprtopscreen = centeryfrac - FixedMul(dc_texturemid,sprydistance);
     sprtopscreen = centeryfrac - FixedMul(vis->texturemid2,vis->distance);
@@ -891,7 +891,7 @@ static void R_ProjectSprite (mobj_t* thing)
 
   vis->mobjflags = thing->flags;
   vis->distance = distance<<detailshift;
-  vis->scale = xscale<<detailshift;
+  vis->xscale = xscale<<detailshift;
   vis->gx = thing->x;
   vis->gy = thing->y;
   vis->gz = thing->z;
@@ -1063,7 +1063,7 @@ static void R_DrawPSprite (pspdef_t* psp)
     vis->texturemid2 = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy-spritetopoffset[index]);
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;
-    vis->scale =
+    vis->xscale =
     vis->distance = pspritescale<<detailshift;
 
     if (flip)
@@ -1235,7 +1235,7 @@ static void R_DrawSprite (vissprite_t* spr)
 	int	phs = viewplayer->mo->subsector->sector->heightsec;
 
 	if ((mh = sectors[spr->heightsec].floorheight) > spr->gz
-	    && (h = centeryfrac - FixedMul(mh -= viewz, spr->scale)) >= 0
+	    && (h = centeryfrac - FixedMul(mh -= viewz, spr->distance)) >= 0
 	    && (h >>= FRACBITS) < viewheight)
 	{
 	    if (mh <= 0 || (phs != -1 && viewz > sectors[phs].floorheight))
@@ -1252,7 +1252,7 @@ static void R_DrawSprite (vissprite_t* spr)
 	}
 
 	if ((mh = sectors[spr->heightsec].ceilingheight) < spr->gzt
-	    && (h = centeryfrac - FixedMul(mh - viewz, spr->scale)) >= 0
+	    && (h = centeryfrac - FixedMul(mh - viewz, spr->distance)) >= 0
 	    && (h >>= FRACBITS) < viewheight)
 	{
 	    if (phs != -1 && viewz >= sectors[phs].ceilingheight)

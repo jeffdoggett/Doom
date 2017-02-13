@@ -455,7 +455,8 @@ typedef struct
     // how far away the sprite is from the viewer
     fixed_t		distance;
 
-    fixed_t		scale;
+    // whether the sprite is scaled up/down (DeHackEd only e.g. Harmony.wad)
+    fixed_t		xscale;
 
     // negative if flipped
     fixed_t		xiscale;
