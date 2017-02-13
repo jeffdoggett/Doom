@@ -53,7 +53,7 @@
 #define SIL_TOP			2
 #define SIL_BOTH		3
 
-#define MAXDRAWSEGS		2048
+extern unsigned int MAXDRAWSEGS;
 
 
 

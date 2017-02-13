@@ -36,12 +36,26 @@ line_t*		linedef;
 sector_t*	frontsector;
 sector_t*	backsector;
 
-drawseg_t	drawsegs[MAXDRAWSEGS];
+drawseg_t*	drawsegs;
 drawseg_t*	ds_p;
 int		drawsegstarttime;
 
 /* killough 4/7/98: indicates doors closed wrt automap bugfix: */
-int      doorclosed;
+int      	doorclosed;
+
+unsigned int	MAXDRAWSEGS;
+
+/* ---------------------------------------------------------------------------- */
+
+void R_InitDrawSegs (void)
+{
+  MAXDRAWSEGS = 128;
+  drawsegs = malloc (sizeof (*drawsegs) * MAXDRAWSEGS);
+  if (drawsegs == NULL)
+    I_Error ("Failed to allocate memory for drawsegs\n");
+
+  ds_p = drawsegs;
+}
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -49,6 +63,18 @@ int      doorclosed;
 //
 void R_ClearDrawSegs (void)
 {
+  drawseg_t* newdrawsegs;
+
+  if ((ds_p - drawsegs) >= MAXDRAWSEGS)
+  {
+    newdrawsegs = realloc (drawsegs, sizeof (*drawsegs) * (MAXDRAWSEGS + 128));
+    if (newdrawsegs)
+    {
+      drawsegs = newdrawsegs;
+      MAXDRAWSEGS += 128;
+    }
+  }
+
   ds_p = drawsegs;
   drawsegstarttime = I_GetTime ();
 }
@@ -243,7 +269,7 @@ void R_ClearClipSegs (void)
 /* It assumes that Doom has already ruled out a door being closed because */
 /* of front-back closure (e.g. front floor is taller than back ceiling). */
 
-int R_DoorClosed(void)
+static int R_DoorClosed (void)
 {
     return
 
@@ -258,8 +284,8 @@ int R_DoorClosed(void)
      curline->sidedef->bottomtexture)
 
     /* properly render skies (consider door "open" if both ceilings are sky): */
-    && (backsector->ceilingpic !=skyflatnum ||
-       frontsector->ceilingpic!=skyflatnum);
+    && (backsector->ceilingpic != skyflatnum ||
+       frontsector->ceilingpic != skyflatnum);
 }
 
 /* ---------------------------------------------------------------------------- */

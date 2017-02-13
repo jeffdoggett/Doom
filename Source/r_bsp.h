@@ -42,7 +42,7 @@ extern boolean		markceiling;
 
 extern boolean		skymap;
 
-extern drawseg_t	drawsegs[MAXDRAWSEGS];
+extern drawseg_t*	drawsegs;
 extern drawseg_t*	ds_p;
 extern int		drawsegstarttime;
 
@@ -55,6 +55,7 @@ typedef void (*drawfunc_t) (int start, int stop);
 
 
 // BSP?
+void R_InitDrawSegs (void);
 void R_ClearClipSegs (void);
 void R_ClearDrawSegs (void);
 
