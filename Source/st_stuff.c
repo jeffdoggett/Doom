@@ -151,12 +151,12 @@ static const unsigned char * keypatches [] =
 #define ST_NUMSPECIALFACES	3
 
 #define ST_FACESTRIDE \
-          (ST_NUMSTRAIGHTFACES+ST_NUMTURNFACES+ST_NUMSPECIALFACES)
+	  (ST_NUMSTRAIGHTFACES+ST_NUMTURNFACES+ST_NUMSPECIALFACES)
 
 #define ST_NUMEXTRAFACES	2
 
 #define ST_NUMFACES \
-          (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
+	  (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
 
 #define ST_TURNOFFSET		(ST_NUMSTRAIGHTFACES)
 #define ST_OUCHOFFSET		(ST_TURNOFFSET + ST_NUMTURNFACES)
@@ -660,7 +660,7 @@ ST_Responder (event_t* ev)
 	  if ((plyr->mo)
 	   && (plyr->mo->health < God_Mode_Health))
 	      plyr->mo->health = God_Mode_Health;
-          if (plyr->health < God_Mode_Health)
+	  if (plyr->health < God_Mode_Health)
 	    plyr->health = God_Mode_Health;
 	  plyr->message = stat_bar_messages [ST_STSTR_DQDON];
 	}
@@ -670,7 +670,7 @@ ST_Responder (event_t* ev)
       // 'fa' cheat for killer fucking arsenal
       else if (cht_CheckCheat(&cheat_ammonokey, ev->data1))
       {
-        if ((!netgame)
+	if ((!netgame)
 	 && (M_CheckParm ("-idfabackpack")))
 	{
 	  if (!plyr->backpack)
@@ -681,7 +681,7 @@ ST_Responder (event_t* ev)
 	  }
 	}
 
-        if (plyr->armourpoints < IDFA_Armour)
+	if (plyr->armourpoints < IDFA_Armour)
 	  plyr->armourpoints = IDFA_Armour;
 
 	if (plyr->armourtype < IDFA_Armour_Class)
@@ -699,7 +699,7 @@ ST_Responder (event_t* ev)
       // 'kfa' cheat for key full ammo
       else if (cht_CheckCheat(&cheat_ammo, ev->data1))
       {
-        if ((!netgame)
+	if ((!netgame)
 	 && (M_CheckParm ("-idkfabackpack")))
 	{
 	  if (!plyr->backpack)
@@ -710,7 +710,7 @@ ST_Responder (event_t* ev)
 	  }
 	}
 
-        if (plyr->armourpoints < IDKFA_Armour)
+	if (plyr->armourpoints < IDKFA_Armour)
 	  plyr->armourpoints = IDKFA_Armour;
 
 	if (plyr->armourtype < IDKFA_Armour_Class)
@@ -737,7 +737,7 @@ ST_Responder (event_t* ev)
 	if (keynum >= '1')
 	{
 	  keynum -= '1';
-          if (keynum < 6)
+	  if (keynum < 6)
 	  {
 	    char * msg;
 	    msg = P_GiveCard (plyr, (card_t) keynum);
@@ -861,10 +861,10 @@ ST_Responder (event_t* ev)
 
       switch (buf[0])
       {
-        case 'e':
-          switch (buf[1])
-          {
-            case 'e':
+	case 'e':
+	  switch (buf[1])
+	  {
+	    case 'e':
 	      G_ExitLevel ();
 	      break;
 
@@ -872,22 +872,22 @@ ST_Responder (event_t* ev)
 	      G_SecretExitLevel ();
 	      break;
 	  }
-          return (false);
+	  return (false);
 
-        case 'n':
-          switch (buf[1])
-          {
-            case 's':
+	case 'n':
+	  switch (buf[1])
+	  {
+	    case 's':
 	      map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
 	      epsd = map_info_p -> normal_exit_to_episode;
 	      map  = map_info_p -> normal_exit_to_map;
-              break;
+	      break;
 
-            default:
-              epsd = gameepisode;
-              map = gamemap;
-              do
-              {
+	    default:
+	      epsd = gameepisode;
+	      map = gamemap;
+	      do
+	      {
 		if (gamemode == commercial)
 		{
 		  map++;
@@ -905,9 +905,9 @@ ST_Responder (event_t* ev)
 		      break;
 		  }
 		}
-              } while (G_MapLump (epsd,map) == -1);
+	      } while (G_MapLump (epsd,map) == -1);
 	  }
-          break;
+	  break;
 
 	case 's':
 	  map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
@@ -987,19 +987,25 @@ int ST_calcPainOffset(void)
 static void ST_updateFaceWidget(void)
 {
     int		i;
+    int		painoffset;
     angle_t	badguyangle;
     angle_t	diffang;
     static int	lastattackdown = -1;
     static int	priority = 0;
+    static int  faceindex = 0;
     boolean	doevilgrin;
 
+    // [crispy] fix status bar face hysteresis
+    painoffset = ST_calcPainOffset();
+    
     if (priority < 10)
     {
 	// dead
 	if (!plyr->health)
 	{
 	    priority = 9;
-	    st_faceindex = ST_DEADFACE;
+	    painoffset = 0;
+	    faceindex = ST_DEADFACE;
 	    st_facecount = 1;
 	}
     }
@@ -1011,9 +1017,12 @@ static void ST_updateFaceWidget(void)
 	    // picking up bonus
 	    doevilgrin = false;
 
-	    for (i=0;i<NUMWEAPONS;i++)
+	    for (i = 0; i < NUMWEAPONS; i++)
 	    {
-		if (oldweaponsowned[i] != plyr->weaponowned[i])
+		if (oldweaponsowned[i] != plyr->weaponowned[i]
+		    // [BH] no evil grin when invulnerable
+		    && !(plyr->cheats & CF_GODMODE)
+		    && !plyr->powers[pw_invulnerability])
 		{
 		    doevilgrin = true;
 		    oldweaponsowned[i] = plyr->weaponowned[i];
@@ -1024,10 +1033,9 @@ static void ST_updateFaceWidget(void)
 		// evil grin if just picked up weapon
 		priority = 8;
 		st_facecount = ST_EVILGRINCOUNT;
-		st_faceindex = ST_calcPainOffset() + ST_EVILGRINOFFSET;
+		faceindex = ST_EVILGRINOFFSET;
 	    }
 	}
-
     }
 
     if (priority < 8)
@@ -1043,7 +1051,8 @@ static void ST_updateFaceWidget(void)
 	    if (st_oldhealth - plyr->health > ST_MUCHPAIN)
 	    {
 		st_facecount = ST_TURNCOUNT;
-		st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+		faceindex = ST_OUCHOFFSET;
+		priority = 8;   // [BH] keep ouch-face visible
 	    }
 	    else
 	    {
@@ -1056,15 +1065,14 @@ static void ST_updateFaceWidget(void)
 		{
 		    // whether right or left
 		    diffang = badguyangle - plyr->mo->angle;
-		    i = diffang > ANG180;
+		    i = (diffang > ANG180);
 		}
 		else
 		{
 		    // whether left or right
 		    diffang = plyr->mo->angle - badguyangle;
-		    i = diffang <= ANG180;
-		} // confusing, aint it?
-
+		    i = (diffang <= ANG180);
+		} // confusing, ain't it?
 
 		st_facecount = ST_TURNCOUNT;
 		st_faceindex = ST_calcPainOffset();
@@ -1072,17 +1080,17 @@ static void ST_updateFaceWidget(void)
 		if (diffang < ANG45)
 		{
 		    // head-on
-		    st_faceindex += ST_RAMPAGEOFFSET;
+		    faceindex = ST_RAMPAGEOFFSET;
 		}
 		else if (i)
 		{
 		    // turn face right
-		    st_faceindex += ST_TURNOFFSET;
+		    faceindex = ST_TURNOFFSET;
 		}
 		else
 		{
 		    // turn face left
-		    st_faceindex += ST_TURNOFFSET+1;
+		    faceindex = ST_TURNOFFSET + 1;
 		}
 	    }
 	}
@@ -1093,69 +1101,66 @@ static void ST_updateFaceWidget(void)
 	// getting hurt because of your own damn stupidity
 	if (plyr->damagecount)
 	{
-	    // if (plyr->health - st_oldhealth > ST_MUCHPAIN) /* Correct the "Ouch face" bug.
+	    // [BH] fix ouch-face when damage > 20
 	    if (st_oldhealth - plyr->health > ST_MUCHPAIN)
 	    {
 		priority = 7;
 		st_facecount = ST_TURNCOUNT;
-		st_faceindex = ST_calcPainOffset() + ST_OUCHOFFSET;
+		faceindex = ST_OUCHOFFSET;
 	    }
 	    else
 	    {
 		priority = 6;
 		st_facecount = ST_TURNCOUNT;
-		st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+		faceindex = ST_RAMPAGEOFFSET;
 	    }
-
 	}
-
     }
 
     if (priority < 6)
     {
-	// rapid firing
-	if (plyr->attackdown)
+	if (plyr->attackdown
+	    // [BH] no rampage face when invulnerable
+	    && !(plyr->cheats & CF_GODMODE) && !plyr->powers[pw_invulnerability])
 	{
-	    if (lastattackdown==-1)
+	    if (lastattackdown == -1)
 		lastattackdown = ST_RAMPAGEDELAY;
 	    else if (!--lastattackdown)
 	    {
 		priority = 5;
-		st_faceindex = ST_calcPainOffset() + ST_RAMPAGEOFFSET;
+		faceindex = ST_RAMPAGEOFFSET;
 		st_facecount = 1;
 		lastattackdown = 1;
 	    }
 	}
 	else
 	    lastattackdown = -1;
-
     }
 
     if (priority < 5)
     {
 	// invulnerability
-	if ((plyr->cheats & CF_GODMODE)
-	    || plyr->powers[pw_invulnerability])
+	if ((plyr->cheats & CF_GODMODE) || plyr->powers[pw_invulnerability])
 	{
 	    priority = 4;
-
-	    st_faceindex = ST_GODFACE;
+	    painoffset = 0;
+	    faceindex = ST_GODFACE;
 	    st_facecount = 1;
-
 	}
-
     }
 
     // look left or look right if the facecount has timed out
     if (!st_facecount)
     {
-	st_faceindex = ST_calcPainOffset() + (st_randomnumber % 3);
+	faceindex = st_randomnumber % 3;
 	st_facecount = ST_STRAIGHTFACECOUNT;
 	priority = 0;
     }
 
     st_facecount--;
 
+    // [crispy] fix status bar face hysteresis
+    st_faceindex = painoffset + faceindex;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1806,7 +1811,7 @@ static void ST_ConvPatchColours (patch_t * patch, byte * palette)
 	  q = &PLAYPAL [*source * 3];
 	  *source++ = AM_load_colour (q[0], q[1], q[2], palette);
 	  length--;
-        }
+	}
       }
     } while (++x < SHORT(patch->width));
   }
