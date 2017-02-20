@@ -1244,7 +1244,7 @@ static void F_CastDrawer (void)
 
   rot = 0;
   if (sprframe->rotate)
-    rot = castrot & 7;
+    rot = (castrot & 7) << 1;
 
   lump = sprframe->lump[rot];
   patch = W_CacheLumpNum (lump, PU_CACHE);
@@ -1385,7 +1385,7 @@ F_DrawPatchCol
 	  dest += SCREENWIDTH;
 	  row += yiscale;
 	} while ((row >> FRACBITS) < lastlength);
-      }      
+      }
       column = (column_t *)(  (byte *)column + lastlength + 4 );
     }
     desttop++;

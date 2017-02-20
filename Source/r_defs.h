@@ -498,13 +498,13 @@ typedef struct
 
     // The sprite number - same as lump_number-firstspritenum except when
     // using partial PWADs.
-    dshort_t	index[8];
+    dshort_t	index[16];
 
     // Lump to use for view angles 0-7.
-    dshort_t	lump[8];
+    dshort_t	lump[16];
 
     // Flip bit (1 = flip) to use for view angles 0-7.
-    byte	flip[8];
+    byte	flip[16];
 
 } spriteframe_t;
 
