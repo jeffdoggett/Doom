@@ -261,6 +261,11 @@ static void R_MergeTextures (void)
     if ((lumpinfo[lump].handle != handle)
      || (lump == 0))
     {
+      if (maptex_lump_1 == -1)			// Some PWADS only have a TEXTURES2 and no TEXTURES1
+      {
+	maptex_lump_1 = maptex_lump_2;
+	maptex_lump_2 = -1;
+      }
       if (maptex_lump_1 != -1)
       {
 	if (names_lump == -1)
