@@ -997,7 +997,7 @@ static void ST_updateFaceWidget(void)
 
     // [crispy] fix status bar face hysteresis
     painoffset = ST_calcPainOffset();
-    
+
     if (priority < 10)
     {
 	// dead
@@ -1101,7 +1101,7 @@ static void ST_updateFaceWidget(void)
 	// getting hurt because of your own damn stupidity
 	if (plyr->damagecount)
 	{
-	    // [BH] fix ouch-face when damage > 20
+	    // if (plyr->health - st_oldhealth > ST_MUCHPAIN) /* Correct the "Ouch face" bug.
 	    if (st_oldhealth - plyr->health > ST_MUCHPAIN)
 	    {
 		priority = 7;
