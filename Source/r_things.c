@@ -837,9 +837,15 @@ static void R_ProjectSprite (mobj_t* thing)
   {
     // choose a different rotation based on player view
     ang = R_PointToAngle (thing->x, thing->y);
-    rot = ((ang-thing->angle+(unsigned)(ANG45/2)*9)-(1<<27))>>28;
+
+    if (sprframe->lump[0] != sprframe->lump[1])		// Sprite with 16 rotations?
+      rot = ((ang-thing->angle+(unsigned)(ANG45/2)*9)-(1<<27))>>28;
+    else
+      rot = (ang-thing->angle+(unsigned)(ANG45/2)*9)>>28;
+
     if (rot >= ARRAY_SIZE(sprframe->index))
       rot = 0;
+
     index = sprframe->index[rot];
     lump = sprframe->lump[rot];
     flip = (boolean)sprframe->flip[rot];
