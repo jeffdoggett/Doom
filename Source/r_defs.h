@@ -491,11 +491,6 @@ typedef struct
 //
 typedef struct
 {
-    // If false use 0 for any position.
-    // Note: as eight entries are available,
-    //  we might as well insert the same name eight times.
-    boolean	rotate;
-
     // The sprite number - same as lump_number-firstspritenum except when
     // using partial PWADs.
     dshort_t	index[16];

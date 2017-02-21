@@ -1242,10 +1242,7 @@ static void F_CastDrawer (void)
   sprdef = &sprites[caststate->sprite];
   sprframe = &sprdef->spriteframes[ caststate->frame & FF_FRAMEMASK];
 
-  rot = 0;
-  if (sprframe->rotate)
-    rot = (castrot & 7) << 1;
-
+  rot = (castrot & 7) << 1;
   lump = sprframe->lump[rot];
   patch = W_CacheLumpNum (lump, PU_CACHE);
 

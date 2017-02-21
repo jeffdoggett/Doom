@@ -111,17 +111,7 @@ R_InstallSpriteLump
 
     if (rotation == 0)
     {
-	// the lump should be used for all rotations
-	if (sprtemp[frame].rotate == false)
-	    I_Error ("R_InitSprites: Sprite %s frame %c has "
-		     "multip rot=0 lump", spritename, 'A'+frame);
-
-	if (sprtemp[frame].rotate == true)
-	    I_Error ("R_InitSprites: Sprite %s frame %c has rotations "
-		     "and a rot=0 lump", spritename, 'A'+frame);
-
-	sprtemp[frame].rotate = false;
-	for (r=0 ; r<8 ; r++)
+	for (r=0 ; r<(ARRAY_SIZE(sprtemp[frame].lump)) ; r++)
 	{
 	    sprtemp[frame].index[r] = index;
 	    sprtemp[frame].lump[r] = lump;
@@ -129,13 +119,6 @@ R_InstallSpriteLump
 	}
 	return;
     }
-
-    // the lump is only used for one rotation
-    if (sprtemp[frame].rotate == false)
-	I_Error ("R_InitSprites: Sprite %s frame %c has rotations "
-		 "and a rot=0 lump", spritename, 'A'+frame);
-
-    sprtemp[frame].rotate = true;
 
     // make 0 based
     rotation--;
@@ -183,7 +166,6 @@ static void R_InitSpriteDefs (void)
     int 	rotation;
     int 	rot;
     int 	lump;
-    int 	done;
     int		maxframe;
 
     sprites = Z_Calloc (NUMSPRITES * sizeof(*sprites), PU_STATIC, NULL);
@@ -207,46 +189,43 @@ static void R_InitSpriteDefs (void)
 	  lump--;
 	  if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
 	  {
-	    done = 0;
 	    do
 	    {
 	      lump--;
 	      if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
 	       || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
 	      {
-		done = 1;
+		break;
 	      }
-	      else
+
+	      if (lumpinfo[lump].name[0])
+		index--;
+	      if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
 	      {
-		if (lumpinfo[lump].name[0])
-		  index--;
-		if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
+		frame = lumpinfo[lump].name[4] - 'A';
+		rotation = lumpinfo[lump].name[5] - '0';
+		if (rotation > 9)			// Sort out A - G
+		  rotation -= 7;
+
+		if (frame >= 0)
 		{
-		  frame = lumpinfo[lump].name[4] - 'A';
-		  rotation = lumpinfo[lump].name[5] - '0';
+		  if (frame > maxframe)
+		    maxframe = frame;
+		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
+		}
+
+		if (lumpinfo[lump].name[6])
+		{
+		  frame = lumpinfo[lump].name[6] - 'A';
+		  rotation = lumpinfo[lump].name[7] - '0';
 		  if (rotation > 9)			// Sort out A - G
 		    rotation -= 7;
-
-		  if (frame >= 0)
-		  {
-		    if (frame > maxframe)
-		      maxframe = frame;
-		    R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
-		  }
-
-		  if (lumpinfo[lump].name[6])
-		  {
-		    frame = lumpinfo[lump].name[6] - 'A';
-		    rotation = lumpinfo[lump].name[7] - '0';
-		    if (rotation > 9)			// Sort out A - G
-		      rotation -= 7;
-		    if (frame > maxframe)
-		      maxframe = frame;
-		    R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
-		  }
+		  if (frame > maxframe)
+		    maxframe = frame;
+		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
 		}
 	      }
-	    } while (done == 0);
+	    } while (1);
 	  }
 	} while (lump);
 
@@ -265,28 +244,102 @@ static void R_InitSpriteDefs (void)
 	    spriteframe_t * sprptr;
 
 	    sprptr = &sprtemp[frame];
-	    switch ((int)sprptr->rotate)
+
+	    // must have all 16 frames
+	    for (rotation=0 ; rotation<ARRAY_SIZE(sprptr->lump) ; rotation++)
 	    {
-	      case -1:
-		if (M_CheckParm ("-showunknown"))
+	      if (sprptr->lump[rotation] == -1)
+	      {
+		if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
 		{
-		  // no rotations were found for that frame at all
-		  printf ("R_InitSprites: No patches found for %s frame %c\n",
-				sprnames[i], frame+'A');
+		  sprptr->lump[rotation] = sprptr->lump[rotation-1];
+		  sprptr->flip[rotation] = sprptr->flip[rotation-1];
+		  sprptr->index[rotation] = sprptr->index[rotation-1];
 		}
-		break;
-
-	      case 0:
-		// only the first rotation is needed
-		break;
-
-	      case 1:
-		// must have all 8 frames
-		for (rotation=0 ; rotation<ARRAY_SIZE(sprptr->lump) ; rotation++)
+		else
 		{
+		  if (M_CheckParm ("-showunknown"))
+		    printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
+			    sprnames[i], frame+'A', rotation);
+
+		  switch (rotation)
+		  {
+		    case 0*2:
+		      if (sprptr->lump[4*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[4*2];
+			sprptr->flip[rotation] = !sprptr->flip[4*2];
+			sprptr->index[rotation] = sprptr->index[4*2];
+		      }
+		      break;
+
+		    case 4*2:
+		      if (sprptr->lump[0*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[0*2];
+			sprptr->flip[rotation] = !sprptr->flip[0*2];
+			sprptr->index[rotation] = sprptr->index[0*2];
+		      }
+		      break;
+
+		    case 2*2:
+		      if (sprptr->lump[6*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[6*2];
+			sprptr->flip[rotation] = !sprptr->flip[6*2];
+			sprptr->index[rotation] = sprptr->index[6*2];
+		      }
+		      break;
+
+		    case 6*2:
+		      if (sprptr->lump[2*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[2*2];
+			sprptr->flip[rotation] = !sprptr->flip[2*2];
+			sprptr->index[rotation] = sprptr->index[2*2];
+		      }
+		      break;
+
+		    case 3*2:
+		      if (sprptr->lump[5*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[5*2];
+			sprptr->flip[rotation] = !sprptr->flip[5*2];
+			sprptr->index[rotation] = sprptr->index[5*2];
+		      }
+		      break;
+
+		    case 5*2:
+		      if (sprptr->lump[3*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[3*2];
+			sprptr->flip[rotation] = !sprptr->flip[3*2];
+			sprptr->index[rotation] = sprptr->index[3*2];
+		      }
+		      break;
+
+		    case 1*2:
+		      if (sprptr->lump[7*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[7*2];
+			sprptr->flip[rotation] = !sprptr->flip[7*2];
+			sprptr->index[rotation] = sprptr->index[7*2];
+		      }
+		      break;
+
+		    case 7*2:
+		      if (sprptr->lump[1*2] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[1*2];
+			sprptr->flip[rotation] = !sprptr->flip[1*2];
+			sprptr->index[rotation] = sprptr->index[1*2];
+		      }
+		      break;
+		  }
+
 		  if (sprptr->lump[rotation] == -1)
 		  {
-		    if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
+		    if (rotation)
 		    {
 		      sprptr->lump[rotation] = sprptr->lump[rotation-1];
 		      sprptr->flip[rotation] = sprptr->flip[rotation-1];
@@ -294,117 +347,20 @@ static void R_InitSpriteDefs (void)
 		    }
 		    else
 		    {
-		      if (M_CheckParm ("-showunknown"))
-			printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
-				sprnames[i], frame+'A', rotation);
-
-		      switch (rotation)
+		      for (rot=rotation ; rot<ARRAY_SIZE(sprptr->lump) ; rot++)
 		      {
-			case 0*2:
-			  if (sprptr->lump[4*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[4*2];
-			    sprptr->flip[rotation] = !sprptr->flip[4*2];
-			    sprptr->index[rotation] = sprptr->index[4*2];
-			  }
-			  break;
-
-			case 4*2:
-			  if (sprptr->lump[0*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[0*2];
-			    sprptr->flip[rotation] = !sprptr->flip[0*2];
-			    sprptr->index[rotation] = sprptr->index[0*2];
-			  }
-			  break;
-
-			case 2*2:
-			  if (sprptr->lump[6*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[6*2];
-			    sprptr->flip[rotation] = !sprptr->flip[6*2];
-			    sprptr->index[rotation] = sprptr->index[6*2];
-			  }
-			  break;
-
-			case 6*2:
-			  if (sprptr->lump[2*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[2*2];
-			    sprptr->flip[rotation] = !sprptr->flip[2*2];
-			    sprptr->index[rotation] = sprptr->index[2*2];
-			  }
-			  break;
-
-			case 3*2:
-			  if (sprptr->lump[5*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[5*2];
-			    sprptr->flip[rotation] = !sprptr->flip[5*2];
-			    sprptr->index[rotation] = sprptr->index[5*2];
-			  }
-			  break;
-
-			case 5*2:
-			  if (sprptr->lump[3*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[3*2];
-			    sprptr->flip[rotation] = !sprptr->flip[3*2];
-			    sprptr->index[rotation] = sprptr->index[3*2];
-			  }
-			  break;
-
-			case 1*2:
-			  if (sprptr->lump[7*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[7*2];
-			    sprptr->flip[rotation] = !sprptr->flip[7*2];
-			    sprptr->index[rotation] = sprptr->index[7*2];
-			  }
-			  break;
-
-			case 7*2:
-			  if (sprptr->lump[1*2] != -1)
-			  {
-			    sprptr->lump[rotation] = sprptr->lump[1*2];
-			    sprptr->flip[rotation] = !sprptr->flip[1*2];
-			    sprptr->index[rotation] = sprptr->index[1*2];
-			  }
-			  break;
-		      }
-
-		      if (sprptr->lump[rotation] == -1)
-		      {
-			if (rotation)
+			if (sprptr->lump[rot] != -1)
 			{
-			  sprptr->lump[rotation] = sprptr->lump[rotation-1];
-			  sprptr->flip[rotation] = sprptr->flip[rotation-1];
-			  sprptr->index[rotation] = sprptr->index[rotation-1];
-			}
-			else
-			{
-			  done = 0;
-			  for (rot=rotation ; rot<ARRAY_SIZE(sprptr->lump) ; rot++)
-			  {
-			    if (sprptr->lump[rot] != -1)
-			    {
-			      sprptr->lump[rotation] = sprptr->lump[rot];
-			      sprptr->flip[rotation] = sprptr->flip[rot];
-			      sprptr->index[rotation] = sprptr->index[rot];
-			      done = 1;
-			      break;
-			    }
-			  }
-			  if (done == 0)
-			  {
-			    sprptr->rotate = false;
-			  }
+			  sprptr->lump[rotation] = sprptr->lump[rot];
+			  sprptr->flip[rotation] = sprptr->flip[rot];
+			  sprptr->index[rotation] = sprptr->index[rot];
+			  break;
 			}
 		      }
 		    }
 		  }
 		}
-		break;
+	      }
 	    }
 	}
 
@@ -833,30 +789,20 @@ static void R_ProjectSprite (mobj_t* thing)
 #endif
   sprframe = &sprdef->spriteframes[ thing->frame & FF_FRAMEMASK];
 
-  if (sprframe->rotate)
-  {
-    // choose a different rotation based on player view
-    ang = R_PointToAngle (thing->x, thing->y);
+  // choose a different rotation based on player view
+  ang = R_PointToAngle (thing->x, thing->y);
 
-    if (sprframe->lump[0] != sprframe->lump[1])		// Sprite with 16 rotations?
-      rot = ((ang-thing->angle+(unsigned)(ANG45/2)*9)-(1<<27))>>28;
-    else
-      rot = (ang-thing->angle+(unsigned)(ANG45/2)*9)>>28;
-
-    if (rot >= ARRAY_SIZE(sprframe->index))
-      rot = 0;
-
-    index = sprframe->index[rot];
-    lump = sprframe->lump[rot];
-    flip = (boolean)sprframe->flip[rot];
-  }
+  if (sprframe->lump[0] != sprframe->lump[1])		// Sprite with 16 rotations?
+    rot = ((ang-thing->angle+(unsigned)(ANG45/2)*9)-(1<<27))>>28;
   else
-  {
-    // use single rotation for all views
-    index = sprframe->index[0];
-    lump = sprframe->lump[0];
-    flip = (boolean)sprframe->flip[0];
-  }
+    rot = (ang-thing->angle+(unsigned)(ANG45/2)*9)>>28;
+
+  if (rot >= ARRAY_SIZE(sprframe->index))
+    rot = 0;
+
+  index = sprframe->index[rot];
+  lump = sprframe->lump[rot];
+  flip = (boolean)sprframe->flip[rot];
 
   spritescale = thing -> info -> scale;
 
