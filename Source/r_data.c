@@ -23,8 +23,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
-
 #if 0
 static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #endif
@@ -490,6 +488,38 @@ static boolean R_SpriteValid (lumpinfo_t* lump_ptr)
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+/*
+   See if there is another lump by this name in a higher slot.
+*/
+
+static boolean R_DuplicateName (lumpinfo_t* lump_ptr, const char * start, const char * end)
+{
+  boolean checking;
+  lumpinfo_t* lump_ptr2;
+
+  checking = true;
+  lump_ptr2 = lump_ptr;
+  do
+  {
+    lump_ptr2++;
+    if (checking)
+    {
+      if (strncasecmp (lump_ptr->name, lump_ptr2->name, 8) == 0)
+        return (true);
+      if ((strncasecmp (lump_ptr2->name, end, 8) == 0)
+       || (lump_ptr2->handle != (lump_ptr2-1)->handle))
+        checking = false;
+    }
+    else if (strncasecmp (lump_ptr2->name, start, 8) == 0)
+    {
+      checking = true;
+    }
+  } while (lump_ptr2 < &lumpinfo[numlumps]);
+
+  return (false);
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 /* Count the number of unique lumps between start and end
 ** We have to discard duplicates. In the case of sprites this
 ** is really tricky because of flipped ones.
@@ -501,7 +531,7 @@ static boolean R_SpriteValid (lumpinfo_t* lump_ptr)
 ** SARG A1xx, SARG xxB2 and SARG B2xx.
 */
 
-static int R_CountEntities (char * start, char * end, int doing_sprites)
+static int R_CountEntities (const char * start, const char * end, int doing_sprites)
 {
   int lump;
   int total;
@@ -537,7 +567,7 @@ static int R_CountEntities (char * start, char * end, int doing_sprites)
 #ifdef MIN_SIZE_LUMP
        || (lump_ptr->size < MIN_SIZE_LUMP)
 #endif
-       || (W_CheckNumForNameLinear (lump_ptr->name) != lump)) /* If there's another one at a higher pos */
+       || (R_DuplicateName (lump_ptr, start, end))) /* If there's another one at a higher pos */
       {
 	valid = false;
       }
