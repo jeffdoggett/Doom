@@ -514,7 +514,7 @@ static boolean R_DuplicateName (lumpinfo_t* lump_ptr, const char * start, const 
     {
       checking = true;
     }
-  } while (lump_ptr2 < &lumpinfo[numlumps]);
+  } while (lump_ptr2 < &lumpinfo[numlumps-1]);
 
   return (false);
 }
