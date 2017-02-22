@@ -495,11 +495,11 @@ typedef struct
     // using partial PWADs.
     dshort_t	index[16];
 
-    // Lump to use for view angles 0-7.
+    // Lump to use for view angles 0-15.
     dshort_t	lump[16];
 
-    // Flip bit (1 = flip) to use for view angles 0-7.
-    byte	flip[16];
+    // Flip bit (1 = flip) to use for view angles 0-15.
+    dshort_t	flip;
 
 } spriteframe_t;
 

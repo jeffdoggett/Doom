@@ -97,37 +97,39 @@ R_InstallSpriteLump
   unsigned	rotation,
   boolean	flipped )
 {
-    int 	r;
+  if (rotation > 9)			// Sort out A - G
+    rotation -= 7;
 
 #if 0
-    printf ("Adding sprite %d %d %d %d %d %s %s\n",
+  printf ("Adding sprite %d %d %d %d %d %s %s\n",
 	index, lump, frame, rotation, flipped, spritename,
-		    lumpinfo[lump].name);
+	lumpinfo[lump].name);
 #endif
 
-    if (frame >= 29 || rotation > ARRAY_SIZE(sprtemp[frame].lump))
-	I_Error("R_InstallSpriteLump: "
-		"Bad frame characters in lump %i frame %i (%i/%i)", lump, frame, rotation, ARRAY_SIZE(sprtemp[frame].lump));
+  if (frame >= ARRAY_SIZE(sprtemp) || rotation > ARRAY_SIZE(sprtemp[frame].lump))
+      I_Error("R_InstallSpriteLump: "
+	      "Bad frame characters in lump %i frame %i (%i/%i)", lump, frame, rotation, ARRAY_SIZE(sprtemp[frame].lump));
 
-    if (rotation == 0)
+  if (rotation == 0)
+  {
+    do
     {
-	for (r=0 ; r<(ARRAY_SIZE(sprtemp[frame].lump)) ; r++)
-	{
-	    sprtemp[frame].index[r] = index;
-	    sprtemp[frame].lump[r] = lump;
-	    sprtemp[frame].flip[r] = (byte)flipped;
-	}
-	return;
-    }
-
+      sprtemp[frame].index[rotation] = index;
+      sprtemp[frame].lump[rotation] = lump;
+      if (flipped)
+	sprtemp[frame].flip |= (1<<rotation);
+      else
+	sprtemp[frame].flip &= ~(1<<rotation);	// Just in case.
+    } while (++rotation < ARRAY_SIZE(sprtemp[frame].lump));
+  }
+  else
+  {
     // make 0 based
-    rotation--;
-
     // Appears to be 0,8,1,9,2,10,3,11,4,12,5,13,6,14,7,15
-    if (rotation > 7)
-      rotation = ((rotation - 8) * 2) + 1;
+    if (rotation > 8)
+      rotation = ((rotation - 9) * 2) + 1;
     else
-      rotation = rotation * 2;
+      rotation = (rotation - 1) * 2;
 
     if (sprtemp[frame].lump[rotation] != -1)
 	I_Error ("R_InitSprites: Sprite %s : %c : %c "
@@ -137,7 +139,11 @@ R_InstallSpriteLump
 
     sprtemp[frame].index[rotation] = index;
     sprtemp[frame].lump[rotation] = lump;
-    sprtemp[frame].flip[rotation] = (byte)flipped;
+    if (flipped)
+      sprtemp[frame].flip |= (1<<rotation);
+    else
+      sprtemp[frame].flip &= ~(1<<rotation);
+  }
 }
 
 
@@ -160,215 +166,255 @@ R_InstallSpriteLump
 //
 static void R_InitSpriteDefs (void)
 {
-    int 	i;
-    int 	index;
-    int 	frame;
-    int 	rotation;
-    int 	rot;
-    int 	lump;
-    int		maxframe;
+  int 	i;
+  int 	index;
+  int 	frame;
+  int 	rotation;
+  int 	rot;
+  int 	lump;
+  int	maxframe;
+  spriteframe_t * sprptr;
 
-    sprites = Z_Calloc (NUMSPRITES * sizeof(*sprites), PU_STATIC, NULL);
+  sprites = Z_Calloc (NUMSPRITES * sizeof(*sprites), PU_STATIC, NULL);
 
-    // scan all the lump names for each of the names,
-    //	noting the highest frame letter.
-    for (i=0 ; i<NUMSPRITES ; i++)
+  // scan all the lump names for each of the names,
+  //	noting the highest frame letter.
+  i = 0;
+  do
+  {
+    // printf ("i = %d of %d\n", i, NUMSPRITES);
+
+    sprptr = &sprtemp[0];
+    maxframe = ARRAY_SIZE(sprtemp);
+    do
     {
-	// printf ("i = %d of %d\n", i, NUMSPRITES);
-	memset (sprtemp,-1, sizeof(sprtemp));
+      for (rotation=0 ; rotation < ARRAY_SIZE(sprptr->lump) ; rotation++)
+      {
+	sprptr->lump [rotation] = -1;
+      }
+      sprptr -> flip = 0;
+      sprptr++;
+    } while (--maxframe);
 
-	maxframe = -1;
+    maxframe = -1;
 
-	// scan the lumps,
-	//  filling in the frames for whatever is found
-	lump = numlumps;
-	index = numspritelumps;
+    // scan the lumps,
+    //  filling in the frames for whatever is found
+    lump = numlumps;
+    index = numspritelumps;
+    do
+    {
+      /* Search for 'end' */
+      lump--;
+      if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
+      {
 	do
 	{
-	  /* Search for 'end' */
 	  lump--;
-	  if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
+	  if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
+	   || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
 	  {
-	    do
-	    {
-	      lump--;
-	      if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
-	       || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
-	      {
-		break;
-	      }
-
-	      if (lumpinfo[lump].name[0])
-		index--;
-	      if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
-	      {
-		frame = lumpinfo[lump].name[4] - 'A';
-		rotation = lumpinfo[lump].name[5] - '0';
-		if (rotation > 9)			// Sort out A - G
-		  rotation -= 7;
-
-		if (frame >= 0)
-		{
-		  if (frame > maxframe)
-		    maxframe = frame;
-		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
-		}
-
-		if (lumpinfo[lump].name[6])
-		{
-		  frame = lumpinfo[lump].name[6] - 'A';
-		  rotation = lumpinfo[lump].name[7] - '0';
-		  if (rotation > 9)			// Sort out A - G
-		    rotation -= 7;
-		  if (frame > maxframe)
-		    maxframe = frame;
-		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
-		}
-	      }
-	    } while (1);
+	    break;
 	  }
-	} while (lump);
 
+	  if (lumpinfo[lump].name[0])
+	    index--;
+	  if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
+	  {
+	    frame = lumpinfo[lump].name[4] - 'A';
+	    rotation = lumpinfo[lump].name[5] - '0';
 
-	// check the frames that were found for completeness
-	if (maxframe == -1)
-	{
-	    sprites[i].numframes = 0;
-	    continue;
-	}
-
-	maxframe++;
-
-	for (frame = 0 ; frame < maxframe ; frame++)
-	{
-	    spriteframe_t * sprptr;
-
-	    sprptr = &sprtemp[frame];
-
-	    // must have all 16 frames
-	    for (rotation=0 ; rotation<ARRAY_SIZE(sprptr->lump) ; rotation++)
+	    if (frame >= 0)
 	    {
+	      if (frame > maxframe)
+		maxframe = frame;
+	      R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
+	    }
+
+	    if (lumpinfo[lump].name[6])
+	    {
+	      frame = lumpinfo[lump].name[6] - 'A';
+	      rotation = lumpinfo[lump].name[7] - '0';
+	      if (frame > maxframe)
+		maxframe = frame;
+	      R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
+	    }
+	  }
+	} while (1);
+      }
+    } while (lump);
+
+    maxframe++;
+    sprites[i].numframes = maxframe;
+
+    // check the frames that were found for completeness
+    if (maxframe)
+    {
+      sprptr = &sprtemp[0];
+      frame = 0;
+      do
+      {
+	// must have all 16 rotations
+	rotation = 0;
+	do
+	{
+	  if (sprptr->lump[rotation] == -1)
+	  {
+	    if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
+	    {
+	      sprptr->lump[rotation] = sprptr->lump[rotation-1];
+	      sprptr->index[rotation] = sprptr->index[rotation-1];
+
+	      if (sprptr->flip & (1<<(rotation-1)))
+		sprptr->flip |= (1<<rotation);
+	      else
+		sprptr->flip &= ~(1<<rotation);
+	    }
+	    else
+	    {
+	      if (M_CheckParm ("-showunknown"))
+		printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
+			sprnames[i], frame+'A', rotation);
+
+	      switch (rotation)
+	      {
+		case 0*2:
+		  if (sprptr->lump[4*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[4*2];
+		    sprptr->index[rotation] = sprptr->index[4*2];
+		    if (sprptr->flip & (1<<(4*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 4*2:
+		  if (sprptr->lump[0*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[0*2];
+		    sprptr->index[rotation] = sprptr->index[0*2];
+		    if (sprptr->flip & (1<<(0*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 2*2:
+		  if (sprptr->lump[6*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[6*2];
+		    sprptr->index[rotation] = sprptr->index[6*2];
+		    if (sprptr->flip & (1<<(6*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 6*2:
+		  if (sprptr->lump[2*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[2*2];
+		    sprptr->index[rotation] = sprptr->index[2*2];
+		    if (sprptr->flip & (1<<(2*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 3*2:
+		  if (sprptr->lump[5*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[5*2];
+		    sprptr->index[rotation] = sprptr->index[5*2];
+		    if (sprptr->flip & (1<<(5*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 5*2:
+		  if (sprptr->lump[3*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[3*2];
+		    sprptr->index[rotation] = sprptr->index[3*2];
+		    if (sprptr->flip & (1<<(3*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip != (1<<rotation);
+		  }
+		  break;
+
+		case 1*2:
+		  if (sprptr->lump[7*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[7*2];
+		    sprptr->index[rotation] = sprptr->index[7*2];
+		    if (sprptr->flip & (1<<(7*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+
+		case 7*2:
+		  if (sprptr->lump[1*2] != -1)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[1*2];
+		    sprptr->index[rotation] = sprptr->index[1*2];
+		    if (sprptr->flip & (1<<(1*2)))
+		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		    else
+		      sprptr->flip |= (1<<rotation);
+		  }
+		  break;
+	      }
+
 	      if (sprptr->lump[rotation] == -1)
 	      {
-		if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
+		if (rotation)
 		{
 		  sprptr->lump[rotation] = sprptr->lump[rotation-1];
-		  sprptr->flip[rotation] = sprptr->flip[rotation-1];
 		  sprptr->index[rotation] = sprptr->index[rotation-1];
+		  if (sprptr->flip & (1<<(rotation-1)))
+		    sprptr->flip |= (1<<rotation);
+		  else
+		    sprptr->flip &= ~(1<<rotation);
 		}
 		else
 		{
-		  if (M_CheckParm ("-showunknown"))
-		    printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
-			    sprnames[i], frame+'A', rotation);
-
-		  switch (rotation)
+		  rot = rotation;
+		  do
 		  {
-		    case 0*2:
-		      if (sprptr->lump[4*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[4*2];
-			sprptr->flip[rotation] = !sprptr->flip[4*2];
-			sprptr->index[rotation] = sprptr->index[4*2];
-		      }
-		      break;
-
-		    case 4*2:
-		      if (sprptr->lump[0*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[0*2];
-			sprptr->flip[rotation] = !sprptr->flip[0*2];
-			sprptr->index[rotation] = sprptr->index[0*2];
-		      }
-		      break;
-
-		    case 2*2:
-		      if (sprptr->lump[6*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[6*2];
-			sprptr->flip[rotation] = !sprptr->flip[6*2];
-			sprptr->index[rotation] = sprptr->index[6*2];
-		      }
-		      break;
-
-		    case 6*2:
-		      if (sprptr->lump[2*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[2*2];
-			sprptr->flip[rotation] = !sprptr->flip[2*2];
-			sprptr->index[rotation] = sprptr->index[2*2];
-		      }
-		      break;
-
-		    case 3*2:
-		      if (sprptr->lump[5*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[5*2];
-			sprptr->flip[rotation] = !sprptr->flip[5*2];
-			sprptr->index[rotation] = sprptr->index[5*2];
-		      }
-		      break;
-
-		    case 5*2:
-		      if (sprptr->lump[3*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[3*2];
-			sprptr->flip[rotation] = !sprptr->flip[3*2];
-			sprptr->index[rotation] = sprptr->index[3*2];
-		      }
-		      break;
-
-		    case 1*2:
-		      if (sprptr->lump[7*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[7*2];
-			sprptr->flip[rotation] = !sprptr->flip[7*2];
-			sprptr->index[rotation] = sprptr->index[7*2];
-		      }
-		      break;
-
-		    case 7*2:
-		      if (sprptr->lump[1*2] != -1)
-		      {
-			sprptr->lump[rotation] = sprptr->lump[1*2];
-			sprptr->flip[rotation] = !sprptr->flip[1*2];
-			sprptr->index[rotation] = sprptr->index[1*2];
-		      }
-		      break;
-		  }
-
-		  if (sprptr->lump[rotation] == -1)
-		  {
-		    if (rotation)
+		    if (sprptr->lump[rot] != -1)
 		    {
-		      sprptr->lump[rotation] = sprptr->lump[rotation-1];
-		      sprptr->flip[rotation] = sprptr->flip[rotation-1];
-		      sprptr->index[rotation] = sprptr->index[rotation-1];
+		      sprptr->lump[rotation] = sprptr->lump[rot];
+		      sprptr->index[rotation] = sprptr->index[rot];
+		      if (sprptr->flip & (1<<rot))
+			sprptr->flip |= (1<<rotation);
+		      else
+			sprptr->flip &= ~(1<<rotation);
+		      break;
 		    }
-		    else
-		    {
-		      for (rot=rotation ; rot<ARRAY_SIZE(sprptr->lump) ; rot++)
-		      {
-			if (sprptr->lump[rot] != -1)
-			{
-			  sprptr->lump[rotation] = sprptr->lump[rot];
-			  sprptr->flip[rotation] = sprptr->flip[rot];
-			  sprptr->index[rotation] = sprptr->index[rot];
-			  break;
-			}
-		      }
-		    }
-		  }
+		  } while (++rot < ARRAY_SIZE(sprptr->lump));
 		}
 	      }
 	    }
-	}
+	  }
+	} while (++rotation < ARRAY_SIZE(sprptr->lump));
+	sprptr++;
+      } while (++frame < maxframe);
 
-	// allocate space for the frames present and copy sprtemp to it
-	sprites[i].numframes = maxframe;
-	sprites[i].spriteframes = Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
-	memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
+      // allocate space for the frames present and copy sprtemp to it
+      sprites[i].spriteframes = Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
+      memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
     }
+  } while (++i < NUMSPRITES);
 }
 
 
@@ -802,7 +848,7 @@ static void R_ProjectSprite (mobj_t* thing)
 
   index = sprframe->index[rot];
   lump = sprframe->lump[rot];
-  flip = (boolean)sprframe->flip[rot];
+  flip = (boolean) (sprframe->flip & (1<<rot));
 
   spritescale = thing -> info -> scale;
 
@@ -1009,7 +1055,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     index = sprframe->index[0];
     lump = sprframe->lump[0];
-    flip = (boolean)sprframe->flip[0];
+    flip = (boolean) (sprframe->flip & (1<<0));
 
     // calculate edges of the shape
     tx = psp->sx-160*FRACUNIT;

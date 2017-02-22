@@ -1245,9 +1245,8 @@ static void F_CastDrawer (void)
   rot = (castrot & 7) << 1;
   lump = sprframe->lump[rot];
   patch = W_CacheLumpNum (lump, PU_CACHE);
-
   drawstyle = 0;
-  if (sprframe->flip[rot])
+  if (sprframe->flip & (1<<rot))
     drawstyle |= 1;			/* Bit 0 = draw flipped */
 
   info = &mobjinfo[castorder[castnum].type];
