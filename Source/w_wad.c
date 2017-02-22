@@ -189,11 +189,11 @@ unsigned int W_LumpNameHash(const char *s)
 {
     // This is the djb2 string hash function, modded to work on strings
     // that have a maximum length of 8.
-    unsigned int        result = 5381;
-    unsigned int        i;
+    unsigned int	result = 5381;
+    unsigned int	i;
 
     for (i = 0; i < 8 && s[i] != '\0'; ++i)
-        result = ((result << 5) ^ result) ^ toupper(s[i]);
+	result = ((result << 5) ^ result) ^ toupper(s[i]);
 
     return result;
 }
@@ -1103,11 +1103,13 @@ int W_SameWadfile (int lump1, int lump2)
 /*
    Sort out the ?_START and ?_END markers.
    Some wads have ??_START or ??_END and also can be badly nested.
+
+   Testwads: Fastshow.wad has extra S_END markers without matching S_START markers
 */
 
 void W_Find_Start_Ends (void)
 {
-  int loading;
+  char loading;
   int lump;
   int endlump;
   int startlump;
@@ -1116,58 +1118,88 @@ void W_Find_Start_Ends (void)
   lump = 0;
   loading = 0;
   endlump = 0;
+  startlump = 0;
   lump_ptr = &lumpinfo[0];
 
   do
   {
+#ifdef DEBUG_START_END
+    printf ("Checking %s\n", lump_ptr->name);
+#endif
+
     if (strncasecmp (lump_ptr->name+2, "_START", 6) == 0)
     {
       /* Found a ??_START marker, shuffle it down */
-      // printf ("Shuffled %s %u\n", lump_ptr->name, lump);
+#ifdef DEBUG_START_END
+      printf ("Shuffled %s %u\n", lump_ptr->name, lump);
+#endif
       memcpy (lump_ptr->name+1, lump_ptr->name+2, 6);
       lump_ptr->name [7] = 0;
     }
+
+    if (strncasecmp (lump_ptr->name+2, "_END", 5) == 0)
+    {
+      /* Found a ??_END marker, shuffle it down */
+#ifdef DEBUG_START_END
+      printf ("Shuffled %s %u\n", lump_ptr->name, lump);
+#endif
+      memcpy (lump_ptr->name+1, lump_ptr->name+2, 6);
+      lump_ptr->name [7] = 0;
+    }
+
     if (strncasecmp (lump_ptr->name+1, "_START", 7) == 0)
     {
       if (loading)		// Nested?
       {
-	// printf ("Nested start (%s) %u\n", lump_ptr->name, lump);
+#ifdef DEBUG_START_END
+	printf ("Nested start (%s) %u\n", lump_ptr->name, lump);
+#endif
 	lump_ptr->name [1] = '-';
       }
       else
       {
-	loading = 1;
+#ifdef DEBUG_START_END
+	printf ("%s lump = %u\n", lump_ptr->name, lump);
+	if (endlump)
+	  printf ("Prev End was lump %u\n", endlump);
+#endif
+	loading = lump_ptr->name [0];
 	startlump = lump;
 	endlump = 0;
-	// printf ("%s lump = %u\n", lump_ptr->name, lump);
       }
-    }
-    if (strncasecmp (lump_ptr->name+2, "_END", 5) == 0)
-    {
-      /* Found a ??_END marker, shuffle it down */
-      // printf ("Shuffled %s %u\n", lump_ptr->name, lump);
-      memcpy (lump_ptr->name+1, lump_ptr->name+2, 6);
-      lump_ptr->name [7] = 0;
-    }
-    if (strncasecmp (lump_ptr->name+1, "_END", 5) == 0)
-    {
-      if ((loading == 0)
-       && (endlump))
-      {
-	lumpinfo[endlump].name [1] = '-';
-	// printf ("Previous end was nested\n");
-      }
-      loading = 0;
-      endlump = lump;
-      // printf ("%s lump = %u\n", lump_ptr->name, lump);
     }
 
-    if ((loading)
-     && (lump_ptr->handle != lumpinfo[startlump].handle))
+    if (strncasecmp (lump_ptr->name+1, "_END", 5) == 0)
     {
+      if (loading != lump_ptr->name [0])		// Matching end?
+      {
+#ifdef DEBUG_START_END
+	printf ("Bogus end marker %s\n", lump_ptr->name);
+#endif
+	lump_ptr->name [1] = '-';
+      }
+      else
+      {
+	if (endlump)
+	{
+#ifdef DEBUG_START_END
+	  printf ("Previous end %s was nested\n", lumpinfo[endlump].name);
+#endif
+	  lumpinfo[endlump].name [1] = '-';
+	}
+	endlump = lump;
+	loading = 0;
+      }
+    }
+
+    if (lump_ptr->handle != lumpinfo[startlump].handle)
+    {
+#ifdef DEBUG_START_END
+      if (loading)
+	printf ("Ran off end of WAD without finding END marker\n");
+#endif
       loading = 0;
       endlump = 0;
-      // printf ("Ran off end of WAD without finding END marker\n");
     }
 
     lump_ptr++;
