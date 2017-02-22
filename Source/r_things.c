@@ -218,26 +218,30 @@ static void R_InitSpriteDefs (void)
 	  }
 
 	  if (lumpinfo[lump].name[0])
-	    index--;
-	  if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
 	  {
-	    frame = lumpinfo[lump].name[4] - 'A';
-	    rotation = lumpinfo[lump].name[5] - '0';
+	    if (--index < 0)
+	      I_Error ("R_InitSpriteDefs: index < 0\n");
 
-	    if (frame >= 0)
+	    if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
 	    {
-	      if (frame > maxframe)
-		maxframe = frame;
-	      R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
-	    }
+	      frame = lumpinfo[lump].name[4] - 'A';
+	      rotation = lumpinfo[lump].name[5] - '0';
 
-	    if (lumpinfo[lump].name[6])
-	    {
-	      frame = lumpinfo[lump].name[6] - 'A';
-	      rotation = lumpinfo[lump].name[7] - '0';
-	      if (frame > maxframe)
-		maxframe = frame;
-	      R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
+	      if (frame >= 0)
+	      {
+		if (frame > maxframe)
+		  maxframe = frame;
+		R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
+	      }
+
+	      if (lumpinfo[lump].name[6])
+	      {
+		frame = lumpinfo[lump].name[6] - 'A';
+		rotation = lumpinfo[lump].name[7] - '0';
+		if (frame > maxframe)
+		  maxframe = frame;
+		R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
+	      }
 	    }
 	  }
 	} while (1);
@@ -346,7 +350,7 @@ static void R_InitSpriteDefs (void)
 		    if (sprptr->flip & (1<<(3*2)))
 		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
 		    else
-		      sprptr->flip != (1<<rotation);
+		      sprptr->flip |= (1<<rotation);
 		  }
 		  break;
 
@@ -415,6 +419,11 @@ static void R_InitSpriteDefs (void)
       memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
     }
   } while (++i < NUMSPRITES);
+
+  /* In theory, if we counted everything correctly, index should be 0 at this point */
+  if ((index)
+   && (M_CheckParm ("-showunknown")))
+    printf ("R_InitSpriteDefs: index = %d\n", index);
 }
 
 
@@ -846,8 +855,11 @@ static void R_ProjectSprite (mobj_t* thing)
   if (rot >= ARRAY_SIZE(sprframe->index))
     rot = 0;
 
-  index = sprframe->index[rot];
   lump = sprframe->lump[rot];
+  if (lump == -1)
+    return;
+
+  index = sprframe->index[rot];
   flip = (boolean) (sprframe->flip & (1<<rot));
 
   spritescale = thing -> info -> scale;
@@ -1053,8 +1065,11 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     sprframe = &sprdef->spriteframes [state->frame & FF_FRAMEMASK];
 
-    index = sprframe->index[0];
     lump = sprframe->lump[0];
+    if (lump == -1)
+      return;
+
+    index = sprframe->index[0];
     flip = (boolean) (sprframe->flip & (1<<0));
 
     // calculate edges of the shape
