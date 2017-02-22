@@ -499,7 +499,7 @@ typedef struct
     dshort_t	lump[16];
 
     // Flip bit (1 = flip) to use for view angles 0-15.
-    dshort_t	flip;
+    dushort_t	flip;
 
 } spriteframe_t;
 

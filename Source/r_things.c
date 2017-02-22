@@ -116,11 +116,11 @@ R_InstallSpriteLump
     {
       sprtemp[frame].index[rotation] = index;
       sprtemp[frame].lump[rotation] = lump;
-      if (flipped)
-	sprtemp[frame].flip |= (1<<rotation);
-      else
-	sprtemp[frame].flip &= ~(1<<rotation);	// Just in case.
     } while (++rotation < ARRAY_SIZE(sprtemp[frame].lump));
+    if (flipped)
+      sprtemp[frame].flip = ~0;
+    else
+      sprtemp[frame].flip = 0;		// Just in case.
   }
   else
   {
