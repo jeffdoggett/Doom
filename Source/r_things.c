@@ -1196,7 +1196,7 @@ static void R_DrawSprite (vissprite_t* spr)
 
     for (x = spr->x1 ; x<=spr->x2 ; x++)
     {
-	cliptop[x] = 0;
+	cliptop[x] = -1;
 	clipbot[x] = viewheight;
     }
 
