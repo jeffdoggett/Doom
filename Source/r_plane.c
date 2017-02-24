@@ -110,7 +110,7 @@ static void R_InitVisplanes (visplane_t * p, unsigned int qty)
 //
 void R_InitPlanes (void)
 {
-  MAXVISPLANES = 128;		// Start low
+  MAXVISPLANES = 256;		// Start low
   visplanes = calloc (MAXVISPLANES, sizeof (visplane_t));
   if (visplanes == NULL)
     I_Error ("Failed to claim visplane memory\n");

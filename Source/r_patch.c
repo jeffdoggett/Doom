@@ -114,9 +114,6 @@ static void createTextureCompositePatch(int id)
     composite_patch->width = texture->width;
     composite_patch->height = texture->height;
     composite_patch->widthmask = texture->widthmask;
-    composite_patch->leftoffset = 0;
-    composite_patch->topoffset = 0;
-    composite_patch->flags = 0;
 
     // work out how much memory we need to allocate for this patch's data
     pixelDataSize = (composite_patch->width * composite_patch->height + 4) & ~3;
@@ -309,9 +306,6 @@ static void createTextureCompositePatch(int id)
 
 	    if (column->pixels[0] == 0xFF)
 	    {
-		// e6y: marking of all patches with holes
-		composite_patch->flags |= PATCH_HASHOLES;
-
 		// force the first pixel (which is a hole), to use
 		// the color from the next solid spot in the column
 		for (y = 0; y < composite_patch->height; ++y)
@@ -329,11 +323,6 @@ static void createTextureCompositePatch(int id)
 	    {
 		if (column->pixels[y] != 0xFF)
 		    continue;
-
-		// this pixel is a hole
-
-		// e6y: marking of all patches with holes
-		composite_patch->flags |= PATCH_HASHOLES;
 
 		if (x && prevColumn->pixels[y - 1] != 0xFF)
 		    column->pixels[y] = prevColumn->pixels[y];  // copy the color from the left
@@ -393,10 +382,3 @@ rcolumn_t *R_GetPatchColumnClamped(rpatch_t *patch, int columnIndex)
   return (&patch->columns [columnIndex]);
 }
 
-rcolumn_t *R_GetPatchColumn(rpatch_t *patch, int columnIndex)
-{
-    if (patch->flags & PATCH_ISNOTTILEABLE)
-	return R_GetPatchColumnClamped(patch, columnIndex);
-    else
-	return R_GetPatchColumnWrapped(patch, columnIndex);
-}

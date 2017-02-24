@@ -467,7 +467,7 @@ void R_InitSprites (void)
     R_InitSpriteDefs ();
 
     num_vissprite = 0;
-    qty_vissprites = 128;			// Start low.
+    qty_vissprites = 256;			// Start low.
     if (((vissprites = malloc (qty_vissprites * sizeof (vissprite_t))) == NULL)
      || ((vissprites_xref = malloc (qty_vissprites * sizeof (vissprite_t*))) == NULL))
       I_Error ("Failed to claim memory for vissprites\n");
