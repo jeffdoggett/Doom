@@ -619,9 +619,9 @@ static void WI_updateAnimatedBack(void)
 		break;
 
 	      case ANIM_LEVEL:
-		// gawd-awful hack for level anims
-		if (!(state == StatCount && i == 7)
-		    && wbs->next == a->data1)
+		// gawd-awful hack for level anims (Corrected by JAD so that E2M9 secret level appears)
+		if ((wbs->next == a->data1)
+		 || ((i == 7) && (wbs->didsecret)))
 		{
 		    a->ctr++;
 		    if (a->ctr == a->nanims) a->ctr--;
