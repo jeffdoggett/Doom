@@ -881,6 +881,7 @@ void dh_fgets (char * a_line, unsigned int max_length, FILE * fin)
   {
     p = fgetc (fin);
     if (max_length) max_length--;
+    if (p == '\t') p = ' ';
     while ((p >= 0) && (p <= 31) && (p != 10))
     {
       p = fgetc (fin);
@@ -3627,7 +3628,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    counter1 = DH_Parse_language_string (a_line);
 	    break;
 	}
-	if ((counter1 == -1) && (*a_line)
+	if ((counter1 == -1) && (*a_line > ' ')
 	 && (M_CheckParm ("-showunknown")))
 	  fprintf (stderr,"DeHackEd:Failed to find \"%s\" at line %d of file %s (job %u)\n", a_line, dh_line_number, filename, current_job);
       }
