@@ -226,6 +226,7 @@ static void S_StartLevelMusic (void)
   unsigned int gm;
   char * music;
   map_dests_t * map_ptr;
+  char		namebuf[12];
 
   // start new music for the level
   mus_paused = false;
@@ -244,20 +245,28 @@ static void S_StartLevelMusic (void)
       gm -= 32;
     mnum = mus_runnin + gm - 1;
   }
-  else if (gameepisode < 4)
+  else if ((gameepisode > 0) && (gameepisode < 4) && (gamemap > 0) && (gamemap < 10))
   {
-    ge = gameepisode;
-    if (ge) ge--;
-    gm = gamemap;
-    if (gm) gm--;
+    ge = gameepisode - 1;
+    gm = gamemap - 1;
     mnum = mus_e1m1 + (ge*9) + gm;
   }
   else
   {
-    gm = gamemap;
-    while (gm >= ARRAY_SIZE (spmus))
-      gm -= ARRAY_SIZE (spmus);
-    mnum = spmus[gm];
+    /* See whether we have this music in the wad */
+    sprintf (namebuf, "D_E%uM%u", gameepisode, gamemap);
+    if (W_CheckNumForName (namebuf) != -1)
+    {
+      S_music[mus_extra].name = namebuf;
+      mnum = mus_extra;
+    }
+    else
+    {
+      gm = gamemap;
+      while (gm >= ARRAY_SIZE (spmus))
+	gm -= ARRAY_SIZE (spmus);
+      mnum = spmus[gm];
+    }
   }
 
   // HACK FOR COMMERCIAL
