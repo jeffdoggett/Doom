@@ -749,7 +749,6 @@ ST_Responder (event_t* ev)
       else if (cht_CheckCheat(&cheat_mus, ev->data1))
       {
 	char	buf[3];
-	int	musnum;
 	mobj_t * mobj;
 
 	/* Only clear this if we are not standing on it. */
@@ -762,30 +761,18 @@ ST_Responder (event_t* ev)
 
 	if (gamemode == commercial)
 	{
-	  musnum = mus_runnin + (buf[0]-'0')*10 + buf[1]-'0' - 1;
-
-	  if (((buf[0]-'0')*10 + buf[1]-'0') > 35)
+	  if (S_StartLevelMusic (255, ((buf[0]-'0')*10) + (buf[1]-'0')))
 	  {
 	    S_StopMusic ();
 	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
-	  }
-	  else
-	  {
-	    S_ChangeMusic(musnum, 1);
 	  }
 	}
 	else
 	{
-	  musnum = mus_e1m1 + (buf[0]-'1')*9 + (buf[1]-'1');
-
-	  if (((buf[0]-'1')*9 + buf[1]-'1') > 31)
+	  if (S_StartLevelMusic (buf[0]-'0', buf[1]-'0'))
 	  {
 	    S_StopMusic ();
 	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
-	  }
-	  else
-	  {
-	    S_ChangeMusic(musnum, 1);
 	  }
 	}
       }

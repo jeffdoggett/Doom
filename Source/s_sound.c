@@ -219,11 +219,9 @@ static const unsigned int spmus[]=
 
 /* ------------------------------------------------------------ */
 
-static void S_StartLevelMusic (void)
+int S_StartLevelMusic (unsigned int ge, unsigned int gm)
 {
   int mnum;
-  unsigned int ge;
-  unsigned int gm;
   char * music;
   map_dests_t * map_ptr;
   char		namebuf[12];
@@ -231,7 +229,7 @@ static void S_StartLevelMusic (void)
   // start new music for the level
   mus_paused = false;
 
-  map_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
+  map_ptr = G_Access_MapInfoTab (ge, gm);
   music = map_ptr -> music;
   if (music)
   {
@@ -240,21 +238,18 @@ static void S_StartLevelMusic (void)
   }
   else if (gamemode == commercial)
   {
-    gm = gamemap;
     while (gm > 32)
       gm -= 32;
     mnum = mus_runnin + gm - 1;
   }
-  else if ((gameepisode > 0) && (gameepisode < 4) && (gamemap > 0) && (gamemap < 10))
+  else if ((ge > 0) && (ge < 4) && (gm > 0) && (gm < 10))
   {
-    ge = gameepisode - 1;
-    gm = gamemap - 1;
-    mnum = mus_e1m1 + (ge*9) + gm;
+    mnum = mus_e1m1 + ((ge-1)*9) + (gm-1);
   }
   else
   {
     /* See whether we have this music in the wad */
-    sprintf (namebuf, "D_E%uM%u", gameepisode, gamemap);
+    sprintf (namebuf, "D_E%uM%u", ge, gm);
     if (W_CheckNumForName (namebuf) != -1)
     {
       S_music[mus_extra].name = namebuf;
@@ -262,7 +257,6 @@ static void S_StartLevelMusic (void)
     }
     else
     {
-      gm = gamemap;
       while (gm >= ARRAY_SIZE (spmus))
 	gm -= ARRAY_SIZE (spmus);
       mnum = spmus[gm];
@@ -276,6 +270,7 @@ static void S_StartLevelMusic (void)
   S_ChangeMusic (mnum, true);
 
 //nextcleanup = 15;
+  return (0);
 }
 
 /* ------------------------------------------------------------ */
@@ -296,7 +291,7 @@ void S_Start(void)
   muschangeinfo.mapthing = NULL;
   muschangeinfo.musnum = 0;
   muschangeinfo.tics = 0;
-  S_StartLevelMusic ();
+  S_StartLevelMusic (gameepisode, gamemap);
 }
 
 /* ------------------------------------------------------------ */
@@ -1250,7 +1245,7 @@ void S_MusInfoThinker (mobj_t *thing)
   }
 
   if (mnum == 0)			// Return to default?
-    S_StartLevelMusic ();
+    S_StartLevelMusic (gameepisode, gamemap);
 }
 
 /* ------------------------------------------------------------ */

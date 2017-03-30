@@ -68,6 +68,8 @@ void S_StopSound(void* origin);
 void S_RemoveSoundOrigin (void *origin);
 
 
+int S_StartLevelMusic (unsigned int ge, unsigned int gm);
+
 // Start music using <music_id> from sounds.h
 void S_StartMusic(int music_id);
 
