@@ -748,6 +748,7 @@ ST_Responder (event_t* ev)
       // 'mus' cheat for changing music
       else if (cht_CheckCheat(&cheat_mus, ev->data1))
       {
+        int	ge,gm;
 	char	buf[3];
 	mobj_t * mobj;
 
@@ -756,24 +757,27 @@ ST_Responder (event_t* ev)
 	 || (mobj->subsector->sector != players[displayplayer].mo->subsector->sector))
 	  muschangeinfo.musnum = 0;
 
-	plyr->message = stat_bar_messages [ST_STSTR_MUS];
 	cht_GetParam(&cheat_mus, buf);
 
 	if (gamemode == commercial)
 	{
-	  if (S_StartLevelMusic (255, ((buf[0]-'0')*10) + (buf[1]-'0')))
-	  {
-	    S_StopMusic ();
-	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
-	  }
+	  ge = 255;
+	  gm = ((buf[0]-'0')*10) + (buf[1]-'0');
 	}
 	else
 	{
-	  if (S_StartLevelMusic (buf[0]-'0', buf[1]-'0'))
-	  {
-	    S_StopMusic ();
-	    plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
-	  }
+	  ge = buf[0]-'0';
+	  gm = buf[1]-'0';
+	}
+
+	if (S_StartLevelMusic (ge, gm))
+	{
+	  S_StopMusic ();
+	  plyr->message = stat_bar_messages [ST_STSTR_NOMUS];
+	}
+	else
+	{
+	  plyr->message = stat_bar_messages [ST_STSTR_MUS];
 	}
       }
       // Simplified, accepting both "noclip" and "idspispopd".

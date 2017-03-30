@@ -226,6 +226,9 @@ int S_StartLevelMusic (unsigned int ge, unsigned int gm)
   map_dests_t * map_ptr;
   char		namebuf[12];
 
+  if ((ge > 255) || (gm > 255))
+    return (1);
+
   // start new music for the level
   mus_paused = false;
 
