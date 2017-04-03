@@ -832,6 +832,7 @@ void P_SpawnDoorCloseIn30 (sector_t* sec)
     door = get_door_block (sec);
     door->direction = 0;
     door->type = normal;
+    door->topheight = sec->ceilingheight;
     door->topcountdown = 30 * 35;
 }
 
