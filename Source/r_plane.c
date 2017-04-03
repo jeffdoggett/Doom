@@ -118,7 +118,7 @@ void R_InitPlanes (void)
 
   R_InitVisplanes (visplanes, MAXVISPLANES);
 
-  MAXOPENINGS = 10000;		// Start low
+  MAXOPENINGS = 0x4000;		// Start low
   openings = malloc (MAXOPENINGS * sizeof (openings[0]));
   if (openings == NULL)
     I_Error ("Failed to claim openings memory\n");
@@ -202,7 +202,7 @@ uintptr_t R_IncreaseOpenings (size_t need)
   dshort_t*	new_openings;
   drawseg_t	*ds;		// jff 8/9/98 needed for fix from ZDoom
 
-  MAXOPENINGS = need;
+  MAXOPENINGS = (need + 0x3FFF) & ~0x3FFF;
 //printf ("MAXOPENINGS = %u\n", MAXOPENINGS);
   new_openings = realloc (openings, MAXOPENINGS * sizeof (openings[0]));
   if (new_openings == NULL)

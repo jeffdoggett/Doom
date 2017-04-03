@@ -627,7 +627,6 @@ void R_StoreWallRange(int start, int stop)
 {
     unsigned int	pos;
     unsigned int	tex;
-    int			timesofar;
     int64_t     dx, dy, dx1, dy1;
 
     pos = (unsigned int) (ds_p - drawsegs);
@@ -635,11 +634,13 @@ void R_StoreWallRange(int start, int stop)
     // don't overflow and crash
     if (pos >= MAXDRAWSEGS)
     {
+        drawsegoverflowcount++;
 	return;
     }
 
     if ((pos & 0xFF) == 0)
     {
+      int timesofar;
       timesofar = I_GetTime ();
       if ((timesofar - drawsegstarttime) > 5)
       {

@@ -44,6 +44,7 @@ extern boolean		skymap;
 
 extern drawseg_t*	drawsegs;
 extern drawseg_t*	ds_p;
+extern unsigned int	drawsegoverflowcount;
 extern int		drawsegstarttime;
 
 extern lighttable_t**	hscalelight;

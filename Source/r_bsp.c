@@ -38,6 +38,7 @@ sector_t*	backsector;
 
 drawseg_t*	drawsegs;
 drawseg_t*	ds_p;
+unsigned int	drawsegoverflowcount;
 int		drawsegstarttime;
 
 /* killough 4/7/98: indicates doors closed wrt automap bugfix: */
@@ -55,6 +56,7 @@ void R_InitDrawSegs (void)
     I_Error ("Failed to allocate memory for drawsegs\n");
 
   ds_p = drawsegs;
+  drawsegoverflowcount = 0;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -63,19 +65,22 @@ void R_InitDrawSegs (void)
 //
 void R_ClearDrawSegs (void)
 {
+  unsigned int newdrawsegqty;
   drawseg_t* newdrawsegs;
 
-  if ((ds_p - drawsegs) >= MAXDRAWSEGS)
+  if (drawsegoverflowcount)
   {
-    newdrawsegs = realloc (drawsegs, sizeof (*drawsegs) * (MAXDRAWSEGS + 128));
+    newdrawsegqty = (MAXDRAWSEGS + drawsegoverflowcount + 127) & ~127;
+    newdrawsegs = realloc (drawsegs, sizeof (*drawsegs) * newdrawsegqty);
     if (newdrawsegs)
     {
       drawsegs = newdrawsegs;
-      MAXDRAWSEGS += 128;
+      MAXDRAWSEGS = newdrawsegqty;
     }
   }
 
   ds_p = drawsegs;
+  drawsegoverflowcount = 0;
   drawsegstarttime = I_GetTime ();
 }
 
