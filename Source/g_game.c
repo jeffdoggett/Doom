@@ -102,7 +102,7 @@ static int	starttime;		// for comparative timing purposes
 
 boolean		viewactive;
 
-boolean		deathmatch;		// only if started as net death
+int		deathmatch;		// only if started as net death
 boolean		netgame;		// only true if packets are broadcast
 boolean		playeringame[MAXPLAYERS];
 player_t	players[MAXPLAYERS];
@@ -2111,7 +2111,7 @@ void G_DoNewGame (void)
   demoplayback = false;
   netdemo = false;
   netgame = false;
-  deathmatch = false;
+  deathmatch = 0;
   playeringame[1] = playeringame[2] = playeringame[3] = false;
   respawnparm = false;
   fastparm = false;
@@ -2413,7 +2413,7 @@ void G_DoPlayDemo (void)
   skill = (skill_t) *p++;
   episode = *p++;
   map = *p++;
-  deathmatch = (boolean) *p++;
+  deathmatch = *p++;
   respawnparm = (boolean) *p++;
   fastparm = (boolean) *p++;
   nomonsters2 = (boolean) *p++;
@@ -2485,7 +2485,7 @@ boolean G_CheckDemoStatus (void)
       demoplayback = false;
       netdemo = false;
       netgame = false;
-      deathmatch = false;
+      deathmatch = 0;
       playeringame[1] = playeringame[2] = playeringame[3] = false;
       respawnparm = false;
       fastparm = false;

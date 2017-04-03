@@ -299,7 +299,7 @@ void I_InitNetwork (void)
 	netgame = false;
 	doomcom->id = DOOMCOM_ID;
 	doomcom->numplayers = doomcom->numnodes = 1;
-	doomcom->deathmatch = false;
+	doomcom->deathmatch = 0;
 	doomcom->consoleplayer = 0;
 	return;
     }

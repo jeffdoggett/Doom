@@ -490,7 +490,7 @@ static void D_ArbitrateNetStart (void)
 		if (netbuffer->player != NET_PROTOCOL_VERSION)
 		    I_Error ("Different DOOM versions cannot play a net game!");
 		startskill = (skill_t) (netbuffer->retransmitfrom & 15);
-		deathmatch = (boolean) ((netbuffer->retransmitfrom & 0xc0) >> 6);
+		deathmatch = (netbuffer->retransmitfrom & 0xc0) >> 6;
 		nomonsters2 =  (boolean) ((netbuffer->retransmitfrom & 0x20) > 0);
 		respawnparm =  (boolean) ((netbuffer->retransmitfrom & 0x10) > 0);
 		startmap = netbuffer->starttic & 0x3f;

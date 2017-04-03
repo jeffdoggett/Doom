@@ -2089,10 +2089,14 @@ void D_DoomMain (void)
   respawnparm = (boolean) M_CheckParm ("-respawn");
   fastparm = (boolean) M_CheckParm ("-fast");
   devparm = (boolean) M_CheckParm ("-devparm");
+  if (M_CheckParm ("-dm3"))
+    deathmatch = 3;
   if (M_CheckParm ("-altdeath"))
-    deathmatch = (boolean) 2;
+    deathmatch = 2;
   else if (M_CheckParm ("-deathmatch"))
-    deathmatch = (boolean) 1;
+    deathmatch = 1;
+  else
+    deathmatch = 0;
 
   D_SetDebugOut ();
   init_text_messages ();
