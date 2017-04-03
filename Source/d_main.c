@@ -2091,7 +2091,7 @@ void D_DoomMain (void)
   devparm = (boolean) M_CheckParm ("-devparm");
   if (M_CheckParm ("-dm3"))
     deathmatch = 3;
-  if (M_CheckParm ("-altdeath"))
+  else if (M_CheckParm ("-altdeath"))
     deathmatch = 2;
   else if (M_CheckParm ("-deathmatch"))
     deathmatch = 1;
