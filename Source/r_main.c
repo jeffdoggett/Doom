@@ -605,7 +605,6 @@ void R_SetViewSize (int flag, int blocks, int detail)
 //
 void R_ExecuteSetViewSize (void)
 {
-    fixed_t	cosadj;
     fixed_t	dy;
     fixed_t	sis;
     int		i;
@@ -716,12 +715,6 @@ void R_ExecuteSetViewSize (void)
 	dy = ((i-viewheight/2)<<FRACBITS)+FRACUNIT/2;
 	dy = abs(dy);
 	yslope[i] = FixedDiv ( (viewwidth<<detailshift)/2*FRACUNIT, dy);
-    }
-
-    for (i=0 ; i<viewwidth ; i++)
-    {
-	cosadj = abs(finecosine[xtoviewangle[i]>>ANGLETOFINESHIFT]);
-	distscale[i] = FixedDiv (FRACUNIT,cosadj);
     }
 
     // Calculate the light levels to use

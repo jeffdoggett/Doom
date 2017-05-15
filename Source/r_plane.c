@@ -75,9 +75,6 @@ lighttable_t**		planezlight;
 fixed_t			planeheight;
 
 fixed_t*		yslope;
-fixed_t*		distscale;
-fixed_t			basexscale;
-fixed_t			baseyscale;
 
 fixed_t			xoffs;
 fixed_t			yoffs;
@@ -130,7 +127,6 @@ void R_InitPlanes (void)
   ceilingclip = calloc (SCREENWIDTH, sizeof (*ceilingclip));
   spanstart = calloc (SCREENHEIGHT, sizeof (*spanstart));
   yslope = calloc (SCREENHEIGHT, sizeof (*yslope));
-  distscale = calloc (SCREENWIDTH, sizeof (*distscale));
 }
 
 //-----------------------------------------------------------------------------
@@ -141,7 +137,6 @@ void R_InitPlanes (void)
 void R_ClearPlanes (void)
 {
     int		i;
-    angle_t	angle;
 
     // opening / clipping determination
     for (i=0 ; i<viewwidth ; i++)
@@ -152,13 +147,6 @@ void R_ClearPlanes (void)
 
     lastvisplane = visplanes;
     lastopening = openings;
-
-    // left to right mapping
-    angle = (viewangle-ANG90)>>ANGLETOFINESHIFT;
-
-    // scale will be unit scale at SCREENWIDTH/2 distance
-    basexscale = FixedDiv (finecosine[angle],centerxfrac);
-    baseyscale = -FixedDiv (finesine[angle],centerxfrac);
 }
 
 //-----------------------------------------------------------------------------
@@ -247,8 +235,6 @@ uintptr_t R_IncreaseOpenings (size_t need)
 // Uses global vars:
 //  planeheight
 //  ds_source
-//  basexscale
-//  baseyscale
 //  viewx
 //  viewy
 //
@@ -576,8 +562,8 @@ void R_DrawPlanes(void)
 	    if (dc_yl <= dc_yh)
 	    {
 		dc_x = x;
-		dc_source = R_GetTextureColumn(tex_patch, (((an + xtoviewangle[x]) ^ flip)
-		    >> ANGLETOSKYSHIFT) + offset);
+		dc_source = R_GetTextureColumn(tex_patch,
+		    (((an + xtoviewangle[x]) ^ flip) >> ANGLETOSKYSHIFT) + offset);
 		dc_texturefrac = R_CalcFrac ();
 		colfunc();
 	    }
