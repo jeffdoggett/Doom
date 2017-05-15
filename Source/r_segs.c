@@ -428,7 +428,7 @@ R_RenderMaskedSegRange
 // CALLED: CORE LOOPING ROUTINE.
 //
 
-void R_RenderSegLoop (void)
+static void R_RenderSegLoop (void)
 {
     angle_t		angle;
     unsigned		index;
@@ -440,20 +440,18 @@ void R_RenderSegLoop (void)
     int			bottom;
     rpatch_t		*tex_patch;
 
-    //texturecolumn = 0;				// shut up compiler warning
-
     for ( ; rw_x < rw_stopx ; rw_x++)
     {
 	// mark floor / ceiling areas
 	yl = (topfrac+heightunit-1)>>heightbits;
+	top = ceilingclip[rw_x]+1;
 
 	// no space above wall?
-	if (yl < ceilingclip[rw_x]+1)
-	    yl = ceilingclip[rw_x]+1;
+	if (yl < top)
+	    yl = top;
 
 	if (markceiling)
 	{
-	    top = ceilingclip[rw_x]+1;
 	    bottom = yl-1;
 
 	    if (bottom >= floorclip[rw_x])
@@ -467,20 +465,21 @@ void R_RenderSegLoop (void)
 	    }
 
 	    // SoM: this should be set here to prevent overdraw
-	    ceilingclip[rw_x] = bottom;
+	    // ceilingclip[rw_x] = bottom;
 	}
 
 	yh = bottomfrac>>heightbits;
+	bottom = floorclip[rw_x]-1;
 
-	if (yh >= floorclip[rw_x])
-	    yh = floorclip[rw_x]-1;
+	if (yh > bottom)
+	    yh = bottom;
 
 	if (markfloor)
 	{
 	    top = yh+1;
-	    bottom = floorclip[rw_x]-1;
 	    if (top <= ceilingclip[rw_x])
 		top = ceilingclip[rw_x]+1;
+
 	    if ((top <= bottom)
 	     && (floorplane))		// killough 4/11/98: add NULL ptr checks
 	    {
@@ -489,20 +488,22 @@ void R_RenderSegLoop (void)
 	    }
 
 	    // SoM: This should be set here to prevent overdraw
-	    floorclip[rw_x] = top;
+	    // floorclip[rw_x] = top;
 	}
 
 	// texturecolumn and lighting are independent of wall tiers
 	if (segtextured)
 	{
 	    // calculate texture offset
-	    angle = (rw_centerangle + xtoviewangle[rw_x])>>ANGLETOFINESHIFT;
-	    texturecolumn = rw_offset-FixedMul(finetangent[angle],rw_distance);
-	    texturecolumn >>= FRACBITS;
+	    angle = (rw_centerangle + xtoviewangle[rw_x]) >> ANGLETOFINESHIFT;
+	    if (angle > FINEANGLES / 2 - 1)
+	      angle = FINEANGLES / 2 - 1;
+
+	    texturecolumn = (rw_offset-FixedMul(finetangent[angle],rw_distance)) >> FRACBITS;
 	    // calculate lighting
 	    index = rw_scale>>lightScaleShift;
 
-	    if (index >=  MAXLIGHTSCALE )
+	    if (index > (MAXLIGHTSCALE-1))
 		index = MAXLIGHTSCALE-1;
 
 	    dc_colormap = walllights[index];
@@ -513,19 +514,21 @@ void R_RenderSegLoop (void)
 	// draw the wall tiers
 	if (midtexture)
 	{
-	    // single sided line
-	    dc_yl = yl;
-	    dc_yh = yh;
-	    dc_texturemid = rw_midtexturemid;
-	    dc_ylim = textureheight[midtexture];
-	    tex_patch = R_CacheTextureCompositePatchNum(midtexture);
-	    dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
-	    dc_texturefrac = R_CalcFrac ();
-	    colfunc ();
+	    if ((yl < viewheight) && (yh >= 0) && (yh >= yl))
+	    {
+		// single sided line
+		dc_yl = yl;
+		dc_yh = yh;
+		dc_texturemid = rw_midtexturemid;
+		dc_ylim = textureheight[midtexture];
+		tex_patch = R_CacheTextureCompositePatchNum(midtexture);
+		dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
+		dc_texturefrac = R_CalcFrac ();
+		colfunc ();
+		R_UnlockTextureCompositePatchNum(midtexture);
+	    }
 	    ceilingclip[rw_x] = viewheight;
 	    floorclip[rw_x] = -1;
-	    R_UnlockTextureCompositePatchNum(midtexture);
-	    tex_patch = NULL;
 	}
 	else
 	{
@@ -541,20 +544,24 @@ void R_RenderSegLoop (void)
 
 		if (mid >= yl)
 		{
-		    dc_yl = yl;
-		    dc_yh = mid;
-		    dc_texturemid = rw_toptexturemid;
-		    dc_ylim = textureheight[toptexture];
-		    tex_patch = R_CacheTextureCompositePatchNum(toptexture);
-		    dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
-		    dc_texturefrac = R_CalcFrac ();
-		    colfunc ();
+		    if ((yl < viewheight) && (mid >= 0))
+		    {
+			dc_yl = yl;
+			dc_yh = mid;
+			dc_texturemid = rw_toptexturemid;
+			dc_ylim = textureheight[toptexture];
+			tex_patch = R_CacheTextureCompositePatchNum(toptexture);
+			dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
+			dc_texturefrac = R_CalcFrac ();
+			colfunc ();
+			R_UnlockTextureCompositePatchNum(toptexture);
+		    }
 		    ceilingclip[rw_x] = mid;
-		    R_UnlockTextureCompositePatchNum(toptexture);
-		    tex_patch = NULL;
 		}
 		else
+		{
 		    ceilingclip[rw_x] = yl-1;
+		}
 	    }
 	    else
 	    {
@@ -575,20 +582,24 @@ void R_RenderSegLoop (void)
 
 		if (mid <= yh)
 		{
-		    dc_yl = mid;
-		    dc_yh = yh;
-		    dc_texturemid = rw_bottomtexturemid;
-		    dc_ylim = textureheight[bottomtexture];
-		    tex_patch = R_CacheTextureCompositePatchNum(bottomtexture);
-		    dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
-		    dc_texturefrac = R_CalcFrac ();
-		    colfunc ();
+		    if ((mid < viewheight) && (yh >= 0))
+		    {
+			dc_yl = mid;
+			dc_yh = yh;
+			dc_texturemid = rw_bottomtexturemid;
+			dc_ylim = textureheight[bottomtexture];
+			tex_patch = R_CacheTextureCompositePatchNum(bottomtexture);
+			dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
+			dc_texturefrac = R_CalcFrac ();
+			colfunc ();
+			R_UnlockTextureCompositePatchNum(bottomtexture);
+		    }
 		    floorclip[rw_x] = mid;
-		    R_UnlockTextureCompositePatchNum(bottomtexture);
-		    tex_patch = NULL;
 		}
 		else
+		{
 		    floorclip[rw_x] = yh+1;
+		}
 	    }
 	    else
 	    {
@@ -634,7 +645,7 @@ void R_StoreWallRange(int start, int stop)
     // don't overflow and crash
     if (pos >= MAXDRAWSEGS)
     {
-        drawsegoverflowcount++;
+	drawsegoverflowcount++;
 	return;
     }
 
