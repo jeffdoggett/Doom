@@ -2691,9 +2691,23 @@ void A_Face (mobj_t *mo, pspdef_t* psp)
 
 void A_Scratch (mobj_t *mo, pspdef_t* psp)
 {
-    mo->target && (A_FaceTarget(mo,psp), P_CheckMeleeRange(mo)) ?
-	mo->state->misc2 ? S_StartSound(mo, (fixed_t)mo->state->misc2) : (void)0,
-	P_DamageMobj(mo->target, mo, mo, (fixed_t)mo->state->misc1) : (void)0;
+    state_t * state;
+    fixed_t misc2;
+
+    if (mo->target)
+    {
+      A_FaceTarget (mo, psp);
+
+      if (P_CheckMeleeRange (mo))
+      {
+	state = mo->state;
+	misc2 = (fixed_t) state->misc2;
+	if (misc2)
+	  S_StartSound (mo, misc2);
+
+	P_DamageMobj (mo->target, mo, mo, (fixed_t)state->misc1);
+      }
+    }
 }
 
 void A_PlaySound (mobj_t *mo, pspdef_t* psp)
