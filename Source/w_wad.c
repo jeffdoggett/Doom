@@ -654,15 +654,43 @@ int W_CheckNumForNameBounded (const char * start, const char * end, const char *
 #endif
 
 /* ---------------------------------------------------------------------------- */
+/*
+   Find the next iteration of a lump name, but ignore lumps within _START, _END markers.
+*/
 
 int W_NextLumpNumForName (const char* name, int startlump)
 {
-  do
+  int loading;
+  const char * lname;
+  lumpinfo_t* lump_ptr;
+
+  if (++startlump < numlumps)
   {
-    if (++startlump >= numlumps)
-      return (-1);
-  } while (strncasecmp (lumpinfo[startlump].name, name, 8));
-  return (startlump);
+    loading = 1;
+    lump_ptr = &lumpinfo[startlump];
+    do
+    {
+      lname = lump_ptr->name;
+
+      if (loading)
+      {
+	if (strncasecmp (lname, name, 8) == 0)
+	  return (startlump);
+
+	if (strncasecmp (lname+1, "_START", 8) == 0)
+	  loading = 0;
+      }
+      else
+      {
+	if (strncasecmp (lname+1, "_END", 8) == 0)
+	  loading = 1;
+      }
+
+      lump_ptr++;
+    } while (++startlump < numlumps);
+  }
+
+  return (-1);
 }
 
 /* ---------------------------------------------------------------------------- */
