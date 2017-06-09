@@ -137,9 +137,9 @@ static byte *GenerateTintTable (const byte *palette, int percent, const byte * f
 		    }
 		    else
 		    {
-			r = MIN(colour1[0] + colour2[0], 255);
-			g = MIN(colour1[1] + colour2[1], 255);
-			b = MIN(colour1[2] + colour2[2], 255);
+			r = colour1[0] + colour2[0]; if (r > 255) r = 255;
+			g = colour1[1] + colour2[1]; if (g > 255) g = 255;
+			b = colour1[2] + colour2[2]; if (b > 255) b = 255;
 		    }
 		}
 		else
