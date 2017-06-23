@@ -299,7 +299,6 @@ static int SlopeDiv (unsigned int num, unsigned int den)
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
 {
     angle_t rc;
-    double at;
 
     x -= x1;
     y -= y1;
