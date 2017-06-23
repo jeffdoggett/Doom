@@ -42,30 +42,44 @@ static const char rcsid[] = "$Id: tables.c,v 1.4 1997/02/03 16:47:57 b1 Exp $";
 
 
 
-#include "tables.h"
+#include "includes.h"
 
 
 
 
-int
-SlopeDiv
-( unsigned	num,
-  unsigned	den)
+int SlopeDiv (unsigned int num, unsigned int den)
 {
-    unsigned 	ans;
+    uint32_t ans32;
+    uint64_t ans64;
 
     if (den < 512)
-	return SLOPERANGE;
+	return (SLOPERANGE);
 
-    ans = (num<<3)/(den>>8);
+    if (num >= 0x20000000)		// Will the shift overflow 32 bits?
+    {
+#ifdef NORMALUNIX
+      printf ("SlopeDiv %X %X\n", num, den);
+#endif
+      ans64 = num;			// Yes. Use 64 bit arithmetic
+      ans64 <<= 3;
+      ans64 /= (den >> 8);
+      ans32 = (int) ans64;
+    }
+    else
+    {
+      ans32 = (num << 3) / (den >> 8);
+    }
 
-    return ans <= SLOPERANGE ? ans : SLOPERANGE;
+    if (ans32 > SLOPERANGE)
+      ans32 = SLOPERANGE;
+
+    return ((int) ans32);
 }
 
 
 
 
-int finetangent[4096] =
+const fixed_t finetangent[4096] =
 {
     -170910304,-56965752,-34178904,-24413316,-18988036,-15535599,-13145455,-11392683,
     -10052327,-8994149,-8137527,-7429880,-6835455,-6329090,-5892567,-5512368,
@@ -582,7 +596,7 @@ int finetangent[4096] =
 };
 
 
-int finesine[10240] =
+const fixed_t finesine[10240] =
 {
     25,75,125,175,226,276,326,376,
     427,477,527,578,628,678,728,779,
@@ -1868,7 +1882,7 @@ int finesine[10240] =
 
 
 
-angle_t tantoangle[2049] =
+const angle_t tantoangle[2049] =
 {
     0,333772,667544,1001315,1335086,1668857,2002626,2336395,
     2670163,3003929,3337694,3671457,4005219,4338979,4672736,5006492,
