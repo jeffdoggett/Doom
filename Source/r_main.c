@@ -273,7 +273,7 @@ static int SlopeDiv (unsigned int num, unsigned int den)
     {
       ans64 = num;			// Yes. Use 64 bit arithmetic
       ans64 <<= 3;
-      ans64 /= (den >> 8);
+      ans64 /= (uint64_t)(den >> 8);
       ans32 = (uint32_t) ans64;
     }
     else
@@ -298,8 +298,6 @@ static int SlopeDiv (unsigned int num, unsigned int den)
 
 angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
 {
-    angle_t rc;
-
     x -= x1;
     y -= y1;
 
