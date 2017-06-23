@@ -46,39 +46,6 @@ static const char rcsid[] = "$Id: tables.c,v 1.4 1997/02/03 16:47:57 b1 Exp $";
 
 
 
-
-int SlopeDiv (unsigned int num, unsigned int den)
-{
-    uint32_t ans32;
-    uint64_t ans64;
-
-    if (den < 512)
-	return (SLOPERANGE);
-
-    if (num >= 0x20000000)		// Will the shift overflow 32 bits?
-    {
-#ifdef NORMALUNIX
-      printf ("SlopeDiv %X %X\n", num, den);
-#endif
-      ans64 = num;			// Yes. Use 64 bit arithmetic
-      ans64 <<= 3;
-      ans64 /= (den >> 8);
-      ans32 = (int) ans64;
-    }
-    else
-    {
-      ans32 = (num << 3) / (den >> 8);
-    }
-
-    if (ans32 > SLOPERANGE)
-      ans32 = SLOPERANGE;
-
-    return ((int) ans32);
-}
-
-
-
-
 const fixed_t finetangent[4096] =
 {
     -170910304,-56965752,-34178904,-24413316,-18988036,-15535599,-13145455,-11392683,

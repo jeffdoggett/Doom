@@ -259,6 +259,33 @@ R_PointOnSegSide
     return 1;
 }
 
+/* -------------------------------------------------------------------------- */
+
+static int SlopeDiv (unsigned int num, unsigned int den)
+{
+    uint32_t ans32;
+    uint64_t ans64;
+
+    if (den < 512)
+	return (SLOPERANGE);
+
+    if (num >= 0x20000000)		// Will the shift overflow 32 bits?
+    {
+      ans64 = num;			// Yes. Use 64 bit arithmetic
+      ans64 <<= 3;
+      ans64 /= (den >> 8);
+      ans32 = (uint32_t) ans64;
+    }
+    else
+    {
+      ans32 = (num << 3) / (den >> 8);
+    }
+
+    if (ans32 > SLOPERANGE)
+      ans32 = SLOPERANGE;
+
+    return ((int) ans32);
+}
 
 /* -------------------------------------------------------------------------- */
 //
@@ -279,22 +306,6 @@ angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x, fixed_t y)
 
     if (!x && !y)
 	return 0;
-
-    if (x > MAXINT / 4 || x < -MAXINT / 4 || y > MAXINT / 4 || y < -MAXINT / 4)
-    {
-	at = atan2(y, x) * ANG180 / M_PI;
-	if (at < 0)			// Major bug in RiscOS here, barfs when
-	{				// the number is negative!
-	  at = -at;
-	  rc = (angle_t) at;
-	  rc = -rc;
-	}
-	else
-	{
-	  rc = (angle_t) at;
-	}
-	return (rc);
-    }
 
     if (x >= 0)
     {
