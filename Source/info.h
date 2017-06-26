@@ -259,9 +259,7 @@ typedef enum
   MT_BLUEBLOOD,
   MT_GREENBLOOD,
   MT_FUZZYBLOOD,
-  MT_BLOODSPLAT,
   MT_TRAIL,
-  MT_SHADOW,
 
   // [BH] 100 extra mobjs to use in DeHackEd patches
   MT_EXTRA00, MT_EXTRA01, MT_EXTRA02, MT_EXTRA03, MT_EXTRA04,
