@@ -248,8 +248,9 @@ static void A_DecrementAmmo (player_t* player, int amount)
     ammotype_t ammo;
 
     ammo = weaponinfo[player->readyweapon].ammo;
-    if (ammo < NUMAMMO)
-      player->ammo[ammo] -= amount;
+    if ((ammo < NUMAMMO)
+     && ((player->ammo[ammo] -= amount) < 0))
+      player->ammo[ammo] = 0;
 }
 
 //-----------------------------------------------------------------------------
