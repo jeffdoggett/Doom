@@ -245,12 +245,17 @@ static boolean P_CheckAmmo (player_t* player)
 
 static void A_DecrementAmmo (player_t* player, int amount)
 {
+    int newamount;
     ammotype_t ammo;
 
     ammo = weaponinfo[player->readyweapon].ammo;
-    if ((ammo < NUMAMMO)
-     && ((player->ammo[ammo] -= amount) < 0))
-      player->ammo[ammo] = 0;
+    if (ammo < NUMAMMO)
+    {
+      newamount = player->ammo[ammo] - amount;
+      if (newamount < 0)
+        newamount = 0;
+      player->ammo[ammo] = newamount;
+    }
 }
 
 //-----------------------------------------------------------------------------
