@@ -479,6 +479,7 @@ static void F_DetermineIntermissionTexts (void)
 //
 void F_StartFinale (int always)
 {
+    int lump;
     map_dests_t * map_ptr;
 
     F_DetermineIntermissionTexts ();
@@ -497,7 +498,13 @@ void F_StartFinale (int always)
 	//finaletext = finale_messages[c1text];  // FIXME - other text, music?
 
 	map_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
-	if (G_MapLump (map_ptr -> normal_exit_to_episode, map_ptr -> normal_exit_to_map) == -1)
+
+	if (secretexit)
+	  lump = G_MapLump (map_ptr -> secret_exit_to_episode, map_ptr -> secret_exit_to_map);
+	else
+	  lump = G_MapLump (map_ptr -> normal_exit_to_episode, map_ptr -> normal_exit_to_map);
+
+	if (lump == -1)
 	{
 	  switch (finaleendgame)
 	  {
@@ -552,6 +559,7 @@ boolean F_Responder (event_t *event)
 void F_Ticker (void)
 {
     int		fc;
+    int		lump;
     map_dests_t * map_ptr;
 
     // check for skipping
@@ -585,8 +593,14 @@ void F_Ticker (void)
 	  return;
 	}
 
-	map_ptr = G_Access_MapInfoTab_E (255, gamemap);
-	if (G_MapLump (255, map_ptr -> normal_exit_to_map) == -1)
+	map_ptr = G_Access_MapInfoTab (gameepisode, gamemap);
+
+	if (secretexit)
+	  lump = G_MapLump (map_ptr -> secret_exit_to_episode, map_ptr -> secret_exit_to_map);
+	else
+	  lump = G_MapLump (map_ptr -> normal_exit_to_episode, map_ptr -> normal_exit_to_map);
+
+	if (lump == -1)
 	{
 	  switch (finaleendgame)
 	  {
