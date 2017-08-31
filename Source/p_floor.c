@@ -939,70 +939,42 @@ int EV_DoElevator
 
 //-----------------------------------------------------------------------------
 
-void T_MoveElevator (elevator_t* elevator)
+void T_MoveElevator (elevator_t *elevator)
 {
-  result_e      res;
+    result_e    res;
 
-  //BOOMTRACEOUT("T_MoveElevator")
+    if (elevator->direction < 0)                // moving down
+    {
+        // jff 4/7/98 reverse order of ceiling/floor
+        res = T_MoveCeilingPlane (elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
 
-  if (elevator->direction<0)      /* moving down */
-  {
-    res = T_MoveFloorPlane        /*jff 4/7/98 reverse order of ceiling/floor */
-    (
-      elevator->sector,
-      elevator->speed,
-      elevator->ceilingdestheight,
-      false,
-      elevator->direction
-    );
-    if (res==ok || res==pastdest) /* jff 4/7/98 don't move ceil if blocked */
-      T_MoveCeilingPlane
-      (
-	elevator->sector,
-	elevator->speed,
-	elevator->floordestheight,
-	false,
-	elevator->direction
-      );
-  }
-  else /* up */
-  {
-    res = T_MoveCeilingPlane	  /*jff 4/7/98 reverse order of ceiling/floor */
-    (
-      elevator->sector,
-      elevator->speed,
-      elevator->floordestheight,
-      false,
-      elevator->direction
-    );
-    if (res==ok || res==pastdest) /* jff 4/7/98 don't move floor if blocked */
-      T_MoveFloorPlane
-      (
-	elevator->sector,
-	elevator->speed,
-	elevator->ceilingdestheight,
-	false,
-	elevator->direction
-      );
-  }
+        // jff 4/7/98 don't move ceil if blocked
+        if (res == ok || res == pastdest)
+            T_MoveFloorPlane (elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
+    }
+    else                                        // up
+    {
+        // jff 4/7/98 reverse order of ceiling/floor
+        res = T_MoveFloorPlane(elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
 
+        // jff 4/7/98 don't move floor if blocked
+        if (res == ok || res == pastdest)
+            T_MoveCeilingPlane(elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
+    }
 
-  if (res != pastdest)	    /* if destination height acheived */
-  {
-    /* make floor move sound */
-    if (!(leveltime&7))
-      S_StartSound((mobj_t *)&elevator->sector->soundorg, sfx_stnmov);
-  }
-  else
-  {
-    elevator->sector->floordata = NULL;     /*jff 2/22/98 */
-    elevator->sector->ceilingdata = NULL;   /*jff 2/22/98 */
-    /*if (demo_compatibility) elevator->sector->lightingdata = NULL; TEST */
-    P_RemoveThinker(&elevator->thinker);    /* remove elevator from actives */
+    // make floor move sound
+    if (!(leveltime & 7))
+        S_StartSound (&elevator->sector->soundorg, sfx_stnmov);
 
-    /* make floor stop sound */
-    S_StartSound((mobj_t *)&elevator->sector->soundorg, sfx_pstop);
-  }
+    if (res == pastdest)                        // if destination height achieved
+    {
+        elevator->sector->floordata = NULL;
+        elevator->sector->ceilingdata = NULL;
+        P_RemoveThinker (&elevator->thinker);     // remove elevator from actives
+
+        // make floor stop sound
+        S_StartSound (&elevator->sector->soundorg, sfx_pstop);
+    }
 }
 
 //-----------------------------------------------------------------------------
