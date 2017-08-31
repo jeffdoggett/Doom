@@ -42,10 +42,7 @@ void T_PlatRaise(plat_t* plat)
   switch(plat->status)
   {
     case up:
-      res = T_MovePlane(plat->sector,
-			plat->speed,
-			plat->high,
-			plat->crush,0,1);
+      res = T_MoveFloorPlane (plat->sector, plat->speed, plat->high, plat->crush, 1);
 
       if (res == crushed && (!plat->crush))
       {
@@ -85,7 +82,7 @@ void T_PlatRaise(plat_t* plat)
       break;
 
     case down:
-      res = T_MovePlane(plat->sector,plat->speed,plat->low,false,0,-1);
+      res = T_MoveFloorPlane (plat->sector,plat->speed,plat->low,false,-1);
 
       if (res == pastdest)
       {

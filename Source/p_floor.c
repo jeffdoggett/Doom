@@ -44,173 +44,171 @@ boolean P_CheckSector(sector_t *sector, boolean crunch);
 //
 // Move a plane (floor or ceiling) and check for crushing
 //
-result_e
-T_MovePlane
-( sector_t*	sector,
-  fixed_t	speed,
-  fixed_t	dest,
-  boolean	crush,
-  int		floorOrCeiling,
-  int		direction )
+result_e T_MoveFloorPlane (sector_t* sector, fixed_t speed, fixed_t dest, boolean crush, int direction)
 {
   boolean	flag;
   fixed_t	lastpos;
 
-  switch(floorOrCeiling)
-  {
-    case 0:
-      // FLOOR
-      switch(direction)
-      {
-	case -1:
-	  // DOWN
-	  if (sector->floorheight - speed < dest)
-	  {
-	    lastpos = sector->floorheight;
-	    sector->floorheight = dest;
-	    flag = P_ChangeSectorFunc(sector,crush);
-#if 0
-	    /* Removed by JAD 13/10/2011 because a floor */
-	    /* going downwards cannot possibly crush anything */
-	    if (flag == true)
-	    {
-		sector->floorheight =lastpos;
-		P_ChangeSectorFunc(sector,crush);
-		//return crushed;
-	    }
-#endif
-	    return pastdest;
-	  }
-	  else
-	  {
-	    lastpos = sector->floorheight;
-	    sector->floorheight -= speed;
-	    flag = P_ChangeSectorFunc(sector,crush);
-#if 0
-	    if (flag == true)
-	    {
-		sector->floorheight = lastpos;
-		P_ChangeSectorFunc(sector,crush);
-		return crushed;
-	    }
-#endif
-	  }
-	  break;
+  lastpos = sector->floorheight;
 
-	case 1:
-	  // UP
-	  if (sector->floorheight + speed > dest)
-	  {
-	    lastpos = sector->floorheight;
-	    sector->floorheight = dest;
-	    flag = P_ChangeSectorFunc(sector,crush);
-	    if (flag == true)
-	    {
-		sector->floorheight = lastpos;
-		P_ChangeSectorFunc(sector,crush);
-		//return crushed;
-	    }
-	    return pastdest;
-	  }
-	  else
-	  {
-	    // COULD GET CRUSHED
-	    lastpos = sector->floorheight;
-	    sector->floorheight += speed;
-	    flag = P_ChangeSectorFunc(sector,crush);
-	    if (flag == true)
-	    {
-	      if (crush == true)
-		  return crushed;
-	      sector->floorheight = lastpos;
-	      P_ChangeSectorFunc(sector,crush);
-	      return crushed;
-	    }
-	  }
-	  break;
+  switch(direction)
+  {
+    case -1:
+      // DOWN
+      if (lastpos - speed < dest)
+      {
+	sector->floorheight = dest;
+	flag = P_ChangeSectorFunc(sector,crush);
+#if 0
+	/* Removed by JAD 13/10/2011 because a floor */
+	/* going downwards cannot possibly crush anything */
+	if (flag == true)
+	{
+	    sector->floorheight = lastpos;
+	    P_ChangeSectorFunc(sector,crush);
+	    //return crushed;
+	}
+#endif
+	return pastdest;
+      }
+      else
+      {
+	sector->floorheight = lastpos - speed;
+	flag = P_ChangeSectorFunc(sector,crush);
+#if 0
+	if (flag == true)
+	{
+	    sector->floorheight = lastpos;
+	    P_ChangeSectorFunc(sector,crush);
+	    return crushed;
+	}
+#endif
       }
       break;
 
     case 1:
-      // CEILING
-      switch(direction)
+      // UP
+
+      if (dest > sector->ceilingheight)
+	dest = sector->ceilingheight;
+
+      if (lastpos + speed > dest)
       {
-	case -1:
-	  // DOWN
-	  if (sector->ceilingheight - speed < dest)
-	  {
-	    lastpos = sector->ceilingheight;
-	    sector->ceilingheight = dest;
-	    flag = P_ChangeSectorFunc(sector,crush);
-
-	    if (flag == true)
-	    {
-		sector->ceilingheight = lastpos;
-		P_ChangeSectorFunc(sector,crush);
-		//return crushed;
-	    }
-	    return pastdest;
-	  }
-	  else
-	  {
-	    // COULD GET CRUSHED
-	    lastpos = sector->ceilingheight;
-	    sector->ceilingheight -= speed;
-	    flag = P_ChangeSectorFunc(sector,crush);
-
-	    if (flag == true)
-	    {
-	      if (crush == true)
-		  return crushed;
-	      sector->ceilingheight = lastpos;
-	      P_ChangeSectorFunc(sector,crush);
+	sector->floorheight = dest;
+	flag = P_ChangeSectorFunc(sector,crush);
+	if (flag == true)
+	{
+	    sector->floorheight = lastpos;
+	    P_ChangeSectorFunc(sector,crush);
+	    //return crushed;
+	}
+	return pastdest;
+      }
+      else
+      {
+	// COULD GET CRUSHED
+	sector->floorheight = lastpos + speed;
+	flag = P_ChangeSectorFunc(sector,crush);
+	if (flag == true)
+	{
+	  if (crush == true)
 	      return crushed;
-	    }
-	  }
-	  break;
-
-	case 1:
-	  // UP
-	  if (sector->ceilingheight + speed > dest)
-	  {
-	    lastpos = sector->ceilingheight;
-	    sector->ceilingheight = dest;
-	    flag = P_ChangeSectorFunc(sector,crush);
-#if 0
-	    /* Removed by JAD 13/10/2011 because a ceiling */
-	    /* going upwards cannot possibly crush anything */
-	    if (flag == true)
-	    {
-	      sector->ceilingheight = lastpos;
-	      P_ChangeSectorFunc(sector,crush);
-	      //return crushed;
-	    }
-#endif
-	    return pastdest;
-	  }
-	  else
-	  {
-	    lastpos = sector->ceilingheight;
-	    sector->ceilingheight += speed;
-	    flag = P_ChangeSectorFunc(sector,crush);
-// UNUSED
-#if 0
-	    if (flag == true)
-	    {
-	      sector->ceilingheight = lastpos;
-	      P_ChangeSectorFunc(sector,crush);
-	      return crushed;
-	    }
-#endif
-	  }
-	  break;
+	  sector->floorheight = lastpos;
+	  P_ChangeSectorFunc(sector,crush);
+	  return crushed;
+	}
       }
       break;
-
   }
+
   return ok;
 }
 
+
+//-----------------------------------------------------------------------------
+
+result_e T_MoveCeilingPlane (sector_t* sector, fixed_t speed, fixed_t dest, boolean crush, int direction)
+{
+  boolean	flag;
+  fixed_t	lastpos;
+
+  lastpos = sector->ceilingheight;
+
+  switch(direction)
+  {
+    case -1:
+      // DOWN
+
+      if (dest < sector->floorheight)
+	dest = sector->floorheight;
+
+      if (lastpos - speed < dest)
+      {
+	sector->ceilingheight = dest;
+	flag = P_ChangeSectorFunc(sector,crush);
+
+	if (flag == true)
+	{
+	    sector->ceilingheight = lastpos;
+	    P_ChangeSectorFunc(sector,crush);
+	    //return crushed;
+	}
+	return pastdest;
+      }
+      else
+      {
+	// COULD GET CRUSHED
+	sector->ceilingheight -= speed;
+	flag = P_ChangeSectorFunc(sector,crush);
+
+	if (flag == true)
+	{
+	  if (crush == true)
+	      return crushed;
+	  sector->ceilingheight = lastpos;
+	  P_ChangeSectorFunc(sector,crush);
+	  return crushed;
+	}
+      }
+      break;
+
+    case 1:
+      // UP
+      if (sector->ceilingheight + speed > dest)
+      {
+	sector->ceilingheight = dest;
+	flag = P_ChangeSectorFunc(sector,crush);
+#if 0
+	/* Removed by JAD 13/10/2011 because a ceiling */
+	/* going upwards cannot possibly crush anything */
+	if (flag == true)
+	{
+	  sector->ceilingheight = lastpos;
+	  P_ChangeSectorFunc(sector,crush);
+	  //return crushed;
+	}
+#endif
+	return pastdest;
+      }
+      else
+      {
+	sector->ceilingheight += speed;
+	flag = P_ChangeSectorFunc(sector,crush);
+// UNUSED
+#if 0
+	if (flag == true)
+	{
+	  sector->ceilingheight = lastpos;
+	  P_ChangeSectorFunc(sector,crush);
+	  return crushed;
+	}
+#endif
+      }
+      break;
+  }
+
+  return ok;
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -223,11 +221,7 @@ void T_MoveFloor(floormove_t* floor)
 
   sec = floor->sector;
 
-  res = T_MovePlane(sec,
-		    floor->speed,
-		    floor->floordestheight,
-		    floor->crush,0,floor->direction);
-
+  res = T_MoveFloorPlane (sec, floor->speed, floor->floordestheight, floor->crush, floor->direction);
 
   if (res != pastdest)
   {
@@ -953,45 +947,41 @@ void T_MoveElevator (elevator_t* elevator)
 
   if (elevator->direction<0)      /* moving down */
   {
-    res = T_MovePlane	     /*jff 4/7/98 reverse order of ceiling/floor */
+    res = T_MoveFloorPlane        /*jff 4/7/98 reverse order of ceiling/floor */
     (
       elevator->sector,
       elevator->speed,
       elevator->ceilingdestheight,
       false,
-      1,			  /* move floor */
       elevator->direction
     );
     if (res==ok || res==pastdest) /* jff 4/7/98 don't move ceil if blocked */
-      T_MovePlane
+      T_MoveCeilingPlane
       (
 	elevator->sector,
 	elevator->speed,
 	elevator->floordestheight,
 	false,
-	0,			/* move ceiling */
 	elevator->direction
       );
   }
   else /* up */
   {
-    res = T_MovePlane	     /*jff 4/7/98 reverse order of ceiling/floor */
+    res = T_MoveCeilingPlane	  /*jff 4/7/98 reverse order of ceiling/floor */
     (
       elevator->sector,
       elevator->speed,
       elevator->floordestheight,
       false,
-      0,			  /* move ceiling */
       elevator->direction
     );
     if (res==ok || res==pastdest) /* jff 4/7/98 don't move floor if blocked */
-      T_MovePlane
+      T_MoveFloorPlane
       (
 	elevator->sector,
 	elevator->speed,
 	elevator->ceilingdestheight,
 	false,
-	1,			/* move floor */
 	elevator->direction
       );
   }

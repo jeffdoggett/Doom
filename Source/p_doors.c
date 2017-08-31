@@ -159,11 +159,7 @@ void T_VerticalDoor (vldoor_t* door)
 
       case -1:
 	// DOWN
-	res = T_MovePlane(door->sector,
-			  door->speed,
-			  door->sector->floorheight,
-			  false,1,door->direction);
-
+	res = T_MoveCeilingPlane (door->sector, door->speed, door->sector->floorheight, false, door->direction);
 	switch (res)
 	{
 	  case pastdest:
@@ -230,11 +226,7 @@ void T_VerticalDoor (vldoor_t* door)
 
       case 1:
 	// UP
-	res = T_MovePlane(door->sector,
-			  door->speed,
-			  door->topheight,
-			  false,1,door->direction);
-
+	res = T_MoveCeilingPlane (door->sector, door->speed, door->topheight, false, door->direction);
 	switch (res)
 	{
 	  case pastdest:

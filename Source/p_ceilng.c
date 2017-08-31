@@ -85,10 +85,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 //    break;
 
     case 1:	// UP
-      res = T_MovePlane(ceiling->sector,
-			ceiling->speed,
-			ceiling->topheight,
-			false,1,ceiling->direction);
+      res = T_MoveCeilingPlane (ceiling->sector, ceiling->speed, ceiling->topheight, false, ceiling->direction);
 
       if (res != pastdest)
       {
@@ -136,12 +133,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
       break;
 
     case -1:	// DOWN
-      res = T_MovePlane(ceiling->sector,
-			ceiling->speed,
-			ceiling->bottomheight,
-			ceiling->crush,1,ceiling->direction);
-
-
+      res = T_MoveCeilingPlane (ceiling->sector, ceiling->speed, ceiling->bottomheight, ceiling->crush,ceiling->direction);
       if (res != pastdest)
       {
 	if (!(leveltime&7))

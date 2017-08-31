@@ -1110,92 +1110,36 @@ typedef enum
 
 } result_e;
 
-result_e
-T_MovePlane
-( sector_t*	sector,
-  fixed_t	speed,
-  fixed_t	dest,
-  boolean	crush,
-  int		floorOrCeiling,
-  int		direction );
+result_e T_MoveFloorPlane (sector_t* sector, fixed_t speed, fixed_t dest, boolean crush, int direction);
+result_e T_MoveCeilingPlane (sector_t* sector, fixed_t speed, fixed_t dest, boolean crush,int direction);
 
-int
-EV_BuildStairs
-( line_t*	line,
-  stair_e	buildtype);
-
-int
-EV_DoFloor
-( line_t*	line,
-  floor_e	floortype );
-
-void T_MoveFloor( floormove_t* floor);
-
+int EV_BuildStairs (line_t* line, stair_e buildtype);
+int EV_DoFloor (line_t* line, floor_e floortype);
+void T_MoveFloor(floormove_t* floor);
 void EV_DoGoobers (void);
 
 
 //
 // P_TELEPT
 //
-int
-EV_Teleport
-( line_t*	line,
-  int		side,
-  mobj_t*	thing );
-
-
-
+int EV_Teleport (line_t* line, int side, mobj_t* thing);
 
 /* special action function prototypes */
 
-void T_LightFlash
-( lightflash_t* flash );
+void T_LightFlash (lightflash_t* flash);
+void T_StrobeFlash (strobe_t* flash);
+void T_FireFlicker (fireflicker_t* flick);
+void T_Glow (glow_t* g);
+void T_PlatRaise (plat_t* plat);
+void T_VerticalDoor (vldoor_t* door);
+void T_MoveCeiling (ceiling_t* ceiling);
+void T_MoveFloor (floormove_t* floor);
+void T_MoveElevator (elevator_t* elevator);
+void T_Scroll (scroll_t *);
+void T_Friction (friction_t *);
+void T_Pusher (pusher_t *);
 
-void T_StrobeFlash
-( strobe_t* flash );
-
-void T_FireFlicker
-( fireflicker_t* flick );
-
-void T_Glow
-( glow_t* g );
-
-void T_PlatRaise
-( plat_t* plat );
-
-void T_VerticalDoor
-( vldoor_t* door );
-
-void T_MoveCeiling
-( ceiling_t* ceiling );
-
-result_e T_MovePlane
-( sector_t* sector,
-  fixed_t speed,
-  fixed_t dest,
-  boolean crush,
-  int floorOrCeiling,
-  int direction );
-
-void T_MoveFloor
-( floormove_t* floor );
-
-void T_MoveElevator
-( elevator_t* elevator );
-
-void T_Scroll
-( scroll_t * );
-
-void T_Friction
-( friction_t * );
-
-void T_Pusher
-( pusher_t * );
-
-
-int EV_DoElevator
-( line_t* line,
-  elevator_e type );
+int EV_DoElevator ( line_t* line, elevator_e type );
 
 
 #endif
