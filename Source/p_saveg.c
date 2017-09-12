@@ -756,8 +756,10 @@ static byte * P_UnArchiveMobj (byte * save_p, actionf_p1 func)
 
   mobj->tracer = (mobj_t*) ((uintptr_t) p_load_32 (save_32_p)); save_32_p++;
 
-  P_SetThingPosition (mobj);
   mobj->info = &mobjinfo[mobj->type];
+
+  P_SetThingPosition (mobj);
+
   mobj->floorz = mobj->subsector->sector->floorheight;
   mobj->ceilingz = mobj->subsector->sector->ceilingheight;
 

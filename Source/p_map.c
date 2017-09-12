@@ -137,6 +137,7 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     int		yh;
     int		bx;
     int		by;
+    fixed_t	radius;
     subsector_t*	newsubsec;
 
     // monsters don't stomp things except on boss level (30)
@@ -150,15 +151,16 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     // kill anything occupying the position
     tmthing = thing;
     tmflags = thing->flags;
+    radius  = thing->radius;
 
     tmx = x;
     tmy = y;
     tmz = z;
 
-    tmbbox[BOXTOP] = y + tmthing->radius;
-    tmbbox[BOXBOTTOM] = y - tmthing->radius;
-    tmbbox[BOXRIGHT] = x + tmthing->radius;
-    tmbbox[BOXLEFT] = x - tmthing->radius;
+    tmbbox[BOXTOP] = y + radius;
+    tmbbox[BOXBOTTOM] = y - radius;
+    tmbbox[BOXRIGHT] = x + radius;
+    tmbbox[BOXLEFT] = x - radius;
 
     newsubsec = R_PointInSubsector (x,y);
     ceilingline = NULL;
@@ -508,7 +510,7 @@ P_CheckPosition
     int		yh;
     int		bx;
     int		by;
-    int		tmradius;
+    fixed_t	tmradius;
     subsector_t*newsubsec;
 
     tmthing = thing;
@@ -593,22 +595,25 @@ mobj_t *P_CheckOnmobj (mobj_t * thing)
     subsector_t	*newsubsec;
     fixed_t	x;
     fixed_t	y;
+    fixed_t	radius;
     mobj_t	oldmo;
 
     x = thing->x;
     y = thing->y;
     tmthing = thing;
     tmflags = thing->flags;
+
     oldmo = *thing;		// save the old mobj before the fake zmovement
     P_FakeZMovement(tmthing);
 
     tmx = x;
     tmy = y;
 
-    tmbbox[BOXTOP] = y + tmthing->radius;
-    tmbbox[BOXBOTTOM] = y - tmthing->radius;
-    tmbbox[BOXRIGHT] = x + tmthing->radius;
-    tmbbox[BOXLEFT] = x - tmthing->radius;
+    radius = tmthing->radius;
+    tmbbox[BOXTOP] = y + radius;
+    tmbbox[BOXBOTTOM] = y - radius;
+    tmbbox[BOXRIGHT] = x + radius;
+    tmbbox[BOXLEFT] = x - radius;
 
     newsubsec = R_PointInSubsector(x, y);
     ceilingline = NULL;
@@ -1952,6 +1957,7 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 {
     int xl, xh, yl, yh, bx, by;
     msecnode_t*	node;
+    fixed_t	radius;
     mobj_t*	saved_tmthing;
     fixed_t	saved_tmx;
     fixed_t	saved_tmy;
@@ -1969,14 +1975,15 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 
     tmthing = thing;
     tmflags = thing->flags;
+    radius  = thing->info->pickupradius;
 
     tmx = x;
     tmy = y;
 
-    tmbbox[BOXTOP] = y + tmthing->radius;
-    tmbbox[BOXBOTTOM] = y - tmthing->radius;
-    tmbbox[BOXRIGHT] = x + tmthing->radius;
-    tmbbox[BOXLEFT] = x - tmthing->radius;
+    tmbbox[BOXTOP] = y + radius;
+    tmbbox[BOXBOTTOM] = y - radius;
+    tmbbox[BOXRIGHT] = x + radius;
+    tmbbox[BOXLEFT] = x - radius;
 
     validcount++;	// used to make sure we only process a line once
 
@@ -2006,15 +2013,16 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 
     // Restore tmthing....
 
-    tmx = saved_tmx;
-    tmy = saved_tmy;
+    tmx = x = saved_tmx;
+    tmy = y = saved_tmy;
     if ((tmthing = saved_tmthing) != NULL)
     {
       tmflags = tmthing->flags;
-      tmbbox[BOXTOP] = tmy + tmthing->radius;
-      tmbbox[BOXBOTTOM] = tmy - tmthing->radius;
-      tmbbox[BOXRIGHT] = tmx + tmthing->radius;
-      tmbbox[BOXLEFT] = tmx - tmthing->radius;
+      radius  = tmthing->radius;
+      tmbbox[BOXTOP] = y + radius;
+      tmbbox[BOXBOTTOM] = y - radius;
+      tmbbox[BOXRIGHT] = x + radius;
+      tmbbox[BOXLEFT] = x - radius;
     }
 }
 
