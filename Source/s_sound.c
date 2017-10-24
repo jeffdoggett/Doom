@@ -855,7 +855,6 @@ S_AdjustSoundParams
     fixed_t	approx_dist;
     fixed_t	adx;
     fixed_t	ady;
-    angle_t	angle;
 
     // calculate the distance to sound origin
     //  and clip it if necessary
@@ -875,21 +874,30 @@ S_AdjustSoundParams
 	//  return 0;
     }
 
-    // angle of source to listener
-    angle = R_PointToAngle2(listener->x,
-			    listener->y,
-			    source->x,
-			    source->y);
-
-    if (angle > listener->angle)
-	angle = angle - listener->angle;
+    if (monosfx)
+    {
+      *sep = NORM_SEP;
+    }
     else
-	angle = angle + (0xffffffff - listener->angle);
+    {
+      angle_t	angle;
 
-    angle >>= ANGLETOFINESHIFT;
+      // angle of source to listener
+      angle = R_PointToAngle2(listener->x,
+			      listener->y,
+			      source->x,
+			      source->y);
 
-    // stereo separation
-    *sep = NORM_SEP - (monosfx ? 0 : (FixedMul(S_STEREO_SWING,finesine[angle])>>FRACBITS));
+      if (angle > listener->angle)
+	  angle = angle - listener->angle;
+      else
+	  angle = angle + (0xffffffff - listener->angle);
+
+      angle >>= ANGLETOFINESHIFT;
+
+      // stereo separation
+      *sep = NORM_SEP - (FixedMul(S_STEREO_SWING,finesine[angle])>>FRACBITS);
+    }
 
     // volume calculation
     if (approx_dist < S_CLOSE_DIST)
