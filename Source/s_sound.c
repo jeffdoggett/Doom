@@ -106,6 +106,7 @@ static int		nextChannel = 0;
 
 static int		nomusic;
 static int		nosfx;
+static int		monosfx;
 
 muschangeinfo_t		muschangeinfo;
 
@@ -133,6 +134,7 @@ void S_InitSound (void)
 {
   nomusic = !snd_AllowMusic;
   nosfx = false;
+  monosfx = false;
 
   if (M_CheckParm ("-nosound"))
   {
@@ -145,6 +147,8 @@ void S_InitSound (void)
       nomusic = true;
     if (M_CheckParm ("-nosfx"))
       nosfx = true;
+    if (M_CheckParm ("-monosfx"))
+      monosfx = true;
   }
 
   S_ReadMUSINFO ();
@@ -885,7 +889,7 @@ S_AdjustSoundParams
     angle >>= ANGLETOFINESHIFT;
 
     // stereo separation
-    *sep = 128 - (FixedMul(S_STEREO_SWING,finesine[angle])>>FRACBITS);
+    *sep = NORM_SEP - (monosfx ? 0 : (FixedMul(S_STEREO_SWING,finesine[angle])>>FRACBITS));
 
     // volume calculation
     if (approx_dist < S_CLOSE_DIST)
