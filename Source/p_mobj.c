@@ -467,12 +467,15 @@ P_NightmareRespawn (mobj_t* mobj)
     fixed_t		x;
     fixed_t		y;
     fixed_t		z;
-    subsector_t*	ss;
     mobj_t*		mo;
     mapthing_t*		mthing;
 
     x = mobj->spawnpoint.x << FRACBITS;
     y = mobj->spawnpoint.y << FRACBITS;
+    if (mobj->info->flags & MF_SPAWNCEILING)
+	z = ONCEILINGZ;
+    else
+	z = ONFLOORZ;
 
 
    /* haleyjd: stupid nightmare respawning bug fix
@@ -495,17 +498,15 @@ P_NightmareRespawn (mobj_t* mobj)
 
     // spawn a teleport fog at old spot
     // because of removal of the body?
-    mo = P_SpawnMobj (mobj->x,
-		      mobj->y,
-		      mobj->subsector->sector->floorheight , MT_TFOG);
+    mo = P_SpawnMobj (mobj->x, mobj->y, z, MT_TFOG);
+
     // initiate teleport sound
     S_StartSound (mo, sfx_telept);
 
     if ((x != mobj->x) || (y != mobj->y))
     {
       // spawn a teleport fog at the new spot
-      ss = R_PointInSubsector (x,y);
-      mo = P_SpawnMobj (x, y, ss->sector->floorheight , MT_TFOG);
+      mo = P_SpawnMobj (x, y, z, MT_TFOG);
       S_StartSound (mo, sfx_telept);
     }
 
@@ -513,11 +514,6 @@ P_NightmareRespawn (mobj_t* mobj)
     mthing = &mobj->spawnpoint;
 
     // spawn it
-    if (mobj->info->flags & MF_SPAWNCEILING)
-	z = ONCEILINGZ;
-    else
-	z = ONFLOORZ;
-
     // inherit attributes from deceased one
     mo = P_SpawnMobj (x,y,z, mobj->type);
     mo->spawnpoint = mobj->spawnpoint;
@@ -792,7 +788,6 @@ void P_RespawnSpecials (void)
     fixed_t		y;
     fixed_t		z;
 
-    subsector_t*	ss;
     mobj_t*		mo;
     mapthing_t*		mthing;
 
@@ -812,23 +807,21 @@ void P_RespawnSpecials (void)
 
     mthing = &itemrespawnque[iquetail];
 
-    x = mthing->x << FRACBITS;
-    y = mthing->y << FRACBITS;
-
-    // spawn a teleport fog at the new spot
-    ss = R_PointInSubsector (x,y);
-    mo = P_SpawnMobj (x, y, ss->sector->floorheight , MT_IFOG);
-    S_StartSound (mo, sfx_itmbk);
-
     // find which type to spawn
     i = P_FindDoomedNum (mthing->type);
 
-    // spawn it
+    x = mthing->x << FRACBITS;
+    y = mthing->y << FRACBITS;
     if (mobjinfo[i].flags & MF_SPAWNCEILING)
 	z = ONCEILINGZ;
     else
 	z = ONFLOORZ;
 
+    // spawn a teleport fog at the new spot
+    mo = P_SpawnMobj (x, y, z, MT_IFOG);
+    S_StartSound (mo, sfx_itmbk);
+
+    // spawn it
     mo = P_SpawnMobj (x,y,z, (mobjtype_t) i);
     mo->spawnpoint = *mthing;
     mo->angle = ANG45 * (mthing->angle/45);
