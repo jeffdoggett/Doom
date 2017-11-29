@@ -365,7 +365,7 @@ int EV_Check_Lock (player_t * p, int keynum)
     }
 
     p->message = door_messages [keynum];
-    S_StartSound(NULL,sfx_oof);
+    S_StartSound(p->mo,sfx_oof);
   }
   return 0;
 }

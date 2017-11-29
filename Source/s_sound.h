@@ -59,7 +59,7 @@ void S_Start(void);
 //
 void
 S_StartSound
-( void*		origin,
+( mobj_t*	origin,
   int		sound_id );
 
 

@@ -964,7 +964,7 @@ void T_MoveElevator (elevator_t *elevator)
 
     // make floor move sound
     if (!(leveltime & 7))
-        S_StartSound (&elevator->sector->soundorg, sfx_stnmov);
+        S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_stnmov);
 
     if (res == pastdest)                        // if destination height achieved
     {
@@ -973,7 +973,7 @@ void T_MoveElevator (elevator_t *elevator)
         P_RemoveThinker (&elevator->thinker);     // remove elevator from actives
 
         // make floor stop sound
-        S_StartSound (&elevator->sector->soundorg, sfx_pstop);
+        S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_pstop);
     }
 }
 

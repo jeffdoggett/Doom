@@ -316,7 +316,7 @@ static int S_GetSfxLumpNum (sfxinfo_t* sfx)
 
 /* ------------------------------------------------------------ */
 
-static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
+static void S_StartSoundAtVolume (mobj_t* origin, int sfx_id, int volume)
 {
   int		rc;
   int		sep;
@@ -326,7 +326,6 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
   int		cnum;
   int		next;
   int		lumpnum;
-  mobj_t*	origin = (mobj_t *) origin_p;
 
 
   // Debug.
@@ -467,7 +466,7 @@ static void S_StartSoundAtVolume (void* origin_p, int sfx_id, int volume)
 
 void
 S_StartSound
-( void*		origin,
+( mobj_t*	origin,
   int		sfx_id )
 {
 #ifdef SAWDEBUG
