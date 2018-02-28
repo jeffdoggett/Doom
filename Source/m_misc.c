@@ -630,6 +630,7 @@ void M_ScreenShot (void)
   byte*	linear;
   char	pcxname [6];
   char	lbmname [80];
+  char * shotdir;
 
   // munge planar buffer to linear
   linear = screens[2];
@@ -640,11 +641,26 @@ void M_ScreenShot (void)
   pcxname [4] = 0;
 
   // find a file name to save it to
-  i=~0;
+
+  shotdir = basedefaultdir;		// Assume default directory
+
+  i = M_CheckParm ("-shotdir");
+  if (i && i<myargc-1)
+  {
+    struct stat file_stat;
+
+    if ((stat (myargv[i+1], &file_stat) == 0)
+     && (file_stat.st_mode & S_IFDIR))
+    {
+      shotdir = myargv[i+1];
+    }
+  }
+
+  i = ~0;
   do
   {
     i++;
-    sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", basedefaultdir, pcxname, i);
+    sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", shotdir, pcxname, i);
   } while (access(lbmname,0) != -1);	// file doesn't exist
 
   // save the pcx file
