@@ -15,6 +15,7 @@
 #include <dirent.h>
 #include "d_main.h"
 #include "acorn.h"
+#define OS_SpriteOp		0x2E
 #define OS_ReadMonotonicTime	0x42
 #define OS_ReadMemMapInfo	0x51
 
@@ -87,6 +88,19 @@ void set_riscos_filetype (const char * file, unsigned int type)
 
   osfile.load = type;
   _kernel_osfile (18,file,&osfile);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+void riscos_screensave (const char * file)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 2;
+  regs.r[2] = (int) file;
+  regs.r[3] = 1;		// Save palette
+
+  _kernel_swi (OS_SpriteOp, &regs, &regs);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -441,7 +455,7 @@ struct dirent *readdir (DIR * dir)
 
       /* Finished when R4 = -1 */
     } while (next != -1);
-  }  
+  }
   return (0);
 }
 

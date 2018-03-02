@@ -523,6 +523,7 @@ void M_LoadDefaults (void)
 
 
 //-----------------------------------------------------------------------------
+#ifndef __riscos
 //
 // SCREEN SHOTS
 //
@@ -619,7 +620,7 @@ WritePCXfile
 
   Z_Free (pcx);
 }
-
+#endif
 //-----------------------------------------------------------------------------
 //
 // M_ScreenShot
@@ -655,20 +656,37 @@ void M_ScreenShot (void)
       shotdir = myargv[i+1];
     }
   }
+  else
+  {
+    char * f;
+#ifdef __riscos
+    f = getenv ("DoomPicDir");
+#else
+    f = getenv ("DOOMPICDIR");
+#endif
+    if (f)
+      shotdir = f;
+  }
 
   i = ~0;
   do
   {
     i++;
+#ifdef __riscos
+    sprintf (lbmname, "%s"DIRSEP"%s%04u", shotdir, pcxname, i);
+#else
     sprintf (lbmname, "%s"DIRSEP"%s%04u"EXTSEP"pcx", shotdir, pcxname, i);
+#endif
   } while (access(lbmname,0) != -1);	// file doesn't exist
 
+#ifdef __riscos
+  riscos_screensave (lbmname);
+#else
   // save the pcx file
   WritePCXfile (lbmname, linear,
 		SCREENWIDTH, SCREENHEIGHT,
 		W_CacheLumpName ("PLAYPAL",PU_CACHE));
-#ifdef __riscos
-  set_riscos_filetype (lbmname, 0x697);
+  // set_riscos_filetype (lbmname, 0x697);
 #endif
 
   players[consoleplayer].message = HU_printf ("%s - %s", screenshot_messages[SC_MESSAGE], lbmname);
