@@ -423,13 +423,10 @@ P_UseSpecialLine
 	switch(line->special)
 	{
 	  case 1: 	// MANUAL DOOR RAISE
-	  case 32:	// MANUAL BLUE
-	  case 33:	// MANUAL RED
-	  case 34:	// MANUAL YELLOW
-	  case 195:
-	  case 174:
-	  case 210:
-	  case 209:
+	  case 195:	// Teleport
+	  case 174:	// Teleport
+	  case 210:	// Teleport
+	  case 209:	// Teleport
 	    break;
 
 	  default:
@@ -452,21 +449,14 @@ P_UseSpecialLine
       case 28:		// Red Door /Locked
 
       case 31:		// Manual door open
+      case 32:		// Blue locked door open
+      case 33:		// Red locked door open
+      case 34:		// Yellow locked door open
 
       case 117:		// Blazing door raise
       case 118:		// Blazing door open
 	EV_VerticalDoor (line, thing);
 	rc = true;
-	break;
-
-      case 32:		// Blue locked door open
-      case 33:		// Red locked door open
-      case 34:		// Yellow locked door open
-	if (thing->player)
-	{
-	  EV_VerticalDoor (line, thing);
-	  rc = true;
-	}
 	break;
 
 	//UNUSED - Door Slide Open&Close
