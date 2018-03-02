@@ -452,14 +452,21 @@ P_UseSpecialLine
       case 28:		// Red Door /Locked
 
       case 31:		// Manual door open
-      case 32:		// Blue locked door open
-      case 33:		// Red locked door open
-      case 34:		// Yellow locked door open
 
       case 117:		// Blazing door raise
       case 118:		// Blazing door open
 	EV_VerticalDoor (line, thing);
 	rc = true;
+	break;
+
+      case 32:		// Blue locked door open
+      case 33:		// Red locked door open
+      case 34:		// Yellow locked door open
+	if (thing->player)
+	{
+	  EV_VerticalDoor (line, thing);
+	  rc = true;
+	}
 	break;
 
 	//UNUSED - Door Slide Open&Close
