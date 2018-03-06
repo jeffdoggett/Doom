@@ -589,10 +589,10 @@ static int EV_DoGenDoorSec (sector_t* sec, line_t* line, vldoor_e type, mobj_t* 
 
   switch (genshift(type,DoorSpeed,DoorSpeedShift))
   {
-    case 0: door->speed = VDOORSPEED/2; break;
-    case 1: door->speed = VDOORSPEED; break;
-    case 2: door->speed = VDOORSPEED * 2; break;
-    default:door->speed = VDOORSPEED * 4;
+    case SpeedSlow: door->speed = VDOORSPEED/2; break;
+    case SpeedNormal: door->speed = VDOORSPEED; break;
+    case SpeedFast: door->speed = VDOORSPEED * 2; break;
+    default: /* SpeedTurbo */ door->speed = VDOORSPEED * 4;
   }
 
   if (type >= GenDoorBase)

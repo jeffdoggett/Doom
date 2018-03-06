@@ -1930,7 +1930,6 @@ P_ShootSpecialLine
       switch(line->special)
       {
 	case 46:
-	case 0x8B00+47:
 	  // OPEN DOOR IMPACT
 	  break;
 
@@ -1961,14 +1960,15 @@ P_ShootSpecialLine
       if (EV_DoDoor(line,normalOpen))
       {
 	P_ChangeSwitchTexture(line,0);
-	line -> special = 0x8B00+47;
+	// We set the line again just in case...
+	line -> special = GenDoorBase
+			| (ODoor << DoorKindShift)
+			| (SpeedNormal << DoorSpeedShift)
+			| (1 << DoorDelayShift)
+			| DoorMonster
+			| GunMany;
 	rc = true;
       }
-      break;
-
-    case 0x8B00+47:
-      if (EV_DoDoor (line,normalOpen))
-	rc = true;
       break;
 
     case 47:

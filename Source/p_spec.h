@@ -173,7 +173,7 @@
 #define LockedKindShift		5
 #define LockedSpeedShift	3
 
-#define genshift(t,a,s)		(t>>s)&(a>>s)
+#define genshift(t,a,s)		((t>>s)&(a>>s))
 
 /* define names for the TriggerType field of the general linedefs */
 
