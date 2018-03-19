@@ -686,14 +686,10 @@ void    P_SpawnGlowingLight(sector_t* sector);
 
 typedef enum
 {
+    nowhere = -1,
     top,
     middle,
-    bottom,
-
-    // Allow for multiple switches
-    sw_top    = 0x10,
-    sw_middle = 0x20,
-    sw_bottom = 0x40
+    bottom
 } bwhere_e;
 
 
@@ -708,7 +704,7 @@ typedef struct
 } button_t;
 
 
-extern button_t* P_StartButton (line_t* line, bwhere_e w, int texture, int time);
+extern void P_StartButton (line_t* line, bwhere_e w, int texture, int time);
 extern void T_Button (button_t* button);
 
  // 1 second, in ticks.

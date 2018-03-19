@@ -255,43 +255,43 @@ void P_PatchSwitchList (const char * patchline)
 
 void T_Button (button_t* button)
 {
-  mobj_t *	soundorg;
+  int     texTop;
+  int     texMid;
+  int     texBot;
+  int     btexture;
+  side_t * side;
+  mobj_t * soundorg;
 
   if ((button -> btimer == 0)
    || (--button -> btimer == 0))
   {
-    // Allow for old savegames which didn't use multiple buttons on a single line.
+    side = &sides[button->line->sidenum[0]];
+    texTop = side -> toptexture;
+    texMid = side -> midtexture;
+    texBot = side -> bottomtexture;
+    btexture = button -> btexture;
 
-    if ((unsigned int)(button -> where) & 0xF0)	// New format?
+    switch (button -> where)
     {
-      unsigned int where = (unsigned int)(button -> where);
+      case top:
+	side->toptexture = btexture;
+	break;
 
-      if (where & (unsigned int) sw_top)
-	sides[button -> line->sidenum[0]].toptexture = button -> btexture;
+      case middle:
+	side->midtexture = btexture;
+	if (texTop == texMid)
+	  side->toptexture = btexture;
+	break;
 
-      if (where & (unsigned int) sw_middle)
-	sides[button -> line->sidenum[0]].midtexture = button -> btexture;
-
-      if (where & (unsigned int) sw_bottom)
-	sides[button -> line->sidenum[0]].bottomtexture = button -> btexture;
+      case bottom:
+	side->bottomtexture = btexture;
+	if (texTop == texBot)
+	  side->toptexture = btexture;
+	if (texMid == texBot)
+	  side->midtexture = btexture;
+	break;
     }
-    else
-    {
-      switch (button -> where)
-      {
-	case top:
-	  sides[button -> line->sidenum[0]].toptexture = button -> btexture;
-	  break;
 
-	case middle:
-	  sides[button -> line->sidenum[0]].midtexture = button -> btexture;
-	  break;
-
-	case bottom:
-	  sides[button -> line->sidenum[0]].bottomtexture = button -> btexture;
-	  break;
-      }
-    }
     soundorg = button -> soundorg;
     if (soundorg == NULL)			// Just in case, should never be zero!
       soundorg = (mobj_t *)&button->line->soundorg;
@@ -304,7 +304,7 @@ void T_Button (button_t* button)
 //
 // Start a button counting down till it turns off.
 //
-button_t*
+void
 P_StartButton
 ( line_t*	line,
   bwhere_e	where,
@@ -320,7 +320,6 @@ P_StartButton
   button -> btexture = texture;
   button -> btimer = time;
   button -> soundorg = (mobj_t *)&line->soundorg;
-  return (button);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -339,9 +338,8 @@ P_ChangeSwitchTexture
   int     i;
   int     sound;
   int	  swtex;
-  boolean sound_required;
+  bwhere_e where;
   side_t * side;
-  button_t* button;
   mobj_t * soundorg;
   switchlist_t*	this_switch;
 
@@ -362,56 +360,41 @@ P_ChangeSwitchTexture
   if (!useAgain)
     line->special = 0;
 
-
   for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
   {
-    sound_required = false;
     i = 0;
     do
     {
+      where = nowhere;
       swtex = this_switch->textures[i];
-      button = NULL;
 
       if (swtex == texTop)
       {
-	sound_required = true;
-	if (useAgain)
-	  button = P_StartButton (line,sw_top,swtex,BUTTONTIME);
+	where = top;
 	side -> toptexture = this_switch->textures[i^1];
       }
 
       if (swtex == texMid)
       {
-	sound_required = true;
-	if (useAgain)
-	{
-	  if (button)			// Already got a thinker?
-	    button -> where = (bwhere_e) (((unsigned int) button -> where) | (unsigned int) sw_middle);
-	  else
-	    button = P_StartButton (line, sw_middle,swtex,BUTTONTIME);
-	}
+	where = middle;
 	side -> midtexture = this_switch->textures[i^1];
       }
 
       if (swtex == texBot)
       {
-	sound_required = true;
-	if (useAgain)
-	{
-	  if (button)			// Already got a thinker?
-	    button -> where = (bwhere_e) (((unsigned int) button -> where) | (unsigned int) sw_bottom);
-	  else
-	    button = P_StartButton(line, sw_bottom,swtex,BUTTONTIME);
-	}
+	where = bottom;
 	side -> bottomtexture = this_switch->textures[i^1];
       }
-    } while (++i < 2);
 
-    if (sound_required)
-    {
-      soundorg = (mobj_t *) &line->soundorg;
-      S_StartSound (soundorg, sound);
-    }
+      if (where != nowhere)
+      {
+	if (useAgain)
+	  P_StartButton (line, where, swtex, BUTTONTIME);
+
+	soundorg = (mobj_t *) &line->soundorg;
+	S_StartSound (soundorg, sound);
+      }
+    } while (++i < 2);
   }
 }
 
