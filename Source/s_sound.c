@@ -537,6 +537,29 @@ S_StartSound
 
 /* ------------------------------------------------------------ */
 
+void
+S_StartSoundOnce
+( mobj_t*	origin,
+  int		sfx_id )
+{
+    int cnum;
+    sfxinfo_t*	sfx;
+
+    sfx = &S_sfx[sfx_id];
+    for (cnum=0 ; cnum<numChannels ; cnum++)
+    {
+	if ((channels[cnum].sfxinfo == sfx) && (channels[cnum].origin == origin))
+	{
+	  // printf ("Suppressed sound %u\n", sfx_id);
+	  return;
+	}
+    }
+
+    S_StartSoundAtVolume(origin, sfx_id, snd_SfxVolume);
+}
+
+/* ------------------------------------------------------------ */
+
 void S_RemoveSoundOrigin (void *origin)
 {
     int cnum;
@@ -545,7 +568,7 @@ void S_RemoveSoundOrigin (void *origin)
 
     for (cnum=0 ; cnum<numChannels ; cnum++)
     {
-	if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
+	if ((channels[cnum].sfxinfo) && (channels[cnum].origin == origin))
 	{
 	    sorigin = &sound_origin [cnum];
 	    mobj = (mobj_t*) origin;

@@ -62,6 +62,11 @@ S_StartSound
 ( mobj_t*	origin,
   int		sound_id );
 
+void
+S_StartSoundOnce
+( mobj_t*	origin,
+  int		sound_id );
+
 
 // Stop sound for thing at <origin>
 void S_StopSound(void* origin);
