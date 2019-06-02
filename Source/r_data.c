@@ -240,6 +240,28 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 
 /* ------------------------------------------------------------------------------------------------ */
 
+static void R_ReadTextureSet (int names_lump, int maptex_lump_1, int maptex_lump_2)
+{
+  // printf ("\nR_ReadTextureSet (%d, %d, %d)", names_lump, maptex_lump_1, maptex_lump_2);
+
+  if (maptex_lump_1 == -1)			// Some PWADS only have a TEXTURES2 and no TEXTURES1
+  {
+    maptex_lump_1 = maptex_lump_2;
+    maptex_lump_2 = -1;
+  }
+  if (maptex_lump_1 != -1)
+  {
+    if (names_lump == -1)
+      names_lump = W_GetNumForName ("PNAMES");
+    R_ReadTextures (names_lump, maptex_lump_1, maptex_lump_2);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+/*
+   Sigil.wad has two sets of PNAMES,TEXTURES1 & TEXTURES2 so just load them all.
+*/
+
 static void R_MergeTextures (void)
 {
   int lump;
@@ -256,20 +278,9 @@ static void R_MergeTextures (void)
   do
   {
     lump--;
-    if ((lumpinfo[lump].handle != handle)
-     || (lump == 0))
+    if (lumpinfo[lump].handle != handle)
     {
-      if (maptex_lump_1 == -1)			// Some PWADS only have a TEXTURES2 and no TEXTURES1
-      {
-	maptex_lump_1 = maptex_lump_2;
-	maptex_lump_2 = -1;
-      }
-      if (maptex_lump_1 != -1)
-      {
-	if (names_lump == -1)
-	  names_lump = W_GetNumForName ("PNAMES");
-	R_ReadTextures (names_lump, maptex_lump_1, maptex_lump_2);
-      }
+      R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
       names_lump = -1;
       maptex_lump_1 = -1;
       maptex_lump_2 = -1;
@@ -277,15 +288,41 @@ static void R_MergeTextures (void)
     }
 
     if (strcasecmp (lumpinfo[lump].name, "PNAMES") == 0)
+    {
+      if (names_lump != -1)	// Already seen one?
+      {
+        R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
+        names_lump = -1;
+        maptex_lump_1 = -1;
+        maptex_lump_2 = -1;
+      }
       names_lump = lump;
-
+    }
     else if (strncasecmp (lumpinfo[lump].name, "TEXTURE1", 8) == 0)
+    {
+      if (maptex_lump_1 != -1)
+      {
+        R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
+        names_lump = -1;
+        maptex_lump_1 = -1;
+        maptex_lump_2 = -1;
+      }
       maptex_lump_1 = lump;
-
+    }
     else if (strncasecmp (lumpinfo[lump].name, "TEXTURE2", 8) == 0)
+    {
+      if (maptex_lump_2 != -1)
+      {
+        R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
+        names_lump = -1;
+        maptex_lump_1 = -1;
+        maptex_lump_2 = -1;
+      }
       maptex_lump_2 = lump;
-
+    }
   } while (lump);
+
+  R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
 }
 
 /* ------------------------------------------------------------------------------------------------ */

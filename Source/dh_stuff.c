@@ -58,6 +58,11 @@ extern const char sky_1 [];
 extern const char sky_2 [];
 extern const char sky_3 [];
 extern const char sky_4 [];
+extern const char sky_5 [];
+extern const char sky_6 [];
+extern const char sky_7 [];
+extern const char sky_8 [];
+extern const char sky_9 [];
 extern const char cwilv [];
 extern const char wilv [];
 extern const char enterpic_1 [];
@@ -2604,6 +2609,16 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
     pp = sky_3;
   else if (strcasecmp (orig, sky_4) == 0)
     pp = sky_4;
+  else if (strcasecmp (orig, sky_5) == 0)
+    pp = sky_5;
+  else if (strcasecmp (orig, sky_6) == 0)
+    pp = sky_6;
+  else if (strcasecmp (orig, sky_7) == 0)
+    pp = sky_7;
+  else if (strcasecmp (orig, sky_8) == 0)
+    pp = sky_8;
+  else if (strcasecmp (orig, sky_9) == 0)
+    pp = sky_9;
   else if (strcasecmp (orig, wilv) == 0)
     pp = wilv;
   else if (strcasecmp (orig, cwilv) == 0)
