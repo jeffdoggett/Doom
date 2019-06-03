@@ -4,6 +4,7 @@
 /* Copyright 1998		*/
 
 #include "includes.h"
+#include <stddef.h>				// For the offsetof() macro
 
 /* Strings from info.c */
 extern char * sprnames [];
@@ -4469,6 +4470,54 @@ static char * replace_map_text (char ** dest, char * ptr)
 
 /* ---------------------------------------------------------------------------- */
 
+static char * replace_all_map_text (unsigned int doing_default, unsigned int episode, unsigned int map, unsigned int ptr_offset, char * ptr)
+{
+  unsigned int i,j;
+  char * newtext;
+  char * dest_ptr_0;
+  char ** dest_ptr_1;
+  char ** dest_ptr_2;
+  map_dests_t * mdest_ptr;
+
+  if (doing_default)
+    mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+  else
+    mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+
+  dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
+  dest_ptr_1 = (char**) dest_ptr_0;
+  ptr = replace_map_text (dest_ptr_1, ptr);
+
+  if (doing_default)
+  {
+    newtext = *dest_ptr_1;
+    i = 1;
+    do
+    {
+      mdest_ptr = G_Access_MapInfoTab_E (255, i);
+      dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
+      dest_ptr_2 = (char**) dest_ptr_0;
+      *dest_ptr_2 = newtext;
+    } while (++i < 100);
+    i = 0;
+    do
+    {
+      j = 0;
+      do
+      {
+        mdest_ptr = G_Access_MapInfoTab_E (i, j);
+	dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
+	dest_ptr_2 = (char**) dest_ptr_0;
+	*dest_ptr_2 = newtext;
+      } while (++j < 10);
+    } while (++i < 10);
+  }
+
+  return (ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 typedef struct
 {
   char name [8];
@@ -4886,20 +4935,23 @@ static void Parse_Mapinfo (char * ptr, char * top)
     {
       /* Picture used as the backdrop for the 'entering level' screen. */
       /* If starts with a $ then the lump is an 'intermission script' */
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      ptr = replace_map_text (&mdest_ptr -> enterpic, ptr+10);
+      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,enterpic), ptr+9);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "exitpic ", 8) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      ptr = replace_map_text (&mdest_ptr -> exitpic, ptr+9);
+      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,exitpic), ptr+8);
+      intertext = -1;
+    }
+    else if (strncasecmp (ptr, "interpic ", 9) == 0)
+    {
+      replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,enterpic), ptr+9);
+      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,exitpic), ptr+9);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "bordertexture ", 14) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      ptr = replace_map_text (&mdest_ptr -> bordertexture, ptr + 15);
+      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,bordertexture), ptr+14);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "music ", 6) == 0)
@@ -4914,7 +4966,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	  ptr [j+4] = 'D';
 	  strcpy (ptr+(j-1), ptr+j+4);
 	}
-	ptr = replace_map_text (&mdest_ptr -> music, ptr);
+	ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,music), ptr);
 	// printf ("Map Music = %s for %u/%u\n", mdest_ptr -> music, episode, map);
       }
       else
