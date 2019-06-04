@@ -1987,49 +1987,62 @@ static void D_ShowStartupMessage (void)
 }
 
 //-----------------------------------------------------------------------------
-/*
-  Change the name of the savegame file to match the wad being played.
-*/
-static void D_SetSaveGameFilename (void)
+
+void D_GetSaveGameFilename (char * dest)
 {
   int p,q;
   char cc;
   char * newtext;
   const char * leaf;
+
+  p = 0;
+  newtext = NULL;
+  dest [0] = 0;
+
+  while (wadfiles[p])
+  {
+    if (IdentifyWad (wadfiles[p], 0) & 255)
+      newtext = wadfiles[p];
+    p++;
+  }
+
+  if (newtext)
+  {
+    leaf = leafname (newtext);
+    q = 0;
+    do
+    {
+      cc = *leaf++;
+      cc = tolower (cc);
+      if ((cc == '/') || (cc == '.') || (q > 35))
+	cc = 0;
+      dest [q++] = cc;
+    } while (cc);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+/*
+  Change the name of the savegame file to match the wad being played.
+*/
+static void D_SetSaveGameFilename (void)
+{
+  char * newtext;
   char gamename [40];
 
   if (strcasecmp (save_game_messages [GG_SAVEGAMENAME], save_game_messages_orig [GG_SAVEGAMENAME]) == 0)
   {
-    p = 0;
-    newtext = NULL;
-    while (wadfiles[p])
-    {
-      if (IdentifyWad (wadfiles[p], 0) & 255)
-	newtext = wadfiles[p];
-      p++;
-    }
+    D_GetSaveGameFilename (gamename);
 
-    if (newtext)
+    if ((gamename [0])
+     && (strcmp (gamename, "doom1"))
+     && (strcmp (gamename, "doom"))
+     && (strcmp (gamename, "doomu")))
     {
-      leaf = leafname (newtext);
-      q = 0;
-      do
-      {
-	cc = *leaf++;
-	cc = tolower (cc);
-	if ((cc == '/') || (cc == '.') || (q > 35))
-	  cc = 0;
-	gamename [q++] = cc;
-      } while (cc);
-
-      if ((strcmp (gamename, "doom1"))
-       && (strcmp (gamename, "doom"))
-       && (strcmp (gamename, "doomu")))
-      {
-	newtext = strdup (gamename);
-	if (newtext)
-	  save_game_messages [GG_SAVEGAMENAME] = newtext;
-      }
+      newtext = strdup (gamename);
+      if (newtext)
+	save_game_messages [GG_SAVEGAMENAME] = newtext;
     }
   }
 

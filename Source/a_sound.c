@@ -199,6 +199,8 @@ extern char * music_names_copy [];
 extern clusterdefs_t * finale_clusterdefs_head;
 extern muschangeinfo_t	muschangeinfo;
 
+extern void D_GetSaveGameFilename (char * dest);
+
 /* ------------------------------------------------------------ */
 
 /* Info about music playing */
@@ -1062,6 +1064,35 @@ static int I_Validate_MusName (const char * musname)
 }
 
 /* ------------------------------------------------------------ */
+/*
+   Allow either "prefix+Wadname" or just "prefix" or just "+wadname"
+*/
+
+static int I_MusicForThisWad (char * buffer, const char * prefix, const char * wadname)
+{
+  unsigned int pos;
+
+  // Are we interested in the postfix?
+
+  pos = dh_inchar (buffer, '+');
+  if (pos == 0)
+  {
+    return (dh_instr (buffer, prefix));
+  }
+
+  buffer [pos-1] = 0;
+  if ((pos > 1)
+   && (dh_instr (buffer, prefix)))
+    return (1);
+
+  if ((wadname [0])
+   && (dh_instr (buffer+pos, wadname)))
+    return (1);
+
+  return (0);
+}
+
+/* ------------------------------------------------------------ */
 
 static void I_InitMusicDirectory (void)
 {
@@ -1071,6 +1102,7 @@ static void I_InitMusicDirectory (void)
   mus_dir_t * mptr;
   char * prefix;
   char * bptr;
+  char wadname [40];
   char buffer [200];
   char filename [100];
 
@@ -1112,6 +1144,8 @@ static void I_InitMusicDirectory (void)
     }
   }
 
+  D_GetSaveGameFilename (wadname);
+
   line = 0;
   do
   {
@@ -1124,7 +1158,7 @@ static void I_InitMusicDirectory (void)
       if (pos)
       {
 	buffer [pos-1] = 0;
-	if (dh_instr (buffer, prefix) == 0)
+	if (I_MusicForThisWad (buffer, prefix, wadname) == 0)
 	  continue;
 	bptr = buffer + pos;
       }

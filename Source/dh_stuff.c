@@ -4470,54 +4470,6 @@ static char * replace_map_text (char ** dest, char * ptr)
 
 /* ---------------------------------------------------------------------------- */
 
-static char * replace_all_map_text (unsigned int doing_default, unsigned int episode, unsigned int map, unsigned int ptr_offset, char * ptr)
-{
-  unsigned int i,j;
-  char * newtext;
-  char * dest_ptr_0;
-  char ** dest_ptr_1;
-  char ** dest_ptr_2;
-  map_dests_t * mdest_ptr;
-
-  if (doing_default)
-    mdest_ptr = G_Access_MapInfoTab_E (255, 0);
-  else
-    mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-
-  dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
-  dest_ptr_1 = (char**) dest_ptr_0;
-  ptr = replace_map_text (dest_ptr_1, ptr);
-
-  if (doing_default)
-  {
-    newtext = *dest_ptr_1;
-    i = 1;
-    do
-    {
-      mdest_ptr = G_Access_MapInfoTab_E (255, i);
-      dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
-      dest_ptr_2 = (char**) dest_ptr_0;
-      *dest_ptr_2 = newtext;
-    } while (++i < 100);
-    i = 0;
-    do
-    {
-      j = 0;
-      do
-      {
-        mdest_ptr = G_Access_MapInfoTab_E (i, j);
-	dest_ptr_0 = ((char *) mdest_ptr) + ptr_offset;
-	dest_ptr_2 = (char**) dest_ptr_0;
-	*dest_ptr_2 = newtext;
-      } while (++j < 10);
-    } while (++i < 10);
-  }
-
-  return (ptr);
-}
-
-/* ---------------------------------------------------------------------------- */
-
 typedef struct
 {
   char name [8];
@@ -4628,6 +4580,38 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 /* ---------------------------------------------------------------------------- */
 
+static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_dests_t * msource_ptr)
+{
+  void * ptr;
+  map_dests_t * mdest_ptr;
+
+  mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+
+//  normal_exit_to_episode;
+//  normal_exit_to_map;
+//  secret_exit_to_episode;
+//  secret_exit_to_map;
+//  this_is_a_secret_level;
+//  reset_kit_etc_on_entering;
+//  intermission_text;
+//  cluster;
+//  nointermission;
+//  allow_monster_telefrags;
+//  par_time_5;			// Par time divided by 5
+//  time_sucks;			// Par time for sucks in minutes
+
+  if (msource_ptr->skydelta != 0x7FFFFFFF)		mdest_ptr->skydelta = msource_ptr->skydelta;
+  if ((ptr = msource_ptr->mapname) != NULL)		mdest_ptr->mapname = ptr;
+  if ((ptr = msource_ptr->sky) != NULL)			mdest_ptr->sky = ptr;
+  if ((ptr = msource_ptr->titlepatch) != NULL)		mdest_ptr->titlepatch = ptr;
+  if ((ptr = msource_ptr->enterpic) != NULL)		mdest_ptr->enterpic = ptr;
+  if ((ptr = msource_ptr->exitpic) != NULL)		mdest_ptr->exitpic = ptr;
+  if ((ptr = msource_ptr->bordertexture) != NULL)	mdest_ptr->bordertexture = ptr;
+  if ((ptr = msource_ptr->music) != NULL)		mdest_ptr->music = ptr;
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void Parse_Mapinfo (char * ptr, char * top)
 {
   char cc;
@@ -4645,6 +4629,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
   bossdeath_t * bd_ptr;
   map_dests_t * mdest_ptr;
   unsigned int args [8];
+  map_dests_t default_mapinfo;
 
   *top = 0;
   clusterdefpresent = dh_instr (ptr, "clusterdef");
@@ -4657,6 +4642,8 @@ static void Parse_Mapinfo (char * ptr, char * top)
   doing_episode = 0;
   doing_default = 0;
   bd_ptr = NULL;
+  memset (&default_mapinfo, 0, sizeof (default_mapinfo));
+  default_mapinfo.skydelta = 0x7FFFFFFF;
 
   do
   {
@@ -4676,6 +4663,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
       doing_episode = 1;
       doing_default = 0;
       intertext = -1;
+      WriteDefaultMapInfo (episode, map, &default_mapinfo);
     }
     else if (strncasecmp (ptr, "name ", 5) == 0)
     {
@@ -4797,6 +4785,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	}
       }
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
+      WriteDefaultMapInfo (episode, map, &default_mapinfo);
     }
     else if (strncasecmp (ptr, "next ", 5) == 0)
     {
@@ -4939,23 +4928,66 @@ static void Parse_Mapinfo (char * ptr, char * top)
     {
       /* Picture used as the backdrop for the 'entering level' screen. */
       /* If starts with a $ then the lump is an 'intermission script' */
-      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,enterpic), ptr+9);
+
+      if (doing_default)
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	default_mapinfo.enterpic = mdest_ptr->enterpic;
+	mdest_ptr = &default_mapinfo;
+      }
+      else
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      }
+
+      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+9);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "exitpic ", 8) == 0)
     {
-      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,exitpic), ptr+8);
+      if (doing_default)
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	default_mapinfo.exitpic = mdest_ptr->exitpic;
+	mdest_ptr = &default_mapinfo;
+      }
+      else
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      }
+      ptr = replace_map_text (&mdest_ptr->exitpic, ptr+8);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "interpic ", 9) == 0)
     {
-      replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,enterpic), ptr+9);
-      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,exitpic), ptr+9);
+      if (doing_default)
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	default_mapinfo.enterpic = mdest_ptr->enterpic;
+	default_mapinfo.exitpic = mdest_ptr->exitpic;
+	mdest_ptr = &default_mapinfo;
+      }
+      else
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      }
+      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+9);
+      mdest_ptr->exitpic = mdest_ptr->enterpic;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "bordertexture ", 14) == 0)
     {
-      ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,bordertexture), ptr+14);
+      if (doing_default)
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	default_mapinfo.bordertexture = mdest_ptr->bordertexture;
+	mdest_ptr = &default_mapinfo;
+      }
+      else
+      {
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      }
+      ptr = replace_map_text (&mdest_ptr->bordertexture, ptr+14);
       intertext = -1;
     }
     else if (strncasecmp (ptr, "music ", 6) == 0)
@@ -4963,14 +4995,24 @@ static void Parse_Mapinfo (char * ptr, char * top)
       ptr += 6;
       if (intertext == -1)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
 	j = dh_instr (ptr, "$MUSIC_");
 	if (j)
 	{					// Bodge for now...
 	  ptr [j+4] = 'D';
 	  strcpy (ptr+(j-1), ptr+j+4);
 	}
-	ptr = replace_all_map_text (doing_default, episode, map, offsetof(map_dests_t,music), ptr);
+
+	if (doing_default)
+	{
+	  mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	  default_mapinfo.music = mdest_ptr->music;
+	  mdest_ptr = &default_mapinfo;
+	}
+	else
+	{
+	  mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	}
+	ptr = replace_map_text (&mdest_ptr->music, ptr);
 	// printf ("Map Music = %s for %u/%u\n", mdest_ptr -> music, episode, map);
       }
       else
@@ -5022,9 +5064,16 @@ static void Parse_Mapinfo (char * ptr, char * top)
       skydelta = 0;
 
       if (doing_default)
+      {
 	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	default_mapinfo.sky = mdest_ptr->sky;
+	default_mapinfo.skydelta = mdest_ptr->skydelta;
+	mdest_ptr = &default_mapinfo;
+      }
       else
+      {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      }
 
       ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
 
@@ -5044,32 +5093,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 //	printf ("Sky delta = '%s' %f (%X)\n", ptr, skd, skydelta);
       }
 
-      if (doing_default)
-      {
-	newtext = mdest_ptr -> sky;
-	i = 1;
-	do
-	{
-	  mdest_ptr = G_Access_MapInfoTab_E (255, i);
-	  mdest_ptr -> skydelta = skydelta;
-	  mdest_ptr -> sky = newtext;
-	} while (++i < 100);
-	i = 0;
-	do
-	{
-	  j = 0;
-	  do
-	  {
-	    mdest_ptr = G_Access_MapInfoTab_E (i, j);
-	    mdest_ptr -> skydelta = skydelta;
-	    mdest_ptr -> sky = newtext;
-	  } while (++j < 10);
-	} while (++i < 10);
-      }
-      else
-      {
-	mdest_ptr -> skydelta = skydelta;
-      }
+      mdest_ptr -> skydelta = skydelta;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "map07special", 12) == 0)
