@@ -4841,16 +4841,18 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	i = 255;
 	j = 255;
-	if (strncasecmp (ptr, "EndGame1", 8) == 0)
-	  i = 1;
-	else if (strncasecmp (ptr, "EndGame2", 8) == 0)
-	  i = 2;
-	else if (strncasecmp (ptr, "EndGame3", 8) == 0)
-	  i = 3;
-	else if (strncasecmp (ptr, "EndGame4", 8) == 0)
-	  i = 4;
-	else if (strncasecmp (ptr, "EndGameC", 8) == 0)
-	  i = 10;
+	if (strncasecmp (ptr, "EndGame", 7) == 0)
+	{
+	  l = ptr[7];
+	  if ((l >= '0') && (l <= '9'))
+	  {
+	    i = l - '0';
+	  }
+	  else if ((l == 'C') || (l == 'c'))
+	  {
+	    i = 10;
+	  }
+	}
       }
       else
       {
