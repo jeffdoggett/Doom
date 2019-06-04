@@ -1072,7 +1072,7 @@ static int I_MusicForThisWad (char * buffer, const char * prefix, const char * w
 {
   unsigned int pos;
 
-  // Are we interested in the postfix?
+  // Are we interested in the wadfile?
 
   pos = dh_inchar (buffer, '+');
   if (pos == 0)
@@ -1081,9 +1081,10 @@ static int I_MusicForThisWad (char * buffer, const char * prefix, const char * w
   }
 
   buffer [pos-1] = 0;
+
   if ((pos > 1)
-   && (dh_instr (buffer, prefix)))
-    return (1);
+   && (dh_instr (buffer, prefix) == 0))
+    return (0);
 
   if ((wadname [0])
    && (dh_instr (buffer+pos, wadname)))
