@@ -108,6 +108,11 @@ typedef enum
   BG_HELP2,
   BG_VICTORY2,
   BG_ENDPIC,
+  BG_ENDPIC5,
+  BG_ENDPIC6,
+  BG_ENDPIC7,
+  BG_ENDPIC8,
+  BG_ENDPIC9,
   BG_TITLEPIC
 } finale_floors_t;
 

@@ -120,6 +120,11 @@ char *	finale_backdrops_orig [] =
   "HELP2",
   "VICTORY2",
   "ENDPIC",
+  "ENDPIC5",
+  "ENDPIC6",
+  "ENDPIC7",
+  "ENDPIC8",
+  "ENDPIC9",
   "TITLEPIC",
   NULL
 };
@@ -1471,6 +1476,7 @@ static void F_BunnyScroll (void)
 void F_Drawer (void)
 {
   int endmode;
+  int pos;
 
     switch (finalestage)
     {
@@ -1514,6 +1520,20 @@ void F_Drawer (void)
 	    D_PageDrawer (finale_backdrops[BG_ENDPIC]);
 	    break;
 
+	  case 5:
+	  case 6:
+	  case 7:
+	  case 8:
+	  case 9:
+	    pos = endmode + (BG_ENDPIC - 4);
+	    do
+	    {
+	      if (W_CheckNumForName (finale_backdrops[pos]) != -1)
+		break;
+	    } while (--pos > BG_ENDPIC);
+	    D_PageDrawer (finale_backdrops[pos]);
+	    break;
+	    
 	  case 10:
 	    D_PageDrawer (finalepic);
 	    F_CastDrawer ();
