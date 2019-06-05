@@ -4663,7 +4663,6 @@ static void Parse_Mapinfo (char * ptr, char * top)
       doing_episode = 1;
       doing_default = 0;
       intertext = -1;
-      WriteDefaultMapInfo (episode, map, &default_mapinfo);
     }
     else if (strncasecmp (ptr, "name ", 5) == 0)
     {
