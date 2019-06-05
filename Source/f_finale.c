@@ -335,6 +335,7 @@ static void F_DetermineIntermissionTexts (void)
   }
   else
   {
+    printf ("NO CLUSTER\n");
     // Okay - IWAD dependend stuff.
     // This has been changed severly, and
     //  some stuff might have changed in the process.

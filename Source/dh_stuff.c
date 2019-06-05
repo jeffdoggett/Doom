@@ -2817,6 +2817,38 @@ static unsigned int replace_sprite_names (char * orig, char * newt)
 
 /* ---------------------------------------------------------------------------- */
 
+static void strncpy_convert_backslash_chars (char * dest, const char * source, unsigned int max)
+{
+  char cc;
+  unsigned int len;
+  len = 0;
+  do
+  {
+    cc = *source++;
+    len++;
+    if (cc == '\\')
+    {
+      cc = *source++;
+      len++;
+      switch (cc)
+      {
+	case 't': cc = '\t'; break;
+	case 'n': cc = '\n'; break;
+	case 'r': cc = '\r'; break;
+	default: *dest++ = '\\';
+      }
+    }
+    *dest++ = cc;
+    if (len >= max)
+    {
+      cc = 0;
+      *dest++ = cc;
+    }
+  } while (cc);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void replace_text_string (char ** ptr, char * newt)
 {
   char cc;
@@ -2836,23 +2868,7 @@ static void replace_text_string (char ** ptr, char * newt)
   {
     /* Need to find '\n' sequences and swap */
     //strcpy (newm, newt);
-    p1 = newm;
-    do
-    {
-      cc = *newt++;
-      if (cc == '\\')
-      {
-	cc = *newt++;
-	switch (cc)
-	{
-	  case 'n': cc = '\n'; break;
-	  case 'r': cc = '\r'; break;
-	  case 't': cc = '\t'; break;
-	}
-      }
-      *p1++ = cc;
-    } while (cc);
-
+    strncpy_convert_backslash_chars (newm, newt, len+10);
     dh_remove_americanisms (newm);
 
     if ((*ptr != NULL)
@@ -4298,8 +4314,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 	newtext = malloc (length + 20);
 	if (newtext)
 	{
-	  strncpy (newtext, lump_ptr, length);
-	  newtext [length] = 0;
+          strncpy_convert_backslash_chars (newtext, lump_ptr, length);
 	  dh_remove_americanisms (newtext);
 	}
 	Z_Free (lump_ptr);
@@ -4316,7 +4331,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 	newtext = malloc (length + 20);
 	if (newtext)
 	{
-	  strcpy (newtext, ptr);
+          strncpy_convert_backslash_chars (newtext, ptr, length);
 	  dh_remove_americanisms (newtext);
 	}
       }
@@ -4582,6 +4597,7 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_dests_t * msource_ptr)
 {
+  byte temp;
   void * ptr;
   map_dests_t * mdest_ptr;
 
@@ -4594,7 +4610,7 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 //  this_is_a_secret_level;
 //  reset_kit_etc_on_entering;
 //  intermission_text;
-//  cluster;
+  if ((temp = msource_ptr->cluster) != 0)		mdest_ptr->cluster = temp;
 //  nointermission;
 //  allow_monster_telefrags;
 //  par_time_5;			// Par time divided by 5
@@ -5234,7 +5250,16 @@ static void Parse_Mapinfo (char * ptr, char * top)
       if ((clusterdefpresent)
        || (*ptr == '='))		// If the = sign is missing then it's a clusterdef
       {
-	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	if (doing_default)
+	{
+	  mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	  default_mapinfo.cluster = mdest_ptr->cluster;
+	  mdest_ptr = &default_mapinfo;
+	}
+	else
+	{
+	  mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+	}
 	mdest_ptr -> cluster = read_int (ptr);
       }
       else
