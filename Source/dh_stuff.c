@@ -2851,9 +2851,7 @@ static void strncpy_convert_backslash_chars (char * dest, const char * source, u
 
 static void replace_text_string (char ** ptr, char * newt)
 {
-  char cc;
   char * newm;
-  char * p1;
   unsigned int len;
 
   len = strlen (newt);
