@@ -295,7 +295,7 @@ void T_Button (button_t* button)
     soundorg = button -> soundorg;
     if (soundorg == NULL)			// Just in case, should never be zero!
       soundorg = (mobj_t *)&button->line->soundorg;
-    S_StartSound(soundorg,sfx_swtchn);
+    S_StartSoundOnce(soundorg,sfx_swtchn);
     P_RemoveThinker(&button->thinker);
   }
 }
