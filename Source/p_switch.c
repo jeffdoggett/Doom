@@ -390,8 +390,6 @@ P_ChangeSwitchTexture
     int sound;
     mobj_t * soundorg;
 
-    soundorg = (mobj_t *) &line->soundorg;
-    
     switch (line->special)
     {
       case 11:			// EXIT SWITCH?
@@ -402,7 +400,8 @@ P_ChangeSwitchTexture
       default:
 	sound = sfx_swtchn;
     }
-    
+
+    soundorg = (mobj_t *) &line->soundorg;
     S_StartSound (soundorg, sound);
   }
 
