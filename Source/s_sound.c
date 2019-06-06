@@ -536,6 +536,8 @@ S_StartSound
 }
 
 /* ------------------------------------------------------------ */
+#if 0
+// Not currently used...
 
 void
 S_StartSoundOnce
@@ -557,7 +559,7 @@ S_StartSoundOnce
 
     S_StartSoundAtVolume(origin, sfx_id, snd_SfxVolume);
 }
-
+#endif
 /* ------------------------------------------------------------ */
 
 void S_RemoveSoundOrigin (void *origin)

@@ -295,7 +295,7 @@ void T_Button (button_t* button)
     soundorg = button -> soundorg;
     if (soundorg == NULL)			// Just in case, should never be zero!
       soundorg = (mobj_t *)&button->line->soundorg;
-    S_StartSoundOnce(soundorg,sfx_swtchn);
+    S_StartSound(soundorg,sfx_swtchn);
     P_RemoveThinker(&button->thinker);
   }
 }
@@ -336,11 +336,10 @@ P_ChangeSwitchTexture
   int     texMid;
   int     texBot;
   int     i;
-  int     sound;
   int	  swtex;
+  boolean startSound;
   bwhere_e where;
   side_t * side;
-  mobj_t * soundorg;
   switchlist_t*	this_switch;
 
   side = &sides[line->sidenum[0]];
@@ -348,17 +347,7 @@ P_ChangeSwitchTexture
   texMid = side -> midtexture;
   texBot = side -> bottomtexture;
 
-  sound = sfx_swtchn;
-
-  switch (line->special)
-  {
-    case 11:			// EXIT SWITCH?
-    case 51:			// Secret exit
-      sound = sfx_swtchx;
-  }
-
-  if (!useAgain)
-    line->special = 0;
+  startSound = false;
 
   for (this_switch = switchhead; this_switch != NULL ; this_switch = this_switch->next)
   {
@@ -391,11 +380,34 @@ P_ChangeSwitchTexture
 	if (useAgain)
 	  P_StartButton (line, where, swtex, BUTTONTIME);
 
-	soundorg = (mobj_t *) &line->soundorg;
-	S_StartSoundOnce (soundorg, sound);
+	startSound = true;
       }
     } while (++i < 2);
   }
+
+  if (startSound)
+  {
+    int sound;
+    mobj_t * soundorg;
+
+    soundorg = (mobj_t *) &line->soundorg;
+    
+    switch (line->special)
+    {
+      case 11:			// EXIT SWITCH?
+      case 51:			// Secret exit
+	sound = sfx_swtchx;
+	break;
+
+      default:
+	sound = sfx_swtchn;
+    }
+    
+    S_StartSound (soundorg, sound);
+  }
+
+  if (!useAgain)
+    line->special = 0;
 }
 
 /* ----------------------------------------------------------------------- */
