@@ -4593,7 +4593,7 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 /* ---------------------------------------------------------------------------- */
 
-static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_dests_t * msource_ptr)
+static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_dests_t * msource_ptr, boolean inwad)
 {
   byte temp;
   void * ptr;
@@ -4614,13 +4614,8 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 //  nointermission;
 
   // There is no 'off' command for these so assume they're off unless otherwise.
-  // But we only want to do this once.
-  if ((mdest_ptr->flags & 0x80) == 0)
-    mdest_ptr->flags = msource_ptr->flags | 0x80;// Bit 0 - allow_monster_telefrags
-						 // Bit 1 - no_sound_clipping
-						 // Bit 7 - been through here already.
-  else
-    mdest_ptr->flags |= msource_ptr->flags;
+  if (inwad)
+    mdest_ptr->flags = msource_ptr->flags;
 
 //  par_time_5;			// Par time divided by 5
 //  time_sucks;			// Par time for sucks in minutes
@@ -4637,7 +4632,7 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 
 /* ---------------------------------------------------------------------------- */
 
-static void Parse_Mapinfo (char * ptr, char * top)
+static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 {
   char cc;
   unsigned int i,j,l;
@@ -4809,7 +4804,7 @@ static void Parse_Mapinfo (char * ptr, char * top)
 	}
       }
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
-      WriteDefaultMapInfo (episode, map, &default_mapinfo);
+      WriteDefaultMapInfo (episode, map, &default_mapinfo, inwad);
     }
     else if (strncasecmp (ptr, "next ", 5) == 0)
     {
@@ -4955,6 +4950,15 @@ static void Parse_Mapinfo (char * ptr, char * top)
       mdest_ptr -> flags |= 1;
       intertext = -1;
     }
+    else if (strncasecmp (ptr, "disallowmonstertelefrags", 24) == 0)
+    {
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      mdest_ptr -> flags &= ~1;
+      intertext = -1;
+    }
     else if (strncasecmp (ptr, "nosoundclipping", 15) == 0)
     {
       if (doing_default)
@@ -4962,6 +4966,15 @@ static void Parse_Mapinfo (char * ptr, char * top)
       else
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> flags |= 2;
+      intertext = -1;
+    }
+    else if (strncasecmp (ptr, "soundclipping", 13) == 0)
+    {
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      mdest_ptr -> flags &= ~2;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "NoInfighting", 12) == 0)
@@ -5684,7 +5697,7 @@ void Load_Mapinfo (void)
 	W_ReadLump (lump, ptr);
 	top = ptr + W_LumpLength (lump);
 	*top++ = '\n';
-	Parse_Mapinfo (ptr, top);
+	Parse_Mapinfo (ptr, top, true);
 	free (ptr);
       }
     }
@@ -5798,7 +5811,7 @@ void Change_To_Mapinfo (FILE * fin)
   {
     size = fread (ptr, 1, size, fin);
     ptr [size++] = '\n';
-    Parse_Mapinfo (ptr, ptr+size);
+    Parse_Mapinfo (ptr, ptr+size, false);
     free (ptr);
   }
 }
