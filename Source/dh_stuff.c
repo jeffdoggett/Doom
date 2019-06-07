@@ -4088,7 +4088,7 @@ static void show_map_dests (map_dests_t * map_ptr)
   if (map_ptr -> skydelta)
     skydelta = -(((double)map_ptr -> skydelta) / FRACUNIT);
 
-  printf ("%u %2u %u %2u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
+  printf ("%u,%u %u,%u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
 	map_ptr -> normal_exit_to_map,
 	map_ptr -> secret_exit_to_episode,
@@ -4097,7 +4097,7 @@ static void show_map_dests (map_dests_t * map_ptr)
 	map_ptr -> reset_kit_etc_on_entering,
 	map_ptr -> intermission_text,
 	map_ptr -> cluster,
-	map_ptr -> allow_monster_telefrags,
+	map_ptr -> flags,
 	map_ptr -> par_time_5 * 5,			// Par time divided by 5
 	map_ptr -> time_sucks,
 	skydelta,
@@ -4608,9 +4608,18 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 //  this_is_a_secret_level;
 //  reset_kit_etc_on_entering;
 //  intermission_text;
+
   if ((temp = msource_ptr->cluster) != 0)		mdest_ptr->cluster = temp;
+
 //  nointermission;
-//  allow_monster_telefrags;
+
+  // There is no 'off' command for these so assume they're off unless otherwise.
+  // But we only want to do this once.
+  if ((mdest_ptr->flags & 0x80) == 0)
+    mdest_ptr->flags = msource_ptr->flags | 0x80;// Bit 0 - allow_monster_telefrags
+						 // Bit 1 - no_sound_clipping
+						 // Bit 7 - been through here already.
+
 //  par_time_5;			// Par time divided by 5
 //  time_sucks;			// Par time for sucks in minutes
 
@@ -4827,7 +4836,10 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	read_map_num (&i, &j, ptr);
       }
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> normal_exit_to_episode = i;
       mdest_ptr -> normal_exit_to_map = j;
       // printf ("Map %u %u has exit to %u %u\n", episode, map, i, j);
@@ -4860,7 +4872,10 @@ static void Parse_Mapinfo (char * ptr, char * top)
       {
 	read_map_num (&i, &j, ptr);
       }
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> secret_exit_to_episode = i;
       mdest_ptr -> secret_exit_to_map = j;
       // printf ("Map %u %u has secret exit to %u %u\n", episode, map, i, j);
@@ -4878,13 +4893,19 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "nointermission", 14) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> nointermission = 1;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "par ", 4) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       l = read_int (ptr+4);
       l = (l+4)/5;
       if (l > 255) l = 255;
@@ -4895,7 +4916,10 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "sucktime ", 9) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       l = read_int (ptr+9);
       if (l > 255) l = 255;
       mdest_ptr -> time_sucks = l;
@@ -4904,20 +4928,38 @@ static void Parse_Mapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "resethealth", 11) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> reset_kit_etc_on_entering |= 1;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "resetinventory", 14) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       mdest_ptr -> reset_kit_etc_on_entering |= 2;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "allowmonstertelefrags", 21) == 0)
     {
-      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      mdest_ptr -> allow_monster_telefrags = 1;
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      mdest_ptr -> flags |= 1;
+      intertext = -1;
+    }
+    else if (strncasecmp (ptr, "nosoundclipping", 15) == 0)
+    {
+      if (doing_default)
+	mdest_ptr = &default_mapinfo;
+      else
+	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      mdest_ptr -> flags |= 2;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "NoInfighting", 12) == 0)

@@ -143,7 +143,7 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     // monsters don't stomp things except on boss level (30)
     if ((boss)
      || (thing->player)
-     || (G_Access_MapInfoTab (gameepisode, gamemap) -> allow_monster_telefrags))
+     || ((G_Access_MapInfoTab (gameepisode, gamemap) -> flags) & 1))	// allow_monster_telefrags
       telefrag = true;
     else
       telefrag = false;

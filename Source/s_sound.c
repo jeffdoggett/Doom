@@ -877,6 +877,7 @@ S_AdjustSoundParams
     fixed_t	approx_dist;
     fixed_t	adx;
     fixed_t	ady;
+    boolean	no_clipping = false;
 
     // calculate the distance to sound origin
     //  and clip it if necessary
@@ -886,14 +887,12 @@ S_AdjustSoundParams
     // From _GG1_ p.428. Appox. eucledian distance fast.
     approx_dist = adx + ady - ((adx < ady ? adx : ady)>>1);
 
-    // I have no idea why ID don't want sound distance on map 8
-    // but I feel that it is a bad idea! JAD 1/5/99
     if (approx_dist > S_CLIPPING_DIST)
     {
-	// if (gamemap != 8)
+	if ((G_Access_MapInfoTab (gameepisode, gamemap) -> flags) & 2)	// no_sound_clipping
+	  no_clipping = true;
+        else
 	  return 0;
-	// if (modifiedgame)
-	//  return 0;
     }
 
     if (monosfx)
@@ -926,25 +925,17 @@ S_AdjustSoundParams
     {
 	*vol = snd_SfxVolume;
     }
+    else if (no_clipping)
+    {
+	if (approx_dist > S_CLIPPING_DIST)
+	    approx_dist = S_CLIPPING_DIST;
 
-    // I have no idea why ID don't want sound distance on map 8
-    // but I feel that it is a bad idea! JAD 1/5/99
-
-//    else if ((gamemap == 8) && (modifiedgame == 0))
-//    {
-//	if (approx_dist > S_CLIPPING_DIST)
-//	    approx_dist = S_CLIPPING_DIST;
-//
-//	*vol = 15+ ((snd_SfxVolume-15)
-//		    *((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-//	    / S_ATTENUATOR;
-//    }
+	*vol = 15+ ((snd_SfxVolume-15) *((S_CLIPPING_DIST - approx_dist)>>FRACBITS)) / S_ATTENUATOR;
+    }
     else
     {
 	// distance effect
-	*vol = (snd_SfxVolume
-		* ((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-	    / S_ATTENUATOR;
+	*vol = (snd_SfxVolume * ((S_CLIPPING_DIST - approx_dist)>>FRACBITS)) / S_ATTENUATOR;
     }
 
     return (*vol > 0);

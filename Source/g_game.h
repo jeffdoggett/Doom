@@ -48,7 +48,9 @@ typedef struct
   unsigned char intermission_text;
   unsigned char	cluster;
   unsigned char	nointermission;
-  unsigned char allow_monster_telefrags;
+  unsigned char flags;				// Bit 0 - allow_monster_telefrags
+						// Bit 1 - no_sound_clipping
+						// Bit 7 - modified by mapinfo
   unsigned char par_time_5;			// Par time divided by 5
   unsigned char	time_sucks;			// Par time for sucks in minutes
   fixed_t	skydelta;
