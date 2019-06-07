@@ -4619,6 +4619,8 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
     mdest_ptr->flags = msource_ptr->flags | 0x80;// Bit 0 - allow_monster_telefrags
 						 // Bit 1 - no_sound_clipping
 						 // Bit 7 - been through here already.
+  else
+    mdest_ptr->flags |= msource_ptr->flags;
 
 //  par_time_5;			// Par time divided by 5
 //  time_sucks;			// Par time for sucks in minutes
