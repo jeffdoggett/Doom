@@ -1340,8 +1340,8 @@ void M_Episode(int choice)
 //
 // M_Options
 //
-char    detailNames[2]	= {ML_GDHIGH, ML_GDLOW};
-char	msgNames[2]	= {ML_MSGOFF, ML_MSGON};
+unsigned char	detailNames[2]	= {ML_GDHIGH, ML_GDLOW};
+unsigned char	msgNames[2]	= {ML_MSGOFF, ML_MSGON};
 
 
 void M_DrawOptions(void)
