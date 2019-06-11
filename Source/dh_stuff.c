@@ -41,6 +41,8 @@ extern char * menu_messages_orig [];
 extern char * episode_names [];
 extern char * endmsg [];
 extern char * endmsg_orig [];
+extern char * menu_lump_names_orig [];
+extern char * menu_lump_names [];
 extern int qty_endmsg_nums;
 
 /* Strings from m_misc.c */
@@ -2529,6 +2531,24 @@ static unsigned int replace_menu_text (char * orig, char * newt)
 
 /* ---------------------------------------------------------------------------- */
 
+static unsigned int replace_menu_lump_text (char * orig, char * newt)
+{
+  unsigned int counter;
+
+  // Entry 0 is a null string.
+  counter = dh_search_str_tab_a ((const char **)&menu_lump_names_orig[1], orig);
+  if (counter != -1)
+  {
+    menu_lump_names [counter+1] = newt;
+    return (0);
+  }
+
+  return (1);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+
 static unsigned int replace_screenshot_text (char * orig, char * newt)
 {
   unsigned int counter;
@@ -3422,6 +3442,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      if (replace_demo_messages_text (string1, string2))
 	      if (replace_startup_text (string1, string2))
 	      if (replace_menu_text (string1, string2))
+	      if (replace_menu_lump_text (string1, string2))
 	      if (replace_quit_text (string1, string2))
 	      if (replace_door_text (string1, string2))
 	      if (replace_saveg_text (string1, string2))

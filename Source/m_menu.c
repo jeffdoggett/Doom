@@ -89,6 +89,123 @@ typedef enum
 
 /* ----------------------------------------------------------------------- */
 
+char * menu_lump_names_orig [] =
+{
+  "",
+  "M_DOOM",
+  "M_NEWG",
+  "M_SKILL",
+  "M_EPISOD",
+  "M_SKULL1",
+  "M_SKULL2",
+  "M_NGAME",
+  "M_OPTION",
+  "M_LOADG",
+  "M_SAVEG",
+  "M_RDTHIS",
+  "M_QUITG",
+  "M_EPI0",
+  "M_EPI1",
+  "M_EPI2",
+  "M_EPI3",
+  "M_EPI4",
+  "M_EPI5",
+  "M_EPI6",
+  "M_EPI7",
+  "M_EPI8",
+  "M_EPI9",
+  "M_JKILL",
+  "M_ROUGH",
+  "M_HURT",
+  "M_ULTRA",
+  "M_NMARE",
+  "M_ENDGAM",
+  "M_MESSG",
+  "M_DETAIL",
+  "M_SCRNSZ",
+  "M_MSENS",
+  "M_SVOL",
+  "M_SFXVOL",
+  "M_MUSVOL",
+  "M_LSLEFT",
+  "M_LSCNTR",
+  "M_LSRGHT",
+  "M_GDHIGH",
+  "M_GDLOW",
+  "M_MSGOFF",
+  "M_MSGON",
+  "M_OPTTTL",
+  "M_THERML",
+  "M_THERMM",
+  "M_THERMR",
+  "M_THERMO",
+  "M_CELL1",
+  "M_CELL2",
+  "STDISK",
+  NULL
+};
+
+
+char * menu_lump_names [ARRAY_SIZE(menu_lump_names_orig)];
+
+
+typedef enum
+{
+  ML_NULL,
+  ML_DOOM,
+  ML_NEWG,
+  ML_SKILL,
+  ML_EPISOD,
+  ML_SKULL1,
+  ML_SKULL2,
+  ML_NGAME,
+  ML_OPTION,
+  ML_LOADG,
+  ML_SAVEG,
+  ML_RDTHIS,
+  ML_QUITG,
+  ML_EPI0,
+  ML_EPI1,
+  ML_EPI2,
+  ML_EPI3,
+  ML_EPI4,
+  ML_EPI5,
+  ML_EPI6,
+  ML_EPI7,
+  ML_EPI8,
+  ML_EPI9,
+  ML_JKILL,
+  ML_ROUGH,
+  ML_HURT,
+  ML_ULTRA,
+  ML_NMARE,
+  ML_ENDGAM,
+  ML_MESSG,
+  ML_DETAIL,
+  ML_SCRNSZ,
+  ML_MSENS,
+  ML_SVOL,
+  ML_SFXVOL,
+  ML_MUSVOL,
+  ML_LSLEFT,
+  ML_LSCNTR,
+  ML_LSRGHT,
+  ML_GDHIGH,
+  ML_GDLOW,
+  ML_MSGOFF,
+  ML_MSGON,
+  ML_OPTTTL,
+  ML_THERML,
+  ML_THERMM,
+  ML_THERMR,
+  ML_THERMO,
+  ML_CELL1,
+  ML_CELL2,
+  ML_STDISK
+} menu_lumps_t;
+
+/* ----------------------------------------------------------------------- */
+
 char* endmsg_orig []=
 {
   // DOOM1
@@ -207,7 +324,7 @@ typedef struct
     // 0 = no cursor here, 1 = ok, 2 = arrows ok
     char	status;
 
-    char	name[10];
+    unsigned char namenum;
 
     // choice = menu item #.
     // if status = 2,
@@ -234,9 +351,6 @@ typedef struct menu_s
 static dushort_t	itemOn;			// menu item skull is on
 static dushort_t	whichSkull;		// which skull to draw
 
-// graphic name of skulls
-// warning: initializer-string for array of chars is too long
-static char    skullName[2][/*8*/9] = {"M_SKULL1","M_SKULL2"};
 
 // current menudef
 static menu_t*	currentMenu;
@@ -319,13 +433,13 @@ enum
 
 static menuitem_t MainMenu[]=
 {
-    {1,"M_NGAME",M_NewGame,'n'},
-    {1,"M_OPTION",M_Options,'o'},
-    {1,"M_LOADG",M_LoadGame,'l'},
-    {1,"M_SAVEG",M_SaveGame,'s'},
+    {1,ML_NGAME,M_NewGame,'n'},
+    {1,ML_OPTION,M_Options,'o'},
+    {1,ML_LOADG,M_LoadGame,'l'},
+    {1,ML_SAVEG,M_SaveGame,'s'},
     // Another hickup with Special edition.
-    {1,"M_RDTHIS",M_ReadThis,'r'},
-    {1,"M_QUITG",M_QuitDOOM,'q'}
+    {1,ML_RDTHIS,M_ReadThis,'r'},
+    {1,ML_QUITG,M_QuitDOOM,'q'}
 };
 
 static menu_t  MainDef =
@@ -353,16 +467,16 @@ enum
 
 static menuitem_t EpisodeMenu[]=
 {
-    {1,"M_EPI0", M_Episode,'0'},
-    {1,"M_EPI1", M_Episode,'k'},
-    {1,"M_EPI2", M_Episode,'t'},
-    {1,"M_EPI3", M_Episode,'i'},
-    {1,"M_EPI4", M_Episode,'t'},
-    {1,"M_EPI5", M_Episode,'5'},
-    {1,"M_EPI6", M_Episode,'6'},
-    {1,"M_EPI7", M_Episode,'7'},
-    {1,"M_EPI8", M_Episode,'8'},
-    {1,"M_EPI9", M_Episode,'9'}
+    {1,ML_EPI0, M_Episode,'0'},
+    {1,ML_EPI1, M_Episode,'k'},
+    {1,ML_EPI2, M_Episode,'t'},
+    {1,ML_EPI3, M_Episode,'i'},
+    {1,ML_EPI4, M_Episode,'t'},
+    {1,ML_EPI5, M_Episode,'5'},
+    {1,ML_EPI6, M_Episode,'6'},
+    {1,ML_EPI7, M_Episode,'7'},
+    {1,ML_EPI8, M_Episode,'8'},
+    {1,ML_EPI9, M_Episode,'9'}
 };
 
 static unsigned char episode_num [ARRAY_SIZE(EpisodeMenu)] =
@@ -396,11 +510,11 @@ enum
 
 static menuitem_t NewGameMenu[]=
 {
-    {1,"M_JKILL",	M_ChooseSkill, 'i'},
-    {1,"M_ROUGH",	M_ChooseSkill, 'h'},
-    {1,"M_HURT",	M_ChooseSkill, 'h'},
-    {1,"M_ULTRA",	M_ChooseSkill, 'u'},
-    {1,"M_NMARE",	M_ChooseSkill, 'n'}
+    {1,ML_JKILL,       M_ChooseSkill, 'i'},
+    {1,ML_ROUGH,       M_ChooseSkill, 'h'},
+    {1,ML_HURT,        M_ChooseSkill, 'h'},
+    {1,ML_ULTRA,       M_ChooseSkill, 'u'},
+    {1,ML_NMARE,       M_ChooseSkill, 'n'}
 };
 
 static menu_t  NewDef =
@@ -433,14 +547,14 @@ enum
 
 static menuitem_t OptionsMenu[]=
 {
-    {1,"M_ENDGAM",	M_EndGame,'e'},
-    {1,"M_MESSG",	M_ChangeMessages,'m'},
-    {1,"M_DETAIL",	M_ChangeGraphicDetail,'g'},
-    {2,"M_SCRNSZ",	M_SizeDisplay,'s'},
-    {-1,"",0},
-    {2,"M_MSENS",	M_ChangeSensitivity,'m'},
-    {-1,"",0},
-    {1,"M_SVOL",	M_Sound,'s'}
+    {1,ML_ENDGAM,	M_EndGame,'e'},
+    {1,ML_MESSG,	M_ChangeMessages,'m'},
+    {1,ML_DETAIL,	M_ChangeGraphicDetail,'g'},
+    {2,ML_SCRNSZ,	M_SizeDisplay,'s'},
+    {-1,ML_NULL,0},
+    {2,ML_MSENS,	M_ChangeSensitivity,'m'},
+    {-1,ML_NULL,0},
+    {1,ML_SVOL,		M_Sound,'s'}
 };
 
 static menu_t  OptionsDef =
@@ -464,7 +578,7 @@ enum
 
 static menuitem_t ReadMenu1[] =
 {
-    {1,"",M_ReadThis2,0}
+    {1,ML_NULL,M_ReadThis2,0}
 };
 
 static menu_t  ReadDef1 =
@@ -485,7 +599,7 @@ enum
 
 static menuitem_t ReadMenu2[]=
 {
-    {1,"",M_FinishReadThis,0}
+    {1,ML_NULL,M_FinishReadThis,0}
 };
 
 static menu_t  ReadDef2 =
@@ -512,10 +626,10 @@ enum
 
 static menuitem_t SoundMenu[]=
 {
-    {2,"M_SFXVOL",M_SfxVol,'s'},
-    {-1,"",0},
-    {2,"M_MUSVOL",M_MusicVol,'m'},
-    {-1,"",0}
+    {2,ML_SFXVOL,M_SfxVol,'s'},
+    {-1,ML_NULL,0},
+    {2,ML_MUSVOL,M_MusicVol,'m'},
+    {-1,ML_NULL,0}
 };
 
 static menu_t  SoundDef =
@@ -544,12 +658,12 @@ enum
 
 static menuitem_t LoadMenu[]=
 {
-    {1,"", M_LoadSelect,'1'},
-    {1,"", M_LoadSelect,'2'},
-    {1,"", M_LoadSelect,'3'},
-    {1,"", M_LoadSelect,'4'},
-    {1,"", M_LoadSelect,'5'},
-    {1,"", M_LoadSelect,'6'}
+    {1,ML_NULL, M_LoadSelect,'1'},
+    {1,ML_NULL, M_LoadSelect,'2'},
+    {1,ML_NULL, M_LoadSelect,'3'},
+    {1,ML_NULL, M_LoadSelect,'4'},
+    {1,ML_NULL, M_LoadSelect,'5'},
+    {1,ML_NULL, M_LoadSelect,'6'}
 };
 
 static menu_t  LoadDef =
@@ -567,12 +681,12 @@ static menu_t  LoadDef =
 //
 static menuitem_t SaveMenu[]=
 {
-    {1,"", M_SaveSelect,'1'},
-    {1,"", M_SaveSelect,'2'},
-    {1,"", M_SaveSelect,'3'},
-    {1,"", M_SaveSelect,'4'},
-    {1,"", M_SaveSelect,'5'},
-    {1,"", M_SaveSelect,'6'}
+    {1,ML_NULL, M_SaveSelect,'1'},
+    {1,ML_NULL, M_SaveSelect,'2'},
+    {1,ML_NULL, M_SaveSelect,'3'},
+    {1,ML_NULL, M_SaveSelect,'4'},
+    {1,ML_NULL, M_SaveSelect,'5'},
+    {1,ML_NULL, M_SaveSelect,'6'}
 };
 
 static menu_t  SaveDef =
@@ -593,7 +707,7 @@ static void M_DrawDiscIcon (void)
   int y;
   patch_t * stdisc;
 
-  stdisc = (patch_t *) W_CacheLumpName0 ("STDISK", PU_CACHE);
+  stdisc = (patch_t *) W_CacheLumpName0 (menu_lump_names[ML_STDISK], PU_CACHE);
   if (stdisc)
   {
     x = ((320-2) - HU_MSGX) - SHORT(stdisc->width);
@@ -654,13 +768,29 @@ void M_SetEpiKey (unsigned int episode, unsigned int key)
 
 void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
 {
+  unsigned char lumpnum;
+  char * newname;
   menuitem_t * m_ptr;
 
   if (episode < ARRAY_SIZE(EpisodeMenu))
   {
     m_ptr = &EpisodeMenu [episode];
-    strncpy (m_ptr -> name, name, len);
-    m_ptr -> name [len] = 0;
+    lumpnum = m_ptr->namenum;   
+    // name = M_EPI5"  (ie has a trailing quote)
+    newname = malloc (len+1);
+    if (newname)
+    {
+      strncpy (newname, name, len);
+      newname [len] = 0;
+      if (strcasecmp (menu_lump_names[lumpnum], name) == 0)
+      {
+	free (newname);		// No change - don't bother.
+      }
+      else    
+      {
+	menu_lump_names[lumpnum] = newname;
+      }
+    }
   }
 }
 
@@ -773,7 +903,7 @@ void M_DrawLoad(void)
 {
   int i;
 
-  V_DrawPatchScaled (72,28,0,W_CacheLumpName("M_LOADG",PU_CACHE));
+  V_DrawPatchScaled (72,28,0,W_CacheLumpName(menu_lump_names[ML_LOADG],PU_CACHE));
   for (i = 0;i < load_end; i++)
   {
       M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i);
@@ -789,15 +919,15 @@ void M_DrawSaveLoadBorder(int x,int y)
 {
   int i;
 
-  V_DrawPatchScaled (x-8,y+7,0,W_CacheLumpName("M_LSLEFT",PU_CACHE));
+  V_DrawPatchScaled (x-8,y+7,0,W_CacheLumpName(menu_lump_names[ML_LSLEFT],PU_CACHE));
 
   for (i = 0;i < 24;i++)
   {
-      V_DrawPatchScaled (x,y+7,0,W_CacheLumpName("M_LSCNTR",PU_CACHE));
+      V_DrawPatchScaled (x,y+7,0,W_CacheLumpName(menu_lump_names[ML_LSCNTR],PU_CACHE));
       x += 8;
   }
 
-  V_DrawPatchScaled (x,y+7,0,W_CacheLumpName("M_LSRGHT",PU_CACHE));
+  V_DrawPatchScaled (x,y+7,0,W_CacheLumpName(menu_lump_names[ML_LSRGHT],PU_CACHE));
 }
 
 
@@ -838,8 +968,8 @@ void M_DrawSave(void)
 {
   int i,x,y;
 
-  V_DrawPatchScaled (72,28,0,W_CacheLumpName("M_SAVEG",PU_CACHE));
-  
+  V_DrawPatchScaled (72,28,0,W_CacheLumpName(menu_lump_names[ML_SAVEG],PU_CACHE));
+
   y = LoadDef.y;
   i = 0;
   do
@@ -1050,7 +1180,7 @@ void M_DrawReadThis2(void)
 //
 void M_DrawSound(void)
 {
-    V_DrawPatchScaled (60,38,0,W_CacheLumpName("M_SVOL",PU_CACHE));
+    V_DrawPatchScaled (60,38,0,W_CacheLumpName(menu_lump_names[ML_SVOL],PU_CACHE));
 
     M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(sfx_vol+1),
 		 16,snd_SfxVolume);
@@ -1110,7 +1240,7 @@ void M_MusicVol(int choice)
 //
 void M_DrawMainMenu(void)
 {
-    V_DrawPatchScaled (94,2,0,W_CacheLumpName("M_DOOM",PU_CACHE));
+    V_DrawPatchScaled (94,2,0,W_CacheLumpName(menu_lump_names[ML_DOOM],PU_CACHE));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1119,8 +1249,8 @@ void M_DrawMainMenu(void)
 //
 void M_DrawNewGame(void)
 {
-    V_DrawPatchScaled (96,14,0,W_CacheLumpName("M_NEWG",PU_CACHE));
-    V_DrawPatchScaled (54,38,0,W_CacheLumpName("M_SKILL",PU_CACHE));
+    V_DrawPatchScaled (96,14,0,W_CacheLumpName(menu_lump_names[ML_NEWG],PU_CACHE));
+    V_DrawPatchScaled (54,38,0,W_CacheLumpName(menu_lump_names[ML_SKILL],PU_CACHE));
 }
 
 void M_NewGame(int choice)
@@ -1146,7 +1276,7 @@ static int epi;
 
 void M_DrawEpisode(void)
 {
-  V_DrawPatchScaled (54,EpiDef.y-25/*38*/,0,W_CacheLumpName("M_EPISOD",PU_CACHE));
+  V_DrawPatchScaled (54,EpiDef.y-25/*38*/,0,W_CacheLumpName(menu_lump_names[ML_EPISOD],PU_CACHE));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1210,8 +1340,8 @@ void M_Episode(int choice)
 //
 // M_Options
 //
-char    detailNames[2][9]	= {"M_GDHIGH","M_GDLOW"};
-char	msgNames[2][9]		= {"M_MSGOFF","M_MSGON"};
+char    detailNames[2]	= {ML_GDHIGH, ML_GDLOW};
+char	msgNames[2]	= {ML_MSGOFF, ML_MSGON};
 
 
 void M_DrawOptions(void)
@@ -1220,16 +1350,16 @@ void M_DrawOptions(void)
   patch_t*	patch1;
   patch_t*	patch2;
 
-  V_DrawPatchScaled (108,15,0,W_CacheLumpName("M_OPTTTL",PU_CACHE));
+  V_DrawPatchScaled (108,15,0,W_CacheLumpName(menu_lump_names[ML_OPTTTL],PU_CACHE));
 
-  patch1 = W_CacheLumpName (OptionsMenu[1].name,PU_CACHE);
-  patch2 = W_CacheLumpName (msgNames[showMessages],PU_CACHE);
+  patch1 = W_CacheLumpName (menu_lump_names[OptionsMenu[1].namenum],PU_CACHE);
+  patch2 = W_CacheLumpName (menu_lump_names[msgNames[showMessages]],PU_CACHE);
   x = OptionsDef.x + SHORT(patch1->width) + SHORT(patch2->leftoffset) + 2;
   y = OptionsDef.y + (LINEHEIGHT*messages);
   V_DrawPatchScaled (x,y,0,patch2);
 
-  patch1 = W_CacheLumpName (OptionsMenu[2].name,PU_CACHE);
-  patch2 = W_CacheLumpName (detailNames[detailLevel],PU_CACHE);
+  patch1 = W_CacheLumpName (menu_lump_names[OptionsMenu[2].namenum],PU_CACHE);
+  patch2 = W_CacheLumpName (menu_lump_names[detailNames[detailLevel]],PU_CACHE);
   x = OptionsDef.x + SHORT(patch1->width) + SHORT(patch2->leftoffset) + 2;
   y = OptionsDef.y + (LINEHEIGHT*detail);
   V_DrawPatchScaled (x,y,0,patch2);
@@ -1557,21 +1687,21 @@ M_DrawThermo
   patch_t*	patcho;
 
   xx = x;
-  patchl = W_CacheLumpName("M_THERML",PU_CACHE);
+  patchl = W_CacheLumpName(menu_lump_names[ML_THERML],PU_CACHE);
   V_DrawPatchScaled (xx,y,0,patchl);
 
   xx += 8;
-  patchm = W_CacheLumpName("M_THERMM",PU_CACHE);
+  patchm = W_CacheLumpName(menu_lump_names[ML_THERMM],PU_CACHE);
   for (i=0;i<thermWidth;i++)
   {
     V_DrawPatchScaled (xx,y,0,patchm);
     xx += 8;
   }
 
-  patchr = W_CacheLumpName("M_THERMR",PU_CACHE);
+  patchr = W_CacheLumpName(menu_lump_names[ML_THERMR],PU_CACHE);
   V_DrawPatchScaled (xx,y,0,patchr);
 
-  patcho = W_CacheLumpName("M_THERMO",PU_CACHE);
+  patcho = W_CacheLumpName(menu_lump_names[ML_THERMO],PU_CACHE);
   V_DrawPatchScaled ((x+8) + thermDot*8,y,0,patcho);
 }
 
@@ -1583,7 +1713,7 @@ M_DrawEmptyCell
   int		item )
 {
     V_DrawPatchScaled (menu->x - 10, menu->y+item*LINEHEIGHT - 1, 0,
-		       W_CacheLumpName("M_CELL1",PU_CACHE));
+		       W_CacheLumpName(menu_lump_names[ML_CELL1],PU_CACHE));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1594,7 +1724,7 @@ M_DrawSelCell
   int		item )
 {
     V_DrawPatchScaled (menu->x - 10, menu->y+item*LINEHEIGHT - 1, 0,
-		       W_CacheLumpName("M_CELL2",PU_CACHE));
+		       W_CacheLumpName(menu_lump_names[ML_CELL2],PU_CACHE));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1719,7 +1849,7 @@ M_WriteText
 	w -= HUlib_Kern (c+HU_FONTSTART, toupper(*ch));
 	cx+=w;
     }
-    
+
     return (cx);
 }
 
@@ -2184,9 +2314,9 @@ void M_Drawer (void)
       m_ptr = currentMenu->menuitems;
       do
       {
-	if (m_ptr -> name [0])
+	if (m_ptr -> namenum != ML_NULL)
 	{
-	  lump = W_CheckNumForName (m_ptr -> name);
+	  lump = W_CheckNumForName (menu_lump_names[m_ptr -> namenum]);
 	  if (lump == -1)
 	  {
 	    if (currentMenu == &EpiDef)
@@ -2229,7 +2359,10 @@ void M_Drawer (void)
     // DRAW SKULL
     if (currentMenu->numitems > 1)
     {
-      patch = W_CacheLumpName(skullName[whichSkull>>3],PU_CACHE);
+      unsigned int skullnum;
+
+      skullnum = ML_SKULL1 + (whichSkull>>3);
+      patch = W_CacheLumpName(menu_lump_names[skullnum],PU_CACHE);
       i = (SHORT(patch->width)) - SKULLXOFF;
       if (i < 0) i = 0;
       x -= i;
@@ -2328,7 +2461,9 @@ static void M_SetEpisodeMenuPos (void)
   do
   {
     len = 0;
-    lump = W_CheckNumForName (m_ptr -> name);
+    lump = -1;
+    if (m_ptr -> namenum != ML_NULL)
+      lump = W_CheckNumForName (menu_lump_names[m_ptr -> namenum]);
     if (lump == -1)
     {
       str = episode_names[episode_num [episode]];
@@ -2358,7 +2493,7 @@ static void M_SetEpisodeMenuPos (void)
     episode = 0;
     do
     {
-      printf ("Menu entry %u is %s -> episode %u", episode, m_ptr -> name, episode_num [episode]);
+      printf ("Menu entry %u is %s -> episode %u", episode, menu_lump_names[m_ptr -> namenum], episode_num [episode]);
       str = episode_names[episode_num [episode]];
       if (str != NULL)
 	printf (" (%s)", str);
@@ -2416,13 +2551,13 @@ void M_Init (void)
 	  /* If the episode maps are in a pwad and the episode_names[] has */
 	  /* been provided but not an M_EPIx lump then destroy the lump. */
 	  if ((episode_names[episode] != NULL)
-	   && ((lump1 = W_CheckNumForName (m_ptr -> name)) != -1)
+	   && ((lump1 = W_CheckNumForName (menu_lump_names[m_ptr -> namenum])) != -1)
 	   && ((lump2 = G_MapLump (255, G_Access_MapStartTab (episode_num [episode]) -> start_map)) != -1)
 	   && (lumpinfo[lump1].handle == lumpinfo[0].handle)
 	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	  {
 //	    printf ("Destroyed menu lump %u for map %u\n", episode, G_Access_MapStartTab (episode_num [episode]) -> start_map);
-	    m_ptr -> name [0] = '-';
+	    m_ptr -> namenum = ML_NULL;
 	  }
 	  m_ptr++;
 	} while (++episode < EpiDef.numitems);
@@ -2449,20 +2584,20 @@ void M_Init (void)
       do
       {
 	//printf ("Checking episode %u\n", episode);
-	if (M_EpisodePresent (m_ptr -> name, episode))
+	if (M_EpisodePresent (menu_lump_names[m_ptr -> namenum], episode))
 	{
 	  episode_num [menu_pos++] = episode;
 
 	  /* If the episode maps are in a pwad and the episode_names[] has */
 	  /* been provided but not an M_EPIx lump then destroy the lump. */
 	  if ((episode_names[episode] != NULL)
-	   && ((lump1 = W_CheckNumForName (m_ptr -> name)) != -1)
+	   && ((lump1 = W_CheckNumForName (menu_lump_names[m_ptr -> namenum])) != -1)
 	   && ((lump2 = G_MapLump (episode, 1)) != -1)
 	   && (lumpinfo[lump1].handle == lumpinfo[0].handle)
 	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	  {
 	    // printf ("Destroyed menu lump %u\n", pos);
-	    m_ptr -> name [0] = '-';
+	    m_ptr -> namenum = ML_NULL;
 	  }
 	  m_ptr++;
 	}

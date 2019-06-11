@@ -135,6 +135,8 @@ extern char * menu_messages [];
 extern char * menu_messages_orig [];
 extern char * endmsg [];
 extern char * endmsg_orig [];
+extern char * menu_lump_names_orig [];
+extern char * menu_lump_names [];
 
 /* Strings from m_misc.c */
 extern char * screenshot_messages [];
@@ -332,6 +334,7 @@ static void init_text_messages (void)
   init_a_text_block (menu_messages, menu_messages_orig);
   init_a_text_block (screenshot_messages, screenshot_messages_orig);
   init_a_text_block (endmsg, endmsg_orig);
+  init_a_text_block (menu_lump_names, menu_lump_names_orig);
   init_a_text_block (door_messages, door_messages_orig);
   init_a_text_block (save_game_messages, save_game_messages_orig);
   init_a_text_block (am_map_messages, am_map_messages_orig);
