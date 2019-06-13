@@ -2183,7 +2183,6 @@ G_InitNew
       S_ResumeSound ();
   }
 
-
   if (skill > sk_nightmare)
       skill = sk_nightmare;
 
@@ -2196,25 +2195,28 @@ G_InitNew
     if (map < 1)
       map = 1;
 
-    if (gamemode == retail)
+    if (gamemode == commercial)
     {
-      if (episode > 4)
-	episode = 4;
-    }
-    else if (gamemode == shareware)
-    {
-      if (episode > 1)
-	episode = 1;		// only start episode 1 on shareware
+      while ((map > 1) && (G_MapLump (episode,map) == -1))
+	map--;
     }
     else
     {
-      if (episode > 3)
-	episode = 3;
+      do
+      {
+	if (map <= 1)
+	{
+	  if (episode <= 1)
+	    break;
+	  map = 9;
+	  episode--;
+	}
+	else
+	{
+	  map--;
+	}
+      } while (G_MapLump (episode,map) == -1);
     }
-
-    if ((map > 9)
-     && (gamemode != commercial))
-      map = 9;
   }
 
   M_ClearRandom ();
@@ -2401,7 +2403,7 @@ void G_DoPlayDemo (void)
     if (dlump != -1)
     {
       if (W_LumpLength (dlump) < 20)
-        return;
+	return;
       demobuffer = demo_p = W_CacheLumpNum (dlump, PU_STATIC);
     }
   }
@@ -2988,9 +2990,9 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	    case 'R':
 	    case 'r':
 	      if (isdigit(a_line [pos+1]))
-	        map_info_p -> reset_kit_etc_on_entering = atoi (&a_line [pos+1]);
+		map_info_p -> reset_kit_etc_on_entering = atoi (&a_line [pos+1]);
 	      else
-	        map_info_p -> reset_kit_etc_on_entering = 3;
+		map_info_p -> reset_kit_etc_on_entering = 3;
 	      break;
 
 	    case '0':
