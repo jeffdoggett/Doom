@@ -1066,6 +1066,7 @@ static int I_Validate_MusName (const char * musname)
 /* ------------------------------------------------------------ */
 /*
    Allow either "prefix+Wadname" or just "prefix" or just "+wadname"
+   Return 0 if matches.
 */
 
 static int I_MusicForThisWad (char * buffer, const char * prefix, const char * wadname)
@@ -1073,24 +1074,23 @@ static int I_MusicForThisWad (char * buffer, const char * prefix, const char * w
   unsigned int pos;
 
   // Are we interested in the wadfile?
-
   pos = dh_inchar (buffer, '+');
   if (pos == 0)
   {
-    return (dh_instr (buffer, prefix));
+    return (strcasecmp (buffer, prefix));
   }
 
   buffer [pos-1] = 0;
 
   if ((pos > 1)
-   && (dh_instr (buffer, prefix) == 0))
-    return (0);
-
-  if ((wadname [0])
-   && (dh_instr (buffer+pos, wadname)))
+   && (strcasecmp (buffer, prefix) != 0))
     return (1);
 
-  return (0);
+  if ((wadname [0])
+   && (strcasecmp (buffer+pos, wadname) == 0))
+    return (0);
+
+  return (1);
 }
 
 /* ------------------------------------------------------------ */
@@ -1101,8 +1101,8 @@ static void I_InitMusicDirectory (void)
   unsigned int line;
   FILE * fin;
   mus_dir_t * mptr;
-  char * prefix;
   char * bptr;
+  char prefix [16];
   char wadname [40];
   char buffer [200];
   char filename [100];
@@ -1123,29 +1123,42 @@ static void I_InitMusicDirectory (void)
   }
 
   /* Work out which version we are */
-  prefix = "Doom1";
-  if (gamemode == commercial)
+
+  pos = 0;
+
+  if (gamemode != commercial)
+  {
+    if (W_CheckNumForName ("FREEDOOM") != -1)
+      pos += sprintf (prefix, "Free");
+    sprintf (prefix+pos, "Doom1");
+  }
+  else
   {
     switch (gamemission)
     {
       case pack_plut:
-	prefix = "Plutonia";
+	sprintf (prefix+pos, "Plutonia");
 	break;
 
       case pack_tnt:
-	prefix = "Tnt";
+	sprintf (prefix+pos, "Tnt");
 	break;
 
       case pack_hacx:
-	prefix = "Hacx";
+	sprintf (prefix+pos, "Hacx");
 	break;
 
       default:
-	prefix = "Doom2";
+        if (W_CheckNumForName ("FREEDOOM") != -1)
+          pos += sprintf (prefix, "Free");
+	sprintf (prefix+pos, "Doom2");
     }
   }
 
   D_GetSaveGameFilename (wadname);
+
+  if (M_CheckParm ("-showmusdir"))
+    printf ("Music - game is '%s', wadname is '%s'\n", prefix, wadname);
 
   line = 0;
   do
@@ -1159,7 +1172,7 @@ static void I_InitMusicDirectory (void)
       if (pos)
       {
 	buffer [pos-1] = 0;
-	if (I_MusicForThisWad (buffer, prefix, wadname) == 0)
+	if (I_MusicForThisWad (buffer, prefix, wadname) != 0)
 	  continue;
 	bptr = buffer + pos;
       }
