@@ -1112,6 +1112,41 @@ static int I_MusicForThisWad (char * buffer, const char * packname, const char *
 }
 
 /* ------------------------------------------------------------ */
+/* Reserve a music data block if not already one present. */
+/* And add it to the linked list. */
+
+static mus_dir_t * I_MusicGetDirBlock (const char * musname, const char * filename)
+{
+  mus_dir_t * mptr;
+
+  mptr = music_directory_head;
+
+  while (mptr)
+  {
+    if (strcasecmp (mptr -> musname, musname) == 0)	// Found duplicate?
+    {
+      strcpy (mptr -> filename, filename);
+      return (mptr);
+    }
+    mptr = mptr -> next;
+  }
+
+  // A new one.
+
+  mptr = malloc (sizeof (mus_dir_t));
+  if (mptr != NULL)
+  {
+    mptr -> next = music_directory_head;
+    music_directory_head = mptr;
+    strcpy (mptr -> musname, musname);
+    strcpy (mptr -> filename, filename);
+  }
+
+  return (mptr);
+}
+
+/* ------------------------------------------------------------ */
+
 
 static void I_InitMusicDirectory (void)
 {
@@ -1214,17 +1249,11 @@ static void I_InitMusicDirectory (void)
 	}
 	else
 	{
-	  mptr = malloc (sizeof (mus_dir_t));
+	  mptr = I_MusicGetDirBlock (bptr, filename);
 	  if (mptr == NULL)
 	    break;
 
-	  mptr -> next = music_directory_head;
-	  music_directory_head = mptr;
-
-	  strcpy (mptr -> musname, bptr);
-	  strcpy (mptr -> filename, filename);
-
-  	  if (M_CheckParm ("-showmusdir"))
+	  if (M_CheckParm ("-showmusdir"))
 	    printf ("Mus dir '%s' -> '%s'\n", mptr -> musname, mptr -> filename);
 	}
       }
