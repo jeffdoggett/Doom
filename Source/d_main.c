@@ -890,8 +890,6 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
 	  pack = (pack_tnt << 8);
 	else if (strcmp (catname+8, "CAMO1") == 0)
 	  pack = (pack_plut << 8);
-	else if (strcmp (catname+8, "HACX-R") == 0)
-	  pack = (pack_hacx << 8);
 	cat_size--;
       } while (cat_size);
     }
@@ -943,9 +941,6 @@ static void IdentifyIwad (const char * name)
 
 	else if (strncasecmp (leaf, "tnt", 3) == 0)
 	  gamemission = pack_tnt;
-
-	else if (strncasecmp (leaf, "hacx", 4) == 0)
-	  gamemission = pack_hacx;
      }
 #endif
       break;
