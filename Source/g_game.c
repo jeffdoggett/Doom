@@ -3206,9 +3206,49 @@ void dirname (char * dest, const char * path)
 }
 
 /* -------------------------------------------------------------------------------------------- */
+/*
+   We use ".." in the filename to represent a "match to here" marker.
+*/
 
-void scan_dir (char * dirname, char * filename, boolean do_it)
+static boolean scan_filematch (const char * filename, const char * searchname)
 {
+  unsigned int dotpos;
+  unsigned int extpos1;
+  unsigned int extpos2;
+
+  if (strcasecmp (filename, searchname) == 0)
+    return (true);
+
+  dotpos = dh_rinchar (filename, EXTSEPC);
+
+  if ((dotpos == 0)
+   || (filename [dotpos-2] != EXTSEPC))
+    return (false);
+
+  if (strncasecmp (filename, searchname, dotpos-2) != 0)
+    return (false);
+
+  /* Filename part matches, need to check the extension */
+
+  extpos1 = dh_rinchar (filename, EXTSEPC);
+  if (extpos1 == 0)
+    return (false);
+
+  extpos2 = dh_rinchar (searchname, EXTSEPC);
+  if (extpos2 == 0)
+    return (false);
+
+  if (strcasecmp (&filename[extpos1-1], &searchname[extpos2-1]) == 0)
+    return (true);
+
+  return (false);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+unsigned int scan_dir (char * dirname, char * filename, boolean do_it, boolean allow_recurse)
+{
+  unsigned int qty_done;
   unsigned char last;
   unsigned int null_pos;
   FILE * fin;
@@ -3218,6 +3258,7 @@ void scan_dir (char * dirname, char * filename, boolean do_it)
 
   null_pos = strlen (filename);
   last = filename [null_pos-1];
+  qty_done = 0;
 
   dirp = opendir (dirname);
   if (dirp == 0)
@@ -3241,9 +3282,10 @@ void scan_dir (char * dirname, char * filename, boolean do_it)
 	{
 	  if (file_stat.st_mode & S_IFDIR)
 	  {
-	    scan_dir (dirname, filename, do_it);
+	    if (allow_recurse)
+	      qty_done += scan_dir (dirname, filename, do_it, allow_recurse);
 	  }
-	  else if (strcasecmp (dp -> d_name, filename) == 0)
+	  else if (scan_filematch (dp -> d_name, filename) == true)
 	  {
 	    fin = fopen (dirname, "r");
 	    if (fin)
@@ -3252,11 +3294,18 @@ void scan_dir (char * dirname, char * filename, boolean do_it)
 	      {
 		switch (last)
 		{
-		  case 'q':
+		  case 'q':				// msq
 		    G_ParseMapSeq (dirname, fin, 1);
 		    break;
-		  default:
+		  case 't':				// hst
 		    G_ParseMapSeq (dirname, fin, 0);
+		    break;
+		  case 'x':				// bex
+		  case 'h':				// deh
+		    DH_parse_hacker_file_f (dirname, fin, ~0);
+		    break;
+		  default:
+		    fprintf (stderr, "Unknown file extension - %s\n", dirname);
 		}
 	      }
 	      else
@@ -3264,6 +3313,7 @@ void scan_dir (char * dirname, char * filename, boolean do_it)
 		printf (" adding %s\n", dirname);
 	      }
 	      fclose (fin);
+	      qty_done++;
 	    }
 	  }
 	}
@@ -3273,6 +3323,8 @@ void scan_dir (char * dirname, char * filename, boolean do_it)
     dirname [null_pos] = 0;		/* And chop it off again */
     closedir (dirp);
   }
+
+  return (qty_done);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -3330,17 +3382,17 @@ static void G_wipe_untested_dir (char * dirname)
 
 /* -------------------------------------------------------------------------------------------- */
 
-void G_parse_map_seq_wad_file (char * wadname, boolean do_it)
+void G_parse_map_seq_wad_file (const char * wadfile, const char * extension, boolean do_it)
 {
   char aline [48];
   char msqname [250];
-  FILE * fin;
 
   /* Change /WAD to /MSQ */
-  DH_replace_file_extension (msqname, wadname, "msq");
-  fin = fopen (msqname, "r");
 
-  if (fin == NULL)
+  dirname (msqname, wadfile);
+  DH_replace_file_extension (aline, leafname(wadfile), extension);
+
+  if (scan_dir (msqname, aline, do_it, false) == 0)
   {
     dirname (msqname, myargv [0]);
     strcat (msqname, DIRSEP"pwads"DIRSEP"Database");
@@ -3354,29 +3406,7 @@ void G_parse_map_seq_wad_file (char * wadname, boolean do_it)
       msqname [null_pos] = 0;
     }
 #endif
-    DH_replace_file_extension (aline, leafname(wadname), "msq");
-    scan_dir (msqname, aline, do_it);
-  }
-  else
-  {
-    /* On a short name system, it's possible that I've just */
-    /* opened the WAD file again, ensure that it's not! */
-
-    dh_fgets (aline, 27, fin);
-
-    if (dh_strcmp (aline,"# Map sequence file") == 0)
-    {
-      if (do_it == true)
-      {
-	fseek (fin, 0, SEEK_SET);
-	G_ParseMapSeq (msqname, fin, 1);
-      }
-      else
-      {
-	printf (" adding %s\n", msqname);
-      }
-    }
-    fclose (fin);
+    scan_dir (msqname, aline, do_it, true);
   }
 }
 

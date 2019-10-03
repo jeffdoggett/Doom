@@ -495,7 +495,7 @@ void W_Reload (void)
 // The name searcher looks backwards, so a later file
 //  does override all earlier ones.
 //
-void W_InitMultipleFiles (char** filenames)
+void W_InitMultipleFiles (wadfilelist_t * filenames)
 {
     int	i;
 
@@ -505,8 +505,11 @@ void W_InitMultipleFiles (char** filenames)
     // will be realloced as lumps are added
     lumpinfo = malloc(1);
 
-    for ( ; *filenames ; filenames++)
-	W_AddFile (*filenames);
+    while (filenames)
+    {
+      W_AddFile (filenames->filename);
+      filenames = filenames -> next;
+    }
 
     if (!numlumps)
 	I_Error ("W_InitFiles: no files found");
@@ -528,16 +531,19 @@ void W_InitMultipleFiles (char** filenames)
 // W_InitFile
 // Just initialize from a single file.
 //
+#if 0
+// Never called
+
 void W_InitFile (const char* filename)
 {
-    char*	names[2];
+  wadfilelist_t names;
 
-    names[0] = (char*)filename;
-    names[1] = NULL;
-    W_InitMultipleFiles (names);
+  names.filename = filename;
+  names.next = NULL;
+  W_InitMultipleFiles (&names);
 }
 
-
+#endif
 
 /* ---------------------------------------------------------------------------- */
 //

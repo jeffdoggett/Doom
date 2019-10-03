@@ -11,6 +11,7 @@ void DH_parse_hacker_file (const char * filename);
 void DH_parse_hacker_wad_file (const char * wadname, boolean do_it);
 unsigned int dh_instr (const char * text, const char * search_string);
 unsigned int dh_inchar (const char * text, char search_char);
+unsigned int dh_rinchar (const char * text, char search_char);
 char * dh_split_lines (char * ptr, char * top);
 char * dh_next_line (char * ptr, char * top);
 void dh_fgets (char * a_line, unsigned int max_length, FILE * fin);

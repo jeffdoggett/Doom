@@ -32,6 +32,13 @@
 //
 // TYPES
 //
+typedef struct wadfilelist_s
+{
+  const char * filename;
+  struct wadfilelist_s * next;
+} wadfilelist_t;
+
+
 typedef struct
 {
     // Should be "IWAD" or "PWAD".
@@ -65,7 +72,7 @@ typedef struct
 extern	lumpinfo_t*	lumpinfo;
 extern	int		numlumps;
 
-void	W_InitMultipleFiles (char** filenames);
+void	W_InitMultipleFiles (wadfilelist_t * filenames);
 void	W_Reload (void);
 
 void	W_QuicksortLumps (int from, int to);

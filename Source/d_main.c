@@ -187,15 +187,15 @@ extern actionf_t states_ptr_copy [NUMSTATES];
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime, I_StartFrame, and I_StartTic
 //
-void D_DoomLoop (void);
-void D_CheckNetGame (void);
-void D_ProcessEvents (void);
-void G_BuildTiccmd (ticcmd_t* cmd);
-void D_DoAdvanceDemo (void);
+static void D_DoomLoop (void);
+
+extern void D_CheckNetGame (void);
+extern void G_BuildTiccmd (ticcmd_t* cmd);
+extern void D_DoAdvanceDemo (void);
 
 
-#define	MAXWADFILES 20
-static char * wadfiles[MAXWADFILES];
+static wadfilelist_t * wadfilelisthead = NULL;
+static wadfilelist_t * wadfilelisttail = NULL;
 
 
 boolean	devparm;	// started game with -devparm
@@ -203,8 +203,6 @@ boolean nomonsters1;	// checkparm of -nomonsters
 boolean nomonsters2;	// checkparm of -nomonsters
 boolean respawnparm;	// checkparm of -respawn
 boolean fastparm;	// checkparm of -fast
-
-boolean drone;
 
 boolean	singletics = false; // debug flag to cancel adaptiveness
 
@@ -549,7 +547,7 @@ void D_Display (void)
 //
 extern  boolean demorecording;
 
-void D_DoomLoop (void)
+static void D_DoomLoop (void)
 {
     if (demorecording)
       G_BeginRecording ();
@@ -752,28 +750,39 @@ void D_StartTitle (void)
 void D_AddFile (const char *file)
 {
   char *newfile;
-  char * q;
-  char ** p;
+  wadfilelist_t * ptr;
 
-  p = wadfiles;
-  while ((q = *p) != NULL)
+  ptr = wadfilelisthead;
+  while (ptr)
   {
-    if (strcasecmp (q, file) == 0)
+    if (strcasecmp (ptr->filename, file) == 0)
       return;				// Already in list
-    p++;
+    ptr = ptr -> next;
   }
 
   newfile = malloc (strlen(file)+1);
+  ptr = malloc (sizeof (wadfilelist_t));
 
-  if (newfile == 0)
+  if ((newfile == NULL) || (ptr == NULL))
   {
-    I_Error("Failed to claim memory for WAD file list\n");
+    I_Error ("Failed to claim memory for WAD file list\n");
+    return;
+  }
+
+  strcpy (newfile, file);
+  ptr -> filename = newfile;
+  ptr -> next = NULL;
+
+  if (wadfilelisthead == NULL)
+  {
+    wadfilelisthead = ptr;
   }
   else
   {
-    strcpy (newfile, file);
-    *p = newfile;
+    wadfilelisttail -> next = ptr;
   }
+
+  wadfilelisttail = ptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1223,7 +1232,8 @@ static int is_a_directory (const char * name)
 
 static int already_in_wadlist (const char * filename, char * suffix)
 {
-  unsigned int p,l;
+  unsigned int l;
+  wadfilelist_t * ptr;
 
   l = strlen (filename);
   if ((l > 3)
@@ -1231,15 +1241,15 @@ static int already_in_wadlist (const char * filename, char * suffix)
     && (strcasecmp (filename + l - 3, suffix) == 0))
   {
     l -= 3;
-    p = 0;
-    while (wadfiles[p])
+    ptr = wadfilelisthead;
+    while (ptr)
     {
-      if (strncasecmp (wadfiles[p], filename, l) == 0)
+      if (strncasecmp (ptr->filename, filename, l) == 0)
       {
-	// fprintf (stderr, "Found file %s already in the wad list (%s)(%u)\n", filename, wadfiles[p], l);
+	// fprintf (stderr, "Found file %s already in the wad list (%s)(%u)\n", filename, ptr->filename, l);
 	return (1);
       }
-      p++;
+      ptr = ptr -> next;
     }
   }
 
@@ -1988,20 +1998,21 @@ static void D_ShowStartupMessage (void)
 
 void D_GetSaveGameFilename (char * dest)
 {
-  int p,q;
+  int q;
   char cc;
-  char * newtext;
+  const char * newtext;
   const char * leaf;
+  wadfilelist_t * ptr;
 
-  p = 0;
   newtext = NULL;
   dest [0] = 0;
 
-  while (wadfiles[p])
+  ptr = wadfilelisthead;
+  while (ptr)
   {
-    if (IdentifyWad (wadfiles[p], 0) & 255)
-      newtext = wadfiles[p];
-    p++;
+    if (IdentifyWad (ptr->filename, 0) & 255)
+      newtext = ptr->filename;
+    ptr = ptr -> next;
   }
 
   if (newtext)
@@ -2078,6 +2089,7 @@ static void D_LoadGameFile (void)
 void D_DoomMain (void)
 {
   unsigned int	p;
+  wadfilelist_t * ptr;
   map_starts_t *  map_info_p;
 
   respawnparm = (boolean) M_CheckParm ("-respawn");
@@ -2107,11 +2119,12 @@ void D_DoomMain (void)
   p = M_CheckParm ("-nowadlang");
   if (p == 0)
   {
-    while (wadfiles[p])
+    ptr = wadfilelisthead;
+    while (ptr)
     {
-      find_language_in_wad (wadfiles[p]);
+      find_language_in_wad (ptr->filename);
       dh_changing_pwad = true;			// Subsequent files are Pwads...
-      p++;
+      ptr = ptr -> next;
     }
   }
 
@@ -2119,11 +2132,12 @@ void D_DoomMain (void)
   if (p == 0)
   {
     dh_changing_pwad = false;
-    while (wadfiles[p])
+    ptr = wadfilelisthead;
+    while (ptr)
     {
-      find_dehacked_in_wad (wadfiles[p]);
+      find_dehacked_in_wad (ptr->filename);
       dh_changing_pwad = true;			// Subsequent files are Pwads...
-      p++;
+      ptr = ptr -> next;
     }
   }
 
@@ -2132,10 +2146,11 @@ void D_DoomMain (void)
   p = M_CheckParm ("-noautodeh");
   if (p == 0)
   {
-    while (wadfiles[p])
+    ptr = wadfilelisthead;
+    while (ptr)
     {
-      DH_parse_hacker_wad_file (wadfiles[p], true);
-      p++;
+      DH_parse_hacker_wad_file (ptr->filename, true);
+      ptr = ptr -> next;
     }
   }
 
@@ -2286,18 +2301,18 @@ void D_DoomMain (void)
 
   //printf ("W_Init: Init WADfiles.\n");
   printf ("Using Wadfiles:\n");
-  W_InitMultipleFiles (wadfiles);
+  W_InitMultipleFiles (wadfilelisthead);
 
 
   /* This simply tells the user that the files were/will be actioned */
-  p = 0;
-  while (wadfiles[p])
+  ptr = wadfilelisthead;
+  while (ptr)
   {
-    HU_parse_map_name_file (wadfiles[p], false);
+    G_parse_map_seq_wad_file (ptr->filename, "hst", false);
     if (M_CheckParm ("-noautodeh") == 0)
-      DH_parse_hacker_wad_file (wadfiles[p], false);
-    G_parse_map_seq_wad_file (wadfiles[p], false);
-    p++;
+      DH_parse_hacker_wad_file (ptr->filename, false);
+    G_parse_map_seq_wad_file (ptr->filename, "msq", false);
+    ptr = ptr -> next;
   }
 
 
@@ -2430,13 +2445,14 @@ void D_DoomMain (void)
   W_QuicksortLumps (0, numlumps-1);
 
   /* We do these down here so that they can override a MAPINFO segment */
-  p = 0;
-  while (wadfiles[p])
+  ptr = wadfilelisthead;
+  while (ptr)
   {
-    HU_parse_map_name_file (wadfiles[p], true);
-    G_parse_map_seq_wad_file (wadfiles[p], true);
-    p++;
+    G_parse_map_seq_wad_file (ptr->filename, "hst", true);
+    G_parse_map_seq_wad_file (ptr->filename, "msq", true);
+    ptr = ptr -> next;
   }
+
   p = M_CheckParm ("-mapseq");
   if (p)
   {

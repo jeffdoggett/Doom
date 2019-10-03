@@ -739,48 +739,6 @@ char ForeignTranslation(unsigned char ch)
 
 /* -------------------------------------------------------------------------------------------- */
 
-void HU_parse_map_name_file (char * wadname, boolean do_it)
-{
-  FILE * fin;
-  char a_line [250];
-  char hstname [250];
-
-  /* Change /WAD to /HST */
-  DH_replace_file_extension (a_line, wadname, "hst");
-  fin = fopen (a_line, "r");
-  if (fin == NULL)
-  {
-    dirname (hstname, myargv [0]);
-    strcat (hstname, DIRSEP"pwads"DIRSEP"Database");
-    DH_replace_file_extension (a_line, leafname(wadname), "hst");
-    scan_dir (hstname, a_line, do_it);
-  }
-  else
-  {
-    /* On a short name system, it's possible that I've just */
-    /* opened the WAD file again, ensure that it's not! */
-
-    if (!((fgetc (fin) == 'P')
-     && (fgetc (fin) == 'W')
-     && (fgetc (fin) == 'A')
-     && (fgetc (fin) == 'D')))
-    {
-      if (do_it == true)
-      {
-        fseek (fin, 0, SEEK_SET);
-        G_ParseMapSeq (a_line, fin, 0);
-      }
-      else
-      {
-        printf (" adding %s\n", a_line);
-      }
-    }
-    fclose (fin);
-  }
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
 void HU_Init(void)
 {
 

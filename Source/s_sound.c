@@ -1273,7 +1273,14 @@ void S_MusInfoThinker (mobj_t *thing)
   }
 
   if (mnum == 0)			// Return to default?
+  {
     S_StartLevelMusic (gameepisode, gamemap);
+    return;
+  }
+
+#ifdef NORMALUNIX
+  printf ("Failed to find Music %u\n", mnum);
+#endif
 }
 
 /* ------------------------------------------------------------ */

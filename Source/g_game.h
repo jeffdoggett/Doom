@@ -130,10 +130,10 @@ void G_MapName (char * name, int episode, int map);
 int G_MapLump (int episode, int map);
 void G_ParseMapSeq (char * filename, FILE * fin, int docheck);
 void G_ReadMapSeq (char * filename);
-void G_parse_map_seq_wad_file (char * wadfile, boolean do_it);
+void G_parse_map_seq_wad_file (const char * wadfile, const char * extension, boolean do_it);
 const char * leafname (const char * path);
 void dirname (char * dest, const char * path);
-void scan_dir (char * dirname, char * filename, boolean do_it);
+unsigned int scan_dir (char * dirname, char * filename, boolean do_it, boolean allow_recurse);
 void G_Patch_Map (void);
 void G_Patch_Map_Things (int thingnumber, mapthing_t * mt);
 

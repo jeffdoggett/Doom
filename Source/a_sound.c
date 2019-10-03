@@ -1066,19 +1066,25 @@ static int I_Validate_MusName (const char * musname)
 /* ------------------------------------------------------------ */
 /* See if the search string is in the comma separated list. */
 
-static int I_MusicInStr (char * buffer, const char * search)
+static int I_MusicInStr (char * buffer, const char * search, boolean truncate)
 {
   int pos;
+  int len;
+
+  if (truncate)
+    len = strlen (buffer);
+  else
+    len = ~0;
 
   while ((pos = dh_inchar (buffer, ',')) != 0)
   {
     buffer [pos-1] = 0;
-    if (strcasecmp (buffer, search) == 0)
+    if (strncasecmp (buffer, search, len) == 0)
       return (0);
     buffer += pos;
   }
 
-  return (strcasecmp (buffer, search));
+  return (strncasecmp (buffer, search, len));
 }
 
 /* ------------------------------------------------------------ */
@@ -1095,17 +1101,17 @@ static int I_MusicForThisWad (char * buffer, const char * packname, const char *
   pos = dh_inchar (buffer, '+');
   if (pos == 0)
   {
-    return (I_MusicInStr (buffer, packname));
+    return (I_MusicInStr (buffer, packname, false));
   }
 
   buffer [pos-1] = 0;
 
   if ((pos > 1)
-   && (I_MusicInStr (buffer, packname) != 0))
+   && (I_MusicInStr (buffer, packname, false) != 0))
     return (1);
 
   if ((wadname [0])
-   && (I_MusicInStr (buffer+pos, wadname) == 0))
+   && (I_MusicInStr (buffer+pos, wadname, true) == 0))
     return (0);
 
   return (1);

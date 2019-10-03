@@ -61,7 +61,6 @@ void HU_Drawer(void);
 char HU_dequeueChatChar(void);
 void HU_Erase(void);
 void HU_ParseMapHst (FILE* fin);
-void HU_parse_map_name_file (char * wadname, boolean do_it);
 char * HU_printf (const char * str, ...);
 
 #endif

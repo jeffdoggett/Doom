@@ -3714,11 +3714,8 @@ void DH_parse_hacker_file (const char * filename)
 
 void DH_replace_file_extension (char * newname, const char * oldname, const char * n_ext)
 {
-  DIR * dirp;
-  struct dirent *dp;
   char * p;
   char * leaf;
-  char buffer [200];
 
   strcpy (newname, oldname);
   leaf = (char *) leafname (newname);
@@ -3732,66 +3729,27 @@ void DH_replace_file_extension (char * newname, const char * oldname, const char
   strcpy (p+1, n_ext);
 
 //printf ("filename %s is now %s\n", oldname, newname);
-
-  /* On a case dependent file system we need to get it right! */
-
-  dirname (buffer, newname);
-  dirp = opendir (buffer);
-  if (dirp)
-  {
-    while ((dp = readdir (dirp)) != NULL)
-    {
-      if (strcasecmp (leaf, dp -> d_name) == 0)
-      {
-	strcpy (leaf, dp -> d_name);
-	break;
-      }
-    }
-    closedir (dirp);
-  }
-
-//printf ("filename %s is now %s\n", oldname, newname);
 }
 
 /* ---------------------------------------------------------------------------- */
 
 void DH_parse_hacker_wad_file (const char * wadname, boolean do_it)
 {
-  char aline [28];
+  char aline [48];
   char dehname [250];
-  FILE * fin;
+
+  dirname (dehname, wadname);
 
   /* Change /WAD to /BEX */
-  DH_replace_file_extension (dehname, wadname, "bex");
-  fin = fopen (dehname, "r");
-  if (fin == NULL)
-  {
-    /* Change /WAD to /DEH */
-    DH_replace_file_extension (dehname, wadname, "deh");
-    fin = fopen (dehname, "r");
-  }
+  DH_replace_file_extension (aline, leafname(wadname), "bex");
+  if (scan_dir (dehname, aline, do_it, false) != 0)
+    return;
 
-  if (fin)
-  {
-    /* On a short name system, it's possible that I've just */
-    /* opened the WAD file again, ensure that it's not! */
+  /* Change /WAD to /DEH */
+  DH_replace_file_extension (aline, leafname(wadname), "deh");
+  scan_dir (dehname, aline, do_it, false);
 
-    dh_fgets (aline, 4, fin);
-
-    if (dh_strcmp (aline,"PWAD") != 0)
-    {
-      if (do_it == true)
-      {
-	fseek (fin, 0, SEEK_SET);
-	DH_parse_hacker_file_f (dehname, fin, ~0);
-      }
-      else
-      {
-	printf (" adding %s\n", dehname);
-      }
-    }
-    fclose (fin);
-  }
+  /* At the moment we do not bother to search the Database for this... */
 }
 
 /* ---------------------------------------------------------------------------- */
