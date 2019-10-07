@@ -880,7 +880,7 @@ static int check_skytexture (const char * skyname)
       do
       {
         cc = buffer [++i];
-      } while ((cc >= 0) && (cc <= 9));
+      } while ((cc >= '0') && (cc <= '9'));
       buffer [i] = 0;
 
       j = R_CheckTextureNumForName (buffer);
