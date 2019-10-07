@@ -326,12 +326,12 @@ EV_DoCeiling
 	      {
 		side = getSide(secnum,i,0);
 		if (side->toptexture >= 0)
-		  if (textureheight[side->toptexture] < offset)
-		    offset = textureheight[side->toptexture];
+		  if (textures[side->toptexture].height < offset)
+		    offset = textures[side->toptexture].height;
 		side = getSide(secnum,i,1);
 		if (side->toptexture >= 0)
-		  if (textureheight[side->toptexture] < offset)
-		    offset = textureheight[side->toptexture];
+		  if (textures[side->toptexture].height < offset)
+		    offset = textures[side->toptexture].height;
 	      }
 	    }
 	    if (offset == ~0)

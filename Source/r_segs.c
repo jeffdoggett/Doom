@@ -322,7 +322,7 @@ R_RenderMaskedSegRange
     backsector = curline->backsector;
     tex = curline->sidedef->midtexture;
     if (tex >= numtextures) tex = 0;
-    texnum = texturetranslation[tex];
+    texnum = textures[tex].translation;
 
     lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
 
@@ -350,7 +350,7 @@ R_RenderMaskedSegRange
     {
 	dc_texturemid = frontsector->floorheight > backsector->floorheight
 	    ? frontsector->floorheight : backsector->floorheight;
-	dc_texturemid = dc_texturemid + textureheight[texnum] - viewz;
+	dc_texturemid = dc_texturemid + textures[texnum].height - viewz;
     }
     else
     {
@@ -396,7 +396,7 @@ R_RenderMaskedSegRange
 	      int64_t t = ((int64_t) centeryfrac << FRACBITS) -
 		(int64_t) dc_texturemid * spryscale;
 
-	      if (t + (int64_t) textureheight[texnum] * spryscale < 0 ||
+	      if (t + (int64_t) textures[texnum].height * spryscale < 0 ||
 		  t > (int64_t) SCREENHEIGHT << FRACBITS*2)
 		continue;	// skip if the texture is out of screen's range
 
@@ -520,7 +520,7 @@ static void R_RenderSegLoop (void)
 		dc_yl = yl;
 		dc_yh = yh;
 		dc_texturemid = rw_midtexturemid;
-		dc_ylim = textureheight[midtexture];
+		dc_ylim = textures[midtexture].height;
 		tex_patch = R_CacheTextureCompositePatchNum(midtexture);
 		dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
 		dc_texturefrac = R_CalcFrac ();
@@ -549,7 +549,7 @@ static void R_RenderSegLoop (void)
 			dc_yl = yl;
 			dc_yh = mid;
 			dc_texturemid = rw_toptexturemid;
-			dc_ylim = textureheight[toptexture];
+			dc_ylim = textures[toptexture].height;
 			tex_patch = R_CacheTextureCompositePatchNum(toptexture);
 			dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
 			dc_texturefrac = R_CalcFrac ();
@@ -587,7 +587,7 @@ static void R_RenderSegLoop (void)
 			dc_yl = mid;
 			dc_yh = yh;
 			dc_texturemid = rw_bottomtexturemid;
-			dc_ylim = textureheight[bottomtexture];
+			dc_ylim = textures[bottomtexture].height;
 			tex_patch = R_CacheTextureCompositePatchNum(bottomtexture);
 			dc_source = R_GetTextureColumn(tex_patch, texturecolumn);
 			dc_texturefrac = R_CalcFrac ();
@@ -725,7 +725,7 @@ void R_StoreWallRange(int start, int stop)
 	// single sided line
 	tex = sidedef->midtexture;
 	if (tex >= numtextures) tex = 0;
-	midtexture = texturetranslation[tex];
+	midtexture = textures[tex].translation;
 //      midtexheight = textureheight[midtexture] >> FRACBITS;
 //      midtexfullbright = texturefullbright[midtexture];
 
@@ -734,7 +734,7 @@ void R_StoreWallRange(int start, int stop)
 
 	if (linedef->flags & ML_DONTPEGBOTTOM)
 	    // bottom of texture at bottom
-	    rw_midtexturemid = frontsector->floorheight + textureheight[midtexture]
+	    rw_midtexturemid = frontsector->floorheight + textures[midtexture].height
 		- viewz + sidedef->rowoffset;
 	else
 	    // top of texture at top
@@ -742,7 +742,7 @@ void R_StoreWallRange(int start, int stop)
 
 	{
 	    // killough 3/27/98: reduce offset
-	    fixed_t     h = textureheight[midtexture];
+	    fixed_t     h = textures[midtexture].height;
 
 	    if (h & (h - FRACUNIT))
 		rw_midtexturemid %= h;
@@ -836,7 +836,7 @@ void R_StoreWallRange(int start, int stop)
 	    // top texture
 	    tex = sidedef->toptexture;
 	    if (tex >= numtextures) tex = 0;
-	    toptexture = texturetranslation[tex];
+	    toptexture = textures[tex].translation;
 //	    toptexheight = textureheight[toptexture] >> FRACBITS;
 //	    toptexfullbright = texturefullbright[toptexture];
 
@@ -845,13 +845,13 @@ void R_StoreWallRange(int start, int stop)
 		rw_toptexturemid = worldtop;
 	    else
 		// bottom of texture
-		rw_toptexturemid = backsector->ceilingheight + textureheight[toptexture] - viewz;
+		rw_toptexturemid = backsector->ceilingheight + textures[toptexture].height - viewz;
 
 	    rw_toptexturemid += sidedef->rowoffset;
 
 	    // killough 3/27/98: reduce offset
 	    {
-		fixed_t     h = textureheight[toptexture];
+		fixed_t     h = textures[toptexture].height;
 
 		if (h & (h - FRACUNIT))
 		    rw_toptexturemid %= h;
@@ -864,7 +864,7 @@ void R_StoreWallRange(int start, int stop)
 	    // bottom texture
 	    tex = sidedef->bottomtexture;
 	    if (tex >= numtextures) tex = 0;
-	    bottomtexture = texturetranslation[tex];
+	    bottomtexture = textures[tex].translation;
 //	    bottomtexheight = textureheight[bottomtexture] >> FRACBITS;
 //	    bottomtexfullbright = texturefullbright[bottomtexture];
 
@@ -878,7 +878,7 @@ void R_StoreWallRange(int start, int stop)
 
 	    // killough 3/27/98: reduce offset
 	    {
-		fixed_t     h = textureheight[bottomtexture];
+		fixed_t     h = textures[bottomtexture].height;
 
 		if (h & (h - FRACUNIT))
 		    rw_bottomtexturemid %= h;

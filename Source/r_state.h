@@ -40,8 +40,13 @@
 //  for rendering.
 //
 
-// needed for texture pegging
-extern fixed_t* 	textureheight;
+typedef struct
+{
+  texture_t *	texture;
+  fixed_t	height;		// for texture pegging
+  int		translation;	// for global animation
+  int		lump;
+} texture_info_t;
 
 // needed for pre rendering (fracs)
 extern fixed_t* 	spritewidth;
@@ -65,8 +70,8 @@ extern int		scaledviewwidth;
 extern int		viewheight;
 
 // for global animation
-extern int*		texturetranslation;
 extern int		numtextures;
+extern texture_info_t * textures;
 
 //
 // Lookup tables for map data.

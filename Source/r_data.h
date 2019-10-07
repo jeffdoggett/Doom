@@ -25,7 +25,6 @@
 #define __R_DATA__
 
 #include "r_defs.h"
-#include "r_state.h"
 #include "r_patch.h"
 
 #ifdef __GNUG__

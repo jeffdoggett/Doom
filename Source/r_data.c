@@ -37,13 +37,8 @@ int		numflats;
 int		numspritelumps;
 
 int		numtextures;
-texture_t**	textures;
 
-// needed for texture pegging
-fixed_t*	textureheight;
-
-// for global animation
-int*		texturetranslation;
+texture_info_t* textures;
 
 flatinfo_t*	flatinfo;
 
@@ -81,7 +76,7 @@ static int R_DuplicateTexture (const char * name, int qty)
   pos = 0;
   do
   {
-    if (strncasecmp (textures[pos]->name, name, sizeof (textures[pos]->name)) == 0)
+    if (strncasecmp (textures[pos].texture->name, name, sizeof (textures[pos].texture->name)) == 0)
       return (1);
   } while (++pos < qty);
 
@@ -149,8 +144,7 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 
     // killough 4/9/98: make column offsets 32-bit;
     // clean up malloc-ing to use sizeof
-    textures = Z_Realloc (textures, numtextures * sizeof(*textures), PU_STATIC, 0);
-    textureheight = Z_Realloc (textureheight, numtextures * sizeof(*textureheight), PU_STATIC, 0);
+    textures = Z_Realloc (textures, (numtextures+1) * sizeof(*textures), PU_STATIC, 0);
 
     for (i = 0; i < numtex; ++directory)
     {
@@ -185,7 +179,7 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 	  continue;
 	}
 
-	texture = textures[texbase+i] = Z_Malloc(sizeof(texture_t) + sizeof(texpatch_t)
+	texture = textures[texbase+i].texture = Z_Malloc(sizeof(texture_t) + sizeof(texpatch_t)
 	    * (SHORT(mtexture->patchcount) - 1), PU_STATIC, 0);
 
 	texture->width = SHORT(mtexture->width);
@@ -225,8 +219,8 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 
 	for (j = 1; j * 2 <= texture->width; j <<= 1);
 	texture->widthmask = j - 1;
-	textureheight[texbase+i] = texture->height << FRACBITS;
-
+	textures[texbase+i].height = texture->height << FRACBITS;
+	textures[texbase+i].lump = names_lump;
 	i++;	// Done here so that 'continue' misses it out...
     }
 
@@ -336,29 +330,22 @@ static void R_InitTextures (void)
     int i;
 
     textures = NULL;
-    textureheight = NULL;
     numtextures = 0;
 
     R_MergeTextures ();
 
-    textures = Z_Realloc (textures, numtextures * sizeof(*textures), PU_STATIC, 0);
-    textureheight = Z_Realloc (textureheight, numtextures * sizeof(*textureheight), PU_STATIC, 0);
-
-    // Create translation table for global animation.
-    // killough 4/9/98: make column offsets 32-bit;
-    // clean up malloc-ing to use sizeof
-    texturetranslation = Z_Malloc((numtextures + 1) * sizeof(*texturetranslation), PU_STATIC, 0);
+    textures = Z_Realloc (textures, (numtextures+1) * sizeof(*textures), PU_STATIC, 0);
 
     for (i = 0; i < numtextures; ++i)
-	texturetranslation[i] = i;
+	textures[i].translation = i;
 
     while (--i >= 0)
     {
 	int j;
 
-	j = W_LumpNameHash(textures[i]->name) % (unsigned int)numtextures;
-	textures[i]->next = textures[j]->index; // Prepend to chain
-	textures[j]->index = i;
+	j = W_LumpNameHash(textures[i].texture->name) % (unsigned int)numtextures;
+	textures[i].texture->next = textures[j].texture->index; // Prepend to chain
+	textures[j].texture->index = i;
     }
 #if 0
     // [BH] Initialize partially fullbright textures.
@@ -890,9 +877,9 @@ int R_CheckTextureNumForName (const char *name)
 
     if (*name != '-')
     {
-	i = textures[W_LumpNameHash(name) % (unsigned int)numtextures]->index;
-	while (i >= 0 && strncasecmp(textures[i]->name, name, 8))
-	    i = textures[i]->next;
+	i = textures[W_LumpNameHash(name) % (unsigned int)numtextures].texture->index;
+	while (i >= 0 && strncasecmp(textures[i].texture->name, name, 8))
+	    i = textures[i].texture->next;
     }
     return i;
 }
@@ -997,7 +984,7 @@ void R_PrecacheLevel (void)
   {
     if (hitlist[i])
     {
-      texture = textures[i];
+      texture = textures[i].texture;
 
       for (j=0 ; j<texture->patchcount ; j++)
       {

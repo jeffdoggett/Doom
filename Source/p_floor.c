@@ -267,12 +267,12 @@ static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum, int 
     {
       side = getSide(secnum,i,0);
       if (side->bottomtexture >= min_text_num)
-	if (textureheight[side->bottomtexture] < offset)
-	    offset = textureheight[side->bottomtexture];
+	if (textures[side->bottomtexture].height < offset)
+	    offset = textures[side->bottomtexture].height;
       side = getSide(secnum,i,1);
       if (side->bottomtexture >= min_text_num)
-	if (textureheight[side->bottomtexture] < offset)
-	  offset = textureheight[side->bottomtexture];
+	if (textures[side->bottomtexture].height < offset)
+	  offset = textures[side->bottomtexture].height;
     }
   }
 

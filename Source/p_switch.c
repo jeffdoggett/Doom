@@ -41,9 +41,6 @@ typedef struct switchlist_s
 
 static switchlist_t * switchhead;
 
-extern texture_t** textures;
-extern int	numtextures;
-
 /* ----------------------------------------------------------------------- */
 //
 // P_InitSwitchList
@@ -54,7 +51,7 @@ extern int	numtextures;
 void P_InitSwitchList (void)
 {
   int	 	i,j;
-  texture_t**	ptr_1;
+  texture_info_t*ptr_1;
   texture_t*	ptr_2;
   switchlist_t*	this_switch;
   switchlist_t**prev_switch;
@@ -67,7 +64,8 @@ void P_InitSwitchList (void)
 
   do
   {
-    ptr_2 = *ptr_1++;
+    ptr_2 = ptr_1->texture;
+    ++ptr_1;
     if (strncasecmp (ptr_2->name, "SW1", 3) == 0)
     {
       strncpy (sw2name, ptr_2->name, 8);

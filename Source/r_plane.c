@@ -518,7 +518,7 @@ void R_DrawPlanes(void)
 	  const side_t *s = *l->sidenum + sides;
 
 	  // Texture comes from upper texture of reference sidedef
-	  texture = texturetranslation[s->toptexture];
+	  texture = textures[s->toptexture].translation;
 
 	  // Horizontal offset is turned into an angle offset,
 	  // to allow sky rotation as well as careful positioning.
@@ -549,7 +549,7 @@ void R_DrawPlanes(void)
 	//  by INVUL inverse mapping.
 	dc_colormap = (fixedcolormap ? fixedcolormap : colormaps);
 
-	dc_ylim = textureheight[texture];
+	dc_ylim = textures[texture].height;
 	dc_iscale = skyiscale;
 	tex_patch = R_CacheTextureCompositePatchNum (texture);
 	offset = skycolumnoffset >> FRACBITS;

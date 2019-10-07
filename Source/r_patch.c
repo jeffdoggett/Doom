@@ -42,9 +42,6 @@
 static rpatch_t	 *patches = 0;
 static rpatch_t	 *texture_composites = 0;
 
-extern int	 numtextures;
-extern texture_t **textures;
-
 void R_InitPatches(void)
 {
     if (!patches)
@@ -95,7 +92,7 @@ static void removePostFromColumn(rcolumn_t *column, int post)
 static void createTextureCompositePatch(int id)
 {
     rpatch_t	*composite_patch = &texture_composites[id];
-    texture_t	*texture = textures[id];
+    texture_t	*texture = textures[id].texture;
     texpatch_t	*texpatch;
     int		patchNum;
     const patch_t *oldPatch;

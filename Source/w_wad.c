@@ -405,9 +405,10 @@ void W_AddFile (const char *filename)
 	    putchar ('\n');
 	    length = 0;
 	  }
+	  lump_p += 10;
+	  i += 10;
 	}
 	lump_p++;
-	fileinfo++;
       } while (++i < numlumps);
     }
 #endif

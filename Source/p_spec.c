@@ -2186,7 +2186,7 @@ void P_UpdateSpecials (void)
     {
       pic = anim->basepic + ( (leveltime/anim->speed + i)%anim->numpics );
       if (anim->istexture)
-	texturetranslation[i] = pic;
+	textures[i].translation = pic;
       else
 	flatinfo[i].translation = pic;
     }

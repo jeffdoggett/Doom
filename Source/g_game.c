@@ -855,11 +855,51 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 
 /* -------------------------------------------------------------------------------------------- */
 
+static int check_skytexture (const char * skyname)
+{
+  char cc;
+  int i,j;
+
+  i = R_CheckTextureNumForName (skyname);
+  if (i != -1)
+  {
+    // For the time being ignore tall textures as these are only
+    // for ports with mouselook.
+    if (textures[i].height == (0x80*FRACUNIT))
+      return (i);
+
+    // Let us see if the name starts with the standard "SKYn".
+    // (BTSX has SKY1TALL and SKY1 etc)
+    if ((strncasecmp (skyname, "SKY", 3) == 0)
+     && ((cc = skyname[3]) >= '0')
+     && (cc <= '9'))
+    {
+      char buffer [12];
+      strcpy (buffer, skyname);
+      i = 3;
+      do
+      {
+        cc = buffer [++i];
+      } while ((cc >= 0) && (cc <= 9));
+      buffer [i] = 0;
+
+      j = R_CheckTextureNumForName (buffer);
+      if ((j != -1)
+       && (textures[j].height == (0x80*FRACUNIT))
+       && (textures[j].lump == textures[i].lump))
+        return (j);
+    }
+  }
+  return (i);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
 static int load_skytexture (map_dests_t * map_info_p)
 {
   int i;
 
-  i = R_CheckTextureNumForName (map_info_p -> sky);
+  i = check_skytexture (map_info_p -> sky);
   if (i != -1)
     return (i);
 
@@ -867,12 +907,12 @@ static int load_skytexture (map_dests_t * map_info_p)
   if (gamemode == commercial)
   {
     if (gamemap < 12)
-      return (R_TextureNumForName (sky_1));
+      return (check_skytexture (sky_1));
 
     if (gamemap < 21)
-      return (R_TextureNumForName (sky_2));
+      return (check_skytexture (sky_2));
 
-    return (R_TextureNumForName (sky_3));
+    return (check_skytexture (sky_3));
   }
 
   // DOOM determines the sky texture to be used
@@ -882,47 +922,47 @@ static int load_skytexture (map_dests_t * map_info_p)
   switch (gameepisode)
   {
     default:
-      i = R_CheckTextureNumForName (sky_9);
+      i = check_skytexture (sky_9);
       if (i != -1)
 	return (i);
 
     case 8:
-      i = R_CheckTextureNumForName (sky_8);
+      i = check_skytexture (sky_8);
       if (i != -1)
 	return (i);
 
     case 7:
-      i = R_CheckTextureNumForName (sky_7);
+      i = check_skytexture (sky_7);
       if (i != -1)
 	return (i);
 
     case 6:
-      i = R_CheckTextureNumForName (sky_6);
+      i = check_skytexture (sky_6);
       if (i != -1)
 	return (i);
 
     case 5:
-      i = R_CheckTextureNumForName (sky_5);
+      i = check_skytexture (sky_5);
       if (i != -1)
 	return (i);
 
     case 4:
-      i = R_CheckTextureNumForName (sky_4);
+      i = check_skytexture (sky_4);
       if (i != -1)
 	return (i);
 
     case 3:
-      i = R_CheckTextureNumForName (sky_3);
+      i = check_skytexture (sky_3);
       if (i != -1)
 	return (i);
 
     case 2:
-      i = R_CheckTextureNumForName (sky_2);
+      i = check_skytexture (sky_2);
       if (i != -1)
 	return (i);
 
     case 1:
-      return (R_TextureNumForName (sky_1));	// Error if this fails!
+      return (check_skytexture (sky_1));	// Error if this fails!
   }
 }
 
