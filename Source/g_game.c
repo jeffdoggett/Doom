@@ -217,15 +217,6 @@ static map_patch_t * map_patches_head = NULL;
 
 const char mapname_1 [] = "E%dM%d";
 const char mapname_2 [] = "MAP%02d";
-const char sky_1 [] = "SKY1";
-const char sky_2 [] = "SKY2";
-const char sky_3 [] = "SKY3";
-const char sky_4 [] = "SKY4";
-const char sky_5 [] = "SKY5";
-const char sky_6 [] = "SKY6";
-const char sky_7 [] = "SKY7";
-const char sky_8 [] = "SKY8";
-const char sky_9 [] = "SKY9";
 const char cwilv [] = "CWILV%2.2d";
 const char wilv [] = "WILV%d%d";
 const char enterpic_1 [] = "WIMAP%d";
@@ -238,16 +229,16 @@ const char borderpatch_2 [] = "GRNROCK";		// DOOM II border patch.
 static map_dests_t next_level_tab_1 [][10] =
 {  // E  M  E  M  S  R  I  C  N  T   Par  Suk  skydelta Name Sky
   {
-    { 0, 1, 0, 1, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M0
-    { 0, 2, 0, 9, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M1
-    { 0, 3, 0, 9, 0, 0, 0, 0, 0, 0,  75/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M2
-    { 0, 4, 0, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M3
-    { 0, 5, 0, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M4
-    { 0, 6, 0, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M5
-    { 0, 7, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M6
-    { 0, 8, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M8
-    { 0, 4, 0, 4, 1, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M9
+    { 0, 1, 0, 1, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M0
+    { 0, 2, 0, 9, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M1
+    { 0, 3, 0, 9, 0, 0, 0, 0, 0, 0,  75/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M2
+    { 0, 4, 0, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M3
+    { 0, 5, 0, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M4
+    { 0, 6, 0, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M5
+    { 0, 7, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M6
+    { 0, 8, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M7
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M8
+    { 0, 4, 0, 4, 1, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M9
   },
   {
     { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M0
@@ -396,73 +387,73 @@ static map_dests_t next_level_tab_2 [] =
   { 255,  0, 255,  0, 0, 0, 4, 0, 0, 0, 180/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 30
   { 255, 16, 255, 32, 1, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 31
   { 255, 16, 255, 16, 2, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 32
-  { 255, 34, 255, 34, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 33
-  { 255, 33, 255, 34, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 34
-  { 255, 36, 255, 36, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 35
-  { 255, 37, 255, 37, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 36
-  { 255, 38, 255, 38, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 37
-  { 255, 39, 255, 39, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 38
-  { 255, 40, 255, 40, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 39
-  { 255, 41, 255, 41, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 40
-  { 255, 42, 255, 42, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 41
-  { 255, 43, 255, 43, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 42
-  { 255, 44, 255, 44, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 43
-  { 255, 45, 255, 45, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 44
-  { 255, 46, 255, 46, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 45
-  { 255, 47, 255, 47, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 46
-  { 255, 48, 255, 48, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 47
-  { 255, 49, 255, 49, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 48
-  { 255, 50, 255, 50, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 49
-  { 255, 51, 255, 51, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 50
-  { 255, 52, 255, 52, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 51
-  { 255, 53, 255, 53, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 52
-  { 255, 54, 255, 54, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 53
-  { 255, 55, 255, 55, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 54
-  { 255, 56, 255, 56, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 55
-  { 255, 57, 255, 57, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 56
-  { 255, 58, 255, 58, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 57
-  { 255, 59, 255, 59, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 58
-  { 255, 60, 255, 60, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 59
-  { 255, 61, 255, 61, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 60
-  { 255, 62, 255, 62, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 61
-  { 255, 63, 255, 63, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 62
-  { 255, 64, 255, 64, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 63
-  { 255, 65, 255, 65, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 64
-  { 255, 66, 255, 66, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 65
-  { 255, 67, 255, 67, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 66
-  { 255, 68, 255, 68, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 67
-  { 255, 69, 255, 69, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 68
-  { 255, 70, 255, 70, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 69
-  { 255, 71, 255, 71, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 60
-  { 255, 72, 255, 72, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 71
-  { 255, 73, 255, 73, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 72
-  { 255, 74, 255, 74, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 73
-  { 255, 75, 255, 75, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 74
-  { 255, 76, 255, 76, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 75
-  { 255, 77, 255, 77, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 76
-  { 255, 78, 255, 78, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 77
-  { 255, 79, 255, 79, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 78
-  { 255, 80, 255, 70, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 79
-  { 255, 81, 255, 81, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 80
-  { 255, 82, 255, 82, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 81
-  { 255, 83, 255, 83, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 82
-  { 255, 84, 255, 84, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 83
-  { 255, 85, 255, 85, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 84
-  { 255, 86, 255, 86, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 85
-  { 255, 87, 255, 87, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 86
-  { 255, 88, 255, 88, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 87
-  { 255, 89, 255, 89, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 88
-  { 255, 90, 255, 80, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 89
-  { 255, 91, 255, 91, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 90
-  { 255, 92, 255, 92, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 91
-  { 255, 93, 255, 93, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 92
-  { 255, 94, 255, 94, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 93
-  { 255, 95, 255, 95, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 94
-  { 255, 96, 255, 96, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 95
-  { 255, 97, 255, 97, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 96
-  { 255, 98, 255, 98, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 97
-  { 255, 99, 255, 99, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 98
-  { 255, 0,  255,  0, 0, 0, 0, 0, 0, 0,   0, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL }	// Map 99 (Wos/Wad has level 99)
+  { 255, 34, 255, 34, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 33
+  { 255, 33, 255, 34, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 34
+  { 255, 36, 255, 36, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 35
+  { 255, 37, 255, 37, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 36
+  { 255, 38, 255, 38, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 37
+  { 255, 39, 255, 39, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 38
+  { 255, 40, 255, 40, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 39
+  { 255, 41, 255, 41, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 40
+  { 255, 42, 255, 42, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 41
+  { 255, 43, 255, 43, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 42
+  { 255, 44, 255, 44, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 43
+  { 255, 45, 255, 45, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 44
+  { 255, 46, 255, 46, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 45
+  { 255, 47, 255, 47, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 46
+  { 255, 48, 255, 48, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 47
+  { 255, 49, 255, 49, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 48
+  { 255, 50, 255, 50, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 49
+  { 255, 51, 255, 51, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 50
+  { 255, 52, 255, 52, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 51
+  { 255, 53, 255, 53, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 52
+  { 255, 54, 255, 54, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 53
+  { 255, 55, 255, 55, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 54
+  { 255, 56, 255, 56, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 55
+  { 255, 57, 255, 57, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 56
+  { 255, 58, 255, 58, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 57
+  { 255, 59, 255, 59, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 58
+  { 255, 60, 255, 60, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 59
+  { 255, 61, 255, 61, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 60
+  { 255, 62, 255, 62, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 61
+  { 255, 63, 255, 63, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 62
+  { 255, 64, 255, 64, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 63
+  { 255, 65, 255, 65, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 64
+  { 255, 66, 255, 66, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 65
+  { 255, 67, 255, 67, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 66
+  { 255, 68, 255, 68, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 67
+  { 255, 69, 255, 69, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 68
+  { 255, 70, 255, 70, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 69
+  { 255, 71, 255, 71, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 60
+  { 255, 72, 255, 72, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 71
+  { 255, 73, 255, 73, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 72
+  { 255, 74, 255, 74, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 73
+  { 255, 75, 255, 75, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 74
+  { 255, 76, 255, 76, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 75
+  { 255, 77, 255, 77, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 76
+  { 255, 78, 255, 78, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 77
+  { 255, 79, 255, 79, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 78
+  { 255, 80, 255, 70, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 79
+  { 255, 81, 255, 81, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 80
+  { 255, 82, 255, 82, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 81
+  { 255, 83, 255, 83, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 82
+  { 255, 84, 255, 84, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 83
+  { 255, 85, 255, 85, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 84
+  { 255, 86, 255, 86, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 85
+  { 255, 87, 255, 87, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 86
+  { 255, 88, 255, 88, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 87
+  { 255, 89, 255, 89, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 88
+  { 255, 90, 255, 80, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 89
+  { 255, 91, 255, 91, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 90
+  { 255, 92, 255, 92, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 91
+  { 255, 93, 255, 93, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 92
+  { 255, 94, 255, 94, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 93
+  { 255, 95, 255, 95, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 94
+  { 255, 96, 255, 96, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 95
+  { 255, 97, 255, 97, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 96
+  { 255, 98, 255, 98, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 97
+  { 255, 99, 255, 99, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 98
+  { 255, 0,  255,  0, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_2, (char*) sky_3, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL }	// Map 99 (Wos/Wad has level 99)
 };
 
 /* -------------------------------------------------------------------------------------------- */
@@ -855,119 +846,6 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static int check_skytexture (const char * skyname)
-{
-  char cc;
-  int i,j;
-
-  i = R_CheckTextureNumForName (skyname);
-  if (i != -1)
-  {
-    // For the time being ignore tall textures as these are only
-    // for ports with mouselook.
-    if (textures[i].height == (0x80*FRACUNIT))
-      return (i);
-
-    // Let us see if the name starts with the standard "SKYn".
-    // (BTSX has SKY1TALL and SKY1 etc)
-    if ((strncasecmp (skyname, "SKY", 3) == 0)
-     && ((cc = skyname[3]) >= '0')
-     && (cc <= '9'))
-    {
-      char buffer [12];
-      strcpy (buffer, skyname);
-      i = 3;
-      do
-      {
-        cc = buffer [++i];
-      } while ((cc >= '0') && (cc <= '9'));
-      buffer [i] = 0;
-
-      j = R_CheckTextureNumForName (buffer);
-      if ((j != -1)
-       && (textures[j].height == (0x80*FRACUNIT))
-       && (textures[j].lump == textures[i].lump))
-        return (j);
-    }
-  }
-  return (i);
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
-static int load_skytexture (map_dests_t * map_info_p)
-{
-  int i;
-
-  i = check_skytexture (map_info_p -> sky);
-  if (i != -1)
-    return (i);
-
-  // Not present, try the old defaults.
-  if (gamemode == commercial)
-  {
-    if (gamemap < 12)
-      return (check_skytexture (sky_1));
-
-    if (gamemap < 21)
-      return (check_skytexture (sky_2));
-
-    return (check_skytexture (sky_3));
-  }
-
-  // DOOM determines the sky texture to be used
-  // depending on the current episode, and the game version.
-
-  // Work backwards 'till we get one.
-  switch (gameepisode)
-  {
-    default:
-      i = check_skytexture (sky_9);
-      if (i != -1)
-	return (i);
-
-    case 8:
-      i = check_skytexture (sky_8);
-      if (i != -1)
-	return (i);
-
-    case 7:
-      i = check_skytexture (sky_7);
-      if (i != -1)
-	return (i);
-
-    case 6:
-      i = check_skytexture (sky_6);
-      if (i != -1)
-	return (i);
-
-    case 5:
-      i = check_skytexture (sky_5);
-      if (i != -1)
-	return (i);
-
-    case 4:
-      i = check_skytexture (sky_4);
-      if (i != -1)
-	return (i);
-
-    case 3:
-      i = check_skytexture (sky_3);
-      if (i != -1)
-	return (i);
-
-    case 2:
-      i = check_skytexture (sky_2);
-      if (i != -1)
-	return (i);
-
-    case 1:
-      return (check_skytexture (sky_1));	// Error if this fails!
-  }
-}
-
-/* -------------------------------------------------------------------------------------------- */
-
 //
 // G_DoLoadLevel
 //
@@ -984,16 +862,7 @@ void G_DoLoadLevel (void)
 
   map_info_p = G_Access_MapInfoTab (gameepisode, gamemap);
 
-  // Set the sky map.
-  // First thing, we have a dummy sky texture name,
-  //  a flat. The data is in the WAD only because
-  //  we look for an actual index, instead of simply
-  //  setting one.
-  skyflatnum = R_FlatNumForName (finale_backdrops[BG_F_SKY1]);
-  skycolumnoffset = 0;
-  skyscrolldelta = map_info_p -> skydelta;
-
-  skytexture = load_skytexture (map_info_p);
+  R_InitSkyMap (map_info_p);
 
   levelstarttic = gametic;		// for time calculation
 

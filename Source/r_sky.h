@@ -38,8 +38,18 @@ extern int skycolumnoffset;
 extern int skyscrolldelta;
 extern fixed_t	skyiscale;
 
-// Called whenever the view size changes.
-void R_InitSkyMap (void);
+extern const char sky_0 [];
+extern const char sky_1 [];
+extern const char sky_2 [];
+extern const char sky_3 [];
+extern const char sky_4 [];
+extern const char sky_5 [];
+extern const char sky_6 [];
+extern const char sky_7 [];
+extern const char sky_8 [];
+extern const char sky_9 [];
+
+void R_InitSkyMap (map_dests_t * map_info_p);
 
 #endif
 //-----------------------------------------------------------------------------

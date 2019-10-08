@@ -646,12 +646,12 @@ void R_ExecuteSetViewSize (void)
       case 11:				// Full screen - no status bar
 	scaledviewwidth = SCREENWIDTH;
 	viewheight = SCREENHEIGHT;
-        break;
+	break;
 
       case 10:				// Fill width - status bar visible.
 	scaledviewwidth = SCREENWIDTH;
 	viewheight = SCREENHEIGHT-((32*sbarscale)>>FRACBITS);
-        break;
+	break;
 
       default:				// Small screen - border visible.
 	scaledviewwidth = ((setblocks*SCREENWIDTH)/10)&~7;
@@ -790,8 +790,6 @@ void R_Init (void)
     // printf ("\nR_InitPlanes");
     R_InitLightTables ();
     // printf ("\nR_InitLightTables");
-    R_InitSkyMap ();
-    // printf ("\nR_InitSkyMap");
     R_InitTranslationTables ();
     // printf ("\nR_InitTranslationsTables");
     R_InitPatches();

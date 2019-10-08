@@ -57,15 +57,6 @@ extern char * door_messages_orig [];
 extern char * save_game_messages [];
 extern char * save_game_messages_orig [];
 
-extern const char sky_1 [];
-extern const char sky_2 [];
-extern const char sky_3 [];
-extern const char sky_4 [];
-extern const char sky_5 [];
-extern const char sky_6 [];
-extern const char sky_7 [];
-extern const char sky_8 [];
-extern const char sky_9 [];
 extern const char cwilv [];
 extern const char wilv [];
 extern const char enterpic_1 [];
@@ -237,6 +228,7 @@ static const char * const dehack_things [] =
   "Width",
   "Height",
   "Mass",
+  "Damage",
   "Missile damage",
   "Action sound",
   "Bits",
@@ -268,6 +260,7 @@ typedef enum
   THING_Width,
   THING_Height,
   THING_Mass,
+  THING_Damage,
   THING_Missile_damage,
   THING_Action_sound,
   THING_Bits,
@@ -1229,31 +1222,31 @@ static void write_all_things (FILE * fout)
 
     fprintf (fout, "%s %d (%s)\n", dehack_patches[1], thing_no+1, name);
 
-    fprintf (fout, "%s = %d\n", dehack_things [0], ptr -> doomednum);
-    fprintf (fout, "%s = %d\n", dehack_things [1], ptr -> spawnstate);
-    fprintf (fout, "%s = %d\n", dehack_things [2], ptr -> spawnhealth);
-    fprintf (fout, "%s = %d\n", dehack_things [3], ptr -> gibhealth);
-    fprintf (fout, "%s = %d\n", dehack_things [4], ptr -> seestate);
-    fprintf (fout, "%s = %d\n", dehack_things [5], ptr -> seesound);
-    fprintf (fout, "%s = %d\n", dehack_things [6], ptr -> reactiontime);
-    fprintf (fout, "%s = %d\n", dehack_things [7], ptr -> attacksound);
-    fprintf (fout, "%s = %d\n", dehack_things [8], ptr -> painstate);
-    fprintf (fout, "%s = %d\n", dehack_things [9], ptr -> painchance);
-    fprintf (fout, "%s = %d\n", dehack_things [10], ptr -> painsound);
-    fprintf (fout, "%s = %d\n", dehack_things [11], ptr -> meleestate);
-    fprintf (fout, "%s = %d\n", dehack_things [12], ptr -> missilestate);
-    fprintf (fout, "%s = %d\n", dehack_things [13], ptr -> deathstate);
-    fprintf (fout, "%s = %d\n", dehack_things [14], ptr -> xdeathstate);
-    fprintf (fout, "%s = %d\n", dehack_things [15], ptr -> deathsound);
-    fprintf (fout, "%s = %d\n", dehack_things [16], ptr -> speed);
-    fprintf (fout, "%s = %d\n", dehack_things [17], ptr -> radius);
-    fprintf (fout, "%s = %d\n", dehack_things [18], ptr -> height);
-    fprintf (fout, "%s = %d\n", dehack_things [19], ptr -> mass);
-    fprintf (fout, "%s = %d\n", dehack_things [20], ptr -> damage);
-    fprintf (fout, "%s = %d\n", dehack_things [21], ptr -> activesound);
-    fprintf (fout, "%s = %d\n", dehack_things [22], ptr -> flags);
-    fprintf (fout, "%s = %d\n", dehack_things [23], ptr -> raisestate);
-    fprintf (fout, "%s = %d\n", dehack_things [24], ptr -> scale);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_ID], ptr -> doomednum);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Initial_frame], ptr -> spawnstate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Hit_points], ptr -> spawnhealth);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Gib_health], ptr -> gibhealth);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_First_moving_frame], ptr -> seestate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Alert_sound], ptr -> seesound);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Reaction_time], ptr -> reactiontime);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Attack_sound], ptr -> attacksound);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Injury_frame], ptr -> painstate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Pain_chance], ptr -> painchance);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Pain_sound], ptr -> painsound);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Close_attack_frame], ptr -> meleestate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Far_attack_frame], ptr -> missilestate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Death_frame], ptr -> deathstate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Exploding_frame], ptr -> xdeathstate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Death_sound], ptr -> deathsound);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Speed], ptr -> speed);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Width], ptr -> radius);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Height], ptr -> height);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Mass], ptr -> mass);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Missile_damage], ptr -> damage);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Action_sound], ptr -> activesound);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Bits], ptr -> flags);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Respawn_frame], ptr -> raisestate);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Scale], ptr -> scale);
 
     fprintf (fout, "\n\n");
     ptr++;
@@ -1454,6 +1447,7 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       ptr -> mass = value;
       break;
 
+    case THING_Damage:
     case THING_Missile_damage:
       ptr -> damage = value;
       break;
@@ -2622,7 +2616,9 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
 
   pp = NULL;
 
-  if (strcasecmp (orig, sky_1) == 0)
+  if (strcasecmp (orig, sky_0) == 0)
+    pp = sky_0;
+  else if (strcasecmp (orig, sky_1) == 0)
     pp = sky_1;
   else if (strcasecmp (orig, sky_2) == 0)
     pp = sky_2;
@@ -2652,8 +2648,7 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
     pp = borderpatch_1;
   else if (strcasecmp (orig, borderpatch_2) == 0)
     pp = borderpatch_2;
-
-  if (pp == NULL)
+  else
     return (1);
 
   episode = 1;
@@ -4291,7 +4286,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 	newtext = malloc (length + 20);
 	if (newtext)
 	{
-          strncpy_convert_backslash_chars (newtext, lump_ptr, length);
+	  strncpy_convert_backslash_chars (newtext, lump_ptr, length);
 	  dh_remove_americanisms (newtext);
 	}
 	Z_Free (lump_ptr);
@@ -4308,7 +4303,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
 	newtext = malloc (length + 20);
 	if (newtext)
 	{
-          strncpy_convert_backslash_chars (newtext, ptr, length);
+	  strncpy_convert_backslash_chars (newtext, ptr, length);
 	  dh_remove_americanisms (newtext);
 	}
       }
