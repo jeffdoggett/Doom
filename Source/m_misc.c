@@ -178,6 +178,7 @@ extern int	weaponrecoil;
 
 extern int	mouseSensitivity;
 extern int	showMessages;
+extern int	show_discicon;
 
 extern int	detailLevel;
 extern int	screenblocks;
@@ -227,6 +228,7 @@ default_t	defaults[] =
   {"sfx_volume",&snd_SfxVolume, sizeof(int), (char *) 8},
   {"music_volume",&snd_MusicVolume, sizeof(int), (char *) 8},
   {"show_messages",&showMessages, sizeof(int), (char *) 1},
+  {"show_discicon",&show_discicon, sizeof(int), (char *) 1},
 
   {"key_right",&key_right, sizeof(int), (char *) KEY_RIGHTARROW},
   {"key_left",&key_left, sizeof(int), (char *) KEY_LEFTARROW},
@@ -421,7 +423,8 @@ void M_SaveDefaults (void)
   if ((f = fopen (defaultfile, "w")) != NULL)
   {
     fputs ("# Doom config file\n"
-	   "# Uncomment lines that you want to change\n\n", f);
+	   "# Commented out lines indicate the current defaults\n"
+	   "# To change an entry uncomment the line and modify the setting\n\n", f);
 
     for (i=0 ; i<numdefaults ; i++)
     {

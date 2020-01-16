@@ -314,6 +314,7 @@ static char		savegamestrings[6][SAVESTRINGSIZE];
 static char		tempstring[160];
 
 extern int		setblocks;
+int			show_discicon = 1;
 static int		stdisctimer = 0;
 
 //
@@ -720,7 +721,8 @@ static void M_DrawDiscIcon (void)
 
 void M_DrawDisc (void)
 {
-  if (M_CheckParm("-noshowdiscicon") == 0)
+  if ((show_discicon)
+   && (M_CheckParm("-noshowdiscicon") == 0))
   {
     stdisctimer = 10;
     M_DrawDiscIcon ();
