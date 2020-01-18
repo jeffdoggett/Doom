@@ -31,6 +31,7 @@ static const char rcsid[] = "$Id: r_data.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 //-----------------------------------------------------------------------------
 // #define MIN_SIZE_LUMP	12
+#define REQ_FLAT_SIZE		4096
 //-----------------------------------------------------------------------------
 
 int		numflats;
@@ -669,7 +670,17 @@ static void R_InitFlats (void)
 	flatinfo_ptr->lump = lump;
 	flatinfo_ptr->translation = i;
 	flatinfo_ptr->index = -1;
-	memset (lump_ptr -> name, 0, sizeof (lump_ptr -> name));
+
+        // We destroy the original entry in the lump list as some wads have the same
+	// lump name for walls and flats. However, ncc1701.wad has walls in the floor
+	// section so we cannot remove them.
+	// Would have been better to detect this earlier but this would break save game
+	// compatibility.
+#ifdef REQ_FLAT_SIZE
+        if (lump_ptr->size == REQ_FLAT_SIZE)
+#endif
+	  memset (lump_ptr -> name, 0, sizeof (lump_ptr -> name));
+
 	flatinfo_ptr++;
       }
       i++;
