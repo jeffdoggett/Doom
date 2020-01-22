@@ -1583,11 +1583,14 @@ static void IdentifyVersion (void)
 	// printf ("Required WAD for %s is type %u\n", f, reqd_pwad);
 	break;
       }
+#if 0
+      // Remove this code as there are PWADs made by stupid authors that have the IWAD tag.
       if (IdentifyWad (f, IWAD_MAGIC) & 255)
       {					// Ooops, the user has specified an IWAD in the -file
 	IdentifyIwad (f);
 	return;
       }
+#endif
     }
   }
 
