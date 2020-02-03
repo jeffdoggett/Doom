@@ -487,7 +487,8 @@ EV_DoDoorR
 	newheight = P_FindLowestCeilingSurrounding(sec);
 	door->topheight = newheight - 4*FRACUNIT;
 	door->direction = -1;
-	T_Makedoorsound (door);
+	if (sec->floorheight < sec->ceilingheight)	// Is door going to move?
+	  T_Makedoorsound (door);
 	break;
 
       case close30ThenOpen:
