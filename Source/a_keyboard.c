@@ -24,7 +24,7 @@ static unsigned int   lastmousebut;
 static unsigned char menu_in_use = 0;
 
 extern boolean	menuactive;
-extern int 	novert;
+extern keyb_t	keyb;
 
 /* -------------------------------------------------------------------------- */
 /* Table to convert Acorn inkey() values to Doom key strokes */
@@ -237,7 +237,7 @@ static void poll_kbd_menu_mode (void)
 
   _kernel_swi (OS_Mouse, &regs, &regs);
 
-  if (novert)
+  if (keyb.novert)
     regs.r[1] = lastmousey;
 
   if ((regs.r[0] != lastmousex)
@@ -408,7 +408,7 @@ static void poll_kbd (void)
 
   _kernel_swi (OS_Mouse, &regs, &regs);
 
-  if (novert)
+  if (keyb.novert)
     regs.r[1] = lastmousey;
 
   if ((regs.r[0] != lastmousex)

@@ -143,33 +143,8 @@ unsigned int M_ReadFile (char const*name, byte**buffer)
 //
 // DEFAULTS
 //
-int		usemouse;
-int		novert;
-int		usejoystick;
 
-extern int	key_right;
-extern int	key_left;
-extern int	key_up;
-extern int	key_down;
-
-extern int	key_strafeleft;
-extern int	key_straferight;
-
-extern int	key_fire;
-extern int	key_use;
-extern int	key_strafe;
-extern int	key_speed;
-extern int	always_run;
-
-extern int	mousebfire;
-extern int	mousebstrafe;
-extern int	mousebforward;
-
-
-extern int	joybfire;
-extern int	joybstrafe;
-extern int	joybuse;
-extern int	joybspeed;
+extern keyb_t	keyb;
 
 extern int	viewwidth;
 extern int	viewheight;
@@ -230,17 +205,39 @@ default_t	defaults[] =
   {"show_messages",&showMessages, sizeof(int), (char *) 1},
   {"show_discicon",&show_discicon, sizeof(int), (char *) 1},
 
-  {"key_right",&key_right, sizeof(int), (char *) KEY_RIGHTARROW},
-  {"key_left",&key_left, sizeof(int), (char *) KEY_LEFTARROW},
-  {"key_up",&key_up, sizeof(int), (char *) KEY_UPARROW},
-  {"key_down",&key_down, sizeof(int), (char *) KEY_DOWNARROW},
-  {"key_strafeleft",&key_strafeleft, sizeof(int), (char *) ','},
-  {"key_straferight",&key_straferight, sizeof(int), (char *) '.'},
+  {"key_right",&keyb.right_1, sizeof(int), (char *) KEY_RIGHTARROW},
+  {"key_left",&keyb.left_1, sizeof(int), (char *) KEY_LEFTARROW},
+  {"key_up",&keyb.up_1, sizeof(int), (char *) KEY_UPARROW},
+  {"key_down",&keyb.down_1, sizeof(int), (char *) KEY_DOWNARROW},
 
-  {"key_fire",&key_fire, sizeof(int), (char *) KEY_RCTRL},
-  {"key_use",&key_use, sizeof(int), (char *) ' '},
-  {"key_strafe",&key_strafe, sizeof(int), (char *) KEY_RALT},
-  {"key_speed",&key_speed, sizeof(int), (char *) KEY_RSHIFT},
+  {"key_right_alt",&keyb.right_2, sizeof(int), (char *) 'd'},
+  {"key_left_alt",&keyb.left_2, sizeof(int), (char *) 'a'},
+  {"key_up_alt",&keyb.up_2, sizeof(int), (char *) 'w'},
+  {"key_down_alt",&keyb.down_2, sizeof(int), (char *) 's'},
+
+  {"key_strafeleft",&keyb.strafeleft, sizeof(int), (char *) ','},
+  {"key_straferight",&keyb.straferight, sizeof(int), (char *) '.'},
+
+  {"key_fire",&keyb.fire, sizeof(int), (char *) KEY_RCTRL},
+  {"key_use",&keyb.use, sizeof(int), (char *) ' '},
+  {"key_strafe",&keyb.strafe, sizeof(int), (char *) KEY_RALT},
+  {"key_speed",&keyb.speed, sizeof(int), (char *) KEY_RSHIFT},
+
+
+  {"use_mouse",&keyb.usemouse, sizeof(int), (char *) 1},
+  {"mouseb_fire",&keyb.mousebfire, sizeof(int), (char *) 0},
+  {"mouseb_strafe",&keyb.mousebstrafe, sizeof(int), (char *) 1},
+  {"mouseb_forward",&keyb.mousebforward, sizeof(int), (char *) 2},
+
+
+  {"use_joystick",&keyb.usejoystick, sizeof(int), (char *) 0},
+  {"joyb_fire",&keyb.joybfire, sizeof(int), (char *) 0},
+  {"joyb_strafe",&keyb.joybstrafe, sizeof(int), (char *) 1},
+  {"joyb_use",&keyb.joybuse, sizeof(int), (char *) 3},
+  {"joyb_speed",&keyb.joybspeed, sizeof(int), (char *) 2},
+
+  {"novert",&keyb.novert, sizeof(int), (char *) 0},
+  {"always_run",&keyb.always_run, sizeof(int), (char *) 0},
 
 // UNIX hack, to be removed.
 #ifdef NORMALUNIX
@@ -254,21 +251,6 @@ default_t	defaults[] =
   {"mousedev", (int*)&mousedev, 0, "/dev/ttyS0"},
   {"mousetype", (int*)&mousetype, 0, "microsoft"},
 #endif
-
-  {"use_mouse",&usemouse, sizeof(int), (char *) 1},
-  {"mouseb_fire",&mousebfire, sizeof(int), (char *) 0},
-  {"mouseb_strafe",&mousebstrafe, sizeof(int), (char *) 1},
-  {"mouseb_forward",&mousebforward, sizeof(int), (char *) 2},
-  {"novert",&novert, sizeof(int), (char *) 0},
-
-
-  {"use_joystick",&usejoystick, sizeof(int), (char *) 0},
-  {"joyb_fire",&joybfire, sizeof(int), (char *) 0},
-  {"joyb_strafe",&joybstrafe, sizeof(int), (char *) 1},
-  {"joyb_use",&joybuse, sizeof(int), (char *) 3},
-  {"joyb_speed",&joybspeed, sizeof(int), (char *) 2},
-
-  {"always_run",&always_run, sizeof(int), (char *) 0},
 
   {"screenblocks",&screenblocks, sizeof(int), (char *) 10},
   {"detaillevel",&detailLevel, sizeof(int), (char *) 0},

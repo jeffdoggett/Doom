@@ -57,6 +57,7 @@ int XShmGetEventBase( Display* dpy ); // problems with g++?
 #include "d_main.h"
 #include "am_map.h"
 #include "m_swap.h"
+#include "g_game.h"
 
 #include "doomdef.h"
 
@@ -107,7 +108,7 @@ static boolean	shmFinished;
 static unsigned char devparm_black;
 static unsigned char devparm_white;
 
-extern int	novert;
+extern keyb_t	keyb;
 
 /***************************************************************************/
 //
@@ -251,7 +252,7 @@ void I_GetEvent(void)
 	break;
       case MotionNotify:
 	event.type = ev_mouse;
-	if (novert)
+	if (keyb.novert)
 	  dy = lastmousey;
 	else
 	  dy = X_event.xmotion.y;
@@ -1010,7 +1011,7 @@ void I_SetScreenSize (void)
     p = M_CheckParm("-0");
     if (p)
       decode_screendef (p);
-  }  
+  }
 }
 
 /***************************************************************************/

@@ -75,6 +75,40 @@ typedef struct item_to_drop_s
   struct item_to_drop_s * next;
 } item_to_drop_t;
 
+typedef struct
+{
+  int		right_1;	// Default arrow keys
+  int		left_1;
+  int		up_1;
+  int		down_1;
+
+  int		right_2;	// Default WASD
+  int		left_2;
+  int		up_2;
+  int		down_2;
+
+  int		strafeleft;
+  int		straferight;
+  int		fire;
+  int		use;
+  int		strafe;
+  int		speed;
+
+  int		always_run;
+  int		usemouse;
+  int		novert;
+  int		usejoystick;
+
+  int		mousebfire;
+  int		mousebstrafe;
+  int		mousebforward;
+
+  int		joybfire;
+  int		joybstrafe;
+  int		joybuse;
+  int		joybspeed;
+} keyb_t;
+
 extern boolean par_changed;
 extern boolean gamekeydown[NUMKEYS];
 
