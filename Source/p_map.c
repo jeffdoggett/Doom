@@ -1592,7 +1592,7 @@ P_RadiusAttack
 
     fixed_t	dist;
 
-    dist = (damage+MAXRADIUS)<<FRACBITS;
+    dist = (damage<<FRACBITS)+MAXRADIUS;
     yh = (spot->y + dist - bmaporgy)>>MAPBLOCKSHIFT;
     yl = (spot->y - dist - bmaporgy)>>MAPBLOCKSHIFT;
     xh = (spot->x + dist - bmaporgx)>>MAPBLOCKSHIFT;
