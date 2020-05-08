@@ -1258,6 +1258,7 @@ P_DamageMobj
   int		temp;
   int		damagecount;
   boolean	justhit;	  // killough 11/98
+  mobjinfo_t *  info = target->info;
 
   if (gamecompletedtimer)
     return;
@@ -1306,7 +1307,7 @@ P_DamageMobj
 			      target->x,
 			      target->y);
 
-      thrust = damage*(FRACUNIT>>3)*100/target->info->mass;
+      thrust = damage*(FRACUNIT>>3)*100/info->mass;
 
       // make fall forwards sometimes
       if ( damage < 40
@@ -1387,12 +1388,12 @@ P_DamageMobj
 
   justhit = false;
 
-  if ( (P_Random () < target->info->painchance)
+  if ( (P_Random () < info->painchance)
        && !(target->flags&MF_SKULLFLY) )
   {
       justhit = true;
 
-      if (P_SetMobjState (target, (statenum_t)target->info->painstate) == false)
+      if (P_SetMobjState (target, (statenum_t)info->painstate) == false)
 	return;
   }
 
@@ -1405,6 +1406,9 @@ P_DamageMobj
       ((source->flags ^ target->flags) & MF_FRIEND ||
        Monsters_Infight1 || Monsters_Infight2))
     {
+      state_t *state = target->state;
+      state_t *spawnstate = &states[info->spawnstate];
+
       // if not intent on another player, chase after this one
       //
       // killough 2/15/98: remember last enemy, to prevent
@@ -1420,9 +1424,10 @@ P_DamageMobj
 
       target->target = source;		// killough 11/98
       target->threshold = BASETHRESHOLD;
-      if (target->state == &states[target->info->spawnstate]
-	  && target->info->seestate != S_NULL)
-	P_SetMobjState (target, (statenum_t) target->info->seestate);
+
+      // [BH] Fix enemy not waking up if damaged during second frame of their idle animation
+      if ((state == spawnstate || state == &states[spawnstate->nextstate]) && info->seestate != S_NULL)
+	P_SetMobjState (target, (statenum_t) info->seestate);
     }
 
   // killough 11/98: Don't attack a friend, unless hit by that friend.
