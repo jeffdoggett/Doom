@@ -21,7 +21,8 @@ static unsigned char  key_to_scan = 3;
 static unsigned int   lastmousex;
 static unsigned int   lastmousey;
 static unsigned int   lastmousebut;
-static unsigned char menu_in_use = 0;
+static unsigned char  menu_in_use = 0;
+static boolean	      constrain_mouse = false;
 
 extern boolean	menuactive;
 extern keyb_t	keyb;
@@ -178,13 +179,71 @@ static int determine_amount_mouse_has_moved (unsigned int new_pos, unsigned int 
 
 /* -------------------------------------------------------------------------- */
 
+static void mouse_to (unsigned int x, unsigned int y)
+{
+    _kernel_swi_regs regs;
+    unsigned char osword_data [12];
+
+    regs.r[0] = 21;
+    regs.r[1] = (int) &osword_data[0];
+    osword_data[0] = 3;
+    osword_data[1] = x; x >>= 8;
+    osword_data[2] = x;
+    osword_data[3] = y; y >>= 8;
+    osword_data[4] = y;
+    _kernel_swi (OS_Word, &regs, &regs);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static void poll_mouse (event_t * event)
+{
+  _kernel_swi_regs regs;
+
+  _kernel_swi (OS_Mouse, &regs, &regs);
+
+  if (keyb.novert)
+    regs.r[1] = lastmousey;
+
+  if ((regs.r[0] != lastmousex)
+   || (regs.r[1] != lastmousey)
+   || (regs.r[2] != lastmousebut))
+  {
+#if 0
+    _kernel_oswrch (4);
+    _kernel_oswrch (31);
+    _kernel_oswrch (0);
+    _kernel_oswrch (0);
+    printf ("%d,%d  %d,%d\n", regs.r[0], regs.r[1], lastmousex, lastmousey);
+    _kernel_oswrch (5);
+#endif
+    event->type = ev_mouse;
+    event->data1 = 0;
+    lastmousebut = regs.r[2];
+    event->data1 = mouse_button_conv [lastmousebut & 7];
+    event->data2 = determine_amount_mouse_has_moved (regs.r[0], lastmousex);
+    event->data3 = determine_amount_mouse_has_moved (regs.r[1], lastmousey);
+    D_PostEvent (event);
+    if (constrain_mouse)
+    {
+      mouse_to (lastmousex = SCREENWIDTH / 2, lastmousey = SCREENHEIGHT / 2);
+    }
+    else
+    {
+      lastmousex = regs.r[0];
+      lastmousey = regs.r[1];
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
 /* When the menu is in use, we use inkey(0) to read the keyboard */
 
 static void poll_kbd_menu_mode (void)
 {
   event_t event;
   unsigned int key;
-  _kernel_swi_regs regs;
 
   if (menu_in_use == 0)	     /* Menu just entered? */
   {
@@ -232,29 +291,8 @@ static void poll_kbd_menu_mode (void)
     D_PostEvent (&event);
   }
 
-
   /* See whether the mouse has moved */
-
-  _kernel_swi (OS_Mouse, &regs, &regs);
-
-  if (keyb.novert)
-    regs.r[1] = lastmousey;
-
-  if ((regs.r[0] != lastmousex)
-   || (regs.r[1] != lastmousey)
-   || (regs.r[2] != lastmousebut))
-  {
-    /* printf ("%d,%d  %d,%d\n", regs.r[0], regs.r[1], lastmousex, lastmousey); */
-    event.type = ev_mouse;
-    event.data1 = 0;
-    lastmousebut = regs.r[2];
-    event.data1 = mouse_button_conv [lastmousebut & 7];
-    event.data2 = determine_amount_mouse_has_moved (regs.r[0], lastmousex);
-    event.data3 = determine_amount_mouse_has_moved (regs.r[1], lastmousey);
-    D_PostEvent (&event);
-    lastmousex = regs.r[0];
-    lastmousey = regs.r[1];
-  }
+  poll_mouse (&event);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -282,7 +320,6 @@ static void poll_kbd (void)
   unsigned int rkey;
   unsigned int dokey;
   unsigned int qtydown;
-  _kernel_swi_regs regs;
 
   menu_in_use = 0;
 
@@ -405,27 +442,7 @@ static void poll_kbd (void)
   }
 
   /* See whether the mouse has moved */
-
-  _kernel_swi (OS_Mouse, &regs, &regs);
-
-  if (keyb.novert)
-    regs.r[1] = lastmousey;
-
-  if ((regs.r[0] != lastmousex)
-   || (regs.r[1] != lastmousey)
-   || (regs.r[2] != lastmousebut))
-  {
-    /* printf ("%d,%d  %d,%d\n", regs.r[0], regs.r[1], lastmousex, lastmousey); */
-    event.type = ev_mouse;
-    event.data1 = 0;
-    lastmousebut = regs.r[2];
-    event.data1 = mouse_button_conv [lastmousebut & 7];
-    event.data2 = determine_amount_mouse_has_moved (regs.r[0], lastmousex);
-    event.data3 = determine_amount_mouse_has_moved (regs.r[1], lastmousey);
-    D_PostEvent (&event);
-    lastmousex = regs.r[0];
-    lastmousey = regs.r[1];
-  }
+  poll_mouse (&event);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -624,6 +641,8 @@ void I_InitKeyboard (void)
     _kernel_swi (OS_Mouse, &regs, &regs);
     lastmousex = regs.r[0];
     lastmousey = regs.r[1];
+
+    constrain_mouse = (boolean) M_CheckParm ("-constrain_mouse");
 
     /* Read inkey() table file */
     init_key_tables ();
