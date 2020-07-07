@@ -273,7 +273,7 @@ typedef enum
   THING_Name1,
   THING_Name2,
   THING_Plural1,
-  THING_Plural2,
+  THING_Plural2
 } thing_element_t;
 
 static const char * const dehack_sounds [] =
