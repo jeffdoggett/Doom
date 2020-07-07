@@ -234,6 +234,10 @@ static const char * const dehack_things [] =
   "Bits",
   "Respawn frame",
   "Scale",
+  "Name1",
+  "Name2",
+  "Plural1",
+  "Plural2",
   NULL
 };
 
@@ -265,7 +269,11 @@ typedef enum
   THING_Action_sound,
   THING_Bits,
   THING_Respawn_frame,
-  THING_Scale
+  THING_Scale,
+  THING_Name1,
+  THING_Name2,
+  THING_Plural1,
+  THING_Plural2,
 } thing_element_t;
 
 static const char * const dehack_sounds [] =
@@ -1349,6 +1357,38 @@ static void decode_things_bits (unsigned int * params, const char * string1)
 
 /* ---------------------------------------------------------------------------- */
 
+static void decode_things_name (unsigned int number, thing_element_t record, char * value)
+{
+  castinfo_t * ptr;
+  char * newtext;
+
+  ptr = &castorder[0];
+  do
+  {
+    if (ptr -> type == (number-1))
+    {
+      switch (record)
+      {
+	case THING_Name1:
+	  newtext = strdup (value);
+	  if (newtext)
+	  {
+	    ptr -> name = newtext;
+	    // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
+	  }
+	  break;
+	//case THING_Name2:
+	//case THING_Plural1:
+	//case THING_Plural2:
+      }
+      break;
+    }
+    ptr++;
+  } while (ptr -> name);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void dh_write_to_thing (unsigned int number, thing_element_t record, unsigned int value)
 {
   mobjinfo_t * ptr;
@@ -1466,6 +1506,12 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
 
     case THING_Scale:
       ptr -> scale = value;
+      break;
+
+    case THING_Name1:		// We already did these.
+    case THING_Name2:
+    case THING_Plural1:
+    case THING_Plural2:
       break;
 
     default:fprintf (stderr, "Invalid record %u for thing %u\n", record, number);
@@ -3501,6 +3547,18 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		    arg = (float) atof (string1);
 		    arg = arg * (FRACUNIT);
 		    params [0] = (int)arg;
+		  }
+		  break;
+
+		case THING_Name1:
+		case THING_Name2:
+		case THING_Plural1:
+		case THING_Plural2:
+		  counter2 = dh_inchar (a_line, '=');
+		  if (counter2)
+		  {
+		    string1 = next_arg (a_line+counter2);
+		    decode_things_name (job_params[0], (thing_element_t) counter1, string1);
 		  }
 		  break;
 	      }
