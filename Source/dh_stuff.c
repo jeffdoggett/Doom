@@ -1370,11 +1370,14 @@ static void decode_things_name (unsigned int number, thing_element_t record, cha
       switch (record)
       {
 	case THING_Name1:
-	  newtext = strdup (value);
-	  if (newtext)
+	  if (strcmp (ptr -> name, value))
 	  {
-	    ptr -> name = newtext;
-	    // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
+	    newtext = strdup (value);
+	    if (newtext)
+	    {
+	      ptr -> name = newtext;
+	      // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
+	    }
 	  }
 	  break;
 	//case THING_Name2:
