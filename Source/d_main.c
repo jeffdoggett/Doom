@@ -120,7 +120,7 @@ extern char*	finale_messages_orig[];
 extern char*	finale_backdrops[];
 extern char*	finale_backdrops_orig[];
 extern char*	cast_names_copy[];
-extern castinfo_t castorder[];
+extern mobjtype_t castorder[];
 
 /* Strings from info.c */
 extern char * sprnames [];
@@ -317,7 +317,7 @@ static void init_text_messages (void)
   unsigned int count;
   char * name;
   char ** c_ptr;
-  castinfo_t * ptr_s;
+  mobjtype_t * ptr_s;
   musicinfo_t * m_ptr;
   sfxinfo_t * s_ptr;
   actionf_t * a_ptr;
@@ -345,10 +345,10 @@ static void init_text_messages (void)
   c_ptr = cast_names_copy;
   do
   {
-    name = ptr_s -> name;
+    mobjinfo[*ptr_s].name1 = *c_ptr;
     ptr_s++;
-    *c_ptr++ = name;
-  } while (name);
+    c_ptr++;
+  } while (*ptr_s >= 0);
 
   m_ptr = S_music;
   c_ptr = music_names_copy;

@@ -130,13 +130,6 @@ typedef struct clusterdefs_s
 clusterdefs_t * F_Access_ClusterDef (unsigned int num);
 clusterdefs_t * F_Create_ClusterDef (unsigned int num);
 
-typedef struct
-{
-    char *name;
-    char *obit;
-    mobjtype_t type;
-} castinfo_t;
-
 #endif
 //-----------------------------------------------------------------------------
 //

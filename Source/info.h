@@ -315,6 +315,8 @@ typedef struct
   int	flags2;
   int	raisestate;
   int	scale;
+  char* name1;
+  char* obit;
 } mobjinfo_t;
 
 extern mobjinfo_t mobjinfo[NUMMOBJTYPES];

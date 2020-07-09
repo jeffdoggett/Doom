@@ -28,7 +28,6 @@ static const char rcsid[] = "$Id: p_inter.c,v 1.4 1997/02/03 22:45:11 b1 Exp $";
 
 #include "includes.h"
 extern item_to_drop_t * item_drop_head;
-extern castinfo_t castorder[];
 extern char* player_names[];
 extern unsigned char player_genders[];
 extern int gamecompletedtimer;
@@ -1003,19 +1002,21 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
 static char * find_obit_msg (mobj_t* killer, mobj_t* victim)
 {
   unsigned int count;
-  castinfo_t * cptr;
+  char * obit;
+  mobjinfo_t * mptr;
   obitinfo_t * obit_ptr;
 
   if (killer == victim)
     return (write_obit (obituary_messages[OB_KILLEDSELF], "self", killer, victim));
 
-  cptr = castorder;
-  do
+  mptr = killer->info;
+  if (mptr->name1)
   {
-    if (killer -> type == cptr -> type)
-      return (write_obit (cptr -> obit, cptr -> name, killer, victim));
-    cptr++;
-  } while (cptr -> obit);
+    obit = mptr->obit;
+    if (obit == NULL)
+      obit = CC_OBIT;
+    return (write_obit (obit, mptr->name1, killer, victim));
+  }
 
   obit_ptr = obit_lookup;
   count = ARRAY_SIZE (obit_lookup);

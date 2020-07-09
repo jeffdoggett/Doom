@@ -16,7 +16,7 @@ extern char*	finale_messages_orig[];
 extern char*	finale_backdrops[];
 extern char*	finale_backdrops_orig[];
 extern char*	cast_names_copy[];
-extern castinfo_t castorder[];
+extern mobjtype_t castorder[];
 extern clusterdefs_t * finale_clusterdefs_head;
 
 /* Structs from p_enemy.c */
@@ -1359,35 +1359,37 @@ static void decode_things_bits (unsigned int * params, const char * string1)
 
 static void decode_things_name (unsigned int number, thing_element_t record, char * value)
 {
-  castinfo_t * ptr;
   char * newtext;
 
-  ptr = &castorder[0];
-  do
+  mobjinfo_t * ptr;
+
+  if ((number == 0)
+   || (number >= NUMMOBJTYPES))
   {
-    if (ptr -> type == (number-1))
-    {
-      switch (record)
+    fprintf (stderr, "Invalid thing number %u\n", number);
+    return;
+  }
+
+  ptr = &mobjinfo[number-1];
+
+  switch (record)
+  {
+    case THING_Name1:
+      if ((ptr -> name1 == NULL)
+       || (strcmp (ptr -> name1, value)))
       {
-	case THING_Name1:
-	  if (strcmp (ptr -> name, value))
-	  {
-	    newtext = strdup (value);
-	    if (newtext)
-	    {
-	      ptr -> name = newtext;
-	      // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
-	    }
-	  }
-	  break;
-	//case THING_Name2:
-	//case THING_Plural1:
-	//case THING_Plural2:
+	newtext = strdup (value);
+	if (newtext)
+	{
+	  ptr -> name1 = newtext;
+	  // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
+	}
       }
       break;
-    }
-    ptr++;
-  } while (ptr -> name);
+    //case THING_Name2:
+    //case THING_Plural1:
+    //case THING_Plural2:
+  }
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -2357,10 +2359,10 @@ static void write_all_texts (FILE * fout)
   pos = 0;
   do
   {
-    write_a_text_msg (fout, castorder[pos].name, counter);
+    write_a_text_msg (fout, cast_names_copy[pos], counter);
     counter++;
     pos++;
-  } while (castorder[pos].name);
+  } while (cast_names_copy[pos]);
 }
 #endif
 
@@ -2452,7 +2454,7 @@ static unsigned int replace_finale_text (char * orig, char * newt)
   {
     if (is_all_spaces (newt))
       newt [0] = 0;
-    castorder[counter].name = newt;
+    mobjinfo [castorder[counter]].name1 = newt;
     return (0);
   }
 
@@ -3165,7 +3167,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   if ((counter1 != -1)
    && (counter1 < (ARRAY_SIZE(dehack_cast_strings)-1)))
   {
-    return (&castorder[counter1].obit);
+    return (&mobjinfo[castorder[counter1]].obit);
   }
 
   counter1 = dh_search_str_tab_a (dehack_other_obit_strings, ttext);
@@ -3202,7 +3204,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   counter1 = dh_search_str_tab_a (dehack_cast_strings, ttext);
   if (counter1 != -1)
   {
-    return (&castorder[counter1].name);
+    return (&mobjinfo[castorder[counter1]].name1);
   }
 
   counter1 = dh_search_str_tab_a (screenshot_message_names, ttext);
