@@ -916,11 +916,12 @@ mobjtype_t castorder[] =
   MT_VILE,
   MT_SPIDER,
   MT_CYBORG,
-  MT_PLAYER,
-  (mobjtype_t) -1
+  MT_PLAYER
 };
 
-char * cast_names_copy [ARRAY_SIZE(castorder)] =
+// Must be in same order as above.
+
+char * cast_names_copy [] =
 {
   CC_ZOMBIE,
   CC_SHOTGUN,
@@ -984,7 +985,7 @@ static void F_NextCast (void)
     castnum++;
     cast_ptr++;
 
-    if (*cast_ptr < 0)
+    if (castnum >= ARRAY_SIZE(castorder))
     {
       castnum = 0;
       cast_ptr = &castorder[0];
@@ -994,7 +995,6 @@ static void F_NextCast (void)
       break;
   } while (--attempts);
 }
-
 
 // --------------------------------------------------------------------------------------------
 //

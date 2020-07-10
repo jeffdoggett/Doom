@@ -348,7 +348,7 @@ static void init_text_messages (void)
     mobjinfo[*ptr_s].name1 = *c_ptr;
     ptr_s++;
     c_ptr++;
-  } while (*ptr_s >= 0);
+  } while (*c_ptr);
 
   m_ptr = S_music;
   c_ptr = music_names_copy;
