@@ -777,7 +777,7 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
   if (episode < ARRAY_SIZE(EpisodeMenu))
   {
     m_ptr = &EpisodeMenu [episode];
-    lumpnum = m_ptr->namenum;   
+    lumpnum = m_ptr->namenum;
     // name = M_EPI5"  (ie has a trailing quote)
     newname = malloc (len+1);
     if (newname)
@@ -788,7 +788,7 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
       {
 	free (newname);		// No change - don't bother.
       }
-      else    
+      else
       {
 	menu_lump_names[lumpnum] = newname;
       }
@@ -2559,7 +2559,7 @@ void M_Init (void)
 	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	  {
 //	    printf ("Destroyed menu lump %u for map %u\n", episode, G_Access_MapStartTab (episode_num [episode]) -> start_map);
-	    m_ptr -> namenum = ML_NULL;
+	    menu_lump_names[m_ptr -> namenum][0] = 0xFF;
 	  }
 	  m_ptr++;
 	} while (++episode < EpiDef.numitems);

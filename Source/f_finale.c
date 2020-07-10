@@ -990,7 +990,7 @@ static void F_NextCast (void)
       castnum = 0;
       cast_ptr = &castorder[0];
     }
-    mobj_ptr = &mobjinfo [castnum];
+    mobj_ptr = &mobjinfo [*cast_ptr];
     if ((mobj_ptr -> name1) && (mobj_ptr -> name1[0]))
       break;
   } while (--attempts);
