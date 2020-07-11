@@ -64,6 +64,9 @@ extern const char enterpic_2 [];
 extern const char borderpatch_1 [];
 extern const char borderpatch_2 [];
 
+extern item_to_drop_t * item_drop_head;
+
+
 /* Strings from am_map.c */
 extern char * am_map_messages [];
 extern char * am_map_messages_orig [];
@@ -234,6 +237,7 @@ static const char * const dehack_things [] =
   "Bits",
   "Respawn frame",
   "Scale",
+  "Dropped item",
   "Name1",
   "Name2",
   "Plural1",
@@ -270,6 +274,7 @@ typedef enum
   THING_Bits,
   THING_Respawn_frame,
   THING_Scale,
+  THING_Dropped_item,
   THING_Name1,
   THING_Name2,
   THING_Plural1,
@@ -1394,6 +1399,33 @@ static void decode_things_name (unsigned int number, thing_element_t record, cha
 
 /* ---------------------------------------------------------------------------- */
 
+static void dh_thing_drop (mobjtype_t number, mobjtype_t value)
+{
+  item_to_drop_t * drop_info_p;
+
+  drop_info_p = item_drop_head;
+  while (drop_info_p)
+  {
+    if (drop_info_p -> just_died == number)
+    {
+      drop_info_p -> mt_spawn = value;
+      return;
+    }
+    drop_info_p = drop_info_p -> next;
+  }
+
+  drop_info_p = malloc (sizeof (item_to_drop_t));
+  if (drop_info_p)
+  {
+    drop_info_p -> next = item_drop_head;
+    item_drop_head = drop_info_p;
+    drop_info_p -> just_died = number;
+    drop_info_p -> mt_spawn = value;
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void dh_write_to_thing (unsigned int number, thing_element_t record, unsigned int value)
 {
   mobjinfo_t * ptr;
@@ -1511,6 +1543,10 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
 
     case THING_Scale:
       ptr -> scale = value;
+      break;
+
+    case THING_Dropped_item:
+      dh_thing_drop ((mobjtype_t) (number-1), (mobjtype_t) (value-1));
       break;
 
     case THING_Name1:		// We already did these.
