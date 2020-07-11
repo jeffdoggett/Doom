@@ -2599,7 +2599,7 @@ void M_Init (void)
 	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	  {
 	    // printf ("Destroyed menu lump %u\n", pos);
-	    m_ptr -> namenum = ML_NULL;
+	    menu_lump_names[m_ptr -> namenum][0] = 0xFF;
 	  }
 	  m_ptr++;
 	}
