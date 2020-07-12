@@ -18,6 +18,8 @@ extern char*	finale_backdrops_orig[];
 extern char*	cast_names_copy[];
 extern mobjtype_t castorder[];
 extern clusterdefs_t * finale_clusterdefs_head;
+extern castlist_t * castlist_head;
+extern castlist_t * castlist_tail;
 
 /* Structs from p_enemy.c */
 extern bossdeath_t * boss_death_actions_head;
@@ -1038,7 +1040,7 @@ unsigned int dh_rinchar (const char * text, char search_char)
 /* ---------------------------------------------------------------------------- */
 /* Return qty of matching characters. */
 
-static unsigned int qty_match (const char * s1, const char * s2)
+unsigned int dh_qty_match (const char * s1, const char * s2)
 {
   char c1,c2;
   unsigned int len;
@@ -4278,6 +4280,15 @@ void DH_remove_duplicate_mapinfos (void)
       map_ptr++;
     } while (++i < 100);
   }
+  if (M_CheckParm ("-showcastlist"))
+  {
+    castlist_t * cast_ptr = castlist_head;
+    while (cast_ptr)
+    {
+      printf ("Cast List '%s'\n", cast_ptr -> cast_name);
+      cast_ptr = cast_ptr -> next;
+    }
+  }
 
 #ifdef CREATE_DEHACK_FILE
   if (M_CheckParm ("-writedehfile"))
@@ -4594,7 +4605,7 @@ static bossdeath_t * find_boss_type (const char * name, unsigned int episode, un
   count = ARRAY_SIZE(boss_names);
   do
   {
-    if (qty_match (name, ptr->name) > 2)		// Three chars is plenty!
+    if (dh_qty_match (name, ptr->name) > 2)		// Three chars is plenty!
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
@@ -4665,6 +4676,39 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 }
 
 /* ---------------------------------------------------------------------------- */
+
+static void add_to_cast_list (const char * newtext)
+{
+  castlist_t * ptr;
+  // printf ("CastName = %s\n", newtext);
+
+  ptr = castlist_head;
+  while (ptr)
+  {
+    if (strcasecmp (ptr -> cast_name, newtext) == 0)
+      return;
+    ptr = ptr -> next;
+  }
+
+  ptr = malloc (sizeof (castlist_t));
+  if (ptr)
+  {
+    strncpy (ptr -> cast_name, newtext, sizeof (ptr -> cast_name));
+    if (castlist_head == NULL)
+    {
+      castlist_head = ptr;
+    }
+    else
+    {
+      castlist_tail -> next = ptr;
+    }
+    castlist_tail = ptr;
+    ptr -> next = NULL;
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
 
 static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_dests_t * msource_ptr, boolean inwad)
 {
@@ -5491,6 +5535,28 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	    // printf ("Cluster pic %u = \'%s\'\n", intertext, newtext);
 	  }
 	}
+      }
+    }
+    else if (strncasecmp (ptr, "CastName ", 9) == 0)
+    {
+      ptr += 9;
+      if (*ptr == '=') ptr++;
+      while (*ptr == ' ') ptr++;
+      if (*ptr == '\"') ptr++;
+      j = dh_inchar (ptr, '"');
+      if (j) ptr [j-1] = 0;
+
+      if (*ptr == '$')
+      {
+	char ** source;
+	ptr++;
+	source = DH_Find_language_text (ptr, false);
+	if (source)
+          add_to_cast_list (*source);
+      }
+      else
+      {
+        add_to_cast_list (ptr);
       }
     }
     ptr = dh_next_line (ptr,top);

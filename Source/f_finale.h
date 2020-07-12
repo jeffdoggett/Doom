@@ -41,8 +41,6 @@ void F_Drawer (void);
 void F_DrawBackgroundFlat (const char * flat);
 void F_StartFinale (int always);
 
-char * F_CastName (mobjtype_t rtype);
-
 typedef enum
 {
   e0text,
@@ -129,6 +127,12 @@ typedef struct clusterdefs_s
 
 clusterdefs_t * F_Access_ClusterDef (unsigned int num);
 clusterdefs_t * F_Create_ClusterDef (unsigned int num);
+
+typedef struct castlist_s
+{
+  char cast_name [40];
+  struct castlist_s * next;
+} castlist_t;
 
 #endif
 //-----------------------------------------------------------------------------

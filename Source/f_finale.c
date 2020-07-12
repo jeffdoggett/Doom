@@ -945,7 +945,7 @@ char * cast_names_copy [] =
   NULL
 };
 
-static int		castnum;
+static mobjtype_t	casttype;
 static int		casttics;
 static state_t*		caststate;
 static unsigned int	castdeath;
@@ -954,11 +954,18 @@ static int		castonmelee;
 static boolean		castattacking;
 static int		castrot;
 
+castlist_t *		castlist_head = NULL;
+castlist_t *		castlist_tail = NULL;
+castlist_t *		castlist = NULL;
+
 // --------------------------------------------------------------------------------------------
 
-char * F_CastName (mobjtype_t rtype)
+static char * F_CastName (mobjtype_t rtype)
 {
   mobjinfo_t * mobj_ptr;
+
+  if (castlist)
+    return (castlist -> cast_name);
 
   mobj_ptr = &mobjinfo [rtype];
   if ((mobj_ptr->name1) && (mobj_ptr->name1[0]))
@@ -969,11 +976,90 @@ char * F_CastName (mobjtype_t rtype)
 
 // --------------------------------------------------------------------------------------------
 
-static void F_NextCast (void)
+static boolean F_FindCastByName (const char * castName)
+{
+  mobjtype_t   cast_num = (mobjtype_t) 0;
+  mobjinfo_t * mobj_ptr = &mobjinfo[0];
+
+  do
+  {
+    if (strcasecmp (mobj_ptr->name1, castName) == 0)
+    {
+      casttype = cast_num;
+      return (true);
+    }
+    ++mobj_ptr;
+    cast_num = (mobjtype_t) (((unsigned int) cast_num) + 1);
+  } while (cast_num < NUMMOBJTYPES);
+
+  // Didn't find a perfect match
+  cast_num = (mobjtype_t) 0;
+  mobj_ptr = &mobjinfo[0];
+  do
+  {
+    if (dh_qty_match (mobj_ptr->name1, castName) > 8)
+    {
+      casttype = cast_num;
+      return (true);
+    }
+    ++mobj_ptr;
+    cast_num = (mobjtype_t) (((unsigned int) cast_num) + 1);
+  } while (cast_num < NUMMOBJTYPES);
+
+  cast_num = (mobjtype_t) 0;
+  mobj_ptr = &mobjinfo[0];
+  do
+  {
+    if (dh_instr (mobj_ptr->name1, castName))
+    {
+      casttype = cast_num;
+      return (true);
+    }
+    ++mobj_ptr;
+    cast_num = (mobjtype_t) (((unsigned int) cast_num) + 1);
+  } while (cast_num < NUMMOBJTYPES);
+
+  return (false);
+}
+
+// --------------------------------------------------------------------------------------------
+
+static void F_NextCast (boolean restart)
 {
   int attempts;
+  static int castnum = 0;
   mobjtype_t * cast_ptr;
   mobjinfo_t * mobj_ptr;
+
+  if (restart)
+  {
+    castnum = -1;
+    castlist = NULL;
+  }
+
+  if (castlist_head)
+  {
+    attempts = 2;
+    do
+    {
+      if (castlist == NULL)
+      {
+	castlist = castlist_head;
+      }
+      else
+      {
+	castlist = castlist -> next;
+	if (castlist == NULL)
+	{
+	  if (--attempts == 0)
+	    break;
+	  castlist = castlist_head;
+	}
+      }
+      if (F_FindCastByName (castlist -> cast_name))
+	return;
+    } while (1);
+  }
 
   attempts = ARRAY_SIZE(castorder) + 2; // Don't get stuck in a loop looking
 		     			// for cast members if some silly bugger
@@ -990,7 +1076,7 @@ static void F_NextCast (void)
       castnum = 0;
       cast_ptr = &castorder[0];
     }
-    mobj_ptr = &mobjinfo [*cast_ptr];
+    mobj_ptr = &mobjinfo [casttype = *cast_ptr];
     if ((mobj_ptr -> name1) && (mobj_ptr -> name1[0]))
       break;
   } while (--attempts);
@@ -1004,10 +1090,9 @@ static void F_NextCast (void)
 static void F_StartCast (void)
 {
     wipegamestate = (gamestate_t) -1;		// force a screen wipe
-    castnum = -1;
     castrot = 0;
-    F_NextCast ();
-    caststate = &states[mobjinfo[castorder[castnum]].seestate];
+    F_NextCast (true);
+    caststate = &states[mobjinfo[casttype].seestate];
     casttics = (int) caststate->tics;
     castdeath = 0;
     finalestage = 2;
@@ -1034,12 +1119,12 @@ void F_CastTicker (void)
      || (caststate->tics == -1 || caststate->nextstate == S_NULL))
     {
 	// switch from deathstate to next monster
-	F_NextCast ();
+	F_NextCast (false);
 	castdeath = 0;
 	castrot = 0;
-	if (mobjinfo[castorder[castnum]].seesound)
-	    S_StartSound (NULL, mobjinfo[castorder[castnum]].seesound);
-	caststate = &states[mobjinfo[castorder[castnum]].seestate];
+	if (mobjinfo[casttype].seesound)
+	    S_StartSound (NULL, mobjinfo[casttype].seesound);
+	caststate = &states[mobjinfo[casttype].seestate];
 	castframes = 0;
     }
     else
@@ -1100,30 +1185,30 @@ void F_CastTicker (void)
 	// go into attack frame
 	castattacking = true;
 	if (castonmelee)
-	    caststate=&states[mobjinfo[castorder[castnum]].meleestate];
+	    caststate=&states[mobjinfo[casttype].meleestate];
 	else
-	    caststate=&states[mobjinfo[castorder[castnum]].missilestate];
+	    caststate=&states[mobjinfo[casttype].missilestate];
 	castonmelee ^= 1;
 	if (caststate == &states[S_NULL])
 	{
 	    if (castonmelee)
 		caststate=
-		    &states[mobjinfo[castorder[castnum]].meleestate];
+		    &states[mobjinfo[casttype].meleestate];
 	    else
 		caststate=
-		    &states[mobjinfo[castorder[castnum]].missilestate];
+		    &states[mobjinfo[casttype].missilestate];
 	}
     }
 
     if (castattacking)
     {
 	if (castframes == 24
-	    ||	caststate == &states[mobjinfo[castorder[castnum]].seestate] )
+	    ||	caststate == &states[mobjinfo[casttype].seestate] )
 	{
 	  stopattack:
 	    castattacking = false;
 	    castframes = 0;
-	    caststate = &states[mobjinfo[castorder[castnum]].seestate];
+	    caststate = &states[mobjinfo[casttype].seestate];
 	}
     }
 
@@ -1171,8 +1256,8 @@ static boolean F_CastResponder (event_t* ev)
 
     /* The PAC-MAN character in original.wad crashes here, so */
     /* only do this with items that are shootable. */
-    if (((mobjinfo[castorder[castnum]].flags & MF_SHOOTABLE) == 0)
-     || (mobjinfo[castorder[castnum]].deathstate == S_NULL))
+    if (((mobjinfo[casttype].flags & MF_SHOOTABLE) == 0)
+     || (mobjinfo[casttype].deathstate == S_NULL))
     {
       castdeath = 10;
     }
@@ -1183,7 +1268,7 @@ static boolean F_CastResponder (event_t* ev)
 					// up the DeHacked and this baddie
 					// never actually dies.
 
-      caststate = &states[mobjinfo[castorder[castnum]].deathstate];
+      caststate = &states[mobjinfo[casttype].deathstate];
       casttics = (int)caststate->tics;
       if ((casttics == -1)
        && (caststate -> action.acp2 == (actionf_p2) A_RandomJump))
@@ -1200,8 +1285,8 @@ static boolean F_CastResponder (event_t* ev)
     castrot = 0;
     castattacking = false;
 
-    if (mobjinfo[castorder[castnum]].deathsound)
-	S_StartSound (NULL, mobjinfo[castorder[castnum]].deathsound);
+    if (mobjinfo[casttype].deathsound)
+	S_StartSound (NULL, mobjinfo[casttype].deathsound);
 
     return true;
 }
@@ -1275,8 +1360,7 @@ static void F_CastDrawer (void)
   spritedef_t* sprdef;
   spriteframe_t* sprframe;
 
-  info = &mobjinfo[castorder[castnum]];
-  F_CastPrint (info->name1);
+  F_CastPrint (F_CastName(casttype));
 
   // draw the current frame in the middle of the screen
   sprdef = &sprites[caststate->sprite];
@@ -1289,6 +1373,7 @@ static void F_CastDrawer (void)
   if (sprframe->flip & (1<<rot))
     drawstyle |= 1;			/* Bit 0 = draw flipped */
 
+  info = &mobjinfo[casttype];
   if (info->flags & MF_SHADOW)
     drawstyle |= 2;			/* Bit 1 = draw fuzzy */
   else if (info->flags & MF_TRANSLUCENT)
@@ -1330,7 +1415,6 @@ static void F_CastDrawer (void)
       V_DrawPatchScaleFlip (x, y, 0, patch, scale, scale, drawstyle);
   }
 }
-
 
 // --------------------------------------------------------------------------------------------
 //
@@ -1427,7 +1511,6 @@ F_DrawPatchCol
   } while (colm < (1 << FRACBITS));
 }
 
-
 // --------------------------------------------------------------------------------------------
 //
 // F_BunnyScroll
@@ -1487,7 +1570,6 @@ static void F_BunnyScroll (void)
       V_DrawPatchScaled (108,68,0,p1);
 }
 
-
 // --------------------------------------------------------------------------------------------
 //
 // F_Drawer
@@ -1514,7 +1596,7 @@ void F_Drawer (void)
 
       default:
 	endmode = finaleendgame;
-        if ((endmode < 1)
+	if ((endmode < 1)
 	 || (endmode > 10))
 	  endmode = gameepisode;
 
