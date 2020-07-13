@@ -849,10 +849,10 @@ static void F_TextWrite (void)
 
     if (longest > 310)
     {
-      if (longest > 330)
+      if (longest > 320)
 	finalexpos = 0;
       else
-	finalexpos = (330-longest)/2;
+	finalexpos = (320-longest)/2;
     }
     return;
   }
@@ -882,8 +882,15 @@ static void F_TextWrite (void)
     }
 
     w = SHORT (hu_font[c]->width);
-    if ((cx+w) < 320)
+    if ((cx+w) > 320)				// Should never happen as we measured above!
+    {
+      if (finalexpos)
+        --finalexpos;
+    }
+    else
+    {
       V_DrawPatchScaled (cx, cy, 0, hu_font[c]);
+    }
     w -= HUlib_Kern (c + HU_FONTSTART, toupper(*ch));
     cx+=w;
   } while (--count);
