@@ -4690,10 +4690,10 @@ static void add_to_cast_list (const char * newtext)
     ptr = ptr -> next;
   }
 
-  ptr = malloc (sizeof (castlist_t));
+  ptr = malloc (sizeof (castlist_t) + strlen(newtext));
   if (ptr)
   {
-    strncpy (ptr -> cast_name, newtext, sizeof (ptr -> cast_name));
+    strcpy (ptr -> cast_name, newtext);
     if (castlist_head == NULL)
     {
       castlist_head = ptr;

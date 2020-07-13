@@ -130,8 +130,8 @@ clusterdefs_t * F_Create_ClusterDef (unsigned int num);
 
 typedef struct castlist_s
 {
-  char cast_name [40];
   struct castlist_s * next;
+  char cast_name [1];
 } castlist_t;
 
 #endif
