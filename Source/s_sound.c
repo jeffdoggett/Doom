@@ -1036,20 +1036,32 @@ int S_FindSoundData (sfxinfo_t * sfx)
   unsigned int value;
   unsigned int hlength;
   unsigned int channels;
+  unsigned int samplerate;
   byte * data;
   byte * sdata;
   byte * ptr_1;
   byte * ptr_2;
 
   length = 0;
-
+  data = NULL;
   sdata = sfx->data;
   type = read_32 (sdata);
   if ((type & 0xFFFF) == 0x0003)			// Standard doom lump
   {
     length = read_32 (sdata + 4);
     data = sdata + 8;
-    sfx->samplerate = type >> 16;
+    samplerate = type >> 16;
+    if (samplerate)
+      sfx->samplerate = samplerate;
+  }
+  else if ((type & 0xFFFF) == 0x0300)			// Broken lump in Arctic-SE (dsskepch)
+  {
+    length = read_32 (sdata + 4);
+    data = sdata + 8;
+    type >>= 16;					// Samplerate is also reversed
+    samplerate = ((type << 8) | (type >> 8)) & 0xFFFF;
+    if (samplerate)
+      sfx->samplerate = samplerate;
   }
   else if (type == 0x46464952)				// RIFF
   {
@@ -1065,7 +1077,9 @@ int S_FindSoundData (sfxinfo_t * sfx)
     /* Two bytes Block alignment			0x20 */
     /* Two bytes bits per sample			0x22 */
 
-    sfx->samplerate = read_32 (sdata + 0x18);
+    samplerate = read_32 (sdata + 0x18);
+    if (samplerate)
+      sfx->samplerate = samplerate;
 
     hlength = read_32 (sdata + 0x10);
     data = sdata + (hlength + 0x14);
