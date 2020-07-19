@@ -142,6 +142,7 @@ char * menu_lump_names_orig [] =
   "M_CELL1",
   "M_CELL2",
   "STDISK",
+  "STCDROM",
   NULL
 };
 
@@ -201,7 +202,8 @@ typedef enum
   ML_THERMO,
   ML_CELL1,
   ML_CELL2,
-  ML_STDISK
+  ML_STDISC,
+  ML_STCDROM
 } menu_lumps_t;
 
 /* ----------------------------------------------------------------------- */
@@ -315,6 +317,7 @@ static char		tempstring[160];
 
 extern int		setblocks;
 int			show_discicon = 1;
+static menu_lumps_t	stdiscicon = ML_STDISC;
 static int		stdisctimer = 0;
 
 //
@@ -708,7 +711,7 @@ static void M_DrawDiscIcon (void)
   int y;
   patch_t * stdisc;
 
-  stdisc = (patch_t *) W_CacheLumpName0 (menu_lump_names[ML_STDISK], PU_CACHE);
+  stdisc = (patch_t *) W_CacheLumpName0 (menu_lump_names[stdiscicon], PU_CACHE);
   if (stdisc)
   {
     x = ((320-2) - HU_MSGX) - SHORT(stdisc->width);
@@ -721,8 +724,7 @@ static void M_DrawDiscIcon (void)
 
 void M_DrawDisc (void)
 {
-  if ((show_discicon)
-   && (M_CheckParm("-noshowdiscicon") == 0))
+  if (stdiscicon != ML_NULL)
   {
     stdisctimer = 10;
     M_DrawDiscIcon ();
@@ -2620,6 +2622,20 @@ void M_Init (void)
 
     default:
       break;
+  }
+
+  if ((show_discicon == 0)
+   || (M_CheckParm ("-noshowdiscicon")))
+  {
+    stdiscicon = ML_NULL;
+  }
+  else if (M_CheckParm ("-cdrom"))
+  {
+    stdiscicon = ML_STCDROM;
+  }
+  else
+  {
+    stdiscicon = ML_STDISC;
   }
 }
 
