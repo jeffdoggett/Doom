@@ -240,6 +240,9 @@ static boolean P_HitFriend(mobj_t *actor)
 boolean P_CheckMissileRange (mobj_t* actor)
 {
     fixed_t	dist;
+    int		mult;
+    int		p;
+    mobjinfo_t* info;
 
     if (! P_CheckSight (actor, actor->target) )
 	return false;
@@ -264,38 +267,25 @@ boolean P_CheckMissileRange (mobj_t* actor)
     dist = P_ApproxDistance ( actor->x-actor->target->x,
 			     actor->y-actor->target->y) - 64*FRACUNIT;
 
-    if (!actor->info->meleestate)
+    info = actor->info;
+    if (!info->meleestate)
 	dist -= 128*FRACUNIT;	// no melee attack, so fire more
 
-    dist >>= 16;
+    dist >>= FRACBITS;
 
-    if (actor->type == MT_VILE)
-    {
-	if (dist > 14*64)
-	    return false;	// too far away
-    }
+    if ((unsigned int) dist > (unsigned int) info->maxattackrange)
+      return false;		// too far away
 
+    if ((unsigned int) dist < (unsigned int) info->meleethreshold)
+      return false;		// close for fist attack
 
-    if (actor->type == MT_UNDEAD)
-    {
-	if (dist < 196)
-	    return false;	// close for fist attack
-	dist >>= 1;
-    }
+    mult = info->missilechancemult;
+    if (mult != FRACUNIT)
+      dist = FixedMul (dist, mult);
 
-
-    if (actor->type == MT_CYBORG
-	|| actor->type == MT_SPIDER
-	|| actor->type == MT_SKULL)
-    {
-	dist >>= 1;
-    }
-
-    if (dist > 200)
-	dist = 200;
-
-    if (actor->type == MT_CYBORG && dist > 160)
-	dist = 160;
+    p = info->minmissilechance;
+    if ((unsigned int) dist > (unsigned int) p)
+      dist = p;
 
     if (P_Random () < dist)
 	return false;

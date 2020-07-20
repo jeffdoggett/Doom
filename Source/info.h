@@ -304,6 +304,10 @@ typedef struct
   int	deathstate;
   int	xdeathstate;
   int	deathsound;
+  int	meleethreshold;
+  int	maxattackrange;
+  int	minmissilechance;
+  int	missilechancemult;
   int	speed;
   int	radius;
   int	pickupradius;

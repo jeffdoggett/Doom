@@ -229,6 +229,11 @@ static const char * const dehack_things [] =
   "Death frame",
   "Exploding frame",
   "Death sound",
+  "Melee threshold",
+  "Max attack range",
+  "Max target range",
+  "Min missile chance",
+  "Missile chance multiplier",
   "Speed",
   "Width",
   "Height",
@@ -266,6 +271,11 @@ typedef enum
   THING_Death_frame,
   THING_Exploding_frame,
   THING_Death_sound,
+  THING_Melee_threshold,
+  THING_Max_attack_range,
+  THING_Max_target_range,
+  THING_Min_missile_chance,
+  THING_Missile_chance_multiplier,
   THING_Speed,
   THING_Width,
   THING_Height,
@@ -1507,6 +1517,23 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
 
     case THING_Death_sound:
       ptr -> deathsound = value;
+      break;
+
+    case THING_Melee_threshold:
+      ptr -> meleethreshold = value;
+      break;
+
+    case THING_Max_attack_range:
+    case THING_Max_target_range:
+      ptr -> maxattackrange = value;
+      break;
+
+    case THING_Min_missile_chance:
+      ptr -> minmissilechance = value;
+      break;
+
+    case THING_Missile_chance_multiplier:
+      ptr -> missilechancemult = value;
       break;
 
     case THING_Speed:

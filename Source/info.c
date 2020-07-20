@@ -4396,6 +4396,10 @@ state_t states [] =
   S_NULL,		/* deathstate	*/ \
   S_NULL,		/* xdeathstate	*/ \
   sfx_None, 		/* deathsound	*/ \
+  0,			/* meleethreshold */ \
+  ~0,			/* maxattackrange */ \
+  200,			/* minmissilechance */ \
+  FRACUNIT,		/* missilechancemult */ \
   0,			/* speed	*/ \
   0,			/* radius	*/ \
   0,			/* pickupradius	*/ \
@@ -4430,6 +4434,10 @@ mobjinfo_t mobjinfo[] =
     S_PLAY_DIE1,						// deathstate
     S_PLAY_XDIE1,						// xdeathstate
     sfx_pldeth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -4460,6 +4468,10 @@ mobjinfo_t mobjinfo[] =
     S_POSS_DIE1,						// deathstate
     S_POSS_XDIE1,						// xdeathstate
     sfx_podth1, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4490,6 +4502,10 @@ mobjinfo_t mobjinfo[] =
     S_SPOS_DIE1,						// deathstate
     S_SPOS_XDIE1,						// xdeathstate
     sfx_podth2, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4520,6 +4536,10 @@ mobjinfo_t mobjinfo[] =
     S_VILE_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_vildth, 						// deathsound
+    0,								// meleethreshold
+    14*64,							// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     15, 							// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4550,6 +4570,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4580,6 +4604,10 @@ mobjinfo_t mobjinfo[] =
     S_SKEL_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_skedth, 						// deathsound
+    196,							// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT/2,							// missilechancemult
     10, 							// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4610,6 +4638,10 @@ mobjinfo_t mobjinfo[] =
     S_TRACEEXP1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
     11*FRACUNIT,						// radius
     11*FRACUNIT,						// pickupradius
@@ -4640,6 +4672,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4670,6 +4706,10 @@ mobjinfo_t mobjinfo[] =
     S_FATT_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_mandth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     48*FRACUNIT,						// radius
     48*FRACUNIT,						// pickupradius
@@ -4700,6 +4740,10 @@ mobjinfo_t mobjinfo[] =
     S_FATSHOTX1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     20*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -4730,6 +4774,10 @@ mobjinfo_t mobjinfo[] =
     S_CPOS_DIE1,						// deathstate
     S_CPOS_XDIE1,						// xdeathstate
     sfx_podth2, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4760,6 +4808,10 @@ mobjinfo_t mobjinfo[] =
     S_TROO_DIE1,						// deathstate
     S_TROO_XDIE1,						// xdeathstate
     sfx_bgdth1, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -4790,6 +4842,10 @@ mobjinfo_t mobjinfo[] =
     S_SARG_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_sgtdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10, 							// speed
     30*FRACUNIT,						// radius
     30*FRACUNIT,						// pickupradius
@@ -4820,6 +4876,10 @@ mobjinfo_t mobjinfo[] =
     S_SARG_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_sgtdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10, 							// speed
     30*FRACUNIT,						// radius
     30*FRACUNIT,						// pickupradius
@@ -4850,6 +4910,10 @@ mobjinfo_t mobjinfo[] =
     S_HEAD_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_cacdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     31*FRACUNIT,						// radius
     31*FRACUNIT,						// pickupradius
@@ -4880,6 +4944,10 @@ mobjinfo_t mobjinfo[] =
     S_BOSS_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_brsdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     24*FRACUNIT,						// radius
     24*FRACUNIT,						// pickupradius
@@ -4910,6 +4978,10 @@ mobjinfo_t mobjinfo[] =
     S_BRBALLX1, 						// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     15*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -4940,6 +5012,10 @@ mobjinfo_t mobjinfo[] =
     S_BOS2_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_kntdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     24*FRACUNIT,						// radius
     24*FRACUNIT,						// pickupradius
@@ -4970,6 +5046,10 @@ mobjinfo_t mobjinfo[] =
     S_SKULL_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT/2,							// missilechancemult
     8,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -5000,6 +5080,10 @@ mobjinfo_t mobjinfo[] =
     S_SPID_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_spidth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT/2,							// missilechancemult
     12, 							// speed
     128*FRACUNIT,						// radius
     128*FRACUNIT,						// pickupradius
@@ -5030,6 +5114,10 @@ mobjinfo_t mobjinfo[] =
     S_BSPI_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_bspdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     12, 							// speed
     64*FRACUNIT,						// radius
     64*FRACUNIT,						// pickupradius
@@ -5060,6 +5148,10 @@ mobjinfo_t mobjinfo[] =
     S_CYBER_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_cybdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT/2,							// missilechancemult
     16, 							// speed
     40*FRACUNIT,						// radius
     40*FRACUNIT,						// pickupradius
@@ -5090,6 +5182,10 @@ mobjinfo_t mobjinfo[] =
     S_PAIN_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_pedth,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     31*FRACUNIT,						// radius
     31*FRACUNIT,						// pickupradius
@@ -5120,6 +5216,10 @@ mobjinfo_t mobjinfo[] =
     S_SSWV_DIE1,						// deathstate
     S_SSWV_XDIE1,						// xdeathstate
     sfx_ssdth,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     8,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5150,6 +5250,10 @@ mobjinfo_t mobjinfo[] =
     S_COMMKEEN, 						// deathstate
     S_NULL,							// xdeathstate
     sfx_keendt, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -5180,6 +5284,10 @@ mobjinfo_t mobjinfo[] =
     S_BRAIN_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_bosdth, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -5210,6 +5318,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5240,6 +5352,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5270,6 +5386,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -5300,6 +5420,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5330,6 +5454,10 @@ mobjinfo_t mobjinfo[] =
     S_BEXP,							// deathstate
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     10*FRACUNIT,						// radius
     10*FRACUNIT,						// pickupradius
@@ -5360,6 +5488,10 @@ mobjinfo_t mobjinfo[] =
     S_TBALLX1,							// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -5390,6 +5522,10 @@ mobjinfo_t mobjinfo[] =
     S_RBALLX1,							// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -5420,6 +5556,10 @@ mobjinfo_t mobjinfo[] =
     S_EXPLODE1, 						// deathstate
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     20*FRACUNIT,						// speed
     11*FRACUNIT,						// radius
     11*FRACUNIT,						// pickupradius
@@ -5450,6 +5590,10 @@ mobjinfo_t mobjinfo[] =
     S_PLASEXP,							// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
     13*FRACUNIT,						// radius
     13*FRACUNIT,						// pickupradius
@@ -5480,6 +5624,10 @@ mobjinfo_t mobjinfo[] =
     S_BFGLAND,							// deathstate
     S_NULL,							// xdeathstate
     sfx_rxplod, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
     13*FRACUNIT,						// radius
     13*FRACUNIT,						// pickupradius
@@ -5510,6 +5658,10 @@ mobjinfo_t mobjinfo[] =
     S_ARACH_PLEX,						// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
     13*FRACUNIT,						// radius
     13*FRACUNIT,						// pickupradius
@@ -5540,6 +5692,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5570,6 +5726,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5600,6 +5760,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5630,6 +5794,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5660,6 +5828,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5690,6 +5862,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5720,6 +5896,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     15*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5750,6 +5930,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     15*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -5780,9 +5964,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5810,9 +5998,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     8*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5840,9 +6032,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5870,9 +6066,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5900,9 +6100,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5930,9 +6134,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     6*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5960,9 +6168,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     6*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -5990,9 +6202,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     6*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6020,9 +6236,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6050,6 +6270,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     14*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6080,6 +6304,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     12*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6110,6 +6338,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     12*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6140,6 +6372,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     14*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6170,6 +6406,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     12*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6200,6 +6440,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     12*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6230,6 +6474,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     14*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6260,6 +6508,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     14*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6290,6 +6542,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     12*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6320,9 +6576,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     4*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6350,6 +6610,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     14*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6380,9 +6644,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     6*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6410,6 +6678,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6440,9 +6712,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     8*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6470,6 +6746,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6500,9 +6780,13 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     7*FRACUNIT, 						// radius
-    20*FRACUNIT,						 // pickupradius
+    20*FRACUNIT,						// pickupradius
     16*FRACUNIT,						// height
     100,							// mass
     0,								// damage
@@ -6530,6 +6814,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6560,6 +6848,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     11*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6590,6 +6882,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6620,6 +6916,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6650,6 +6950,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6680,6 +6984,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6710,6 +7018,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6740,6 +7052,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6770,6 +7086,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -6800,6 +7120,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6830,6 +7154,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6860,6 +7188,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6890,6 +7222,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6920,6 +7256,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6950,6 +7290,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -6980,6 +7324,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7010,6 +7358,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7040,6 +7392,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7070,6 +7426,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7100,6 +7460,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7130,6 +7494,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7160,6 +7528,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7190,6 +7562,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7220,6 +7596,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7250,6 +7630,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7280,6 +7664,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7310,6 +7698,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7340,6 +7732,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7370,6 +7766,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7400,6 +7800,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7430,6 +7834,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7460,6 +7868,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7490,6 +7902,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7520,6 +7936,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7550,6 +7970,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7580,6 +8004,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -7610,6 +8038,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7640,6 +8072,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7670,6 +8106,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7700,6 +8140,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7730,6 +8174,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7760,6 +8208,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7790,6 +8242,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7820,6 +8276,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7850,6 +8310,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7880,6 +8344,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7910,6 +8378,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7940,6 +8412,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -7970,6 +8446,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8000,6 +8480,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8030,6 +8514,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8060,6 +8548,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8090,6 +8582,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8120,6 +8616,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8150,6 +8650,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8180,6 +8684,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8210,6 +8718,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     32*FRACUNIT,						// radius
     32*FRACUNIT,						// pickupradius
@@ -8240,6 +8752,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8270,6 +8786,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8300,6 +8820,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8330,6 +8854,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8360,6 +8888,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8390,6 +8922,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8420,6 +8956,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8450,6 +8990,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8480,6 +9024,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8510,6 +9058,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8541,6 +9093,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     8,								// radius
     8,								// pickupradius
@@ -8572,6 +9128,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     8,								// radius
     8,								// pickupradius
@@ -8603,6 +9163,10 @@ mobjinfo_t mobjinfo[] =
     S_DOGS_DIE1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_dgdth,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     10, 							// speed
     12*FRACUNIT,						// radius
     12*FRACUNIT,						// pickupradius
@@ -8634,6 +9198,10 @@ mobjinfo_t mobjinfo[] =
     S_PLS1EXP,							// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
     13*FRACUNIT,						// radius
     13*FRACUNIT,						// pickupradius
@@ -8665,6 +9233,10 @@ mobjinfo_t mobjinfo[] =
     S_PLS2BALLX1,						// deathstate
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
     6*FRACUNIT, 						// radius
     6*FRACUNIT, 						// pickupradius
@@ -8696,6 +9268,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     10*FRACUNIT,						// radius
     10*FRACUNIT,						// pickupradius
@@ -8727,6 +9303,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     20*FRACUNIT,						// radius
     20*FRACUNIT,						// pickupradius
@@ -8757,6 +9337,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     16*FRACUNIT,						// radius
     16*FRACUNIT,						// pickupradius
@@ -8788,6 +9372,10 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// deathstate
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
+    0,								// meleethreshold
+    ~0,								// maxattackrange
+    200,							// minmissilechancechance
+    FRACUNIT,							// missilechancemult
     0,								// speed
     4*FRACUNIT, 						// radius
     4*FRACUNIT, 						// pickupradius
