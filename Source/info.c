@@ -4397,7 +4397,7 @@ state_t states [] =
   S_NULL,		/* xdeathstate	*/ \
   sfx_None, 		/* deathsound	*/ \
   0,			/* meleethreshold */ \
-  ~0,			/* maxattackrange */ \
+  MAXINT,		/* maxattackrange */ \
   200,			/* minmissilechance */ \
   FRACUNIT,		/* missilechancemult */ \
   0,			/* speed	*/ \
@@ -4435,7 +4435,7 @@ mobjinfo_t mobjinfo[] =
     S_PLAY_XDIE1,						// xdeathstate
     sfx_pldeth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -4469,7 +4469,7 @@ mobjinfo_t mobjinfo[] =
     S_POSS_XDIE1,						// xdeathstate
     sfx_podth1, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4503,7 +4503,7 @@ mobjinfo_t mobjinfo[] =
     S_SPOS_XDIE1,						// xdeathstate
     sfx_podth2, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4571,7 +4571,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -4605,7 +4605,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_skedth, 						// deathsound
     196,							// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT/2,							// missilechancemult
     10, 							// speed
@@ -4639,7 +4639,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
@@ -4673,7 +4673,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -4707,7 +4707,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_mandth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4741,7 +4741,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     20*FRACUNIT,						// speed
@@ -4775,7 +4775,7 @@ mobjinfo_t mobjinfo[] =
     S_CPOS_XDIE1,						// xdeathstate
     sfx_podth2, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4809,7 +4809,7 @@ mobjinfo_t mobjinfo[] =
     S_TROO_XDIE1,						// xdeathstate
     sfx_bgdth1, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4843,7 +4843,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_sgtdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10, 							// speed
@@ -4877,7 +4877,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_sgtdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10, 							// speed
@@ -4911,7 +4911,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_cacdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4945,7 +4945,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_brsdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -4979,7 +4979,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     15*FRACUNIT,						// speed
@@ -5013,7 +5013,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_kntdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -5047,7 +5047,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT/2,							// missilechancemult
     8,								// speed
@@ -5081,7 +5081,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_spidth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT/2,							// missilechancemult
     12, 							// speed
@@ -5115,7 +5115,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_bspdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     12, 							// speed
@@ -5149,7 +5149,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_cybdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT/2,							// missilechancemult
     16, 							// speed
@@ -5183,7 +5183,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_pedth,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -5217,7 +5217,7 @@ mobjinfo_t mobjinfo[] =
     S_SSWV_XDIE1,						// xdeathstate
     sfx_ssdth,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     8,								// speed
@@ -5251,7 +5251,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_keendt, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5285,7 +5285,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_bosdth, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5319,7 +5319,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5353,7 +5353,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5387,7 +5387,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
@@ -5421,7 +5421,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5455,7 +5455,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5489,7 +5489,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
@@ -5523,7 +5523,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10*FRACUNIT,						// speed
@@ -5557,7 +5557,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_barexp, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     20*FRACUNIT,						// speed
@@ -5591,7 +5591,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
@@ -5625,7 +5625,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_rxplod, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
@@ -5659,7 +5659,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
@@ -5693,7 +5693,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5727,7 +5727,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5761,7 +5761,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5795,7 +5795,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5829,7 +5829,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5863,7 +5863,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5897,7 +5897,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5931,7 +5931,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5965,7 +5965,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -5999,7 +5999,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6033,7 +6033,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6067,7 +6067,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6101,7 +6101,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6135,7 +6135,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6169,7 +6169,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6203,7 +6203,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6237,7 +6237,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6271,7 +6271,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6305,7 +6305,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6339,7 +6339,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6373,7 +6373,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6407,7 +6407,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6441,7 +6441,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6475,7 +6475,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6509,7 +6509,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6543,7 +6543,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6577,7 +6577,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6611,7 +6611,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6645,7 +6645,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6679,7 +6679,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6713,7 +6713,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6747,7 +6747,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6781,7 +6781,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6815,7 +6815,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6849,7 +6849,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6883,7 +6883,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6917,7 +6917,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6951,7 +6951,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -6985,7 +6985,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7019,7 +7019,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7053,7 +7053,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7087,7 +7087,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7121,7 +7121,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7155,7 +7155,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7189,7 +7189,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7223,7 +7223,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7257,7 +7257,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7291,7 +7291,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7325,7 +7325,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7359,7 +7359,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7393,7 +7393,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7427,7 +7427,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7461,7 +7461,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7495,7 +7495,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7529,7 +7529,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7563,7 +7563,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7597,7 +7597,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7631,7 +7631,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7665,7 +7665,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7699,7 +7699,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7733,7 +7733,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7767,7 +7767,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7801,7 +7801,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7835,7 +7835,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7869,7 +7869,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7903,7 +7903,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7937,7 +7937,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -7971,7 +7971,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8005,7 +8005,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8039,7 +8039,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8073,7 +8073,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8107,7 +8107,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8141,7 +8141,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8175,7 +8175,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8209,7 +8209,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8243,7 +8243,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8277,7 +8277,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8311,7 +8311,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8345,7 +8345,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8379,7 +8379,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8413,7 +8413,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8447,7 +8447,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8481,7 +8481,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8515,7 +8515,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8549,7 +8549,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8583,7 +8583,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8617,7 +8617,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8651,7 +8651,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8685,7 +8685,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8719,7 +8719,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8753,7 +8753,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8787,7 +8787,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8821,7 +8821,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8855,7 +8855,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8889,7 +8889,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8923,7 +8923,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8957,7 +8957,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -8991,7 +8991,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9025,7 +9025,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9059,7 +9059,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9094,7 +9094,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9129,7 +9129,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9164,7 +9164,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_dgdth,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     10, 							// speed
@@ -9199,7 +9199,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
@@ -9234,7 +9234,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_firxpl, 						// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     25*FRACUNIT,						// speed
@@ -9269,7 +9269,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9304,7 +9304,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9338,7 +9338,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed
@@ -9373,7 +9373,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// xdeathstate
     sfx_None,							// deathsound
     0,								// meleethreshold
-    ~0,								// maxattackrange
+    MAXINT,							// maxattackrange
     200,							// minmissilechancechance
     FRACUNIT,							// missilechancemult
     0,								// speed

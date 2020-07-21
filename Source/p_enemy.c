@@ -273,10 +273,10 @@ boolean P_CheckMissileRange (mobj_t* actor)
 
     dist >>= FRACBITS;
 
-    if ((unsigned int) dist > (unsigned int) info->maxattackrange)
+    if (dist > info->maxattackrange)
       return false;		// too far away
 
-    if ((unsigned int) dist < (unsigned int) info->meleethreshold)
+    if (dist < info->meleethreshold)
       return false;		// close for fist attack
 
     mult = info->missilechancemult;
@@ -284,7 +284,7 @@ boolean P_CheckMissileRange (mobj_t* actor)
       dist = FixedMul (dist, mult);
 
     p = info->minmissilechance;
-    if ((unsigned int) dist > (unsigned int) p)
+    if (dist > p)
       dist = p;
 
     if (P_Random () < dist)
