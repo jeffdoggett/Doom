@@ -1103,7 +1103,8 @@ P_KillMobj
   p = item_drop_head;
   while (p)
   {
-    if (p -> just_died == target->type)
+    if ((p -> just_died == target->type)
+     && ((unsigned int)(p -> mt_spawn) < NUMMOBJTYPES))
     {
       if (mobjinfo [p -> mt_spawn].flags & MF_COUNTKILL)
       {
