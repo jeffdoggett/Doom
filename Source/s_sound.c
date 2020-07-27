@@ -349,26 +349,26 @@ static void S_StartSoundAtVolume (mobj_t* origin, int sfx_id, int volume)
     lumpnum = S_GetSfxLumpNum (sfx);
     if (lumpnum >= 0)
     {
-      sfx->link = NULL;			// We have the actual lump, so destroy the link.
+      sfx->link = sfx_None;		// We have the actual lump, so destroy the link.
     }
-    else if (sfx->link == NULL)		// Alternative available?
+    else if (sfx->link == sfx_None)	// Alternative available?
     {
       return;				// No.
     }
     else
     {
-      lumpnum = S_GetSfxLumpNum (sfx->link);
+      lumpnum = S_GetSfxLumpNum (&S_sfx[sfx->link]);
       if (lumpnum < 0)
 	return;
       if (sfx->pitch == -1)		// Do we want the different settings?
-	sfx->link = NULL;		// No. Destroy the link now that it has been used.
+	sfx->link = sfx_None;		// No. Destroy the link now that it has been used.
     }
     sfx->lumpnum = lumpnum;
   }
 
   // Initialize sound parameters
 
-  if (sfx->link)
+  if (sfx->link != sfx_None)
   {
     volume += sfx->volume;
 
@@ -633,7 +633,7 @@ void S_UpdateSounds(void* listener_p)
 		volume = snd_SfxVolume;
 		sep = NORM_SEP;
 
-		if (sfx->link)
+		if (sfx->link != sfx_None)
 		{
 		    volume += sfx->volume;
 		    if (volume < 1)
@@ -950,6 +950,19 @@ static int S_getChannel (sfxinfo_t* sfxinfo)
 {
   // channel number to use
   int cnum;
+
+#if 0
+  // Leave out for now...
+  if ((origin)
+   && (sfxinfo->singularity != sg_none))
+  {
+    for (cnum=0 ; cnum<numChannels ; cnum++)
+      if ((channels[cnum].sfxinfo != NULL)
+       && (channels[cnum].sfxinfo->singularity == sfxinfo->singularity)
+       && (channels[cnum].origin == origin))
+        return (cnum);
+  }
+#endif
 
   // Find an open channel
   for (cnum=0 ; cnum<numChannels ; cnum++)

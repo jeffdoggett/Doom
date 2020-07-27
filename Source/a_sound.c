@@ -341,16 +341,12 @@ I_StartSound
   if (music_available & QTM_PLAYING)		// Qtm swipes 4 channels!
     max_sfx_chan = MAX_SFX_CHAN - qtm_channels_swiped;
 
+  sfx = &S_sfx[id];
   channel = ~0;
 
   // Chainsaw troubles.
   // Play these sound effects only one at a time.
-  if ((id == sfx_sawup)
-   || (id == sfx_sawidl)
-   || (id == sfx_sawful)
-   || (id == sfx_sawhit)
-   || (id == sfx_stnmov)
-   || (id == sfx_pistol))
+  if (sfx->singularity != sg_none)
   {
     channel = MIN_SFX_CHAN;
     while ((id != current_play_id [channel]) && (++channel <= max_sfx_chan));
@@ -376,7 +372,6 @@ I_StartSound
 
   last_snd_channel = channel;
   current_play_id [channel] = id;
-  sfx = &S_sfx[id];
 
   // printf ("Playing sound %s\n", sfx->name);
   // printf ("Using sound channel %d\n", channel);

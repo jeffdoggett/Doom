@@ -192,7 +192,7 @@ myioctl
 //
 void*
 getsfx
-( char*         sfxname,
+( sfxinfo_t*	p_sfx,
   int*          len )
 {
     unsigned char*      sfx;
@@ -206,7 +206,7 @@ getsfx
 
     // Get the sound data from the WAD, allocate lump
     //  in zone memory.
-    sprintf(name, "ds%s", sfxname);
+    sprintf(name, "ds%s", p_sfx->name);
 
     // Now, there is a severe problem with the
     //  sound handling, in it is not (yet/anymore)
@@ -218,12 +218,12 @@ getsfx
     // I do not do runtime patches to that
     //  variable. Instead, we will use a
     //  default sound for replacement.
-    if ( W_CheckNumForName(name) == -1 )
-      sfxlump = W_GetNumForName("dspistol");
-    else
-      sfxlump = W_GetNumForName(name);
+    sfxlump = W_CheckNumForName (name);
+    if (sfxlump < 0)
+      return NULL;
 
-    size = W_LumpLength( sfxlump );
+    p_sfx->lumpnum = sfxlump;
+    size = W_LumpLength (sfxlump);
 
     // Debug.
     // fprintf( stderr, "." );
@@ -401,7 +401,7 @@ addsfx
 // version.
 // See soundserver initdata().
 //
-void I_SetChannels()
+void I_SetChannels(void)
 {
   // Init internal lookups (raw data, mixing buffer, channels).
   // This function sets up internal lookups used during
@@ -728,7 +728,7 @@ void I_ShutdownSound(void)
 
 
 void
-I_InitSound()
+I_InitSound(void)
 {
 #ifdef SNDSERV
   char buffer[256];
@@ -770,7 +770,7 @@ I_InitSound()
     fprintf(stderr, "Could not start sound server [%s]\n", buffer);
 #else
 
-  int i;
+  int i,j;
 
 #ifdef SNDINTR
   fprintf( stderr, "I_SoundSetTimer: %d microsecs\n", SOUND_INTERVAL );
@@ -811,18 +811,21 @@ I_InitSound()
 
   for (i=1 ; i<NUMSFX ; i++)
   {
-    // Alias? Example is the chaingun sound linked to pistol.
-    if (!S_sfx[i].link)
+    // Load data from WAD file.
+    S_sfx[i].data = getsfx (&S_sfx[i], &lengths[i]);
+    if ((S_sfx[i].data == NULL)
+     && ((j = S_sfx[i].link) != sfx_None))
     {
-      // Load data from WAD file.
-      S_sfx[i].data = getsfx( S_sfx[i].name, &lengths[i] );
+      S_sfx[i].data = getsfx (&S_sfx[j], &lengths[i]);
     }
-    else
+    if (S_sfx[i].data == NULL)
     {
-      // Previously loaded already?
-      S_sfx[i].data = S_sfx[i].link->data;
-      lengths[i] = lengths[(S_sfx[i].link - S_sfx)/sizeof(sfxinfo_t)];
+      S_sfx[i].lumpnum = S_sfx[sfx_pistol].lumpnum;
+      S_sfx[i].data = S_sfx[sfx_pistol].data;
+      lengths[i] = lengths[sfx_pistol];
     }
+    S_sfx[i].adata = S_sfx[i].data;
+    S_sfx[i].length = lengths[i];
   }
 
   fprintf( stderr, " pre-cached all sound data\n");

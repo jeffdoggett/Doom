@@ -24,12 +24,22 @@
 #define __SOUNDS__
 
 
+enum
+{
+  sg_none,
+  sg_itemup,
+  sg_wpnup,
+  sg_oof,
+  sg_getpow,
+  sg_stnmov,
+  sg_saw
+};
+
 //
 // SoundFX struct.
 //
-typedef struct sfxinfo_struct	sfxinfo_t;
 
-struct sfxinfo_struct
+typedef struct
 {
     // up to 6-character name
     char*	name;
@@ -41,7 +51,7 @@ struct sfxinfo_struct
     int		priority;
 
     // referenced sound if a link
-    sfxinfo_t*	link;
+    int		link;
 
     // pitch if a link
     int		pitch;
@@ -61,7 +71,7 @@ struct sfxinfo_struct
     void*	data;
     void*	adata;		// The actual address of the audio data
     unsigned int length;
-};
+} sfxinfo_t;
 
 
 
