@@ -336,6 +336,8 @@ typedef enum
     sfx_dgdth,
     sfx_dgpain,
     sfx_secret,
+    sfx_gibdth,
+    sfx_scrsht,
     NUMSFX
 } sfxenum_t;
 

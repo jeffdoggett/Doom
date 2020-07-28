@@ -230,6 +230,8 @@ sfxinfo_t S_sfx[] =
   { "dgdth",  sg_none,    70, sfx_None, -1, -1, -1, 11025 },
   { "dgpain", sg_none,    96, sfx_None, -1, -1, -1, 11025 },
   { "secret", sg_none,    60, sfx_getpow, -1, -1, -1, 11025 },
+  { "gibdth", sg_none,    60, sfx_None, -1, -1, -1, 11025 },
+  { "scrsht", sg_none,     0, sfx_None, -1, -1, -1, 11025 },
   { NULL,     sg_none,     0, sfx_None, -1, -1, -1, 11025 }
 };
 

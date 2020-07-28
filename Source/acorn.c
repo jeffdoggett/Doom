@@ -4,18 +4,11 @@
    are recreated here.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/stat.h>
+#include "includes.h"
 #include <kernel.h>
-#include <string.h>
-#include <dirent.h>
-#include "d_main.h"
-#include "acorn.h"
+
 #define OS_SpriteOp		0x2E
+#define OS_ReadVduVariables	0x31
 #define OS_ReadMonotonicTime	0x42
 #define OS_ReadMemMapInfo	0x51
 
@@ -91,18 +84,172 @@ void set_riscos_filetype (const char * file, unsigned int type)
 }
 
 /* ---------------------------------------------------------------------------- */
+/*
+   The screensave appears to be broken in 5.24
+*/
 
-void riscos_screensave (const char * file)
+#if 1
+
+typedef struct
 {
+  unsigned int area_size;
+  unsigned int qty_sprites;
+  unsigned int first_sprite;
+  unsigned int next_free;
+
+  unsigned int sprite_size;
+  char sprite_name [12];
+  unsigned int width;
+  unsigned int height;
+  unsigned int first_bit;
+  unsigned int last_bit;
+  unsigned int offset;
+  unsigned int offset2;
+  unsigned int mode;
+} Sprite_t;
+
+typedef struct
+{
+  int XEigFactor;
+  int YEigFactor;
+  int ScreenSize;
+  int Log2BPP;
+  int GWLCol;
+  int GWBRow;
+  int GWRCol;
+  int GWTrow;
+} vduVar_t;
+
+static const int VduVarNums [] =
+{
+  4,
+  5,
+  7,
+  9,
+  128,
+  129,
+  130,
+  131,
+  -1
+};
+
+boolean riscos_screensave (const char * file)
+{
+  unsigned int size;
+  int palette;
+  Sprite_t *sprite;
+  _kernel_oserror * rc;
+  _kernel_swi_regs regs;
+  vduVar_t vdu;
+
+  regs.r[0] = (int) VduVarNums;
+  regs.r[1] = (int) &vdu;
+  rc = _kernel_swi (OS_ReadVduVariables, &regs, &regs);
+
+#if 0
+  printf ("VDU %u %u %u %u %u %u %u %u\n", vdu.XEigFactor, vdu.YEigFactor, vdu.ScreenSize,
+  			vdu.Log2BPP, vdu.GWLCol, vdu.GWBRow, vdu.GWRCol, vdu.GWTrow);
+#endif
+
+  size = vdu.ScreenSize + (((vdu.GWRCol-vdu.GWLCol)+1) * 4);// Seems to need extra workspace.
+  if (vdu.Log2BPP <= 3)					// Also need extra for the palette
+    size *= 2;
+
+  sprite = malloc (size + sizeof (Sprite_t));
+  if (sprite == NULL)
+  {
+    fprintf (stderr, "Failed to claim memory for sprite\n");
+    return (false);
+  }
+
+  sprite -> area_size = size;
+  sprite -> first_sprite = 16;
+
+  /* initialise the sprite area */
+
+  regs.r[0] = 0x109;
+  regs.r[1] = (int) sprite;
+  rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
+  if (rc)
+  {
+    fprintf (stderr, "Sprite 109 error %s\n", rc -> errmess);
+    free (sprite);
+    return (false);
+  }
+
+  if (vdu.Log2BPP > 3)
+    palette = 0;
+  else
+    palette = 1;
+
+  /* Grab the screen */
+  regs.r[0] = 0x110;
+  regs.r[1] = (int) sprite;
+  regs.r[2] = (int) "screendump";
+  regs.r[3] = palette;
+  regs.r[4] = vdu.GWLCol << vdu.XEigFactor;
+  regs.r[5] = vdu.GWBRow << vdu.YEigFactor;
+  regs.r[6] = vdu.GWRCol << vdu.XEigFactor;
+  regs.r[7] = vdu.GWTrow << vdu.YEigFactor;
+  rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
+  if (rc)
+  {
+    fprintf (stderr, "Sprite 110 error %s\n", rc -> errmess);
+    free (sprite);
+    return (false);
+  }
+
+  /* Remove the left hand wastage */
+  regs.r[0] = 0x136;
+  regs.r[1] = (int) sprite;
+  regs.r[2] = (int) "screendump";
+  rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
+  if (rc)
+  {
+    fprintf (stderr, "Sprite 136 error %s\n", rc -> errmess);
+    free (sprite);
+    return (false);
+  }
+
+  /* Save to the file */
+  regs.r[0] = 0x10C;
+  regs.r[1] = (int) sprite;
+  regs.r[2] = (int) file;
+  rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
+  if (rc)
+  {
+    fprintf (stderr, "Sprite 10C error %s\n", rc -> errmess);
+    free (sprite);
+    return (false);
+  }
+
+  free (sprite);
+  return (true);
+}
+
+#else
+/* ------------------------------------------------------------------------------ */
+
+boolean riscos_screensave (const char * file)
+{
+  _kernel_oserror * rc;
   _kernel_swi_regs regs;
 
   regs.r[0] = 2;
   regs.r[2] = (int) file;
   regs.r[3] = 1;		// Save palette
 
-  _kernel_swi (OS_SpriteOp, &regs, &regs);
+  rc = _kernel_swi (OS_SpriteOp, &regs, &regs);
+  if (rc)
+  {
+    fprintf (stderr, "Sprite 2 error %s\n", rc -> errmess);
+    return false;
+  }
+
+  return (true);
 }
 
+#endif
 /* ---------------------------------------------------------------------------- */
 
 int mkdir (const char * directory_name, mode_t perms)

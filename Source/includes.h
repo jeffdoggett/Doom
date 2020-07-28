@@ -14,15 +14,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #endif
-#ifdef __riscos
-#include "acorn.h"
-#endif
-
 
 #include "doomtype.h"
 #include "doomdef.h"
 #include "doomdata.h"
 #include "doomstat.h"
+
+#ifdef __riscos
+#include "acorn.h"
+#endif
 
 #include "d_event.h"
 

@@ -545,7 +545,7 @@ typedef struct
 //
 // WritePCXfile
 //
-void
+boolean
 WritePCXfile
 ( char*		filename,
   byte*		data,
@@ -555,8 +555,9 @@ WritePCXfile
 {
   int		i;
   int		length;
+  boolean	rc;
   pcx_t*	pcx;
-  byte*	pack;
+  byte*		pack;
 
   pcx = Z_Malloc (width*height*2+1000, PU_STATIC, NULL);
 
@@ -601,9 +602,10 @@ WritePCXfile
 
   // write output file
   length = pack - (byte *)pcx;
-  M_WriteFile (filename, pcx, length);
+  rc = M_WriteFile (filename, pcx, length);
 
   Z_Free (pcx);
+  return (rc);
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -614,6 +616,7 @@ void M_ScreenShot (void)
 {
   int	i;
   byte*	linear;
+  boolean status;
   char	pcxname [6];
   char	lbmname [80];
   char * shotdir;
@@ -665,19 +668,23 @@ void M_ScreenShot (void)
   } while (access(lbmname,0) != -1);	// file doesn't exist
 
 #ifdef __riscos
-  riscos_screensave (lbmname);
+  status = riscos_screensave (lbmname);
 #else
   // save the pcx file
-  WritePCXfile (lbmname, linear,
+  status = WritePCXfile (lbmname, linear,
 		SCREENWIDTH, SCREENHEIGHT,
 		W_CacheLumpName ("PLAYPAL",PU_CACHE));
   // set_riscos_filetype (lbmname, 0x697);
 #endif
 
-  players[consoleplayer].message = HU_printf ("%s - %s", screenshot_messages[SC_MESSAGE], lbmname);
+  if (status)
+  {
+    S_StartSound (NULL, sfx_scrsht);
+    players[consoleplayer].message = HU_printf ("%s - %s", screenshot_messages[SC_MESSAGE], lbmname);
 #ifdef NORMALUNIX
-  printf ("%s\n", players[consoleplayer].message);
+    printf ("%s\n", players[consoleplayer].message);
 #endif
+  }
 }
 
 //-----------------------------------------------------------------------------

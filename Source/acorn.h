@@ -18,7 +18,7 @@
 
 
 void set_riscos_filetype (const char * file, unsigned int type);
-void riscos_screensave (const char * file);
+boolean riscos_screensave (const char * file);
 
 int access(const char * filename, int mode);
 int mkdir (const char * directory_name, mode_t perms);

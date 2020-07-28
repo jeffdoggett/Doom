@@ -24,17 +24,7 @@
 static const char rcsid[] = "$Id: m_argv.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#ifdef __riscos
-#include "acorn.h"
-#endif
-
-#include "doomtype.h"
-#include "dh_stuff.h"
-#include "i_system.h"
-#include "m_argv.h"
+#include "includes.h"
 
 unsigned int	myargc;
 char *	myargv [MAXARGVS];
