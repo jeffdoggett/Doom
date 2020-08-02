@@ -1426,6 +1426,10 @@ static void dh_thing_drop (mobjtype_t number, mobjtype_t value)
     drop_info_p = drop_info_p -> next;
   }
 
+  if (((unsigned int)(number) >= NUMMOBJTYPES)
+   || ((unsigned int)(value) >= NUMMOBJTYPES))
+    return;
+
   drop_info_p = malloc (sizeof (item_to_drop_t));
   if (drop_info_p)
   {
