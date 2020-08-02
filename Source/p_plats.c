@@ -312,7 +312,7 @@ EV_DoPlat
 
 //	      plat->high = sec->floorheight;
 	      plat->status = down;
-	      plat->type = downToLowestCeiling;
+	      plat->type = downWaitUpStay;
 	      break;
 
 	    default:	/* LnF2HnF */			// PERP
