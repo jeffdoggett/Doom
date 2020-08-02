@@ -237,7 +237,8 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 
 static void R_ReadTextureSet (int names_lump, int maptex_lump_1, int maptex_lump_2)
 {
-  // printf ("\nR_ReadTextureSet (%d, %d, %d)", names_lump, maptex_lump_1, maptex_lump_2);
+  if (M_CheckParm ("-showtextureset"))
+    printf ("\nR_ReadTextureSet (%d, %d, %d)", names_lump, maptex_lump_1, maptex_lump_2);
 
   if (maptex_lump_1 == -1)			// Some PWADS only have a TEXTURES2 and no TEXTURES1
   {
@@ -265,6 +266,19 @@ static void R_MergeTextures (void)
   int maptex_lump_2;
   FILE * handle;
 
+  if (M_CheckParm ("-alwaysmergetextures") == 0)
+  {
+    // Read the three lumps first in the standard way.
+    names_lump    = W_CheckNumForName ("PNAMES");
+    maptex_lump_1 = W_CheckNumForName ("TEXTURE1");
+    maptex_lump_2 = W_CheckNumForName ("TEXTURE2");
+    R_ReadTextureSet (names_lump, maptex_lump_1, maptex_lump_2);
+  }
+
+  if (M_CheckParm ("-nomergetextures"))
+    return;
+
+  // Then use a merge system.
   lump = numlumps;
   names_lump = -1;
   maptex_lump_1 = -1;
