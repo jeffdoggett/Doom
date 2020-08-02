@@ -340,10 +340,10 @@ EV_DoPlat
 
 	  switch ((((int) type) >> LiftDelayShift) & 3)
 	  {
-	    case 0: plat->wait = (35*PLATWAIT)*1; break;
-	    case 1: plat->wait = (35*PLATWAIT)*3; break;
-	    case 2: plat->wait = (35*PLATWAIT)*5; break;
-	    default: plat->wait = (35*PLATWAIT)*10; break;
+	    case 0: plat->wait = 35*1; break;
+	    case 1: plat->wait = 35*3; break;
+	    case 2: plat->wait = 35*5; break;
+	    default: plat->wait = 35*10; break;
 	  }
 
 	  S_StartSound((mobj_t *)&sec->soundorg,sfx_pstart);
