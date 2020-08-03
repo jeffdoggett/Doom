@@ -1606,21 +1606,20 @@ static void write_all_sounds (FILE * fout)
   do
   {
     fprintf (fout, "%s %d\n", dehack_patches[2], sound_no);
-    fprintf (fout, "%s = %d\n", dehack_sounds [0], (int) ptr -> name);
-    fprintf (fout, "%s = %d\n", dehack_sounds [1], (int) ptr -> singularity);
-    fprintf (fout, "%s = %d\n", dehack_sounds [2], (int) ptr -> priority);
-    fprintf (fout, "%s = %d\n", dehack_sounds [3], (int) ptr -> link);
-    fprintf (fout, "%s = %d\n", dehack_sounds [4], 0 /*(int) ptr -> usefulness*/);
-    fprintf (fout, "%s = %d\n", dehack_sounds [5], (int) ptr -> lumpnum);
-    fprintf (fout, "%s = %d\n", dehack_sounds [6], (int) ptr -> data);
-    fprintf (fout, "%s = %d\n", dehack_sounds [7], (int) ptr -> pitch);
-    fprintf (fout, "%s = %d\n", dehack_sounds [8], (int) ptr -> volume);
+    fprintf (fout, "%s = %d\n", dehack_sounds [0], (int) (uintptr_t) ptr -> name);	// "Offset"
+    fprintf (fout, "%s = %d\n", dehack_sounds [1], (int) ptr -> singularity);		// "Zero/One"
+    fprintf (fout, "%s = %d\n", dehack_sounds [2], (int) ptr -> priority);		// "Value"
+    fprintf (fout, "%s = %d\n", dehack_sounds [3], ptr -> link);			// "Zero 1"
+    fprintf (fout, "%s = %d\n", dehack_sounds [4], ptr -> pitch);			// "Zero 2"
+    fprintf (fout, "%s = %d\n", dehack_sounds [5], ptr -> volume);			// "Zero 3"
+    fprintf (fout, "%s = %d\n", dehack_sounds [6], (int) (uintptr_t) ptr -> data);	// "Zero 4"
+    fprintf (fout, "%s = %d\n", dehack_sounds [7], -1 /* usefulness */);		// "Neg. One 1"
+    fprintf (fout, "%s = %d\n", dehack_sounds [8], ptr -> lumpnum);			// "Neg. One 2"
 
     fprintf (fout, "\n\n");
     ptr++;
     sound_no++;
   } while (sound_no < NUMSFX);
-
 }
 #endif
 /* ---------------------------------------------------------------------------- */
@@ -1629,44 +1628,47 @@ static void dh_write_to_sound (unsigned int number, unsigned int record, unsigne
 {
   sfxinfo_t * ptr;
 
+  if ((unsigned int) number >= NUMSFX)
+    return;
+
   ptr = &S_sfx[number];
 
   switch (record)
   {
-    case 0: //	"Offset",
+    case 0: //	"Offset"
       // ptr -> name = value;   Don't change pointers willy nilly!
       break;
 
-    case 1: //	"Zero/One",
+    case 1: //	"Zero/One"
       ptr -> singularity = value;
       break;
 
-    case 2: //	"Value",
+    case 2: //	"Value"
       ptr -> priority = value;
       break;
 
-    case 3: //	"Zero 1",
-      // ptr -> link = value;   Don't change pointers willy nilly!
+    case 3: //	"Zero 1"
+      // ptr -> link = value;
       break;
 
-    case 4: //	"Zero 2",
-      // ptr -> usefulness = value;
-      break;
-
-    case 5: //	"Zero 3",
-      ptr -> lumpnum = value;
-      break;
-
-    case 6: //	"Zero 4",
-      // ptr -> data = value;   Don't change pointers willy nilly!
-      break;
-
-    case 7: //	"Neg. One 1",
+    case 4: //	"Zero 2"
       ptr -> pitch = value;
       break;
 
-    case 8: //	"Neg. One 2"
+    case 5: //	"Zero 3"
       ptr -> volume = value;
+      break;
+
+    case 6: //	"Zero 4"
+      // ptr -> data = value;
+      break;
+
+    case 7: //	"Neg. One 1"
+      // ptr -> usefulness = value;
+      break;
+
+    case 8: //	"Neg. One 2"
+      // ptr -> lumpnum = value;
       break;
   }
 }
