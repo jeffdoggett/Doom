@@ -341,14 +341,19 @@ static void init_text_messages (void)
   init_a_text_block (stat_bar_messages, stat_bar_messages_orig);
   init_a_text_block (special_effects_messages, special_effects_messages_orig);
 
-  ptr_s = castorder;
-  c_ptr = cast_names_copy;
-  do
+  // If we are going to write to the Dehacked file later
+  // then we need the dehacked names - not the cast names.
+  if (M_CheckParm ("-writedehfile") == 0)
   {
-    mobjinfo[*ptr_s].name1 = *c_ptr;
-    ptr_s++;
-    c_ptr++;
-  } while (*c_ptr);
+    ptr_s = castorder;
+    c_ptr = cast_names_copy;
+    do
+    {
+      mobjinfo[*ptr_s].name1 = *c_ptr;
+      ptr_s++;
+      c_ptr++;
+    } while (*c_ptr);
+  }
 
   m_ptr = S_music;
   c_ptr = music_names_copy;

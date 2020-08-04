@@ -2471,43 +2471,7 @@ static const char * const cast_mtconv [NUMMOBJTYPES+1] =
   "MISC79", "MISC80", "MISC81", "MISC82", "MISC83", "MISC84",
   "MISC85", "MISC86", "MT_PUSH", "MT_PULL", "MT_DOGS", "MT_PLASMA1",
   "MT_PLASMA2", "MT_SCEPTRE", "MT_BIBLE", "MT_MUSICSOURCE","MT_GIBDTH",
-  NULL
-};
-
-/* -------------------------------------------------------------------------------------------- */
-
-const char * const thing_names [NUMMOBJTYPES+1] =
-{
-  "Player","Trooper","Sargeant","Archvile","Archvile Attack","Revenant",
-  "Revenant Fireball","Fireball Trail","Mancubus","Mancubus Fireball",
-  "Chaingun Sargeant","Imp","Demon","Spectre","Cacodemon","Baron of Hell",
-  "Baron Fireball","Hell Knight","Lost Soul","Spiderdemon","Arachnotron",
-  "Cyberdemon","Pain Elemental","SS Nazi","Commander Keen","Big Brain",
-  "Demon Spawner","Demon Spawn Spot","Demon Spawn Cube","Demon Spawn Fire",
-  "Barrel","Imp Fireball","Caco Fireball","Rocket (in air)","Plasma Bullet",
-  "BFG Shot","Arach. Fireball","Bullet Puff","Blood Splat","Teleport Flash",
-  "Item Respawn Fog","Teleport Exit","BFG Hit","Green Armor","Blue Armor",
-  "Health Potion","Armor Helmet","Blue Keycard","Red Keycard","Yellow Keycard",
-  "Yellow Skull Key","Red Skull Key","Blue Skull Key","Stim Pack","Medical Kit",
-  "Soul Sphere","Invulnerability","Berserk Sphere","Blur Sphere","Radiation Suit",
-  "Computer Map","Lite Amp. Visor","Mega Sphere","Ammo Clip","Box of Ammo",
-  "Rocket","Box of Rockets","Energy Cell","Energy Pack","Shells","Box of Shells",
-  "Backpack","BFG 9000","Chaingun","Chainsaw","Rocket Launcher","Plasma Gun",
-  "Shotgun","Super Shotgun","Tall Lamp","Tall Lamp 2","Short Lamp",
-  "Tall Gr. Pillar","Short Gr. Pillar","Tall Red Pillar","Short Red Pillar",
-  "Pillar w/Skull","Pillar w/Heart","Eye in Symbol","Flaming Skulls","Grey Tree",
-  "Tall Blue Torch","Tall Green Torch","Tall Red Torch","Small Blue Torch",
-  "Small Gr. Torch","Small Red Torch","Brown Stub","Technical Column","Candle",
-  "Candelabra","Swaying Body","Hanging Arms Out","One-legged Body","Hanging Torso",
-  "Hanging Leg","Hanging Arms Out2","Hanging Torso 2","One-legged Body 2","Hanging Leg 2",
-  "Swaying Body 2","Dead Cacodemon","Dead Marine","Dead Trooper","Dead Demon",
-  "Dead Lost Soul","Dead Imp","Dead Sargeant","Guts and Bones","Guts and Bones 2",
-  "Skewered Heads","Pool of Blood","Pole with Skull","Pile of Skulls","Impaled Body",
-  "Twitching Body","Large Tree","Flaming Barrel","Hanging Body 1","Hanging Body 2",
-  "Hanging Body 3","Hanging Body 4","Hanging Body 5","Hanging Body 6","Pool Of Blood 1",
-  "Pool Of Blood 2","Brains",
-  "Wind Push", "Wind Pull", "Dog", "Plasma 1",
-  "Plasma 2", "Sceptre", "Bible", "Musicsource","Gibdeath",
+  "MT_BLUEBLOOD","MT_GREENBLOOD","MT_FUZZYBLOOD","MT_TRAIL",
   NULL
 };
 
@@ -2554,20 +2518,28 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
   }
   else
   {
-    cmp = thing_names;
     if (strncasecmp (buffer, "MT_", 3) == 0)
     {
       src += 3;
+      counter = 0;
       cmp = cast_mtconv;
+      do
+      {
+        if (strcasecmp (src, cmp [counter]) == 0)
+	  return ((mobjtype_t)counter);
+        counter++;
+      } while (cmp[counter]);
     }
-
-    counter = 0;
-    do
+    else
     {
-      if (strcasecmp (src, cmp [counter]) == 0)
-	return ((mobjtype_t)counter);
-      counter++;
-    } while (cmp[counter]);
+      counter = 0;
+      do
+      {
+        if (strcasecmp (src, mobjinfo [counter].name1) == 0)
+	  return ((mobjtype_t)counter);
+        counter++;
+      } while (counter < NUMMOBJTYPES);
+    }
   }
 
 

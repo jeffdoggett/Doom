@@ -4378,7 +4378,7 @@ state_t states [] =
 
 //-----------------------------------------------------------------------------
 
-#define EXTRA_MOBJINFO \
+#define EXTRA_MOBJINFO(n) \
 {					\
   -1, 			/* doomednum	*/ \
   S_NULL,		/* spawnstate	*/ \
@@ -4410,7 +4410,8 @@ state_t states [] =
   0,			/* flags	*/ \
   0,			/* flags2	*/ \
   S_NULL,		/* raisestate	*/ \
-  FRACUNIT		/* scale	*/ \
+  FRACUNIT,		/* scale	*/ \
+  n			/* name1	*/ \
 }
 
 //-----------------------------------------------------------------------------
@@ -4448,7 +4449,9 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP|MF_NOTDMATCH,	// flags
     MF2_PASSMOBJ,						// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Player",							// name1
+    CC_OBIT_SELF						// obit
   },
 
   {								// MT_POSSESSED
@@ -4482,7 +4485,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_POSS_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Trooper"							// name1
   },
 
   {								// MT_SHOTGUY
@@ -4516,7 +4520,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_SPOS_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Sargeant"							// name1
   },
 
   {								// MT_VILE
@@ -4550,7 +4555,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Archvile"							// name1
   },
 
   {								// MT_FIRE
@@ -4584,7 +4590,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Archvile Attack"						// name1
   },
 
   {								// MT_UNDEAD
@@ -4618,7 +4625,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_SKEL_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Revenant"							// name1
   },
 
   {								// MT_TRACER
@@ -4652,7 +4660,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Revenant Fireball"						// name1
   },
 
   {								// MT_SMOKE
@@ -4686,7 +4695,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Fireball Trail"						// name1
   },
 
   {								// MT_FATSO
@@ -4720,7 +4730,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_FATT_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Mancubus"							// name1
   },
 
   {								// MT_FATSHOT
@@ -4754,7 +4765,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Mancubus Fireball"						// name1
   },
 
   {								// MT_CHAINGUY
@@ -4788,7 +4800,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_CPOS_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Chaingun Sargeant"						// name1
   },
 
   {								// MT_TROOP
@@ -4822,7 +4835,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_TROO_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Imp"							// name1
   },
 
   {								// MT_SERGEANT
@@ -4856,7 +4870,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_SARG_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Demon"							// name1
   },
 
   {								// MT_SHADOWS
@@ -4890,7 +4905,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_SHADOW|MF_COUNTKILL,		// flags
     0,								// flags2
     S_SARG_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Spectre"							// name1
   },
 
   {								// MT_HEAD
@@ -4924,7 +4940,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,// flags
     MF2_PASSMOBJ,						// flags2
     S_HEAD_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Cacodemon"							// name1
   },
 
   {								// MT_BRUISER
@@ -4958,7 +4975,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_BOSS_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Baron of Hell"						// name1
   },
 
   {								// MT_BRUISERSHOT
@@ -4992,7 +5010,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Baron Fireball"						// name1
   },
 
   {								// MT_KNIGHT
@@ -5026,7 +5045,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_BOS2_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hell Knight"						// name1
   },
 
   {								// MT_SKULL
@@ -5060,7 +5080,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY,		// flags
     MF2_PASSMOBJ,						// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Lost Soul"							// name1
   },
 
   {								// MT_SPIDER
@@ -5094,7 +5115,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Spiderdemon"						// name1
   },
 
   {								// MT_BABY
@@ -5128,7 +5150,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_BSPI_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Arachnotron"						// name1
   },
 
   {								// MT_CYBORG
@@ -5162,7 +5185,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Cyberdemon"						// name1
   },
 
   {								// MT_PAIN
@@ -5196,7 +5220,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,// flags
     0,								// flags2
     S_PAIN_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pain Elemental"						// name1
   },
 
   {								// MT_WOLFSS
@@ -5230,7 +5255,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_SSWV_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "SS Nazi"							// name1
   },
 
   {								// MT_KEEN
@@ -5264,7 +5290,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY|MF_SHOOTABLE|MF_COUNTKILL,// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Commander Keen"						// name1
   },
 
   {								// MT_BOSSBRAIN
@@ -5298,7 +5325,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Big Brain"							// name1
   },
 
   {								// MT_BOSSSPIT
@@ -5332,7 +5360,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOSECTOR,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Demon Spawner"						// name1
   },
 
   {								// MT_BOSSTARGET
@@ -5366,7 +5395,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOSECTOR,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Demon Spawn Spot"						// name1
   },
 
   {								// MT_SPAWNSHOT
@@ -5400,7 +5430,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_NOCLIP,// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Demon Spawn Cube"						// name1
   },
 
   {								// MT_SPAWNFIRE
@@ -5434,7 +5465,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Demon Spawn Fire"						// name1
   },
 
   {								// MT_BARREL
@@ -5468,7 +5500,9 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_NOBLOOD,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Barrel",							// name1,
+    CC_OBIT_BARREL						// obit
   },
 
   {								// MT_TROOPSHOT
@@ -5502,7 +5536,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Imp Fireball"						// name1
   },
 
   {								// MT_HEADSHOT
@@ -5536,7 +5571,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Caco Fireball"						// name1
   },
 
   {								// MT_ROCKET
@@ -5570,7 +5606,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Rocket (in air)"						// name1
   },
 
   {								// MT_PLASMA
@@ -5604,7 +5641,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Plasma Bullet"						// name1
   },
 
   {								// MT_BFG
@@ -5638,7 +5676,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "BFG Shot"							// name1
   },
 
   {								// MT_ARACHPLAZ
@@ -5672,7 +5711,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Arach. Fireball"						// name1
   },
 
   {								// MT_PUFF
@@ -5706,7 +5746,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Bullet Puff"						// name1
   },
 
   {								// MT_BLOOD
@@ -5740,7 +5781,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Blood Splat"						// name1
   },
 
   {								// MT_TFOG
@@ -5774,7 +5816,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Teleport Flash"						// name1
   },
 
   {								// MT_IFOG
@@ -5808,7 +5851,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Item Respawn Fog"						// name1
   },
 
   {								// MT_TELEPORTMAN
@@ -5842,7 +5886,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOSECTOR,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Teleport Exit"						// name1
   },
 
   {								// MT_EXTRABFG
@@ -5876,7 +5921,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_NOGRAVITY, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "BFG Hit"							// name1
   },
 
   {								// MT_MISC0
@@ -5910,7 +5956,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Green Armour"						// name1
   },
 
   {								// MT_MISC1
@@ -5944,7 +5991,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Blue Armour"						// name1
   },
 
   {								// MT_MISC2
@@ -5978,7 +6026,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Health Potion"						// name1
   },
 
   {								// MT_MISC3
@@ -6012,7 +6061,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Armour Helmet"						// name1
   },
 
   {								// MT_MISC4
@@ -6046,7 +6096,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Blue Keycard"						// name1
   },
 
   {								// MT_MISC5
@@ -6080,7 +6131,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Red Keycard"						// name1
   },
 
   {								// MT_MISC6
@@ -6114,7 +6166,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Yellow Keycard"						// name1
   },
 
   {								// MT_MISC7
@@ -6148,7 +6201,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Yellow Skull Key"						// name1
   },
 
   {								// MT_MISC8
@@ -6182,7 +6236,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Red Skull Key"						// name1
   },
 
   {								// MT_MISC9
@@ -6216,7 +6271,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_NOTDMATCH,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Blue Skull Key"						// name1
   },
 
   {								// MT_MISC10
@@ -6250,7 +6306,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Stim Pack"							// name1
   },
 
   {								// MT_MISC11
@@ -6284,7 +6341,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Medical Kit"						// name1
   },
 
   {								// MT_MISC12
@@ -6318,7 +6376,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Soul Sphere"						// name1
   },
 
   {								// MT_INV
@@ -6352,7 +6411,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Invulnerability"						// name1
   },
 
   {								// MT_MISC13
@@ -6386,7 +6446,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Berserk Sphere"						// name1
   },
 
   {								// MT_INS
@@ -6420,7 +6481,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Blur Sphere"						// name1
   },
 
   {								// MT_MISC14
@@ -6454,7 +6516,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Radiation Suit"						// name1
   },
 
   {								// MT_MISC15
@@ -6488,7 +6551,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Computer Map"						// name1
   },
 
   {								// MT_MISC16
@@ -6522,7 +6586,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Lite Amp. Visor"						// name1
   },
 
   {								// MT_MEGA
@@ -6556,7 +6621,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Mega Sphere"						// name1
   },
 
   {								// MT_CLIP
@@ -6590,7 +6656,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Ammo Clip"							// name1
   },
 
   {								// MT_MISC17
@@ -6624,7 +6691,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Box of Ammo"						// name1
   },
 
   {								// MT_MISC18
@@ -6658,7 +6726,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Rocket"							// name1
   },
 
   {								// MT_MISC19
@@ -6692,7 +6761,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Box of Rockets"						// name1
   },
 
   {								// MT_MISC20
@@ -6726,7 +6796,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Energy Cell"						// name1
   },
 
   {								// MT_MISC21
@@ -6760,7 +6831,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Energy Pack"						// name1
   },
 
   {								// MT_MISC22
@@ -6794,7 +6866,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Shells"							// name1
   },
 
   {								// MT_MISC23
@@ -6828,7 +6901,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Box of Shells"						// name1
   },
 
   {								// MT_MISC24
@@ -6862,7 +6936,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Backpack"							// name1
   },
 
   {								// MT_MISC25
@@ -6896,7 +6971,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "BFG 9000"							// name1
   },
 
   {								// MT_CHAINGUN
@@ -6930,7 +7006,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Chaingun"							// name1
   },
 
   {								// MT_MISC26
@@ -6964,7 +7041,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Chainsaw"							// name1
   },
 
   {								// MT_MISC27
@@ -6998,7 +7076,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Rocket Launcher"						// name1
   },
 
   {								// MT_MISC28
@@ -7032,7 +7111,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Plasma Gun"						// name1
   },
 
   {								// MT_SHOTGUN
@@ -7066,7 +7146,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Shotgun"							// name1
   },
 
   {								// MT_SUPERSHOTGUN
@@ -7100,7 +7181,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL, 						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Super Shotgun"						// name1
   },
 
   {								// MT_MISC29
@@ -7134,7 +7216,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Lamp"							// name1
   },
 
   {								// MT_MISC30
@@ -7168,7 +7251,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Lamp 2"						// name1
   },
 
   {								// MT_MISC31
@@ -7202,7 +7286,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Short Lamp"						// name1
   },
 
   {								// MT_MISC32
@@ -7236,7 +7321,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Gr. Pillar"						// name1
   },
 
   {								// MT_MISC33
@@ -7270,7 +7356,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Short Gr. Pillar"						// name1
   },
 
   {								// MT_MISC34
@@ -7304,7 +7391,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Red Pillar"						// name1
   },
 
   {								// MT_MISC35
@@ -7338,7 +7426,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Short Red Pillar"						// name1
   },
 
   {								// MT_MISC36
@@ -7372,7 +7461,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pillar w/Skull"						// name1
   },
 
   {								// MT_MISC37
@@ -7406,7 +7496,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pillar w/Heart"						// name1
   },
 
   {								// MT_MISC38
@@ -7440,7 +7531,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Eye in Symbol"						// name1
   },
 
   {								// MT_MISC39
@@ -7474,7 +7566,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Flaming Skulls"						// name1
   },
 
   {								// MT_MISC40
@@ -7508,7 +7601,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Grey Tree"							// name1
   },
 
   {								// MT_MISC41
@@ -7542,7 +7636,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Blue Torch"						// name1
   },
 
   {								// MT_MISC42
@@ -7576,7 +7671,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Green Torch"						// name1
   },
 
   {								// MT_MISC43
@@ -7610,7 +7706,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Tall Red Torch"						// name1
   },
 
   {								// MT_MISC44
@@ -7644,7 +7741,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Small Blue Torch"						// name1
   },
 
   {								// MT_MISC45
@@ -7678,7 +7776,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Small Gr. Torch"						// name1
   },
 
   {								// MT_MISC46
@@ -7712,7 +7811,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Small Red Torch"						// name1
   },
 
   {								// MT_MISC47
@@ -7746,7 +7846,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Brown Stub"						// name1
   },
 
   {								// MT_MISC48
@@ -7780,7 +7881,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Technical Column"						// name1
   },
 
   {								// MT_MISC49
@@ -7814,7 +7916,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Candle"							// name1
   },
 
   {								// MT_MISC50
@@ -7848,7 +7951,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Candelabra"						// name1
   },
 
   {								// MT_MISC51
@@ -7882,7 +7986,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Swaying Body"						// name1
   },
 
   {								// MT_MISC52
@@ -7916,7 +8021,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Arms Out"						// name1
   },
 
   {								// MT_MISC53
@@ -7950,7 +8056,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "One-legged Body"						// name1
   },
 
   {								// MT_MISC54
@@ -7984,7 +8091,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Torso"						// name1
   },
 
   {								// MT_MISC55
@@ -8018,7 +8126,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Leg"						// name1
   },
 
   {								// MT_MISC56
@@ -8052,7 +8161,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPAWNCEILING|MF_NOGRAVITY,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Arms Out2"						// name1
   },
 
   {								// MT_MISC57
@@ -8086,7 +8196,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPAWNCEILING|MF_NOGRAVITY,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Torso 2"						// name1
   },
 
   {								// MT_MISC58
@@ -8120,7 +8231,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPAWNCEILING|MF_NOGRAVITY,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "One-legged Body 2"						// name1
   },
 
   {								// MT_MISC59
@@ -8154,7 +8266,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPAWNCEILING|MF_NOGRAVITY,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Leg 2"						// name1
   },
 
   {								// MT_MISC60
@@ -8188,7 +8301,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPAWNCEILING|MF_NOGRAVITY,				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Swaying Body 2"						// name1
   },
 
   {								// MT_MISC61
@@ -8222,7 +8336,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Cacodemon"						// name1
   },
 
   {								// MT_MISC62
@@ -8256,7 +8371,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Marine"						// name1
   },
 
   {								// MT_MISC63
@@ -8290,7 +8406,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Trooper"						// name1
   },
 
   {								// MT_MISC64
@@ -8324,7 +8441,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Demon"						// name1
   },
 
   {								// MT_MISC65
@@ -8358,7 +8476,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Lost Soul"						// name1
   },
 
   {								// MT_MISC66
@@ -8392,7 +8511,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Imp"							// name1
   },
 
   {								// MT_MISC67
@@ -8426,7 +8546,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dead Sargeant"						// name1
   },
 
   {								// MT_MISC68
@@ -8460,7 +8581,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Guts and Bones"						// name1
   },
 
   {								// MT_MISC69
@@ -8494,7 +8616,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Guts and Bones 2"						// name1
   },
 
   {								// MT_MISC70
@@ -8528,7 +8651,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Skewered Heads"						// name1
   },
 
   {								// MT_MISC71
@@ -8562,7 +8686,8 @@ mobjinfo_t mobjinfo[] =
     0,								// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pool of Blood"						// name1
   },
 
   {								// MT_MISC72
@@ -8596,7 +8721,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pole with Skull"						// name1
   },
 
   {								// MT_MISC73
@@ -8630,7 +8756,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pile of Skulls"						// name1
   },
 
   {								// MT_MISC74
@@ -8664,7 +8791,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Impaled Body"						// name1
   },
 
   {								// MT_MISC75
@@ -8698,7 +8826,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Twitching Body"						// name1
   },
 
   {								// MT_MISC76
@@ -8732,7 +8861,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Large Tree"						// name1
   },
 
   {								// MT_MISC77
@@ -8766,7 +8896,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID,							// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Flaming Barrel"						// name1
   },
 
   {								// MT_MISC78
@@ -8800,7 +8931,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 1"						// name1
   },
 
   {								// MT_MISC79
@@ -8834,7 +8966,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 2"						// name1
   },
 
   {								// MT_MISC80
@@ -8868,7 +9001,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 3"						// name1
   },
 
   {								// MT_MISC81
@@ -8902,7 +9036,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 4"						// name1
   },
 
   {								// MT_MISC82
@@ -8936,7 +9071,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 5"						// name1
   },
 
   {								// MT_MISC83
@@ -8970,7 +9106,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,			// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Hanging Body 6"						// name1
   },
 
   {								// MT_MISC84
@@ -9004,7 +9141,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pool Of Blood 1"						// name1
   },
 
   {								// MT_MISC85
@@ -9038,7 +9176,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Pool Of Blood 2"						// name1
   },
 
   {								// MT_MISC86
@@ -9072,7 +9211,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Brains"							// name1
   },
 
   // For use with wind and current effects
@@ -9107,7 +9247,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Wind Push"							// name1
   },
 
   // For use with wind and current effects
@@ -9142,7 +9283,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP,						// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Wind Pull"							// name1
   },
 
   // Marine's best friend :)					// killough 7/19/98
@@ -9177,7 +9319,8 @@ mobjinfo_t mobjinfo[] =
     MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL, 			// flags
     0,								// flags2
     S_DOGS_RAISE1,						// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Dog"							// name1
   },
 
   // killough 7/11/98: this is the first of two plasma fireballs in the beta
@@ -9212,7 +9355,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Plasma 1"							// name1
   },
 
   // killough 7/11/98: this is the second of two plasma fireballs in the beta
@@ -9247,7 +9391,8 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Plasma 2"							// name1
   },
 
   // killough 7/11/98: this is the evil sceptre in the beta version
@@ -9282,7 +9427,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Sceptre"							// name1
   },
 
   // killough 7/11/98: this is the unholy bible in the beta version
@@ -9317,7 +9463,8 @@ mobjinfo_t mobjinfo[] =
     MF_SPECIAL|MF_COUNTITEM,					// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Bible"							// name1
   },
 
   {								// MT_MUSICSOURCE
@@ -9352,6 +9499,7 @@ mobjinfo_t mobjinfo[] =
     0,								// flags2
     S_NULL,							// raisestate
     FRACUNIT,							// scale
+    "Musicsource"						// name1
   },
 
 
@@ -9386,35 +9534,36 @@ mobjinfo_t mobjinfo[] =
     MF_NOBLOCKMAP | MF_DROPOFF, 				// flags
     0,								// flags2
     S_NULL,							// raisestate
-    FRACUNIT							// scale
+    FRACUNIT,							// scale
+    "Gibdeath"							// name1
   },
 
-  EXTRA_MOBJINFO,			// Blue Blood (MT_BLUEBLOOD)
-  EXTRA_MOBJINFO,			// Green Blood (MT_GREENBLOOD)
-  EXTRA_MOBJINFO,			// Fuzzy Blood (MT_FUZZYBLOOD)
-  EXTRA_MOBJINFO,			// Smoke Trail (MT_TRAIL)
+  EXTRA_MOBJINFO("Blue Blood"),			// Blue Blood (MT_BLUEBLOOD)
+  EXTRA_MOBJINFO("Green Blood"),		// Green Blood (MT_GREENBLOOD)
+  EXTRA_MOBJINFO("Fuzzy Blood"),		// Fuzzy Blood (MT_FUZZYBLOOD)
+  EXTRA_MOBJINFO("Trail"),			// Smoke Trail (MT_TRAIL)
 
   /* Extra mobjs from MT_EXTRA00 to MT_EXTRA99 */
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO,
-  EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO, EXTRA_MOBJINFO
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
+  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL)
 };
 
 //-----------------------------------------------------------------------------

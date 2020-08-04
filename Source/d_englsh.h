@@ -738,6 +738,7 @@
 
 #define CC_OBIT		"%o was killed by %k"
 #define CC_OBIT_SELF	"%o killed %hself."
+#define CC_OBIT_BARREL	"%o got too close to %k."
 #endif
 //-----------------------------------------------------------------------------
 //

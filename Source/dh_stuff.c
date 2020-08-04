@@ -511,7 +511,7 @@ static const codeptrs_t codeptr_frames [] =
 
 /* These tables are in the same order as the declarations of the messages */
 
-static const char * const dehack_monster_obit_strings [] =
+static const char * const dehack_thing_obit_strings [] =
 {
   "OB_ZOMBIE",
   "OB_SHOTGUY",
@@ -531,15 +531,39 @@ static const char * const dehack_monster_obit_strings [] =
   "OB_VILE",
   "OB_SPIDER",
   "OB_CYBORG",
+  "OB_KILLEDSELF",
+  "OB_BARREL",
   NULL
+};
+
+static mobjtype_t dehack_thing_obit_nums [] =
+{
+  MT_POSSESSED,
+  MT_SHOTGUY,
+  MT_CHAINGUY,
+  MT_WOLFSS,
+  MT_TROOP,
+  MT_SERGEANT,
+  MT_SHADOWS,
+  MT_SKULL,
+  MT_HEAD,
+  MT_KNIGHT,
+  MT_BRUISER,
+  MT_BABY,
+  MT_PAIN,
+  MT_UNDEAD,
+  MT_FATSO,
+  MT_VILE,
+  MT_SPIDER,
+  MT_CYBORG,
+  MT_PLAYER,
+  MT_BARREL,
 };
 
 static const char * const dehack_other_obit_strings [] =
 {
-  "OB_BARREL",
   "OB_CRUSH",
   "OB_LAVA",
-  "OB_KILLEDSELF",
 #if 0
   "OB_UNDEADHIT",
   "OB_IMPHIT",
@@ -824,7 +848,6 @@ actionf_t states_ptr_copy [NUMSTATES];
 /* ---------------------------------------------------------------------------- */
 #define CREATE_DEHACK_FILE
 #ifdef CREATE_DEHACK_FILE
-extern const char * const thing_names [];
 
 static const char * const ammo_names [] =
 {
@@ -1236,14 +1259,25 @@ static void write_all_things (FILE * fout)
   int thing_no;
   const char * name;
   mobjinfo_t * ptr;
+  char namestr [20];
 
   ptr = &mobjinfo[0];
   thing_no = 0;
   do
   {
-    name = thing_names[thing_no];
+    name = ptr -> name1;
     if (name == NULL)
-      name = "Unknown";
+    {
+      if ((thing_no >= MT_EXTRA00) && (thing_no <= MT_EXTRA99))
+      {
+        sprintf (namestr, "Extra %u", thing_no - MT_EXTRA00);
+        name = namestr;
+      }
+      else
+      {
+        name = "Unknown";
+      }
+    }
 
     fprintf (fout, "%s %d (%s)\n", dehack_patches[1], thing_no+1, name);
 
@@ -1595,6 +1629,7 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
 
 /* ---------------------------------------------------------------------------- */
 #ifdef CREATE_DEHACK_FILE
+
 static void write_all_sounds (FILE * fout)
 {
   unsigned int sound_no;
@@ -3234,11 +3269,10 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
       return (&demo_names [counter1-'1']);
   }
 
-  counter1 = dh_search_str_tab_a (dehack_monster_obit_strings, ttext);
-  if ((counter1 != -1)
-   && (counter1 < (ARRAY_SIZE(dehack_cast_strings)-1)))
+  counter1 = dh_search_str_tab_a (dehack_thing_obit_strings, ttext);
+  if (counter1 != -1)
   {
-    return (&mobjinfo[castorder[counter1]].obit);
+    return (&mobjinfo[dehack_thing_obit_nums[counter1]].obit);
   }
 
   counter1 = dh_search_str_tab_a (dehack_other_obit_strings, ttext);
@@ -4159,12 +4193,12 @@ static void show_boss_action (void)
     if (bd_ptr -> monsterbits & (1<<MT_SPIDER))
       ptr += sprintf (ptr, " SPIDER");
 
-    printf ("Boss action: %u,%u%s %u %lX %u\n",
+    printf ("Boss action: %u,%u%s %u %p %u\n",
 		bd_ptr -> episode,
 		bd_ptr -> map,
 		monsters,
 		bd_ptr -> tag,
-		(uintptr_t)bd_ptr -> func,
+		bd_ptr -> func,
 		bd_ptr -> action);
     bd_ptr = bd_ptr -> next;
   } while (bd_ptr);

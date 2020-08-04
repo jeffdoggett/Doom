@@ -72,33 +72,17 @@ typedef enum
 
 char * obituary_messages [] =
 {
-  "%o got too close to %k.",
   "%o was squished.",
   "%o was melted.",
-  CC_OBIT_SELF,
   NULL
 };
 
 // Lookup table in dh_stuff.c is in the same order...
 typedef enum
 {
-  OB_BARREL,
   OB_CRUSH,
   OB_LAVA,
-  OB_KILLEDSELF,
 } obits_t;
-
-typedef struct
-{
-  mobjtype_t mt;
-  obits_t ob;
-  char name [12];
-} obitinfo_t;
-
-static obitinfo_t obit_lookup [] =
-{
-  MT_BARREL, OB_BARREL, "barrel"
-};
 
 /* ------------------------------------------------------- */
 
@@ -846,6 +830,9 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
   char * d_msg;
   char * obit_msg;
 
+  if (s_msg == NULL)			// Just in case.
+    s_msg = CC_OBIT;
+
   gender = 0;
   if (victim->player)			// We already checked this!
     gender = player_genders [victim->player - players];
@@ -1001,34 +988,23 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
 
 static char * find_obit_msg (mobj_t* killer, mobj_t* victim)
 {
-  unsigned int count;
+  char * killername;
   char * obit;
   mobjinfo_t * mptr;
-  obitinfo_t * obit_ptr;
-
-  if (killer == victim)
-    return (write_obit (obituary_messages[OB_KILLEDSELF], "self", killer, victim));
 
   mptr = killer->info;
-  if (mptr->name1)
-  {
-    obit = mptr->obit;
-    if (obit == NULL)
-      obit = CC_OBIT;
-    return (write_obit (obit, mptr->name1, killer, victim));
-  }
+  killername = mptr->name1;
+  obit = mptr->obit;
 
-  obit_ptr = obit_lookup;
-  count = ARRAY_SIZE (obit_lookup);
-  do
-  {
-    if (killer -> type == obit_ptr -> mt)
-      return (write_obit (obituary_messages[obit_ptr -> ob], obit_ptr -> name, killer, victim));
-    obit_ptr++;
-  } while (--count);
+  if (killer == victim)
+    return (write_obit (obit, "self", killer, victim));
 
-  if (M_CheckParm ("-showunknown"))
+  if (killername)
+    return (write_obit (obit, killername, killer, victim));
+
+  if (M_CheckParm ("-showunknownkiller"))
     printf ("find_obit_msg: type = %u\n", killer -> type);
+
   return (0);
 }
 
