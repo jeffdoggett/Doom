@@ -4252,6 +4252,39 @@ static void show_map_dests (map_dests_t * map_ptr)
 }
 
 /* ---------------------------------------------------------------------------- */
+
+static void show_thing_drops (void)
+{
+  item_to_drop_t * drop_info_p;
+  const char * name1;
+  const char * name2;
+  mobjtype_t m1;
+  mobjtype_t m2;
+
+  drop_info_p = item_drop_head;
+  while (drop_info_p)
+  {
+    m1 = drop_info_p -> just_died;
+    m2 = drop_info_p -> mt_spawn;
+
+    if (((unsigned int) m1 < NUMMOBJTYPES)
+     && ((unsigned int) m2 < NUMMOBJTYPES))
+    {
+      name1 = mobjinfo [m1].name1;
+      if (name1 == NULL)
+	name1 = "Unknown";
+
+      name2 = mobjinfo [m2].name1;
+      if (name1 == NULL)
+	name1 = "Unknown";
+
+      printf ("Thing %u (%s) drops item %u (%s)\n", m1, name1, m2, name2);
+    }
+    drop_info_p = drop_info_p -> next;
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
 /* Currently I'm not sure whether the boss death table replaces the original */
 /* or supplements it. For now remove any duplicates. */
 
@@ -4295,6 +4328,7 @@ void DH_remove_duplicate_mapinfos (void)
   {
     putchar ('\n');
     show_boss_action ();
+    show_thing_drops ();
 
     if ((cp = finale_clusterdefs_head) != NULL)
     {
@@ -4358,15 +4392,32 @@ void DH_remove_duplicate_mapinfos (void)
   }
 
 #ifdef CREATE_DEHACK_FILE
-  if (M_CheckParm ("-writedehfile"))
+  i = M_CheckParm ("-writedehfile");
+  if (i)
   {
     FILE * fout;
+    const char * filename;
+
+    ++i;
+    if ((myargv[i] != 0) && (myargv[i][0]) && (myargv[i][0] != '-'))
+    {
+      filename = myargv[i];
+    }
+    else
+    {
 #ifdef __riscos
-    fout = fopen ("<DeHack$Dir>.Resources.DeHack/Deh", "w");
+      filename = "<DeHack$Dir>.Resources.DeHack/Deh";
 #else
-    fout = fopen ("DeHack.Deh", "w");
+      filename = "DeHack.Deh";
 #endif
-    if (fout)
+    }
+
+    fout = fopen (filename, "w");
+    if (fout == NULL)
+    {
+      fprintf (stderr, "Failed to open file %s for writing\n", filename);
+    }
+    else
     {
       fprintf (fout, "Patch File for DeHackEd v3.0\n");
       fprintf (fout, "Doom version = 21\n");
