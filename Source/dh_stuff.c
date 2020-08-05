@@ -4198,7 +4198,7 @@ static void show_boss_action (void)
 		bd_ptr -> map,
 		monsters,
 		bd_ptr -> tag,
-		bd_ptr -> func,
+		(void*) (uintptr_t) (bd_ptr -> func),
 		bd_ptr -> action);
     bd_ptr = bd_ptr -> next;
   } while (bd_ptr);
