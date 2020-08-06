@@ -1017,7 +1017,7 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
 {
   int special;
 
-#if 1
+#if 0
   {
     char * sourcename = NULL;
     char * inflictorname = NULL;
