@@ -794,7 +794,7 @@ void P_RespawnSpecials (void)
     int			i;
 
     // only respawn items in deathmatch
-    if (deathmatch < 2) 
+    if (deathmatch < 2)
 	return;
 
     // nothing left to respawn?
@@ -903,7 +903,7 @@ void P_SpawnPlayer (mapthing_t* mthing)
 // The fields of the mapthing should
 // already be in host byte order.
 //
-unsigned int P_SpawnMapThing (mapthing_t* mthing)
+mobjtype_t P_SpawnMapThing (mapthing_t* mthing)
 {
     int			i;
     int			bit;
@@ -928,7 +928,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	/* Add to the top of the linked list, will need reversing later... */
 	dmstart -> next = deathmatchstartlist;
 	deathmatchstartlist = dmstart;
-	return (0);
+	return (MT_NULL);
     }
 
     // check for players specially
@@ -940,7 +940,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	if (!deathmatch)
 	    P_SpawnPlayer (mthing);
 
-	return (0);
+	return (MT_NULL);
     }
 
     options = mthing->options;
@@ -958,7 +958,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
       }
       else
       {
-	return (0);
+	return (MT_NULL);
       }
     }
 
@@ -970,7 +970,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	bit = 1<<(gameskill-1);
 
     if (!(options & bit) )
-	return (0);
+	return (MT_NULL);
 
     // find which type to spawn
     i = P_FindDoomedNum (type);
@@ -980,21 +980,21 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
 	printf ("P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
 	      type, mthing->x, mthing->y);
       mthing->options &= ~31;
-      return (0);
+      return (MT_NULL);
     }
 
     ptr = &mobjinfo [i];
 
     // don't spawn keycards and players in deathmatch
     if (deathmatch && (ptr -> flags & MF_NOTDMATCH))
-	return (0);
+	return (MT_NULL);
 
     // don't spawn any monsters if -nomonsters
     if ((nomonsters1 | nomonsters2)
 	&& ( i == MT_SKULL
 	     || (ptr -> flags & MF_COUNTKILL)) )
     {
-	return (i);
+	return ((mobjtype_t) i);
     }
 
     // spawn it
@@ -1041,7 +1041,7 @@ unsigned int P_SpawnMapThing (mapthing_t* mthing)
     if (mobj->flags & MF_COUNTITEM)
 	totalitems++;
 
-    return (0);
+    return (MT_NULL);
 }
 
 /* -------------------------------------------------------------------------------------------- */

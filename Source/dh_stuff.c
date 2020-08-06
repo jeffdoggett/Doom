@@ -4139,6 +4139,7 @@ static bossdeath_t * access_boss_actions (unsigned int episode, unsigned int map
     bd_ptr -> tag = 666;
     bd_ptr -> episode = episode;
     bd_ptr -> map = map;
+    bd_ptr -> monster = MT_NULL;
   }
 
   return (bd_ptr);
@@ -4158,7 +4159,7 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 
     bd_ptr_2 -> episode = bd_ptr -> episode;
     bd_ptr_2 -> map = bd_ptr -> map;
-    bd_ptr_2 -> monsterbits = bd_ptr -> monsterbits;
+    bd_ptr_2 -> monster = bd_ptr -> monster;
     bd_ptr_2 -> tag = bd_ptr -> tag;
     bd_ptr = bd_ptr_2;
   }
@@ -4173,29 +4174,29 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 typedef struct
 {
   char name [8];
-  unsigned int number;
+  mobjtype_t mt_number;
 } boss_names_t;
 
 static const boss_names_t boss_names [] =
 {
-  { "Zombie",	1<<MT_POSSESSED},	// Need to fill the correct
-  { "SHOTGUN",	1<<MT_SHOTGUY},		// names...
-  { "HEAVY",	1<<MT_CHAINGUY},
-  { "WOLF",	1<<MT_WOLFSS},
-  { "IMP",	1<<MT_TROOP},
-  { "DEMON",	1<<MT_SERGEANT},
-  { "SPECTRE",	1<<MT_SHADOWS},
-  { "LOST",	1<<MT_SKULL},
-  { "CACO",	1<<MT_HEAD},
-  { "HELL",	1<<MT_KNIGHT},
-  { "BARON",	1<<MT_BRUISER},
-  { "ARACH",	1<<MT_BABY},
-  { "PAIN",	1<<MT_PAIN},
-  { "REVEN",	1<<MT_UNDEAD},
-  { "MANCU",	1<<MT_FATSO},
-  { "ARCH",	1<<MT_VILE},
-  { "Spider",	1<<MT_SPIDER},
-  { "Cyber",	1<<MT_CYBORG}
+  { "Zombie",	MT_POSSESSED},		// Need to fill the correct
+  { "SHOTGUN",	MT_SHOTGUY},		// names...
+  { "HEAVY",	MT_CHAINGUY},
+  { "WOLF",	MT_WOLFSS},
+  { "IMP",	MT_TROOP},
+  { "DEMON",	MT_SERGEANT},
+  { "SPECTRE",	MT_SHADOWS},
+  { "LOST",	MT_SKULL},
+  { "CACO",	MT_HEAD},
+  { "HELL",	MT_KNIGHT},
+  { "BARON",	MT_BRUISER},
+  { "ARACH",	MT_BABY},
+  { "PAIN",	MT_PAIN},
+  { "REVEN",	MT_UNDEAD},
+  { "MANCU",	MT_FATSO},
+  { "ARCH",	MT_VILE},
+  { "Spider",	MT_SPIDER},
+  { "Cyber",	MT_CYBORG}
 };
 
 static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
@@ -4212,7 +4213,7 @@ static bossdeath_t * find_boss_type (const char * name, unsigned int episode, un
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= ptr->number;
+	bd_ptr -> monster = ptr->mt_number;
       return (bd_ptr);
     }
     ptr++;
@@ -4284,7 +4285,7 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 /* ---------------------------------------------------------------------------- */
 
-static const char * find_boss_action_name (uint32_t boss_bit)
+static const char * find_boss_action_name (mobjtype_t boss)
 {
   uint32_t counter;
   const boss_names_t * ptr;
@@ -4293,7 +4294,7 @@ static const char * find_boss_action_name (uint32_t boss_bit)
   counter = ARRAY_SIZE(boss_names);
   do
   {
-    if (boss_bit == ptr -> number)
+    if (boss == ptr -> mt_number)
       return (ptr -> name);
     ++ptr;
   } while (--counter);
@@ -4324,29 +4325,19 @@ static const char * find_boss_action_func_name (actionf2 function, unsigned int 
 
 static void show_boss_action (void)
 {
-  unsigned int pos;
   char monsters [100];
   bossdeath_t * bd_ptr;
-  char * ptr;
 
   bd_ptr = boss_death_actions_head;
   do
   {
-    ptr = monsters;
-
-    if (bd_ptr -> monsterbits == 0)
+    if (bd_ptr -> monster < 0)
     {
-      strcpy (ptr, " [Removed]");
+      strcpy (monsters, " [Removed]");
     }
     else
     {
-      pos = 1;
-      do
-      {
-	if (bd_ptr -> monsterbits & pos)
-	  ptr += sprintf (ptr, " %s", find_boss_action_name(pos));
-	pos <<= 1;
-      } while (pos);
+      sprintf (monsters, " %s", find_boss_action_name(bd_ptr -> monster));
     }
 
     printf ("Boss action: %u,%u%s %u %p %u (%s)\n",
@@ -4464,12 +4455,12 @@ void DH_remove_duplicate_mapinfos (void)
       {
 	if ((bd_ptr_1 -> episode == bd_ptr -> episode)
 	 && (bd_ptr_1 -> map == bd_ptr -> map)
-	 && (bd_ptr_1 -> monsterbits & bd_ptr -> monsterbits)
+	 && (bd_ptr_1 -> monster == bd_ptr -> monster)
 	 && (bd_ptr_1 -> tag == bd_ptr -> tag)
 	 && (bd_ptr_1 -> func == bd_ptr -> func)
 	 && (bd_ptr_1 -> action == bd_ptr -> action))
 	{
-	  bd_ptr_1 -> monsterbits &= ~bd_ptr -> monsterbits;
+	  bd_ptr_1 -> monster = MT_NULL;
 //	  bd_ptr_1 -> tag = 0;		// and this inhibits the -nomonster cheat in A_Activate_Death_Sectors
 //	  bd_ptr_1 -> func = (actionf2) EV_DoNothing;	// For safety!
 //	  printf ("Removed duplicate boss action from %u,%u (%X %X)\n", bd_ptr_1 -> episode, bd_ptr_1 -> map, bd_ptr_1 -> monsterbits,bd_ptr -> monsterbits);
@@ -5453,7 +5444,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
       {
-	bd_ptr -> monsterbits = 1<<MT_FATSO;
+	bd_ptr -> monster = MT_FATSO;
 	bd_ptr -> func = (actionf2) EV_DoFloor;
 	bd_ptr -> action = lowerFloorToLowest;
 	bd_ptr = new_bossdeath_action ();
@@ -5462,7 +5453,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	  bd_ptr -> episode = episode;
 	  bd_ptr -> map = map;
 	  bd_ptr -> tag = 667;
-	  bd_ptr -> monsterbits = 1<<MT_BABY;
+	  bd_ptr -> monster = MT_BABY;
 	  bd_ptr -> func = (actionf2) EV_DoFloor;
 	  bd_ptr -> action = raiseToTexture;
 	}
@@ -5474,7 +5465,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       //printf ("baronspecial\n");
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_BRUISER;
+	bd_ptr -> monster = MT_BRUISER;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "cyberdemonspecial", 17) == 0)
@@ -5482,7 +5473,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       //printf ("cyberdemonspecial\n");
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_CYBORG;
+	bd_ptr -> monster = MT_CYBORG;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "spidermastermindspecial", 23) == 0)
@@ -5490,7 +5481,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       //printf ("spidermastermindspecial\n");
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_SPIDER;
+	bd_ptr -> monster = MT_SPIDER;
       intertext = -1;
     }
 #if 0
@@ -5498,21 +5489,21 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_???;
+	bd_ptr -> monster = MT_???;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "minotaurspecial", 15) == 0)
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_???;
+	bd_ptr -> monster = MT_???;
       intertext = -1;
     }
     else if (strncasecmp (ptr, "dsparilspecial", 14) == 0)
     {
       bd_ptr = access_boss_actions (episode, map, bd_ptr);
       if (bd_ptr)
-	bd_ptr -> monsterbits |= 1<<MT_???;
+	bd_ptr -> monster = MT_???;
       intertext = -1;
     }
 #endif

@@ -1927,43 +1927,43 @@ void A_Explode (mobj_t* thingy, pspdef_t* psp)
 
 static bossdeath_t bd_action_7 =
 {
-  4, 8, 1<<MT_SPIDER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, NULL
+  4, 8, MT_SPIDER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, NULL
 };
 
 static bossdeath_t bd_action_6 =
 {
-  4, 6, 1<<MT_CYBORG,	666, (actionf2) EV_DoDoor,   blazeOpen, &bd_action_7
+  4, 6, MT_CYBORG,	666, (actionf2) EV_DoDoor,   blazeOpen, &bd_action_7
 };
 
 static bossdeath_t bd_action_5 =
 {
-  3, 8, 1<<MT_SPIDER,	0,   (actionf2) G_ExitLevel, 0, &bd_action_6
+  3, 8, MT_SPIDER,	0,   (actionf2) G_ExitLevel, 0, &bd_action_6
 };
 
 static bossdeath_t bd_action_4 =
 {
-  2, 8, 1<<MT_CYBORG,	0,   (actionf2) G_ExitLevel, 0, &bd_action_5
+  2, 8, MT_CYBORG,	0,   (actionf2) G_ExitLevel, 0, &bd_action_5
 };
 
 static bossdeath_t bd_action_3 =
 {
-  1, 8, 1<<MT_BRUISER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_4
+  1, 8, MT_BRUISER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_4
 };
 
 static bossdeath_t bd_action_2 =
 {
-  255, 7, 1<<MT_BABY,	667, (actionf2) EV_DoFloor,  raiseToTexture, &bd_action_3
+  255, 7, MT_BABY,	667, (actionf2) EV_DoFloor,  raiseToTexture, &bd_action_3
 };
 
 static bossdeath_t bd_action_1 =
 {
-  255, 7, 1<<MT_FATSO,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_2
+  255, 7, MT_FATSO,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_2
 };
 
 #if 0
 static bossdeath_t bd_action_0 =
 {
-  0, 0, 1<<MT_KEEN,	666, (actionf2) EV_DoDoor,   normalOpen, &bd_action_1
+  0, 0, MT_KEEN,	666, (actionf2) EV_DoDoor,   normalOpen, &bd_action_1
 };
 #endif
 
@@ -2030,7 +2030,7 @@ static int A_AllOtherBossesDead (mobj_t* mo)
 
 /* ---------------------------------------------------------------------------- */
 
-static void A_Scan_death_tables (unsigned int monsterbits)
+static void A_Scan_death_tables (mobjtype_t monster)
 {
   unsigned char epi;
   bossdeath_t * bd_ptr;
@@ -2044,7 +2044,7 @@ static void A_Scan_death_tables (unsigned int monsterbits)
   bd_ptr = boss_death_actions_head;
   do
   {
-    if ((bd_ptr -> monsterbits & monsterbits)
+    if ((bd_ptr -> monster == monster)
      && ((bd_ptr -> episode == 0) || (bd_ptr -> episode == epi))
      && ((bd_ptr -> map == 0) || (bd_ptr -> map == gamemap)))
     {
@@ -2067,9 +2067,8 @@ void A_BossDeath (mobj_t* mo, pspdef_t* psp)
 {
   if ((A_AllOtherBossesDead (mo))
    && (A_PlayerAlive ()))
-    A_Scan_death_tables (1<<mo->type);
+    A_Scan_death_tables (mo->type);
 }
-
 
 /* ---------------------------------------------------------------------------- */
 //
@@ -2275,16 +2274,23 @@ void A_KeenDie (mobj_t* mo, pspdef_t* psp)
 
 /* ---------------------------------------------------------------------------- */
 
-void A_Activate_Death_Sectors (unsigned int monsterbits)
+void A_Activate_Death_Sectors (unsigned char * monsterbits)
 {
+  unsigned int count;
   line_t junk;
 
   // printf ("A_Activate_Death_Sectors (%X)\n", monsterbits);
 
-  A_Scan_death_tables (monsterbits);
+  // Find bits set in the array.
+  count = 0;
+  do
+  {
+    if (monsterbits [count>>3] & (1 << (count & 7)))
+      A_Scan_death_tables ((mobjtype_t) count);
+  } while (++count < NUMMOBJTYPES);
 
   /* Finally do the Commander Keen actions */
-  if (monsterbits & (1<<MT_KEEN))
+  if (monsterbits [MT_KEEN>>3] & (1 << (MT_KEEN & 7)))
   {
     // printf ("Actioned keen tag\n");
     junk.tag = 666;

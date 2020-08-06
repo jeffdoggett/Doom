@@ -29,8 +29,8 @@ static const char rcsid[] = "$Id: p_setup.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "includes.h"
 #include <math.h>
 
-extern unsigned int P_SpawnMapThing (mapthing_t* mthing);
-extern void A_Activate_Death_Sectors (unsigned int monsterbits);
+extern mobjtype_t P_SpawnMapThing (mapthing_t* mthing);
+extern void A_Activate_Death_Sectors (unsigned char * monsterbits);
 extern void P_Init_Intercepts (void);
 extern void P_Init_SpecHit (void);
 
@@ -817,7 +817,7 @@ static void P_LoadNodes_V4 (int lump)
 //
 // P_LoadThings
 //
-static unsigned int P_LoadThings (int lump)
+static void P_LoadThings (unsigned char * nomonsterbits, int lump)
 {
     byte*		data;
     int			i;
@@ -825,7 +825,6 @@ static unsigned int P_LoadThings (int lump)
     mapthing_t*		mt;
     mapthing_t		mtl;
     int			numthings;
-    unsigned int	nomonsterbits;
     unsigned int	monsternotloaded;
 
 #if 0
@@ -844,8 +843,6 @@ static unsigned int P_LoadThings (int lump)
 #else
     numthings = W_LumpLength (lump) / sizeof(mapthing_t);
 #endif
-
-    nomonsterbits = 0;
 
     mt = (mapthing_t *)data;
     for (i=0 ; i<numthings ; i++)
@@ -879,11 +876,10 @@ static unsigned int P_LoadThings (int lump)
 	  if ((mtl.type == 84) && (bfgedition))
 	    mtl.type = 65;
 #endif
-	  monsternotloaded = P_SpawnMapThing (&mtl);
-	  if ((monsternotloaded)		// Luckily the -nomonsters stuff that
-	   && (monsternotloaded < 32))		// we are interested in fits in 1 - 31
+	  monsternotloaded = (unsigned int) P_SpawnMapThing (&mtl);
+	  if (monsternotloaded < NUMMOBJTYPES)
 	  {
-	    nomonsterbits |= (1 << monsternotloaded);
+	    nomonsterbits [monsternotloaded >> 3] |= (1 << (monsternotloaded & 7));
 	  }
 	}
 
@@ -895,8 +891,6 @@ static unsigned int P_LoadThings (int lump)
     }
 
     W_ReleaseLumpNum (lump);
-
-    return (nomonsterbits);
 }
 
 //-----------------------------------------------------------------------------
@@ -1815,7 +1809,9 @@ P_SetupLevel
 {
     int		i;
     int		lumpnum;
-    unsigned int nomonsterbits;
+    unsigned char nomonsterbits [(NUMMOBJTYPES+7)/8];
+
+    memset (nomonsterbits, 0, sizeof (nomonsterbits));
 
     totalkills = totalitems = totalsecret = wminfo.maxfrags = 0;
     wminfo.partime = 150*(35*5);
@@ -1859,7 +1855,6 @@ P_SetupLevel
     if (lumpnum == -1)
       I_Error ("P_SetupLevel: Map not found! (%u,%u)", episode, map);
 
-
     leveltime = 0;
 
     // note: most of this ordering is important
@@ -1871,7 +1866,6 @@ P_SetupLevel
      || (P_LoadBlockMap (lumpnum+ML_BLOCKMAP)))
       P_CreateBlockMap ();
     P_ClearMobjChains ();
-
 
     switch ((int) P_CheckMapFormat (lumpnum))
     {
@@ -1902,10 +1896,9 @@ P_SetupLevel
     G_Patch_Map ();
     R_CalcSegsLength ();
 
-
     bodyqueslot = 0;
     deathmatchstartlist = NULL;
-    nomonsterbits = P_LoadThings (lumpnum+ML_THINGS);
+    P_LoadThings (nomonsterbits, lumpnum+ML_THINGS);
 
     // if deathmatch, randomly spawn the active players
     if (deathmatch)
@@ -1934,9 +1927,9 @@ P_SetupLevel
 
     //printf ("free memory: 0x%x\n", Z_FreeMemory());
 
-    if (nomonsterbits)				// If no monsters then
-      A_Activate_Death_Sectors (nomonsterbits);	// action the sectors that would have been
-						// actioned when they die.
+    // If any monsters omitted then action the sectors that would have been
+    // actioned when they die.
+    A_Activate_Death_Sectors (nomonsterbits);
 }
 
 //-----------------------------------------------------------------------------

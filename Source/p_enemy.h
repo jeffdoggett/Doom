@@ -33,7 +33,7 @@ typedef struct bossdeath_s
 {
   unsigned char episode;
   unsigned char map;
-  unsigned int monsterbits;
+  mobjtype_t monster;
   unsigned int tag;
   actionf2 func;
   unsigned int action;
