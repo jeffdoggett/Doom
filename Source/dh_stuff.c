@@ -4337,7 +4337,7 @@ static void show_boss_action (void)
     }
     else
     {
-      monster = find_boss_action_name (bd_ptr -> monster);
+      monster = find_boss_action_name(bd_ptr -> monster);
     }
 
     printf ("Boss action: %u,%u %s %u %p %u (%s)\n",

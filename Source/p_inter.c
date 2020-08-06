@@ -986,7 +986,7 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
 
 //-----------------------------------------------------------------------------
 
-static char * find_obit_msg (mobj_t* killer, mobj_t* victim)
+static char * find_obit_killer (mobj_t* victim, mobj_t* killer)
 {
   char * killername;
   char * obit;
@@ -1005,7 +1005,62 @@ static char * find_obit_msg (mobj_t* killer, mobj_t* victim)
   if (M_CheckParm ("-showunknownkiller"))
     printf ("find_obit_msg: type = %u\n", killer -> type);
 
-  return (0);
+  return (NULL);
+}
+
+//-----------------------------------------------------------------------------
+// victim - usually player, inflictor - e.g. IMP FIREBALL, source - e.g. IMP
+// 			    inflictor - e.g. BARREL, source - e.g. NULL
+// 			    inflictor - e.g. ZOMBIEMAN, source - e.g. ZOMBIEMAN
+
+static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
+{
+  int special;
+
+#if 1
+  {
+    char * sourcename = NULL;
+    char * inflictorname = NULL;
+    if (source)
+      sourcename = source->info->name1;
+    if (inflictor)
+      inflictorname = inflictor->info->name1;
+    if (sourcename == NULL)
+      sourcename = "unknown";
+    if (inflictorname == NULL)
+      inflictorname = "unknown";
+    printf ("P_KillMobj inflictor='%s', source = '%s'\n", inflictorname, sourcename);
+  }
+#endif
+
+  if (source)
+    return (find_obit_killer (victim, source));
+
+  // count environment kills against you
+  victim->player->frags[victim->player-players]++;
+  if (inflictor)
+    return (find_obit_killer (victim, inflictor));
+
+  /* No source and no inflictor. */
+  /* Only happens on crushing and slime sectors. */
+  if (crushchange)
+    return (write_obit (obituary_messages[OB_CRUSH], "ceiling", NULL, victim));
+
+  special = victim->subsector->sector->special;
+  switch (special & 0x1F)
+  {
+    case 4:
+    case 5:
+    case 7:
+    case 16:
+      return (write_obit (obituary_messages[OB_LAVA], "lava", NULL, victim));
+
+    default:
+      if (special & 0x60)
+	return (write_obit (obituary_messages[OB_LAVA], "lava", NULL, victim));
+  }
+
+  return (NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -1052,7 +1107,6 @@ P_KillMobj
 {
   int		th;
   int		flags;
-  int		special;
   int		gibhealth;
   fixed_t	height;
   fixed_t	dropheight;
@@ -1124,45 +1178,7 @@ P_KillMobj
 
   if (target->player)
   {
-    msg = NULL;
-
-    if (!source)
-    {
-      // count environment kills against you
-      target->player->frags[target->player-players]++;
-      if (inflictor)
-      {
-	msg = find_obit_msg (inflictor, target);
-      }
-      /* No source and no inflictor. */
-      /* Only happens on crushing and slime sectors. */
-      else if (crushchange)
-      {
-	msg = write_obit (obituary_messages[OB_CRUSH], "ceiling", NULL, target);
-      }
-      else
-      {
-	special = target->subsector->sector->special;
-	switch (special & 0x1F)
-	{
-	  case 4:
-	  case 5:
-	  case 7:
-	  case 16:
-	    msg = write_obit (obituary_messages[OB_LAVA], "lava", NULL, target);
-	    break;
-
-	  default:
-	    if (special & 0x60)
-	      msg = write_obit (obituary_messages[OB_LAVA], "lava", NULL, target);
-	}
-      }
-    }
-    else
-    {
-      msg = find_obit_msg (source, target);
-    }
-
+    msg = find_obit_msg (target, inflictor, source);
     if (msg)
     {
       /* We write to the console player here rather */
