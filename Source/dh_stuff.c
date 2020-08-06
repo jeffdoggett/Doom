@@ -1270,12 +1270,12 @@ static void write_all_things (FILE * fout)
     {
       if ((thing_no >= MT_EXTRA00) && (thing_no <= MT_EXTRA99))
       {
-        sprintf (namestr, "Extra %u", thing_no - MT_EXTRA00);
-        name = namestr;
+	sprintf (namestr, "Extra %u", thing_no - MT_EXTRA00);
+	name = namestr;
       }
       else
       {
-        name = "Unknown";
+	name = "Unknown";
       }
     }
 
@@ -1874,7 +1874,7 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
   {
     case 0:ptr -> ammo		= (ammotype_t) value; break;
     case 1:ptr -> upstate	= value; break;
-    case 2:ptr -> downstate 	= value; break;
+    case 2:ptr -> downstate	= value; break;
     case 3:ptr -> readystate	= value; break;
     case 4:ptr -> atkstate	= value; break;
     case 5:ptr -> flashstate	= value; break;
@@ -2139,7 +2139,7 @@ static void dh_write_to_cheat (unsigned int record, char * aline)
 	cheat_powerup_seq [3][c] =
 	cheat_powerup_seq [4][c] =
 	cheat_powerup_seq [5][c] =
- 	cheat_powerup_seq [6][c] = ptr [c];
+	cheat_powerup_seq [6][c] = ptr [c];
       }
 #endif
       c++;
@@ -3467,7 +3467,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Thing number (%d) at line %d\n",
-	  			     params[0],dh_line_number);
+				     params[0],dh_line_number);
 	    }
 	    break;
 
@@ -3481,7 +3481,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Sound number (%d) at line %d\n",
-	  			     params[0],dh_line_number);
+				     params[0],dh_line_number);
 	    }
 	    break;
 
@@ -3495,7 +3495,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
-	  			     params[0],NUMSTATES,dh_line_number);
+				     params[0],NUMSTATES,dh_line_number);
 	    }
 	    break;
 
@@ -3509,13 +3509,13 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Ammo number (%d) at line %d\n",
-	  			     params[0],dh_line_number);
+				     params[0],dh_line_number);
 	    }
 	    break;
 
 	  case JOB_WEAPON:
 	    if (params[0] < NUMWEAPONS)
- 	    {
+	    {
 	      current_job = JOB_WEAPON;
 	      job_params[0] = params[0];
 	    }
@@ -3523,13 +3523,13 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Weapon number (%d) at line %d\n",
-	  			     params[0], dh_line_number);
+				     params[0], dh_line_number);
 	    }
 	    break;
 
 	  case JOB_POINTER:
 	    if (params[0] < 448)
- 	    {
+	    {
 	      current_job = JOB_POINTER;
 	      job_params[0] = params[0];
 	      job_params[1] = params[1];
@@ -3538,7 +3538,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    {
 	      current_job = JOB_NULL;
 	      fprintf (stderr, "DeHackEd: Invalid Pointer number (%d) at line %d\n",
-	  			     params[0], dh_line_number);
+				     params[0], dh_line_number);
 	    }
 	    break;
 
@@ -3777,7 +3777,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    if (counter2 >= NUMSTATES)
 	    {
 	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
-	  			     counter2,NUMSTATES,dh_line_number);
+				     counter2,NUMSTATES,dh_line_number);
 	      counter1 = -1;
 	      break;
 	    }
@@ -4170,8 +4170,161 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 
 /* ---------------------------------------------------------------------------- */
 
+typedef struct
+{
+  char name [8];
+  unsigned int number;
+} boss_names_t;
+
+static const boss_names_t boss_names [] =
+{
+  { "Zombie",	1<<MT_POSSESSED},	// Need to fill the correct
+  { "SHOTGUN",	1<<MT_SHOTGUY},		// names...
+  { "HEAVY",	1<<MT_CHAINGUY},
+  { "WOLF",	1<<MT_WOLFSS},
+  { "IMP",	1<<MT_TROOP},
+  { "DEMON",	1<<MT_SERGEANT},
+  { "SPECTRE",	1<<MT_SHADOWS},
+  { "LOST",	1<<MT_SKULL},
+  { "CACO",	1<<MT_HEAD},
+  { "HELL",	1<<MT_KNIGHT},
+  { "BARON",	1<<MT_BRUISER},
+  { "ARACH",	1<<MT_BABY},
+  { "PAIN",	1<<MT_PAIN},
+  { "REVEN",	1<<MT_UNDEAD},
+  { "MANCU",	1<<MT_FATSO},
+  { "ARCH",	1<<MT_VILE},
+  { "Spider",	1<<MT_SPIDER},
+  { "Cyber",	1<<MT_CYBORG}
+};
+
+static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
+{
+  unsigned int count;
+  const boss_names_t * ptr;
+
+//printf ("Looking for %d chars (%s)\n", len, name);
+  ptr = boss_names;
+  count = ARRAY_SIZE(boss_names);
+  do
+  {
+    if (dh_qty_match (name, ptr->name) > 2)		// Three chars is plenty!
+    {
+      bd_ptr = access_boss_actions (episode, map, bd_ptr);
+      if (bd_ptr)
+	bd_ptr -> monsterbits |= ptr->number;
+      return (bd_ptr);
+    }
+    ptr++;
+  } while (--count);
+  fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
+  return (bd_ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+typedef struct
+{
+  char name [24];
+  actionf2 function;
+  unsigned int param;
+} spec_actions_t;
+
+static const spec_actions_t spec_actions [] =
+{
+  { "Door_Open",	    (actionf2) EV_DoDoor,  blazeOpen},
+  { "Door_Close",	    (actionf2) EV_DoDoor,  blazeClose},
+  { "Door_Raise",	    (actionf2) EV_DoDoor,  blazeRaise},
+//{ "Door_LockedRaise",	    (actionf2) EV_??,	   ???},
+  { "Floor_LowerToLowest",  (actionf2) EV_DoFloor, lowerFloorToLowest},
+  { "Floor_LowerToNearest", (actionf2) EV_DoFloor, lowerFloorToNearest},
+  { "Floor_RaiseToHighest", (actionf2) EV_DoFloor, raiseFloorToHighest},
+  { "Floor_RaiseToNearest", (actionf2) EV_DoFloor, raiseFloorToNearest},
+  { "Floor_RaiseByTexture", (actionf2) EV_DoFloor, raiseToTexture },
+//{ "Stairs_BuildDown",	    (actionf2) EV_BuildStairs, ??? },
+//{ "Stairs_BuildUp",	    (actionf2) EV_BuildStairs, ??? },
+
+// Following are mainly for the debug printout.
+  { "Exit_Level",	    (actionf2) G_ExitLevel, 0 },
+  { "Kill_All",		    (actionf2) P_Massacre, 0 }
+};
+
+static bossdeath_t * find_special_action (const char * name, unsigned int episode, unsigned int map, unsigned int * args, bossdeath_t * bd_ptr)
+{
+  unsigned int len;
+  unsigned int count;
+  const spec_actions_t * ptr;
+
+  len = 0;
+  while ((name [len] > ' ') && (name [len] != '\"'))
+    len++;
+
+  if (len)
+  {
+//  printf ("Looking for %d chars (%s)\n", len, name);
+    ptr = spec_actions;
+    count = ARRAY_SIZE(spec_actions);
+    do
+    {
+      if (strncasecmp (name, ptr->name, len) == 0)
+      {
+	bd_ptr = set_boss_action (bd_ptr, ptr->function, ptr->param);
+	if (bd_ptr)
+	{
+	  bd_ptr -> tag = args [0];
+	}
+	return (bd_ptr);
+      }
+      ptr++;
+    } while (--count);
+    fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
+  }
+  return (bd_ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static const char * find_boss_action_name (uint32_t boss_bit)
+{
+  uint32_t counter;
+  const boss_names_t * ptr;
+
+  ptr = boss_names;
+  counter = ARRAY_SIZE(boss_names);
+  do
+  {
+    if (boss_bit == ptr -> number)
+      return (ptr -> name);
+    ++ptr;
+  } while (--counter);
+
+  return ("Unknown");
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static const char * find_boss_action_func_name (actionf2 function, unsigned int param)
+{
+  uint32_t counter;
+  const spec_actions_t * ptr;
+
+  ptr = spec_actions;
+  counter = ARRAY_SIZE(spec_actions);
+  do
+  {
+    if ((function == ptr -> function) && (param == ptr -> param))
+      return (ptr -> name);
+    ++ptr;
+  } while (--counter);
+
+  return ("Unknown operation");
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void show_boss_action (void)
 {
+  unsigned int pos;
   char monsters [100];
   bossdeath_t * bd_ptr;
   char * ptr;
@@ -4180,26 +4333,30 @@ static void show_boss_action (void)
   do
   {
     ptr = monsters;
-    strcpy (ptr, " [Removed]");
 
-    if (bd_ptr -> monsterbits & (1<<MT_FATSO))
-      ptr += sprintf (ptr, " FATSO");
-    if (bd_ptr -> monsterbits & (1<<MT_BABY))
-      ptr += sprintf (ptr, " BABY");
-    if (bd_ptr -> monsterbits & (1<<MT_BRUISER))
-      ptr += sprintf (ptr, " BRUISER");
-    if (bd_ptr -> monsterbits & (1<<MT_CYBORG))
-      ptr += sprintf (ptr, " CYBORG");
-    if (bd_ptr -> monsterbits & (1<<MT_SPIDER))
-      ptr += sprintf (ptr, " SPIDER");
+    if (bd_ptr -> monsterbits == 0)
+    {
+      strcpy (ptr, " [Removed]");
+    }
+    else
+    {
+      pos = 1;
+      do
+      {
+	if (bd_ptr -> monsterbits & pos)
+	  ptr += sprintf (ptr, " %s", find_boss_action_name(pos));
+	pos <<= 1;
+      } while (pos);
+    }
 
-    printf ("Boss action: %u,%u%s %u %p %u\n",
+    printf ("Boss action: %u,%u%s %u %p %u (%s)\n",
 		bd_ptr -> episode,
 		bd_ptr -> map,
 		monsters,
 		bd_ptr -> tag,
 		(void*) (uintptr_t) (bd_ptr -> func),
-		bd_ptr -> action);
+		bd_ptr -> action,
+		find_boss_action_func_name (bd_ptr -> func, bd_ptr -> action));
     bd_ptr = bd_ptr -> next;
   } while (bd_ptr);
 }
@@ -4685,116 +4842,6 @@ static char * replace_map_text (char ** dest, char * ptr)
 
 /* ---------------------------------------------------------------------------- */
 
-typedef struct
-{
-  char name [8];
-  unsigned int number;
-} boss_names_t;
-
-static const boss_names_t boss_names [] =
-{
-  { "Zombie",	1<<MT_POSSESSED},	// Need to fill the correct
-  { "SHOTGUN",	1<<MT_SHOTGUY},		// names...
-  { "HEAVY",	1<<MT_CHAINGUY},
-  { "WOLF",	1<<MT_WOLFSS},
-  { "IMP",	1<<MT_TROOP},
-  { "DEMON",	1<<MT_SERGEANT},
-  { "SPECTRE",	1<<MT_SHADOWS},
-  { "LOST",	1<<MT_SKULL},
-  { "CACO",	1<<MT_HEAD},
-  { "HELL",	1<<MT_KNIGHT},
-  { "BARON",	1<<MT_BRUISER},
-  { "ARACH",	1<<MT_BABY},
-  { "PAIN",	1<<MT_PAIN},
-  { "REVEN",	1<<MT_UNDEAD},
-  { "MANCU",	1<<MT_FATSO},
-  { "ARCH",	1<<MT_VILE},
-  { "Spider",	1<<MT_SPIDER},
-  { "Cyber",	1<<MT_CYBORG}
-};
-
-static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
-{
-  unsigned int count;
-  const boss_names_t * ptr;
-
-//printf ("Looking for %d chars (%s)\n", len, name);
-  ptr = boss_names;
-  count = ARRAY_SIZE(boss_names);
-  do
-  {
-    if (dh_qty_match (name, ptr->name) > 2)		// Three chars is plenty!
-    {
-      bd_ptr = access_boss_actions (episode, map, bd_ptr);
-      if (bd_ptr)
-	bd_ptr -> monsterbits |= ptr->number;
-      return (bd_ptr);
-    }
-    ptr++;
-  } while (--count);
-  fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
-  return (bd_ptr);
-}
-
-/* ---------------------------------------------------------------------------- */
-
-typedef struct
-{
-  char name [24];
-  actionf2 function;
-  unsigned int param;
-} spec_actions_t;
-
-static const spec_actions_t spec_actions [] =
-{
-  { "Door_Open",	    (actionf2) EV_DoDoor,  blazeOpen},
-  { "Door_Close",	    (actionf2) EV_DoDoor,  blazeClose},
-  { "Door_Raise",	    (actionf2) EV_DoDoor,  blazeRaise},
-//{ "Door_LockedRaise",	    (actionf2) EV_??,  	   ???},
-  { "Floor_LowerToLowest",  (actionf2) EV_DoFloor, lowerFloorToLowest},
-  { "Floor_LowerToNearest", (actionf2) EV_DoFloor, lowerFloorToNearest},
-  { "Floor_RaiseToHighest", (actionf2) EV_DoFloor, raiseFloorToHighest},
-  { "Floor_RaiseToNearest", (actionf2) EV_DoFloor, raiseFloorToNearest},
-  { "Floor_RaiseByTexture", (actionf2) EV_DoFloor, raiseToTexture }
-//{ "Stairs_BuildDown",	    (actionf2) EV_BuildStairs, ??? }
-//{ "Stairs_BuildUp",	    (actionf2) EV_BuildStairs, ??? }
-};
-
-static bossdeath_t * find_special_action (const char * name, unsigned int episode, unsigned int map, unsigned int * args, bossdeath_t * bd_ptr)
-{
-  unsigned int len;
-  unsigned int count;
-  const spec_actions_t * ptr;
-
-  len = 0;
-  while ((name [len] > ' ') && (name [len] != '\"'))
-    len++;
-
-  if (len)
-  {
-//  printf ("Looking for %d chars (%s)\n", len, name);
-    ptr = spec_actions;
-    count = ARRAY_SIZE(spec_actions);
-    do
-    {
-      if (strncasecmp (name, ptr->name, len) == 0)
-      {
-	bd_ptr = set_boss_action (bd_ptr, ptr->function, ptr->param);
-	if (bd_ptr)
-	{
-	  bd_ptr -> tag = args [0];
-	}
-	return (bd_ptr);
-      }
-      ptr++;
-    } while (--count);
-    fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
-  }
-  return (bd_ptr);
-}
-
-/* ---------------------------------------------------------------------------- */
-
 static void add_to_cast_list (const char * newtext)
 {
   castlist_t * ptr;
@@ -4914,7 +4961,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       ptr = read_map_num (&episode, &map, ptr+8);
       if (episode == 255)
-      	episode = M_GetNextEpi (map);
+	episode = M_GetNextEpi (map);
       doing_episode = 1;
       doing_default = 0;
       intertext = -1;
@@ -5670,11 +5717,11 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	ptr++;
 	source = DH_Find_language_text (ptr, false);
 	if (source)
-          add_to_cast_list (*source);
+	  add_to_cast_list (*source);
       }
       else
       {
-        add_to_cast_list (ptr);
+	add_to_cast_list (ptr);
       }
     }
     ptr = dh_next_line (ptr,top);
@@ -5948,7 +5995,7 @@ void Load_Mapinfo (void)
 	foundmapinfo |= 1;
       else
 	foundmapinfo |= 2;
-      ptr = malloc (W_LumpLength (lump) + 4); 	// Allow extra because some mapinfos lack a trailing CR/LF
+      ptr = malloc (W_LumpLength (lump) + 4);	// Allow extra because some mapinfos lack a trailing CR/LF
       if (ptr)
       {
 	W_ReadLump (lump, ptr);
