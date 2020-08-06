@@ -4325,7 +4325,7 @@ static const char * find_boss_action_func_name (actionf2 function, unsigned int 
 
 static void show_boss_action (void)
 {
-  char monsters [100];
+  const char * monster;
   bossdeath_t * bd_ptr;
 
   bd_ptr = boss_death_actions_head;
@@ -4333,17 +4333,17 @@ static void show_boss_action (void)
   {
     if (bd_ptr -> monster < 0)
     {
-      strcpy (monsters, " [Removed]");
+      monster = "[Removed]";
     }
     else
     {
-      sprintf (monsters, " %s", find_boss_action_name(bd_ptr -> monster));
+      monster = find_boss_action_name (bd_ptr -> monster);
     }
 
-    printf ("Boss action: %u,%u%s %u %p %u (%s)\n",
+    printf ("Boss action: %u,%u %s %u %p %u (%s)\n",
 		bd_ptr -> episode,
 		bd_ptr -> map,
-		monsters,
+		monster,
 		bd_ptr -> tag,
 		(void*) (uintptr_t) (bd_ptr -> func),
 		bd_ptr -> action,
