@@ -736,9 +736,10 @@
 #define CC_HERO		"OUR HERO"
 #define CC_WOLF		"WOLFENSTEIN SOLDIER"
 
-#define CC_OBIT		"%o was killed by %k"
-#define CC_OBIT_SELF	"%o killed %hself."
-#define CC_OBIT_BARREL	"%o got too close to %k."
+#define OB_GEN		"%o was killed by %k"
+#define OB_KILLEDSELF	"%o killed %hself."
+#define OB_BARREL	"%o got too close to %k."
+
 #endif
 //-----------------------------------------------------------------------------
 //

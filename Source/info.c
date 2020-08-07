@@ -4451,7 +4451,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// raisestate
     FRACUNIT,							// scale
     "Player",							// name1
-    CC_OBIT_SELF						// obit
+    OB_KILLEDSELF						// obit0
   },
 
   {								// MT_POSSESSED
@@ -5502,7 +5502,7 @@ mobjinfo_t mobjinfo[] =
     S_NULL,							// raisestate
     FRACUNIT,							// scale
     "Barrel",							// name1,
-    CC_OBIT_BARREL						// obit
+    OB_BARREL							// obit0
   },
 
   {								// MT_TROOPSHOT

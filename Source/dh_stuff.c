@@ -511,7 +511,7 @@ static const codeptrs_t codeptr_frames [] =
 
 /* These tables are in the same order as the declarations of the messages */
 
-static const char * const dehack_thing_obit_strings [] =
+static const char * const dehack_thing_obit0_strings [] =
 {
   "OB_ZOMBIE",
   "OB_SHOTGUY",
@@ -536,7 +536,7 @@ static const char * const dehack_thing_obit_strings [] =
   NULL
 };
 
-static mobjtype_t dehack_thing_obit_nums [] =
+static mobjtype_t dehack_thing_obit0_nums [] =
 {
   MT_POSSESSED,
   MT_SHOTGUY,
@@ -560,18 +560,35 @@ static mobjtype_t dehack_thing_obit_nums [] =
   MT_BARREL,
 };
 
+static const char * const dehack_thing_obit1_strings [] =
+{
+  "OB_UNDEADHIT",
+  "OB_IMPHIT",
+  "OB_DEMONHIT",
+  "OB_SPECTREHIT",
+  "OB_BARONHIT",
+  "OB_KNIGHTHIT",
+  "OB_CACOHIT",
+  NULL
+};
+
+static mobjtype_t dehack_thing_obit1_nums [] =
+{
+  MT_UNDEAD,
+  MT_TROOP,
+  MT_SERGEANT,
+  MT_SHADOWS,
+  MT_BRUISER,
+  MT_KNIGHT,
+  MT_HEAD
+};
+
+
 static const char * const dehack_other_obit_strings [] =
 {
   "OB_CRUSH",
   "OB_LAVA",
 #if 0
-  "OB_UNDEADHIT",
-  "OB_IMPHIT",
-  "OB_CACOHIT",
-  "OB_DEMONHIT",
-  "OB_SPECTREHIT",
-  "OB_BARONHIT",
-  "OB_KNIGHTHIT",
 
   "OB_SUICIDE",
   "OB_FALLING",
@@ -3269,10 +3286,16 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
       return (&demo_names [counter1-'1']);
   }
 
-  counter1 = dh_search_str_tab_a (dehack_thing_obit_strings, ttext);
+  counter1 = dh_search_str_tab_a (dehack_thing_obit0_strings, ttext);
   if (counter1 != -1)
   {
-    return (&mobjinfo[dehack_thing_obit_nums[counter1]].obit);
+    return (&mobjinfo[dehack_thing_obit0_nums[counter1]].obits[0]);
+  }
+
+  counter1 = dh_search_str_tab_a (dehack_thing_obit1_strings, ttext);
+  if (counter1 != -1)
+  {
+    return (&mobjinfo[dehack_thing_obit1_nums[counter1]].obits[1]);
   }
 
   counter1 = dh_search_str_tab_a (dehack_other_obit_strings, ttext);
@@ -3352,7 +3375,7 @@ static unsigned int DH_Parse_language_string (char * a_line)
   do
   {
     cc = a_line [counter2];
-    if ((cc <= ' ') || (counter2 >= (sizeof (first_word)-2)))
+    if ((cc <= ' ') || (cc == '=') || (counter2 >= (sizeof (first_word)-2)))
       cc = 0;
     first_word [counter2++] = cc;
   } while (cc);
@@ -4433,6 +4456,28 @@ static void show_thing_drops (void)
 }
 
 /* ---------------------------------------------------------------------------- */
+
+static void show_thing_obits (void)
+{
+  unsigned int counter;
+  unsigned int onum;
+  const mobjinfo_t * ptr;
+
+  counter = 0;
+  ptr = &mobjinfo[0];
+  do
+  {
+    onum = 0;
+    do
+    {
+      if (ptr->obits[onum])
+        printf ("Thing %u obit[%u] = '%s'\n", counter, onum, ptr->obits[onum]);
+    } while (++onum < ARRAY_SIZE(ptr->obits));
+    ++ptr;
+  } while (++counter < NUMMOBJTYPES);
+}
+
+/* ---------------------------------------------------------------------------- */
 /* Currently I'm not sure whether the boss death table replaces the original */
 /* or supplements it. For now remove any duplicates. */
 
@@ -4477,6 +4522,7 @@ void DH_remove_duplicate_mapinfos (void)
     putchar ('\n');
     show_boss_action ();
     show_thing_drops ();
+    show_thing_obits ();
 
     if ((cp = finale_clusterdefs_head) != NULL)
     {

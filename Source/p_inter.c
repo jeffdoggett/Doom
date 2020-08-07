@@ -831,7 +831,7 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
   char * obit_msg;
 
   if (s_msg == NULL)			// Just in case.
-    s_msg = CC_OBIT;
+    s_msg = OB_GEN;
 
   gender = 0;
   if (victim->player)			// We already checked this!
@@ -986,7 +986,7 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
 
 //-----------------------------------------------------------------------------
 
-static char * find_obit_killer (mobj_t* victim, mobj_t* killer)
+static char * find_obit_killer (mobj_t* victim, mobj_t* killer, unsigned int obitnum)
 {
   char * killername;
   char * obit;
@@ -994,7 +994,7 @@ static char * find_obit_killer (mobj_t* victim, mobj_t* killer)
 
   mptr = killer->info;
   killername = mptr->name1;
-  obit = mptr->obit;
+  obit = mptr->obits[obitnum];
 
   if (killer == victim)
     return (write_obit (obit, "self", killer, victim));
@@ -1034,12 +1034,24 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
 #endif
 
   if (source)
-    return (find_obit_killer (victim, source));
+  {
+    if (inflictor == source)
+    {
+      // Some wads (e.g. Harmony) put the demon attack in obit[1]
+      if (source->info->obits[1])
+	return (find_obit_killer (victim, source, 1));
+    }
+    return (find_obit_killer (victim, source, 0));
+  }
 
   // count environment kills against you
   victim->player->frags[victim->player-players]++;
   if (inflictor)
-    return (find_obit_killer (victim, inflictor));
+  {
+    if (inflictor->info->obits[1])
+      return (find_obit_killer (victim, inflictor, 1));
+    return (find_obit_killer (victim, inflictor, 0));
+  }
 
   /* No source and no inflictor. */
   /* Only happens on crushing and slime sectors. */
