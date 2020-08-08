@@ -585,6 +585,8 @@ static mobjtype_t dehack_thing_obit1_nums [] =
 
 static const char * const dehack_other_obit_strings [] =
 {
+  "OB_DEFAULT",
+
   "OB_CRUSH",
   "OB_SLIME",
 
@@ -624,7 +626,6 @@ static const char * const dehack_other_obit_strings [] =
   "OB_RAILGUN",
   "OB_MPBFG_MBF",
   "OB_MONTELEFRAG",
-  "OB_DEFAULT",
 
   "OB_FRIENDLY1",
   "OB_FRIENDLY2",

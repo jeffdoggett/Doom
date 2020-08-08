@@ -74,6 +74,8 @@ typedef enum
 // Lookup table in dh_stuff.c is in the same order...
 typedef enum
 {
+  OB_DEFAULT,
+
   OB_CRUSH,
   OB_SLIME,
 
@@ -113,7 +115,6 @@ typedef enum
   OB_RAILGUN,
   OB_MPBFG_MBF,
   OB_MONTELEFRAG,
-  OB_DEFAULT,
 
   OB_FRIENDLY1,
   OB_FRIENDLY2,
@@ -125,6 +126,7 @@ typedef enum
 
 char * obituary_messages [OB_QUANTITY] =
 {
+  "%o died.",
   "%o was squished.",
   "%o was melted."
 };
@@ -1088,7 +1090,7 @@ static char * find_obit_killer (mobj_t* victim, mobj_t* killer, unsigned int obi
   if (M_CheckParm ("-showunknownkiller"))
     printf ("find_obit_msg: type = %u\n", killer -> type);
 
-  return (NULL);
+  return (write_obit (obituary_messages[OB_DEFAULT], "bad luck", NULL, victim));
 }
 
 //-----------------------------------------------------------------------------
@@ -1155,7 +1157,7 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
 	return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
   }
 
-  return (NULL);
+  return (write_obit (obituary_messages[OB_DEFAULT], "bad luck", NULL, victim));
 }
 
 //-----------------------------------------------------------------------------
