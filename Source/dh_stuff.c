@@ -583,22 +583,18 @@ static mobjtype_t dehack_thing_obit1_nums [] =
   MT_HEAD
 };
 
-
 static const char * const dehack_other_obit_strings [] =
 {
   "OB_CRUSH",
-  "OB_LAVA",
-#if 0
+  "OB_SLIME",
 
   "OB_SUICIDE",
   "OB_FALLING",
   "OB_EXIT",
   "OB_WATER",
-  "OB_SLIME",
   "OB_SPLASH",
   "OB_R_SPLASH",
   "OB_ROCKET",
-  "OB_KILLEDSELF",
 
   "OB_STEALTHBABY",
   "OB_STEALTHVILE",
@@ -613,7 +609,6 @@ static const char * const dehack_other_obit_strings [] =
   "OB_STEALTHSHOTGUY",
   "OB_STEALTHZOMBIE",
 
-
   "OB_MPFIST",
   "OB_MPCHAINSAW",
   "OB_MPPISTOL",
@@ -627,6 +622,7 @@ static const char * const dehack_other_obit_strings [] =
   "OB_MPBFG_SPLASH",
   "OB_MPTELEFRAG",
   "OB_RAILGUN",
+  "OB_MPBFG_MBF",
   "OB_MONTELEFRAG",
   "OB_DEFAULT",
 
@@ -634,7 +630,6 @@ static const char * const dehack_other_obit_strings [] =
   "OB_FRIENDLY2",
   "OB_FRIENDLY3",
   "OB_FRIENDLY4",
-#endif
   NULL
 };
 
@@ -660,6 +655,31 @@ static const char * const dehack_cast_strings [] =
   "CC_CYBER",
   "CC_HERO",
   NULL
+};
+
+static const char * const dehack_tag_strings [] =
+{
+  "TAG_FIST",
+  "TAG_BFG9000",
+  "TAG_CHAINGUN",
+  "TAG_CHAINSAW",
+  "TAG_ROCKETLAUNCHER",
+  "TAG_PLASMARIFLE",
+  "TAG_SHOTGUN",
+  "TAG_SUPERSHOTGUN",
+  NULL
+};
+
+static mobjtype_t dehack_tag_nums [] =
+{
+  MT_PLAYER,
+  MT_BFG,
+  MT_CHAINGUN,
+  MT_MISC26,
+  MT_MISC27,
+  MT_MISC28,
+  MT_SHOTGUN,
+  MT_SUPERSHOTGUN
 };
 
 static const char * const dehack_require_key_strings [] =
@@ -3333,6 +3353,16 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   if (counter1 != -1)
   {
     return (&mobjinfo[castorder[counter1]].name1);
+  }
+
+  counter1 = dh_search_str_tab_a (dehack_tag_strings, ttext);
+  if (counter1 != -1)
+  {
+    static char * null_name = NULL;
+    if (counter1 == MT_PLAYER)
+      return (&null_name);
+
+    return (&mobjinfo[dehack_tag_nums[counter1]].name1);
   }
 
   counter1 = dh_search_str_tab_a (screenshot_message_names, ttext);

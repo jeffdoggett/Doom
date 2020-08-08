@@ -70,19 +70,64 @@ typedef enum
 
 /* ------------------------------------------------------- */
 
-char * obituary_messages [] =
-{
-  "%o was squished.",
-  "%o was melted.",
-  NULL
-};
 
 // Lookup table in dh_stuff.c is in the same order...
 typedef enum
 {
   OB_CRUSH,
-  OB_LAVA,
+  OB_SLIME,
+
+  OB_SUICIDE,
+  OB_FALLING,
+  OB_EXIT,
+  OB_WATER,
+  OB_SPLASH,
+  OB_R_SPLASH,
+  OB_ROCKET,
+
+  OB_STEALTHBABY,
+  OB_STEALTHVILE,
+  OB_STEALTHBARON,
+  OB_STEALTHCACO,
+  OB_STEALTHCHAINGUY,
+  OB_STEALTHDEMON,
+  OB_STEALTHKNIGHT,
+  OB_STEALTHIMP,
+  OB_STEALTHFATSO,
+  OB_STEALTHUNDEAD,
+  OB_STEALTHSHOTGUY,
+  OB_STEALTHZOMBIE,
+
+  OB_MPFIST,
+  OB_MPCHAINSAW,
+  OB_MPPISTOL,
+  OB_MPSHOTGUN,
+  OB_MPSSHOTGUN,
+  OB_MPCHAINGUN,
+  OB_MPROCKET,
+  OB_MPR_SPLASH,
+  OB_MPPLASMARIFLE,
+  OB_MPBFG_BOOM,
+  OB_MPBFG_SPLASH,
+  OB_MPTELEFRAG,
+  OB_RAILGUN,
+  OB_MPBFG_MBF,
+  OB_MONTELEFRAG,
+  OB_DEFAULT,
+
+  OB_FRIENDLY1,
+  OB_FRIENDLY2,
+  OB_FRIENDLY3,
+  OB_FRIENDLY4,
+
+  OB_QUANTITY
 } obits_t;
+
+char * obituary_messages [OB_QUANTITY] =
+{
+  "%o was squished.",
+  "%o was melted."
+};
 
 /* ------------------------------------------------------- */
 
@@ -820,6 +865,8 @@ static int copy_player_name (char * dest, const char * name)
   %g: he/she/it, depending on the gender of the victim
   %h: him/her/it
   %p: his/her/its
+  %s: his/hers/theirs/its
+  %r: he's/she's/they're/it's
 */
 
 static char * write_obit (const char * s_msg, const char * monstername, mobj_t* killer, mobj_t* victim)
@@ -904,6 +951,42 @@ static char * write_obit (const char * s_msg, const char * monstername, mobj_t* 
 	      break;
 	  }
 	  d_msg += 3;
+	  break;
+
+	case 'r':
+	  switch (gender)
+	  {
+	    case 0:
+	      strcpy (d_msg, "he's");
+	      d_msg += 4;
+	      break;
+	    case 1:
+	      strcpy (d_msg, "she's");
+	      d_msg += 5;
+	      break;
+	    default:
+	      strcpy (d_msg, "they're");
+	      d_msg += 7;
+	      break;
+	  }
+	  break;
+
+	case 's':
+	  switch (gender)
+	  {
+	    case 0:
+	      strcpy (d_msg, "his");
+	      d_msg += 3;
+	      break;
+	    case 1:
+	      strcpy (d_msg, "hers");
+	      d_msg += 4;
+	      break;
+	    default:
+	      strcpy (d_msg, "theirs");
+	      d_msg += 6;
+	      break;
+	  }
 	  break;
 
 	case 'o':				// Victim's name
@@ -1065,11 +1148,11 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
     case 5:
     case 7:
     case 16:
-      return (write_obit (obituary_messages[OB_LAVA], "lava", NULL, victim));
+      return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
 
     default:
       if (special & 0x60)
-	return (write_obit (obituary_messages[OB_LAVA], "lava", NULL, victim));
+	return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
   }
 
   return (NULL);
