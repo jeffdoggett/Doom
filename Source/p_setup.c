@@ -91,8 +91,8 @@ mobj_t**	blocklinks;
 // A 511x511 blockmap would still have a valid negative number
 // e.g. -1..510, so they would be set to -2
 // Non-extreme maps remain unaffected.
-int                 blockmapxneg = -257;
-int                 blockmapyneg = -257;
+int		blockmapxneg = -257;
+int		blockmapyneg = -257;
 
 //-----------------------------------------------------------------------------
 // REJECT
@@ -1498,10 +1498,10 @@ static void P_CreateBlockMap (void)
 #if 0
       // Debug
       if (ndx != count)					// If we've done it right
-        I_Error ("Blockmap build failed\n");		// these should match.
+	I_Error ("Blockmap build failed\n");		// these should match.
 
       if (!P_VerifyBlockMap (count))
-        I_Error ("Blockmap build invalid\n");
+	I_Error ("Blockmap build invalid\n");
 #endif
 
       free (bmap);					// Free uncompressed blockmap
@@ -1634,7 +1634,6 @@ static void P_GroupLines (void)
 
 	// adjust bounding box to map blocks
 	block = P_GetSafeBlockY (bbox[BOXTOP] - bmaporgy + MAXRADIUS);
-	block = (bbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
 	block = (block >= bmapheight ? bmapheight - 1 : block);
 	sector->blockbox[BOXTOP] = block;
 
@@ -1846,17 +1845,17 @@ static void P_ShowLevelInfo (void)
       line_t * line = &lines[0];
       do
       {
-        if (line->tag == tagnum)
-          printf ("Line %u has tag %u\n", linenum, tagnum);
-        ++line;
+	if (line->tag == tagnum)
+	  printf ("Line %u has tag %u\n", linenum, tagnum);
+	++line;
       } while (++linenum < numlines);
       int sectornum = 0;
       sector_t * sector = &sectors[0];
       do
       {
-        if (sector->tag == tagnum)
-          printf ("Sector %u has tag %u\n", sectornum, tagnum);
-        ++sector;
+	if (sector->tag == tagnum)
+	  printf ("Sector %u has tag %u\n", sectornum, tagnum);
+	++sector;
       } while (++sectornum < numsectors);
     }
   }
