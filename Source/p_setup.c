@@ -81,6 +81,18 @@ fixed_t		bmaporgy;
 // for thing chains
 mobj_t**	blocklinks;
 
+// MAES: extensions to support 512x512 blockmaps.
+// They represent the maximum negative number which represents
+// a positive offset, otherwise they are left at -257, which
+// never triggers a check.
+// If a blockmap index is ever LE than either, then
+// its actual value is to be interpreted as 0x01FF&x.
+// Full 512x512 blockmaps get this value set to -1.
+// A 511x511 blockmap would still have a valid negative number
+// e.g. -1..510, so they would be set to -2
+// Non-extreme maps remain unaffected.
+int                 blockmapxneg = -257;
+int                 blockmapyneg = -257;
 
 //-----------------------------------------------------------------------------
 // REJECT
@@ -1160,12 +1172,26 @@ static int P_LoadBlockMap (int lump)
   printf ("bmapheight = %u\n", bmapheight);
 #endif
 
+  if (lastlist >= 0x10000)
+  {
+    if ((lastlist - firstlist) > 0x10000)
+    {
 #ifdef NORMALUNIX
-  if ((lastlist - firstlist) > 0x10000)
-    printf ("Very large blockmap %X\n", lastlist - firstlist);
-  else if (lastlist >= 0x10000)
-    printf ("Large blockmap %X\n", lastlist);
+      printf ("Very large blockmap %X\n", lastlist - firstlist);
 #endif
+      // For now don't bother to try to rescue.
+      // Eviternity MAP 15 has a broken blockmap.
+      Z_Free (blockmaphead);
+      Z_Free (wadblockmaplump);
+      return (1);
+    }
+#ifdef NORMALUNIX
+    else
+    {
+      printf ("Large blockmap %X\n", lastlist);
+    }
+#endif
+  }
 
   if (firstlist >= lastlist || bmapwidth < 1 || bmapheight < 1)
   {
@@ -1492,6 +1518,12 @@ static void P_ClearMobjChains (void)
   // clear out mobj chains
   count = sizeof(*blocklinks) * bmapwidth * bmapheight;
   blocklinks = Z_Calloc (count, PU_LEVEL, NULL);
+
+  // MAES: set blockmapxneg and blockmapyneg
+  // E.g. for a full 512x512 map, they should be both
+  // -1. For a 257*257, they should be both -255 etc.
+  blockmapxneg = (bmapwidth > 255 ? bmapwidth - 512 : -257);
+  blockmapyneg = (bmapheight > 255 ? bmapheight - 512 : -257);
 }
 
 //-----------------------------------------------------------------------------
@@ -1601,19 +1633,20 @@ static void P_GroupLines (void)
 	sector->soundorg.y = bbox[BOXTOP] / 2 + bbox[BOXBOTTOM] / 2;
 
 	// adjust bounding box to map blocks
+	block = P_GetSafeBlockY (bbox[BOXTOP] - bmaporgy + MAXRADIUS);
 	block = (bbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
 	block = (block >= bmapheight ? bmapheight - 1 : block);
 	sector->blockbox[BOXTOP] = block;
 
-	block = (bbox[BOXBOTTOM] - bmaporgy - MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = P_GetSafeBlockY (bbox[BOXBOTTOM] - bmaporgy - MAXRADIUS);
 	block = (block < 0 ? 0 : block);
 	sector->blockbox[BOXBOTTOM] = block;
 
-	block = (bbox[BOXRIGHT] - bmaporgx + MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = P_GetSafeBlockX (bbox[BOXRIGHT] - bmaporgx + MAXRADIUS);
 	block = (block >= bmapwidth ? bmapwidth - 1 : block);
 	sector->blockbox[BOXRIGHT] = block;
 
-	block = (bbox[BOXLEFT] - bmaporgx - MAXRADIUS) >> MAPBLOCKSHIFT;
+	block = P_GetSafeBlockX (bbox[BOXLEFT] - bmaporgx - MAXRADIUS);
 	block = (block < 0 ? 0 : block);
 	sector->blockbox[BOXLEFT] = block;
     }
@@ -1797,6 +1830,39 @@ static mapformat_t P_CheckMapFormat (int lumpnum)
 }
 
 //-----------------------------------------------------------------------------
+#if 0
+  // Used for debug
+static void P_ShowLevelInfo (void)
+{
+  int p;
+
+  p = M_CheckParm ("-showtag");
+  if (p)
+  {
+    int tagnum = atoi (myargv[p+1]);
+    if (tagnum)
+    {
+      int linenum = 0;
+      line_t * line = &lines[0];
+      do
+      {
+        if (line->tag == tagnum)
+          printf ("Line %u has tag %u\n", linenum, tagnum);
+        ++line;
+      } while (++linenum < numlines);
+      int sectornum = 0;
+      sector_t * sector = &sectors[0];
+      do
+      {
+        if (sector->tag == tagnum)
+          printf ("Sector %u has tag %u\n", sectornum, tagnum);
+        ++sector;
+      } while (++sectornum < numsectors);
+    }
+  }
+}
+#endif
+//-----------------------------------------------------------------------------
 //
 // P_SetupLevel
 //
@@ -1930,6 +1996,7 @@ P_SetupLevel
     // If any monsters omitted then action the sectors that would have been
     // actioned when they die.
     A_Activate_Death_Sectors (nomonsterbits);
+    // P_ShowLevelInfo ();	// Debug use
 }
 
 //-----------------------------------------------------------------------------

@@ -1420,10 +1420,10 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 	viletryy =
 	    actor->y + actor->info->speed*yspeed[actor->movedir];
 
-	xl = (viletryx - bmaporgx - MAXRADIUS*2)>>MAPBLOCKSHIFT;
-	xh = (viletryx - bmaporgx + MAXRADIUS*2)>>MAPBLOCKSHIFT;
-	yl = (viletryy - bmaporgy - MAXRADIUS*2)>>MAPBLOCKSHIFT;
-	yh = (viletryy - bmaporgy + MAXRADIUS*2)>>MAPBLOCKSHIFT;
+        xl = P_GetSafeBlockX(viletryx - bmaporgx - MAXRADIUS * 2);
+        xh = P_GetSafeBlockX(viletryx - bmaporgx + MAXRADIUS * 2);
+        yl = P_GetSafeBlockY(viletryy - bmaporgy - MAXRADIUS * 2);
+        yh = P_GetSafeBlockY(viletryy - bmaporgy + MAXRADIUS * 2);
 
 	vileobj = actor;
 	for (bx=xl ; bx<=xh ; bx++)

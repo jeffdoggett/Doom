@@ -176,10 +176,10 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     numspechit = 0;
 
     // stomp on any things contacted
-    xl = (tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-    xh = (tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
-    yl = (tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-    yh = (tmbbox[BOXTOP] - bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+    xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS);
+    xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS);
+    yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS);
+    yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy + MAXRADIUS);
 
     for (bx=xl ; bx<=xh ; bx++)
 	for (by=yl ; by<=yh ; by++)
@@ -547,10 +547,10 @@ P_CheckPosition
     // because mobj_ts are grouped into mapblocks
     // based on their origin point, and can overlap
     // into adjacent blocks by up to MAXRADIUS units.
-    xl = (tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS)>>MAPBLOCKSHIFT;
-    xh = (tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS)>>MAPBLOCKSHIFT;
-    yl = (tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
-    yh = (tmbbox[BOXTOP] - bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
+    xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS);
+    xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS);
+    yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS);
+    yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy + MAXRADIUS);
 
     for (bx=xl ; bx<=xh ; bx++)
 	for (by=yl ; by<=yh ; by++)
@@ -571,10 +571,10 @@ P_CheckPosition
       tmbbox[BOXLEFT] = x - tmradius;
     }
 
-    xl = (tmbbox[BOXLEFT] - bmaporgx)>>MAPBLOCKSHIFT;
-    xh = (tmbbox[BOXRIGHT] - bmaporgx)>>MAPBLOCKSHIFT;
-    yl = (tmbbox[BOXBOTTOM] - bmaporgy)>>MAPBLOCKSHIFT;
-    yh = (tmbbox[BOXTOP] - bmaporgy)>>MAPBLOCKSHIFT;
+    xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx);
+    xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx);
+    yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy);
+    yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy);
 
     for (bx=xl ; bx<=xh ; bx++)
 	for (by=yl ; by<=yh ; by++)
@@ -633,10 +633,10 @@ mobj_t *P_CheckOnmobj (mobj_t * thing)
     // the bounding box is extended by MAXRADIUS because mobj_ts are grouped
     // into mapblocks based on their origin point, and can overlap into adjacent
     // blocks by up to MAXRADIUS units
-    xl = (tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS) >> MAPBLOCKSHIFT;
-    xh = (tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS) >> MAPBLOCKSHIFT;
-    yl = (tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS) >> MAPBLOCKSHIFT;
-    yh = (tmbbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
+    xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS);
+    xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS);
+    yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS);
+    yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy + MAXRADIUS);
 
     for (bx = xl; bx <= xh; bx++)
 	for (by = yl; by <= yh; by++)
@@ -1593,10 +1593,12 @@ P_RadiusAttack
     fixed_t	dist;
 
     dist = (damage<<FRACBITS)+MAXRADIUS;
-    yh = (spot->y + dist - bmaporgy)>>MAPBLOCKSHIFT;
-    yl = (spot->y - dist - bmaporgy)>>MAPBLOCKSHIFT;
-    xh = (spot->x + dist - bmaporgx)>>MAPBLOCKSHIFT;
-    xl = (spot->x - dist - bmaporgx)>>MAPBLOCKSHIFT;
+
+    xh = P_GetSafeBlockX(spot->x + dist - bmaporgx);
+    xl = P_GetSafeBlockX(spot->x - dist - bmaporgx);
+    yh = P_GetSafeBlockY(spot->y + dist - bmaporgy);
+    yl = P_GetSafeBlockY(spot->y - dist - bmaporgy);
+
     bombspot = spot;
     bombsource = source;
     bombdamage = damage;
@@ -1987,10 +1989,10 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
 
     validcount++;	// used to make sure we only process a line once
 
-    xl = (tmbbox[BOXLEFT] - bmaporgx) >> MAPBLOCKSHIFT;
-    xh = (tmbbox[BOXRIGHT] - bmaporgx) >> MAPBLOCKSHIFT;
-    yl = (tmbbox[BOXBOTTOM] - bmaporgy) >> MAPBLOCKSHIFT;
-    yh = (tmbbox[BOXTOP] - bmaporgy) >> MAPBLOCKSHIFT;
+    xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx);
+    xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx);
+    yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy);
+    yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy);
 
     for (bx = xl; bx <= xh; bx++)
 	for (by = yl; by <= yh; by++)

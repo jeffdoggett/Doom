@@ -380,8 +380,8 @@ void P_UnsetThingPosition (mobj_t* thing)
 	    thing->bprev->bnext = thing->bnext;
 	else
 	{
-	    blockx = (thing->x - bmaporgx)>>MAPBLOCKSHIFT;
-	    blocky = (thing->y - bmaporgy)>>MAPBLOCKSHIFT;
+	    blockx = P_GetSafeBlockX(thing->x - bmaporgx);
+	    blocky = P_GetSafeBlockY(thing->y - bmaporgy);
 
 	    if (blockx>=0 && blockx < bmapwidth
 		&& blocky>=0 && blocky <bmapheight)
@@ -1216,3 +1216,32 @@ P_PathTraverse
 //-----------------------------------------------------------------------------
 
 #endif
+
+//-----------------------------------------------------------------------------
+// MAES: support 512x512 blockmaps.
+extern int blockmapxneg;
+extern int blockmapyneg;
+
+int P_GetSafeBlockX (int coord)
+{
+    // If x is LE than those special values, interpret as positive.
+    // Otherwise, leave it as it is.
+    if ((coord >>= MAPBLOCKSHIFT) <= blockmapxneg)
+        return (coord & 0x01FF);    // Broke width boundary
+
+    return coord;
+}
+
+//-----------------------------------------------------------------------------
+// MAES: support 512x512 blockmaps.
+int P_GetSafeBlockY (int coord)
+{
+    // If y is LE than those special values, interpret as positive.
+    // Otherwise, leave it as it is.
+    if ((coord >>= MAPBLOCKSHIFT) <= blockmapyneg)
+        return (coord & 0x01FF);    // Broke height boundary
+
+    return coord;
+}
+
+//-----------------------------------------------------------------------------
