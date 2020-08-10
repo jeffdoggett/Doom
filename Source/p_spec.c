@@ -263,6 +263,7 @@ static anim_t* read_anim (animdef_t * an_ptr)
 {
   int   bp;
   int   pn;
+  int	numpics;
   anim_t* thisanim;
 
   if (an_ptr -> istexture)
@@ -280,20 +281,24 @@ static anim_t* read_anim (animdef_t * an_ptr)
 
   if ((bp != -1) && (pn != -1))
   {
-    thisanim = malloc (sizeof (anim_t));
-    if (thisanim)
+    numpics = pn - bp + 1;
+    if (numpics < 2)
     {
-      thisanim->basepic = bp;
-      thisanim->picnum = pn;
-      thisanim->istexture = an_ptr -> istexture;
-      thisanim->numpics = thisanim->picnum - thisanim->basepic + 1;
-
-      if (thisanim->numpics < 2)
-	I_Error ("P_InitPicAnims: bad cycle from %s to %s",
-		  an_ptr -> startname,
-		  an_ptr -> endname);
-
-      thisanim->speed = an_ptr -> speed;
+      fprintf (stderr, "P_InitPicAnims: bad cycle from %s to %s\n",
+		an_ptr -> startname,
+		an_ptr -> endname);
+    }
+    else
+    {
+      thisanim = malloc (sizeof (anim_t));
+      if (thisanim)
+      {
+        thisanim->basepic = bp;
+        thisanim->picnum = pn;
+        thisanim->numpics = numpics;
+        thisanim->istexture = an_ptr -> istexture;
+        thisanim->speed = an_ptr -> speed;
+      }
     }
   }
 
