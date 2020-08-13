@@ -307,11 +307,15 @@ static char		saveOldString[SAVESTRINGSIZE];
 boolean			inhelpscreens;
 boolean			menuactive;
 
-#define SKULLXOFF		-12
-#define LINEHEIGHT		16
+#define SKULLXOFF	-12
+#define LINEHEIGHT	16
+
+#define QTY_SAVE_SLOTS	8
+#define SAVEGAME_OFFSET (((QTY_SAVE_SLOTS - 6) / 2) * LINEHEIGHT)
+
 
 extern boolean		sendpause;
-static char		savegamestrings[6][SAVESTRINGSIZE];
+static char		savegamestrings[QTY_SAVE_SLOTS][SAVESTRINGSIZE];
 
 static char		tempstring[160];
 
@@ -514,11 +518,11 @@ enum
 
 static menuitem_t NewGameMenu[]=
 {
-    {1,ML_JKILL,       M_ChooseSkill, 'i'},
-    {1,ML_ROUGH,       M_ChooseSkill, 'h'},
-    {1,ML_HURT,        M_ChooseSkill, 'h'},
-    {1,ML_ULTRA,       M_ChooseSkill, 'u'},
-    {1,ML_NMARE,       M_ChooseSkill, 'n'}
+    {1,ML_JKILL, M_ChooseSkill, 'i'},
+    {1,ML_ROUGH, M_ChooseSkill, 'h'},
+    {1,ML_HURT,  M_ChooseSkill, 'h'},
+    {1,ML_ULTRA, M_ChooseSkill, 'u'},
+    {1,ML_NMARE, M_ChooseSkill, 'n'}
 };
 
 static menu_t  NewDef =
@@ -646,20 +650,6 @@ static menu_t  SoundDef =
     0
 };
 
-//
-// LOAD GAME MENU
-//
-enum
-{
-    load1,
-    load2,
-    load3,
-    load4,
-    load5,
-    load6,
-    load_end
-} load_e;
-
 static menuitem_t LoadMenu[]=
 {
     {1,ML_NULL, M_LoadSelect,'1'},
@@ -667,16 +657,18 @@ static menuitem_t LoadMenu[]=
     {1,ML_NULL, M_LoadSelect,'3'},
     {1,ML_NULL, M_LoadSelect,'4'},
     {1,ML_NULL, M_LoadSelect,'5'},
-    {1,ML_NULL, M_LoadSelect,'6'}
+    {1,ML_NULL, M_LoadSelect,'6'},
+    {1,ML_NULL, M_LoadSelect,'7'},
+    {1,ML_NULL, M_LoadSelect,'8'}
 };
 
 static menu_t  LoadDef =
 {
-    load_end,
+    QTY_SAVE_SLOTS,
     &MainDef,
     LoadMenu,
     M_DrawLoad,
-    80,54,
+    80,54-SAVEGAME_OFFSET,
     0
 };
 
@@ -690,16 +682,18 @@ static menuitem_t SaveMenu[]=
     {1,ML_NULL, M_SaveSelect,'3'},
     {1,ML_NULL, M_SaveSelect,'4'},
     {1,ML_NULL, M_SaveSelect,'5'},
-    {1,ML_NULL, M_SaveSelect,'6'}
+    {1,ML_NULL, M_SaveSelect,'6'},
+    {1,ML_NULL, M_SaveSelect,'7'},
+    {1,ML_NULL, M_SaveSelect,'8'}
 };
 
 static menu_t  SaveDef =
 {
-    load_end,
+    QTY_SAVE_SLOTS,
     &MainDef,
     SaveMenu,
     M_DrawSave,
-    80,54,
+    80,54-SAVEGAME_OFFSET,
     0
 };
 
@@ -878,7 +872,7 @@ void M_ReadSaveStrings(void)
   FILE* handle;
   char  name[256];
 
-  i = load_end;
+  i = QTY_SAVE_SLOTS;
   do
   {
     i--;
@@ -905,13 +899,20 @@ void M_ReadSaveStrings(void)
 //
 void M_DrawLoad(void)
 {
-  int i;
+  int i,y;
+  patch_t * loadpatch;
 
-  V_DrawPatchScaled (72,28,0,W_CacheLumpName(menu_lump_names[ML_LOADG],PU_CACHE));
-  for (i = 0;i < load_end; i++)
+  loadpatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_LOADG],PU_CACHE);
+  y = LoadDef.y - (SHORT(loadpatch->height) + 9);
+  if (y < 0) y = 0;
+  V_DrawPatchScaled (72,y,0,loadpatch);
+
+  y = LoadDef.y;
+  for (i = 0;i < QTY_SAVE_SLOTS; i++)
   {
-      M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i);
-      M_WriteText(LoadDef.x,LoadDef.y+LINEHEIGHT*i,savegamestrings[i]);
+      M_DrawSaveLoadBorder(LoadDef.x,y);
+      M_WriteText(LoadDef.x,y,savegamestrings[i]);
+      y += LINEHEIGHT;
   }
 }
 
@@ -971,8 +972,12 @@ void M_LoadGame (int choice)
 void M_DrawSave(void)
 {
   int i,x,y;
+  patch_t * savepatch;
 
-  V_DrawPatchScaled (72,28,0,W_CacheLumpName(menu_lump_names[ML_SAVEG],PU_CACHE));
+  savepatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_SAVEG],PU_CACHE);
+  y = LoadDef.y - (SHORT(savepatch->height) + 9);
+  if (y < 0) y = 0;
+  V_DrawPatchScaled (72,y,0,savepatch);
 
   y = LoadDef.y;
   i = 0;
@@ -987,7 +992,7 @@ void M_DrawSave(void)
       M_WriteText (x, y, "_");
 
     y += LINEHEIGHT;
-  } while (++i < load_end);
+  } while (++i < QTY_SAVE_SLOTS);
 }
 
 /* ----------------------------------------------------------------------- */
