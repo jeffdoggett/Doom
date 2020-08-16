@@ -378,9 +378,10 @@ boolean P_Move (mobj_t*	actor)
     else
     {
 	actor->flags &= ~MF_INFLOAT;
-
+#if 0
 	// killough 10/98:
 	// Let normal momentum carry them, instead of steptoeing them across ice.
+	// JAD - This code causes a hang - remove for now.
 	if (friction > ORIG_FRICTION)
 	{
 	    actor->x = origx;
@@ -389,6 +390,7 @@ boolean P_Move (mobj_t*	actor)
 	    actor->momx += FixedMul(deltax, movefactor);
 	    actor->momy += FixedMul(deltay, movefactor);
 	}
+#endif
     }
 
     if (!(actor->flags & MF_FLOAT))
