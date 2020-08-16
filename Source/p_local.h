@@ -206,6 +206,7 @@ void P_SetThingPosition (mobj_t* thing);
 extern boolean		floatok;
 extern fixed_t		tmfloorz;
 extern fixed_t		tmceilingz;
+extern fixed_t		tmbbox[4];
 
 
 extern	line_t*		ceilingline;
@@ -246,6 +247,8 @@ P_RadiusAttack
   int		damage );
 
 
+int P_GetFriction(const mobj_t *mo, int *frictionfactor);   // killough 08/28/98
+int P_GetMoveFactor(const mobj_t *mo, int *frictionp);
 
 //
 // P_SETUP

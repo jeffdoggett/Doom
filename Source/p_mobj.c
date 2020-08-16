@@ -219,30 +219,66 @@ void P_XYMovement (mobj_t* mo)
 	    xmove = ymove = 0;
 	}
 
-	if (!P_TryMove (mo, ptryx, ptryy))
+	if (!P_TryMove(mo, ptryx, ptryy))
 	{
 	    // blocked move
-	    if ((flags & (MF_MISSILE|MF_BOUNCES)) == MF_MISSILE)
+	    // killough 08/11/98: bouncing off walls
+	    // killough 10/98:
+	    // Add ability for objects other than players to bounce on ice
+	    if (!(mo->flags & MF_MISSILE)
+		&& ((mo->flags & MF_BOUNCES)
+		    || (!player && blockline && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
+	    {
+		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
+			    / ((blockline->dx >> FRACBITS) * (blockline->dx >> FRACBITS)
+			    + (blockline->dy >> FRACBITS) * (blockline->dy >> FRACBITS));
+		fixed_t x = FixedMul(r, blockline->dx);
+		fixed_t y = FixedMul(r, blockline->dy);
+
+		// reflect momentum away from wall
+		mo->momx = x * 2 - mo->momx;
+		mo->momy = y * 2 - mo->momy;
+
+		// if under gravity, slow down in
+		// direction perpendicular to wall.
+		if (!(mo->flags & MF_NOGRAVITY))
+		{
+		    mo->momx = (mo->momx + x) / 2;
+		    mo->momy = (mo->momy + y) / 2;
+		}
+	    }
+	    else if (player)
+	    {
+		// try to slide along it
+		P_SlideMove(mo);
+		break;
+	    }
+	    else if (mo->flags & MF_MISSILE)
 	    {
 		// explode a missile
-		if (ceilingline &&
-		    ceilingline->backsector &&
-		    ceilingline->backsector->ceilingpic == skyflatnum)
+		if (ceilingline && ceilingline->backsector
+		    && ceilingline->backsector->ceilingpic == skyflatnum
+		    && mo->z > ceilingline->backsector->ceilingheight)
 		{
 		    // Hack to prevent missiles exploding
 		    // against the sky.
 		    // Does not handle sky floors.
-		    P_RemoveMobj (mo);
+
+		    // [BH] still play sound when firing BFG into sky
+		    if (mo->type == MT_BFG)
+			S_StartSound(mo, mo->info->deathsound);
+
+		    P_RemoveMobj(mo);
 		    return;
 		}
-		P_ExplodeMissile (mo);
-	    }
-	    else if ((mo->player) || (flags & MF_SLIDE))
-	    {	// try to slide along it
-		P_SlideMove (mo);
+
+		P_ExplodeMissile(mo);
 	    }
 	    else
-		mo->momx = mo->momy = 0;
+	    {
+		mo->momx = 0;
+		mo->momy = 0;
+	    }
 	}
     } while (xmove || ymove);
 
@@ -314,14 +350,18 @@ void P_XYMovement (mobj_t* mo)
 	return;
     }
 
-    friction = FRICTION;
-
-    /* Are we in an icy sector? */
-    if (sector -> special & 0x100)
-      friction = 0xF000;
-
+    friction = P_GetFriction (mo, NULL);
     mo->momx = FixedMul (mo->momx, friction);
     mo->momy = FixedMul (mo->momy, friction);
+
+    // killough 10/98: Always decrease player bobbing by ORIG_FRICTION.
+    // This prevents problems with bobbing on ice, where it was not being
+    // reduced fast enough, leading to all sorts of kludges being developed.
+//    if (player && player->mo == mo)     //  Not voodoo dolls
+//    {
+//	player->momx = FixedMul(player->momx, ORIG_FRICTION);
+//	player->momy = FixedMul(player->momy, ORIG_FRICTION);
+//    }
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -655,8 +695,8 @@ P_SpawnMobj
     mobj->height = info->height;
     mobj->flags  = info->flags;
 
-    if (type == MT_PLAYER)         // Players
-      mobj->flags |= MF_FRIEND;    // are always friends.
+    if (type == MT_PLAYER)	// Players
+      mobj->flags |= MF_FRIEND;	// are always friends.
 
     mobj->flags2 = info->flags2;
     mobj->health = info->spawnhealth;

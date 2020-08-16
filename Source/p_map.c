@@ -30,7 +30,6 @@ static const char rcsid[] = "$Id: p_map.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 #include "includes.h"
 
 
-static fixed_t	tmbbox[4];
 static mobj_t*	tmthing;
 static int	tmflags;
 static fixed_t	tmx;
@@ -42,6 +41,7 @@ static fixed_t	tmz;
 // if within "tmfloorz - tmceilingz".
 boolean		floatok;
 
+fixed_t		tmbbox[4];
 fixed_t		tmfloorz;
 fixed_t		tmceilingz;
 fixed_t		tmdropoffz;
@@ -123,6 +123,77 @@ boolean PIT_StompThing (mobj_t* thing)
       damage = (thing->health + thing->info->spawnhealth) + 1;
     P_DamageMobj (thing, tmthing, tmthing, damage);
     return true;
+}
+
+//
+// killough 08/28/98:
+//
+// P_GetFriction
+//
+// Returns the friction associated with a particular mobj.
+int P_GetFriction(const mobj_t *mo, int *frictionfactor)
+{
+    int friction = ORIG_FRICTION;
+    int movefactor = ORIG_FRICTION_FACTOR;
+
+    // Assign the friction value to objects on the floor, non-floating,
+    // and clipped. Normally the object's friction value is kept at
+    // ORIG_FRICTION and this thinker changes it for icy or muddy floors.
+    //
+    // When the object is straddling sectors with the same
+    // floorheight that have different frictions, use the lowest
+    // friction value (muddy has precedence over icy).
+    if (!(mo->flags & (MF_NOCLIP | MF_NOGRAVITY)))
+	for (const msecnode_t *m = mo->touching_sectorlist; m; m = m->m_tnext)
+	{
+	    const sector_t  *sec = m->m_sector;
+
+	    if ((sec->special & FRICTION_MASK)
+		&& (sec->friction < friction || friction == ORIG_FRICTION)
+		&& (mo->z <= sec->floorheight || (sec->heightsec && mo->z <= sectors[sec->heightsec].floorheight)))
+	    {
+		friction = sec->friction;
+		movefactor = sec->movefactor;
+	    }
+	}
+
+    if (frictionfactor)
+	*frictionfactor = movefactor;
+
+    return friction;
+}
+
+// phares 3/19/98
+// P_GetMoveFactor() returns the value by which the x,y
+// movements are multiplied to add to player movement.
+//
+// killough 08/28/98: rewritten
+int P_GetMoveFactor(const mobj_t *mo, int *frictionp)
+{
+    int movefactor;
+    int friction = P_GetFriction(mo, &movefactor);
+
+    // If the floor is icy or muddy, it's harder to get moving. This is where
+    // the different friction factors are applied to 'trying to move'. In
+    // p_mobj.c, the friction factors are applied as you coast and slow down.
+    if (friction < ORIG_FRICTION)
+    {
+	// phares 3/11/98: you start off slowly, then increase as
+	// you get better footing
+	int momentum = P_ApproxDistance(mo->momx, mo->momy);
+
+	if (momentum > (MORE_FRICTION_MOMENTUM << 2))
+	    movefactor <<= 3;
+	else if (momentum > (MORE_FRICTION_MOMENTUM << 1))
+	    movefactor <<= 2;
+	else if (momentum > MORE_FRICTION_MOMENTUM)
+	    movefactor <<= 1;
+    }
+
+    if (frictionp)
+	*frictionp = friction;
+
+    return movefactor;
 }
 
 

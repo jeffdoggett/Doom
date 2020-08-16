@@ -173,16 +173,18 @@ void P_MovePlayer (player_t* player)
 
   if (onground)
   {
+    int movefactor = P_GetMoveFactor (mo, NULL);
+
     if ((j = cmd->forwardmove) != 0)
     {
       if (j > 0x7F) j |= ~0xFF;
-      P_Thrust (player, mo->angle, j*2048);
+      P_Thrust (player, mo->angle, j*movefactor);
     }
 
     if ((j = cmd->sidemove) != 0)
     {
       if (j > 0x7F) j |= ~0xFF;
-      P_Thrust (player, mo->angle-ANG90, j*2048);
+      P_Thrust (player, mo->angle-ANG90, j*movefactor);
     }
   }
 

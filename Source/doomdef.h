@@ -337,11 +337,11 @@ typedef enum
 #define DEN_PLAYER7 4003
 #define DEN_PLAYER8 4004
 
+#endif
+
 #define MORE_FRICTION_MOMENTUM 15000       /* mud factor based on momentum */
 #define ORIG_FRICTION          0xE800      /* original value */
 #define ORIG_FRICTION_FACTOR   2048        /* original value */
-
-#endif
 
 // DOOM basic types (boolean),
 //  and max/min values.

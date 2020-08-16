@@ -85,8 +85,8 @@ typedef struct animdef2_s
 } animdef2_t;
 
 static void P_SpawnScrollers(void);
-//static void P_SpawnFriction(void);
-//static void P_SpawnPushers(void);
+static void P_SpawnFriction(void);
+static void P_SpawnPushers(void);
 
 //
 // P_InitPicAnims
@@ -293,11 +293,11 @@ static anim_t* read_anim (animdef_t * an_ptr)
       thisanim = malloc (sizeof (anim_t));
       if (thisanim)
       {
-        thisanim->basepic = bp;
-        thisanim->picnum = pn;
-        thisanim->numpics = numpics;
-        thisanim->istexture = an_ptr -> istexture;
-        thisanim->speed = an_ptr -> speed;
+	thisanim->basepic = bp;
+	thisanim->picnum = pn;
+	thisanim->numpics = numpics;
+	thisanim->istexture = an_ptr -> istexture;
+	thisanim->speed = an_ptr -> speed;
       }
     }
   }
@@ -2142,21 +2142,21 @@ void P_PlayerInSpecialSector (player_t* player)
   }
 
 #if 0
-  if (sector->special & 0x100)		// Icy
+  if (sector->special & FRICTION_MASK)	// Icy
   {
   }
 #endif
 #if 0
-  if (sector->special & 0x200)		// Wind/current/pushers/pullers are enabled for this sector
+  if (sector->special & PUSH_MASK)	// Wind/current/pushers/pullers are enabled for this sector
   {					// Nova Map 27 has this bit set
   }
 #endif
 
-  if (sector->special & 0xFE00)		// Anything else
+  if (sector->special & 0xFC00)		// Anything else
   {
     if (M_CheckParm ("-showunknown"))
       printf ("P_PlayerInSpecialSector: unknown special %i\n", sector->special);
-    sector->special &= ~0xFE00;
+    sector->special &= ~0xFC00;
   }
 }
 
@@ -2335,8 +2335,8 @@ void P_SpawnSpecials (void)
   //if (!compatibility && !demo_compatibility)
   {
     P_SpawnScrollers();
-    //P_SpawnFriction();
-    //P_SpawnPushers();
+    P_SpawnFriction();
+    P_SpawnPushers();
 
     for (line=lines,i=0; i<numlines; i++,line++)
     {
@@ -2889,3 +2889,409 @@ static void P_SpawnScrollers(void)
 }
 
 /* ---------------------------------------------------------------------------- */
+//
+// FRICTION EFFECTS
+//
+// phares 03/12/98: Start of friction effects
+//
+// As the player moves, friction is applied by decreasing the x and y
+// momentum values on each tic. By varying the percentage of decrease,
+// we can simulate muddy or icy conditions. In mud, the player slows
+// down faster. In ice, the player slows down more slowly.
+//
+// The amount of friction change is controlled by the length of a linedef
+// with type 223. A length < 100 gives you mud. A length > 100 gives you ice.
+//
+// Also, each sector where these effects are to take place is given a
+// new special type _______. Changing the type value at runtime allows
+// these effects to be turned on or off.
+//
+// Sector boundaries present problems. The player should experience these
+// friction changes only when his feet are touching the sector floor. At
+// sector boundaries where floor height changes, the player can find
+// himself still 'in' one sector, but with his feet at the floor level
+// of the next sector (steps up or down). To handle this, Thinkers are used
+// in icy/muddy sectors. These thinkers examine each object that is touching
+// their sectors, looking for players whose feet are at the same level as
+// their floors. Players satisfying this condition are given new friction
+// values that are applied by the player movement code later.
+//
+// killough 08/28/98:
+//
+// Completely redid code, which did not need thinkers, and which put a heavy
+// drag on CPU. Friction is now a property of sectors, NOT objects inside
+// them. All objects, not just players, are affected by it, if they touch
+// the sector's floor. Code simpler and faster, only calling on friction
+// calculations when an object needs friction considered, instead of doing
+// friction calculations on every sector during every tic.
+//
+// Although this -might- ruin BOOM demo sync involving friction, it's the only
+// way, short of code explosion, to fix the original design bug. Fixing the
+// design bug in BOOM's original friction code, while maintaining demo sync
+// under every conceivable circumstance, would double or triple code size, and
+// would require maintenance of buggy legacy code which is only useful for old
+// demos. DOOM demos, which are more important IMO, are not affected by this
+// change.
+//
+
+//
+// Initialize the sectors where friction is increased or decreased
+static void P_SpawnFriction(void)
+{
+    line_t  *l = lines;
+
+    // killough 08/28/98: initialize all sectors to normal friction first
+    for (int i = 0; i < numsectors; i++)
+    {
+	sectors[i].friction = ORIG_FRICTION;
+	sectors[i].movefactor = ORIG_FRICTION_FACTOR;
+    }
+
+    for (int i = 0; i < numlines; i++, l++)
+	if (l->special == 223)
+	{
+	    int length = P_ApproxDistance(l->dx, l->dy) >> FRACBITS;
+	    int friction = BETWEEN(0, (0x1EB8 * length) / 0x80 + 0xD000, FRACUNIT);
+	    int movefactor;
+
+	    // The following check might seem odd. At the time of movement,
+	    // the move distance is multiplied by 'friction/0x10000', so a
+	    // higher friction value actually means 'less friction'.
+	    if (friction > ORIG_FRICTION)       // ice
+		movefactor = MAX(32, ((0x10092 - friction) * 0x70) / 0x0158);
+	    else
+		movefactor = MAX(32, ((friction - 0xDB34) * 0x0A) / 0x80);
+
+	    for (int s = -1; (s = P_FindSectorFromLineTag(l, s)) >= 0;)
+	    {
+		// killough 08/28/98:
+		//
+		// Instead of spawning thinkers, which are slow and expensive,
+		// modify the sector's own friction values. Friction should be
+		// a property of sectors, not objects which reside inside them.
+		// Original code scanned every object in every friction sector
+		// on every tic, adjusting its friction, putting unnecessary
+		// drag on CPU. New code adjusts friction of sector only once
+		// at level startup, and then uses this friction value.
+		sectors[s].friction = friction;
+		sectors[s].movefactor = movefactor;
+	    }
+	}
+}
+
+//
+// PUSH/PULL EFFECT
+//
+// phares 03/20/98: Start of push/pull effects
+//
+// This is where push/pull effects are applied to objects in the sectors.
+//
+// There are four kinds of push effects
+//
+// 1) Pushing Away
+//
+//    Pushes you away from a point source defined by the location of an
+//    MT_PUSH Thing. The force decreases linearly with distance from the
+//    source. This force crosses sector boundaries and is felt w/in a circle
+//    whose center is at the MT_PUSH. The force is felt only if the point
+//    MT_PUSH can see the target object.
+//
+// 2) Pulling toward
+//
+//    Same as Pushing Away except you're pulled toward an MT_PULL point
+//    source. This force crosses sector boundaries and is felt w/in a circle
+//    whose center is at the MT_PULL. The force is felt only if the point
+//    MT_PULL can see the target object.
+//
+// 3) Wind
+//
+//    Pushes you in a constant direction. Full force above ground, half
+//    force on the ground, nothing if you're below it (water).
+//
+// 4) Current
+//
+//    Pushes you in a constant direction. No force above ground, full
+//    force if on the ground or below it (water).
+//
+// The magnitude of the force is controlled by the length of a controlling
+// linedef. The force vector for types 3 & 4 is determined by the angle
+// of the linedef, and is constant.
+//
+// For each sector where these effects occur, the sector special type has
+// to have the PUSH_MASK bit set. If this bit is turned off by a switch
+// at run-time, the effect will not occur. The controlling sector for
+// types 1 & 2 is the sector containing the MT_PUSH/MT_PULL Thing.
+
+#define PUSH_FACTOR 7
+
+//
+// Add a push thinker to the thinker list
+static void Add_Pusher(int type, int x_mag, int y_mag, mobj_t *source, int affectee)
+{
+    sector_t *sec;
+    sec = &sectors[affectee];
+
+    // Be sure the special sector type is still turned on. If so, proceed.
+    // Else, bail out; the sector type has been changed on us.
+    if (!(sec->special & PUSH_MASK))
+	return;
+
+    pusher_t *p = Z_Calloc (sizeof(*p), PU_LEVSPEC, NULL);
+
+    p->source = source;
+    p->type = (push_type_t) type;
+    p->x_mag = x_mag >> FRACBITS;
+    p->y_mag = y_mag >> FRACBITS;
+    p->magnitude = P_ApproxDistance(p->x_mag, p->y_mag);
+
+    // point source exist?
+    if (source)
+    {
+	p->radius = p->magnitude << (FRACBITS + 1);	// where force goes to zero
+	p->x = p->source->x;
+	p->y = p->source->y;
+    }
+
+    p->affectee = affectee;
+    P_AddThinker (&p->thinker, (actionf_p1) T_Pusher);
+}
+
+//
+// PIT_PushThing determines the angle and magnitude of the effect.
+// The object's x and y momentum values are changed.
+//
+// tmpusher belongs to the point source (MT_PUSH/MT_PULL).
+//
+// killough 10/98: allow to affect things besides players
+
+static pusher_t *tmpusher;  // pusher structure for blockmap searches
+
+static boolean PIT_PushThing(mobj_t *thing)
+{
+    if ((sentient(thing) || (thing->flags & MF_SHOOTABLE)) && !(thing->flags & MF_NOCLIP))
+    {
+	fixed_t sx = tmpusher->x;
+	fixed_t sy = tmpusher->y;
+	fixed_t speed = (tmpusher->magnitude - ((P_ApproxDistance(thing->x - sx, thing->y - sy) >> FRACBITS) >> 1))
+		    << (FRACBITS - PUSH_FACTOR - 1);
+
+	// killough 10/98: make magnitude decrease with square
+	// of distance, making it more in line with real nature,
+	// so long as it's still in range with original formula.
+	//
+	// Removes angular distortion, and makes effort required
+	// to stay close to source, grow increasingly hard as you
+	// get closer, as expected. Still, it doesn't consider z :(
+	if (speed > 0)
+	{
+	    int x = (thing->x - sx) >> FRACBITS;
+	    int y = (thing->y - sy) >> FRACBITS;
+
+	    speed = (fixed_t)(((int64_t)tmpusher->magnitude << 23) / ((int64_t)x * x + (int64_t)y * y + 1));
+	}
+
+	// If speed <= 0, you're outside the effective radius. You also have
+	// to be able to see the push/pull source point.
+	if (speed > 0 && P_CheckSight(thing, tmpusher->source))
+	{
+	    angle_t pushangle = R_PointToAngle2(thing->x, thing->y, sx, sy);
+
+	    if (tmpusher->source->type == MT_PUSH)
+		pushangle += ANG180;    // away
+
+	    pushangle >>= ANGLETOFINESHIFT;
+	    thing->momx += FixedMul(speed, finecosine[pushangle]);
+	    thing->momy += FixedMul(speed, finesine[pushangle]);
+	}
+    }
+
+    return true;
+}
+
+//
+// T_Pusher looks for all objects that are inside the radius of
+// the effect.
+//
+void T_Pusher(pusher_t *p)
+{
+    sector_t *sec;
+    int xspeed, yspeed;
+    int hs;
+    int ht = 0;
+
+    sec = &sectors [p->affectee];
+
+    // Be sure the special sector type is still turned on. If so, proceed.
+    // Else, bail out; the sector type has been changed on us.
+    if (!(sec->special & PUSH_MASK))
+	return;
+
+    // For constant pushers (wind/current) there are 3 situations:
+    //
+    // 1) Affected Thing is above the floor.
+    //
+    //    Apply the full force if wind, no force if current.
+    //
+    // 2) Affected Thing is on the ground.
+    //
+    //    Apply half force if wind, full force if current.
+    //
+    // 3) Affected Thing is below the ground (underwater effect).
+    //
+    //    Apply no force if wind, full force if current.
+    if (p->type == p_push)
+    {
+      if (p->source) 				// Just in case
+      {
+	// Seek out all pushable things within the force radius of this
+	// point pusher. Crosses sectors, so use blockmap.
+	int xl;
+	int xh;
+	int yl;
+	int yh;
+	int radius;
+
+	tmpusher = p;				// MT_PUSH/MT_PULL point source
+	radius = p->radius;			// where force goes to zero
+	tmbbox[BOXTOP] = p->y + radius;
+	tmbbox[BOXBOTTOM] = p->y - radius;
+	tmbbox[BOXRIGHT] = p->x + radius;
+	tmbbox[BOXLEFT] = p->x - radius;
+
+	xl = P_GetSafeBlockX(tmbbox[BOXLEFT] - bmaporgx - MAXRADIUS);
+	xh = P_GetSafeBlockX(tmbbox[BOXRIGHT] - bmaporgx + MAXRADIUS);
+	yl = P_GetSafeBlockY(tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS);
+	yh = P_GetSafeBlockY(tmbbox[BOXTOP] - bmaporgy + MAXRADIUS);
+
+	for (int bx = xl; bx <= xh; bx++)
+	    for (int by = yl; by <= yh; by++)
+		P_BlockThingsIterator(bx, by, &PIT_PushThing);
+      }
+      return;
+    }
+
+    // constant pushers p_wind and p_current
+    if ((hs = sec->heightsec) != 0)		     // special water sector?
+	ht = sectors[hs].floorheight;
+
+    // things touching this sector
+    for (msecnode_t *node = sec->touching_thinglist; node; node = node->m_snext)
+    {
+	mobj_t  *thing = node->m_thing;
+
+	if (!thing->player || (thing->flags & (MF_NOGRAVITY | MF_NOCLIP)))
+	    continue;
+
+	if (p->type == p_wind)
+	{
+	    if (!sec->heightsec)		// NOT special water sector
+	    {
+		if (thing->z > thing->floorz)	// above ground
+		{
+		    xspeed = p->x_mag;		// full force
+		    yspeed = p->y_mag;
+		}
+		else				// on ground
+		{
+		    xspeed = p->x_mag >> 1;	// half force
+		    yspeed = p->y_mag >> 1;
+		}
+	    }
+	    else				// special water sector
+	    {
+		if (thing->z > ht)		// above ground
+		{
+		    xspeed = p->x_mag;		// full force
+		    yspeed = p->y_mag;
+		}
+		else
+		{
+		    if (thing->player->viewz < ht) // underwater
+			xspeed = yspeed = 0;	   // no force
+		    else			   // wading in water
+		    {
+			xspeed = p->x_mag >> 1;	// half force
+			yspeed = p->y_mag >> 1;
+		    }
+		}
+	    }
+	}
+	else					// p_current
+	{
+	    if (!sec->heightsec)		// NOT special water sector
+	    {
+		if (thing->z > sec->floorheight)// above ground
+		{
+		    xspeed = 0;			// no force
+		    yspeed = 0;
+		}
+		else				// on ground
+		{
+		    xspeed = p->x_mag;		// full force
+		    yspeed = p->y_mag;
+		}
+	    }
+	    else				// special water sector
+	    {
+		if (thing->z > ht)		// above ground
+		{
+		    xspeed = 0;			// no force
+		    yspeed = 0;
+		}
+		else				// underwater
+		{
+		    xspeed = p->x_mag;		// full force
+		    yspeed = p->y_mag;
+		}
+	    }
+	}
+	thing->momx += xspeed << (FRACBITS - PUSH_FACTOR);
+	thing->momy += yspeed << (FRACBITS - PUSH_FACTOR);
+    }
+}
+
+// P_GetPushThing() returns a pointer to an MT_PUSH or MT_PULL thing, NULL otherwise.
+mobj_t *P_GetPushThing(int s)
+{
+    sector_t    *sec = sectors + s;
+    mobj_t      *thing = sec->thinglist;
+
+    while (thing)
+    {
+	if (thing->type == MT_PUSH || thing->type == MT_PULL)
+	    return thing;
+
+	thing = thing->snext;
+    }
+
+    return NULL;
+}
+
+//
+// Initialize the sectors where pushers are present
+//
+static void P_SpawnPushers(void)
+{
+    line_t  *l = lines;
+    mobj_t  *thing;
+
+    for (int i = 0; i < numlines; i++, l++)
+	switch (l->special)
+	{
+	    case 224:
+		for (int s = -1; (s = P_FindSectorFromLineTag(l, s)) >= 0;)
+		    Add_Pusher(p_wind, l->dx, l->dy, NULL, s);
+		break;
+
+	    case 225:
+		for (int s = -1; (s = P_FindSectorFromLineTag(l, s)) >= 0;)
+		    Add_Pusher(p_current, l->dx, l->dy, NULL, s);
+		break;
+
+	    case 226:
+		for (int s = -1; (s = P_FindSectorFromLineTag(l, s)) >= 0;)
+		    if ((thing = P_GetPushThing(s)) != NULL)    // No MT_P* means no effect
+			Add_Pusher(p_push, l->dx, l->dy, thing, s);
+		break;
+	}
+}

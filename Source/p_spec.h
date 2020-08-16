@@ -391,16 +391,18 @@ typedef struct
 
 /* phares 3/20/98: added new model of Pushers for push/pull effects */
 
+typedef enum
+{
+  p_push,
+  p_pull,
+  p_wind,
+  p_current
+} push_type_t;
+
 typedef struct
 {
   thinker_t thinker;	/* Thinker structure for Pusher */
-  enum
-  {
-    p_push,
-    p_pull,
-    p_wind,
-    p_current
-  } type;
+  push_type_t type;
   mobj_t* source;	/* Point source if point pusher */
   int x_mag;		/* X Strength */
   int y_mag;		/* Y Strength */

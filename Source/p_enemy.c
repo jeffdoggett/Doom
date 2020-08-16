@@ -310,32 +310,41 @@ extern	int	numspechit;
 
 boolean P_Move (mobj_t*	actor)
 {
-    fixed_t tryx;
-    fixed_t tryy;
-
+    fixed_t tryx, tryy;
+    fixed_t deltax, deltay;
+    fixed_t origx, origy;
+    int     movefactor;
+    int     friction = ORIG_FRICTION;
     int     speed;
 
     if (actor->movedir == DI_NODIR)
 	return false;
 
+    // killough 10/98: make monsters get affected by ice and sludge too:
+    movefactor = P_GetMoveFactor(actor, &friction);
+
     speed = actor->info->speed;
 
-    tryx = actor->x + speed * xspeed[actor->movedir];
-    tryy = actor->y + speed * yspeed[actor->movedir];
+    if (friction < ORIG_FRICTION)	// sludge
+    {
+      speed = ((ORIG_FRICTION_FACTOR - (ORIG_FRICTION_FACTOR - movefactor) / 2) * speed) / ORIG_FRICTION_FACTOR;
+      if (speed == 0)
+      {
+	speed = 1;			// always give the monster a little bit of speed
+      }
+    }
+
+    tryx = (origx = actor->x) + (deltax = speed * xspeed[actor->movedir]);
+    tryy = (origy = actor->y) + (deltay = speed * yspeed[actor->movedir]);
 
     if (!P_TryMove(actor, tryx, tryy))
     {
-	boolean good;
-
 	// open any specials
+	int good;
+
 	if ((actor->flags & MF_FLOAT) && floatok)
 	{
-	    // must adjust height
-	    if (actor->z < tmfloorz)
-		actor->z += FLOATSPEED;
-	    else
-		actor->z -= FLOATSPEED;
-
+	    actor->z += (actor->z < tmfloorz ? FLOATSPEED : -FLOATSPEED); // must adjust height
 	    actor->flags |= MF_INFLOAT;
 	    return true;
 	}
@@ -347,12 +356,12 @@ boolean P_Move (mobj_t*	actor)
 
 	// if the special is not a door that can be opened, return false
 	//
-	// killough 8/9/98: this is what caused monsters to get stuck in
+	// killough 08/09/98: this is what caused monsters to get stuck in
 	// doortracks, because it thought that the monster freed itself
 	// by opening a door, even if it was moving towards the doortrack,
 	// and not the door itself.
 	//
-	// killough 9/9/98: If a line blocking the monster is activated,
+	// killough 09/09/98: If a line blocking the monster is activated,
 	// return true 90% of the time. If a line blocking the monster is
 	// not activated, but some other line is, return false 90% of the
 	// time. A bit of randomness is needed to ensure it's free from
@@ -360,20 +369,31 @@ boolean P_Move (mobj_t*	actor)
 	//
 	// Do NOT simply return false 1/4th of the time (causes monsters to
 	// back out when they shouldn't, and creates secondary stickiness).
-
-	for (good = false; numspechit--;)
+	for (good = 0; numspechit--;)
 	    if (P_UseSpecialLine(actor, spechit[numspechit], 0))
-		good = (boolean)(good|(spechit[numspechit] == blockline ? 1 : 2));
+		good |= (spechit[numspechit] == blockline ? 1 : 2);
 
 	return (boolean)(good && ((P_Random() >= 230) ^ (good & 1)));
     }
     else
     {
 	actor->flags &= ~MF_INFLOAT;
+
+	// killough 10/98:
+	// Let normal momentum carry them, instead of steptoeing them across ice.
+	if (friction > ORIG_FRICTION)
+	{
+	    actor->x = origx;
+	    actor->y = origy;
+	    movefactor *= FRACUNIT / ORIG_FRICTION_FACTOR / 4;
+	    actor->momx += FixedMul(deltax, movefactor);
+	    actor->momy += FixedMul(deltay, movefactor);
+	}
     }
 
     if (!(actor->flags & MF_FLOAT))
 	actor->z = actor->floorz;
+
     return true;
 }
 
@@ -544,7 +564,7 @@ static boolean PIT_FindTarget (mobj_t *mo)
 {
   mobj_t *actor = current_actor;
 
-  if (!((mo->flags ^ actor->flags) & MF_FRIEND &&        // Invalid target
+  if (!((mo->flags ^ actor->flags) & MF_FRIEND &&	// Invalid target
 	mo->health > 0 && (mo->flags & MF_COUNTKILL || mo->type == MT_SKULL)))
     return true;
 
@@ -709,7 +729,7 @@ static boolean P_LookForMonsters (mobj_t *actor, boolean allaround)
 
   // Search for new enemy
 
-  if (cap->cnext != cap)        // Empty list? bail out early
+  if (cap->cnext != cap)	// Empty list? bail out early
 #endif
     {
       int x = (actor->x - bmaporgx)>>MAPBLOCKSHIFT;
@@ -1420,10 +1440,10 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 	viletryy =
 	    actor->y + actor->info->speed*yspeed[actor->movedir];
 
-        xl = P_GetSafeBlockX(viletryx - bmaporgx - MAXRADIUS * 2);
-        xh = P_GetSafeBlockX(viletryx - bmaporgx + MAXRADIUS * 2);
-        yl = P_GetSafeBlockY(viletryy - bmaporgy - MAXRADIUS * 2);
-        yh = P_GetSafeBlockY(viletryy - bmaporgy + MAXRADIUS * 2);
+	xl = P_GetSafeBlockX(viletryx - bmaporgx - MAXRADIUS * 2);
+	xh = P_GetSafeBlockX(viletryx - bmaporgx + MAXRADIUS * 2);
+	yl = P_GetSafeBlockY(viletryy - bmaporgy - MAXRADIUS * 2);
+	yh = P_GetSafeBlockY(viletryy - bmaporgy + MAXRADIUS * 2);
 
 	vileobj = actor;
 	for (bx=xl ; bx<=xh ; bx++)

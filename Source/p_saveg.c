@@ -869,7 +869,8 @@ enum
   tc_elevator,
   tc_fireflicker,
   tc_button,
-  tc_music
+  tc_music,
+  tc_pusher
 } specials_e;
 
 //-----------------------------------------------------------------------------
@@ -1444,6 +1445,78 @@ static byte * P_UnArchiveScroll (byte * save_p)
 
 //-----------------------------------------------------------------------------
 
+static byte * P_ArchivePusher (byte * save_p, pusher_t* pusher)
+{
+  unsigned int thinker;
+  unsigned int * save_32_p;
+
+  *save_p++ = tc_pusher;
+  PADSAVEP();
+
+  save_32_p = (unsigned int *) save_p;
+
+  thinker = 0;
+
+  if (pusher->thinker.function.acp1)
+    thinker = 1;
+
+  p_save_32 (0);					// SPARE!!!
+  p_save_32 (0);					// SPARE!!!
+  p_save_32 (thinker);
+  p_save_32 ((unsigned int) pusher->type);
+  p_save_32 (pusher->x_mag);
+  p_save_32 (pusher->y_mag);
+  p_save_32 (pusher->magnitude);
+  p_save_32 (pusher->radius);
+  p_save_32 (pusher->x);
+  p_save_32 (pusher->y);
+  p_save_32 (pusher->affectee);
+  return ((byte *) save_32_p);
+}
+
+//-----------------------------------------------------------------------------
+
+static byte * P_UnArchivePusher (byte * save_p)
+{
+  pusher_t* pusher;
+  unsigned int thinker;
+  unsigned int * save_32_p;
+
+  PADSAVEP();
+  pusher = Z_Malloc (sizeof(*pusher), PU_LEVSPEC, NULL);
+
+  save_32_p = (unsigned int *) save_p;
+
+  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
+  /* p_load_32 (save_32_p); */ save_32_p++;		// SPARE!!!
+  thinker = p_load_32 (save_32_p); save_32_p++;
+  pusher->type = (push_type_t) p_load_32 (save_32_p); save_32_p++;
+  pusher->x_mag = p_load_32 (save_32_p); save_32_p++;
+  pusher->y_mag = p_load_32 (save_32_p); save_32_p++;
+  pusher->magnitude = p_load_32 (save_32_p); save_32_p++;
+  pusher->radius = p_load_32 (save_32_p); save_32_p++;
+  pusher->x = p_load_32 (save_32_p); save_32_p++;
+  pusher->y = p_load_32 (save_32_p); save_32_p++;
+  pusher->affectee = p_load_32 (save_32_p); save_32_p++;
+
+  if (pusher->type == p_push)
+    pusher->source = P_GetPushThing(pusher->affectee);
+  else
+    pusher->source = NULL;
+
+  if (thinker)
+    P_AddThinker (&pusher->thinker, (actionf_p1)T_Pusher);
+  else
+    P_AddThinker (&pusher->thinker, NULL);
+
+#ifdef VERBOSE_LOAD
+  printf ("P_UnArchivepusher\n");
+#endif
+  return ((byte *) save_32_p);
+}
+
+//-----------------------------------------------------------------------------
+
 static byte * P_ArchiveElevator (byte * save_p, elevator_t* elevator)
 {
   unsigned int thinker;
@@ -1764,6 +1837,12 @@ byte * P_ArchiveSpecials (byte * save_p)
      || (th->function.acp1 == (actionf_p1)S_MusInfoThinker))
       continue;
 
+    if (th->function.acp1 == (actionf_p1)T_Pusher)
+    {
+      save_p = P_ArchivePusher (save_p, (pusher_t*) th);
+      continue;
+    }
+
     if (th->function.aci == -1)				// Idle....
       continue;
 
@@ -1842,6 +1921,10 @@ byte * P_UnArchiveSpecials (byte * save_p)
 
       case tc_music:
 	save_p = P_UnArchiveMusic (save_p);
+	break;
+
+      case tc_pusher:
+	save_p = P_UnArchivePusher (save_p);
 	break;
 
       default:

@@ -46,6 +46,9 @@
 #endif
 
 
+// killough 11/98:
+// Whether an object is "sentient" or not. Used for environmental influences.
+#define sentient(mobj)      (mobj->health > 0 && mobj->info->seestate)
 
 //
 // NOTES: mobj_t
@@ -302,8 +305,8 @@ typedef struct mobj_s
 } mobj_t;
 
 
-#define STOPSPEED		0x1000
-#define FRICTION		0xe800
+#define STOPSPEED	0x1000
+#define WATERFRICTION   0xD500
 
 #endif
 //-----------------------------------------------------------------------------

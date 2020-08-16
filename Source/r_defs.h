@@ -131,6 +131,12 @@ typedef	struct
     int			linecount;
     struct line_s**	lines;	// [linecount] size
 
+    // killough 08/28/98: friction is a sector property, not an mobj property.
+    // these fields used to be in mobj_t, but presented performance problems
+    // when processed as mobj properties. Fix is to make them sector properties.
+    int friction;
+    int movefactor;
+
   // killough 10/98: support skies coming from sidedefs. Allows scrolling
   // skies and other effects. No "level info" kind of lump is needed,
   // because you can use an arbitrary number of skies per level with this
