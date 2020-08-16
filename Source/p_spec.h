@@ -552,7 +552,7 @@ P_BoomSpecialLine
   triggered_e	trigtype);
 
 
-void    P_PlayerInSpecialSector (player_t* player);
+void    P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t special);
 
 int
 twoSided

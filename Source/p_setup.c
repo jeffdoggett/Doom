@@ -387,6 +387,8 @@ void P_LoadSectors (int lump)
 	ss->heightsec = -1;
 	ss->floorlightsec = -1;
 	ss->ceilinglightsec = -1;
+	ss->friction = ORIG_FRICTION;
+	ss->movefactor = ORIG_FRICTION_FACTOR;
 #ifdef PADDED_STRUCTS
 	ms = (mapsector_t *) ((byte *) ms + 26);
 #else

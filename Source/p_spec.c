@@ -2013,12 +2013,9 @@ P_ShootSpecialLine
 // Called every tic frame
 //  that the player origin is in a special sector
 //
-void P_PlayerInSpecialSector (player_t* player)
+void P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t special)
 {
   int damage;
-  sector_t* sector;
-
-  sector = player->mo->subsector->sector;
 
   // Falling, not all the way down yet?
   if (player->mo->z != sector->floorheight)
@@ -2026,7 +2023,7 @@ void P_PlayerInSpecialSector (player_t* player)
 
   // Has hitten ground.
 
-  switch (sector->special & 0x1F)
+  switch (special & 0x1F)
   {
     case 0:
       break;
@@ -2060,7 +2057,7 @@ void P_PlayerInSpecialSector (player_t* player)
     case 9:
       // SECRET SECTOR
       player->secretcount++;
-      sector->special &= ~31;
+      sector->special = special & ~31;
       sector->oldspecial |= 9;
       if (player == &players[consoleplayer])
       {
@@ -2085,7 +2082,7 @@ void P_PlayerInSpecialSector (player_t* player)
       if (player->health <= 10)
       {
 	G_ExitLevel();
-	sector->special &= ~31;
+	sector->special = special & ~31;
       }
       break;
 
@@ -2101,8 +2098,8 @@ void P_PlayerInSpecialSector (player_t* player)
 
     default:
       if (M_CheckParm ("-showunknown"))
-	printf ("P_PlayerInSpecialSector: unknown special %i\n", sector->special);
-      sector->special &= ~31;
+	printf ("P_PlayerInSpecialSector: unknown special %i\n", special);
+      sector->special = special & ~31;
   }
 
   switch (sector->special & 0x60)
@@ -2939,13 +2936,6 @@ static void P_SpawnScrollers(void)
 static void P_SpawnFriction(void)
 {
     line_t  *l = lines;
-
-    // killough 08/28/98: initialize all sectors to normal friction first
-    for (int i = 0; i < numsectors; i++)
-    {
-	sectors[i].friction = ORIG_FRICTION;
-	sectors[i].movefactor = ORIG_FRICTION_FACTOR;
-    }
 
     for (int i = 0; i < numlines; i++, l++)
 	if (l->special == 223)

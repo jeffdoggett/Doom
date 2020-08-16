@@ -267,6 +267,8 @@ void P_PlayerThink (player_t* player)
   mobj_t*	mo;
   ticcmd_t*	cmd;
   weapontype_t	newweapon;
+  sector_t*	sector;
+  dushort_t	special;
 
   mo = player->mo;
 
@@ -303,8 +305,10 @@ void P_PlayerThink (player_t* player)
 
   P_CalcHeight (player);
 
-  if (mo->subsector->sector->special)
-    P_PlayerInSpecialSector (player);
+  sector = mo->subsector->sector;
+  special = sector -> special & ~(FRICTION_MASK | PUSH_MASK); // Not interested in these.
+  if (special)
+    P_PlayerInSpecialSector (player, sector, special);
 
   // Check for weapon change.
 
