@@ -1784,34 +1784,6 @@ boolean PIT_ChangeSector (mobj_t*	thing)
     return true;
 }
 
-
-#ifndef USE_BOOM_P_ChangeSector
-//
-// P_ChangeSector
-//
-
-boolean
-P_ChangeSector
-( sector_t*	sector,
-  boolean	crunch )
-{
-    int	x;
-    int	y;
-
-    nofit = false;
-    crushchange = crunch;
-
-    // re-check heights for all things near the moving sector
-    for (x=sector->blockbox[BOXLEFT] ; x<= sector->blockbox[BOXRIGHT] ; x++)
-	for (y=sector->blockbox[BOXBOTTOM];y<= sector->blockbox[BOXTOP] ; y++)
-	    P_BlockThingsIterator (x, y, PIT_ChangeSector);
-
-
-    crushchange = false;
-    return nofit;
-}
-
-#else
 // P_ChangeSector
 // jff 3/19/98 added to just check monsters on the periphery
 // of a moving sector instead of all in bounding box of the
@@ -2098,5 +2070,3 @@ void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y)
       tmbbox[BOXLEFT] = x - radius;
     }
 }
-
-#endif

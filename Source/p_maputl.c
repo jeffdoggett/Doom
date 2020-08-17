@@ -351,7 +351,6 @@ void P_UnsetThingPosition (mobj_t* thing)
 	else
 	    thing->subsector->sector->thinglist = thing->snext;
 
-#ifdef USE_BOOM_P_ChangeSector
 	// phares 3/14/98
 	//
 	// Save the sector list pointed to by touching_sectorlist.
@@ -366,7 +365,6 @@ void P_UnsetThingPosition (mobj_t* thing)
 	// routine will clear out the nodes in sector_list.
 	sector_list = thing->touching_sectorlist;
 	thing->touching_sectorlist = NULL; // to be restored by P_SetThingPosition
-#endif
     }
 
     if ( ! (thing->flags & MF_NOBLOCKMAP) )
@@ -426,8 +424,6 @@ P_SetThingPosition (mobj_t* thing)
 
 	sec->thinglist = thing;
 
-
-#ifdef USE_BOOM_P_ChangeSector
 	// phares 3/16/98
 	//
 	// If sector_list isn't NULL, it has a collection of sector
@@ -443,7 +439,6 @@ P_SetThingPosition (mobj_t* thing)
 	P_CreateSecNodeList(thing, thing->x, thing->y);
 	thing->touching_sectorlist = sector_list; // Attach to Thing's mobj_t
 	sector_list = NULL; // clear for next time
-#endif
     }
 
 

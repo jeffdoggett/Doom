@@ -1907,9 +1907,7 @@ P_SetupLevel
 #endif
 	Z_FreeTags (PU_LEVEL, PU_PURGELEVEL-1);
 
-#ifdef USE_BOOM_P_ChangeSector
     headsecnode = NULL;
-#endif
 
     // UNUSED W_Profile ();
     P_InitThinkers ();

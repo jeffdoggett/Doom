@@ -863,9 +863,7 @@ void G_DoLoadLevel (void)
     p++;
   } while (++i < MAXPLAYERS);
 
-#ifdef USE_BOOM_P_ChangeSector
   sector_list = NULL;
-#endif
 
   P_SetupLevel (gameepisode, gamemap, 0, gameskill);
   displayplayer = consoleplayer;		// view the guy you are playing

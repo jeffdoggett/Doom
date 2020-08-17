@@ -28,10 +28,7 @@ static const char rcsid[] = "$Id: p_mobj.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #include "includes.h"
 
 extern void G_PlayerReborn (int player);
-
-#ifdef USE_BOOM_P_ChangeSector
 extern void P_DelSeclist (msecnode_t *node);
-#endif
 
 unsigned int mtf_mask = 0;
 
@@ -314,24 +311,6 @@ void P_XYMovement (mobj_t* mo)
 
     stopspeed = STOPSPEED;
     sector = mo->subsector->sector;
-
-#ifndef USE_BOOM_P_ChangeSector
-    /* Allow things being carried to fall off the edge. */
-    if (flags & MF_SLIDE)
-    {
-      /* If the sector that we are above is a scrolling one */
-      /* then we shouldn't exit here. So the FRICTION is */
-      /* applied in T_Scroll() instead. */
-
-      if (mo->floorz > sector->floorheight)
-	return;
-
-      /* Cod.wad level 10 throws some very slow moving stuff off */
-      /* the end of a conveyor over a drop and it has to slide */
-      /* onto a teleport line. */
-      stopspeed = 1;
-    }
-#endif
 
     if (mo->momx > -stopspeed
 	&& mo->momx < stopspeed
@@ -775,14 +754,12 @@ void P_RemoveMobj (mobj_t* mobj)
     // unlink from sector and block lists
     P_UnsetThingPosition (mobj);
 
-#ifdef USE_BOOM_P_ChangeSector
     // Delete all nodes on the current sector_list
     if (sector_list)
     {
 	P_DelSeclist(sector_list);
 	sector_list = NULL;
     }
-#endif
 
     S_RemoveSoundOrigin (mobj);
 

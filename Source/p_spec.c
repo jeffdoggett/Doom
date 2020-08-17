@@ -2459,32 +2459,6 @@ void P_SpawnSpecials (void)
 }
 
 /* ---------------------------------------------------------------------------- */
-#if 0
-int P_SectorActive(special_e t, const sector_t *sec)
-{
-  //BOOMTRACEOUT("P_SectorActive")
-
-#if 0
-  if (demo_compatibility)  /* return whether any thinker is active */
-    return sec->floordata || sec->ceilingdata || sec->lightingdata;
-  else
-#endif
-  {
-    switch (t)	     /* return whether thinker of same type is active */
-    {
-      case floor_special:
-	return (int)sec->floordata;
-      case ceiling_special:
-	return (int)sec->ceilingdata;
-      case lighting_special:
-	return (int)sec->lightingdata;
-    }
-  }
-  return 1; /* don't know which special, must be active, shouldn't be here */
-}
-#endif
-
-/* ---------------------------------------------------------------------------- */
 
 sector_t *P_FindModelFloorSector (fixed_t floordestheight,int secnum)
 {
@@ -2539,39 +2513,6 @@ sector_t *P_FindModelCeilingSector (fixed_t ceilingdestheight,int secnum)
   }
   return NULL;
 }
-
-/* ---------------------------------------------------------------------------- */
-#if 0
-static fixed_t mov_dx, mov_dy;
-static fixed_t mov_height, mov_waterheight;
-
-static boolean P_MoveThing (mobj_t *thing)
-{
-  if (!(thing->flags & MF_NOCLIP)
-   && (!(thing->flags & MF_NOGRAVITY || thing->z > mov_height)
-    || thing->z < mov_waterheight))
-  {
-    /* Move objects only if on floor or underwater, */
-    /* non-floating, and clipped. */
-    thing->momx += mov_dx;
-    thing->momy += mov_dy;
-    thing->flags |= MF_SLIDE;
-  }
-  return (0);
-}
-
-/* ---------------------------------------------------------------------------- */
-
-static void P_MoveAllNearThings (sector_t *sector)
-{
-  int	x;
-  int	y;
-
-  for (x=sector->blockbox[BOXLEFT] ; x<= sector->blockbox[BOXRIGHT] ; x++)
-      for (y=sector->blockbox[BOXBOTTOM];y<= sector->blockbox[BOXTOP] ; y++)
-	  P_BlockThingsIterator (x, y, P_MoveThing);
-}
-#endif
 
 /* ---------------------------------------------------------------------------- */
 
@@ -2635,14 +2576,6 @@ void T_Scroll(scroll_t *s)
       sectors[sec->heightsec].floorheight > height ?
       sectors[sec->heightsec].floorheight : MININT;
 
-#if 0
-      mov_dx = dx;
-      mov_dy = dy;
-      mov_height = height;
-      mov_waterheight = waterheight;
-      P_MoveAllNearThings (sec);
-#endif
-#ifdef USE_BOOM_P_ChangeSector
       {
 	struct msecnode_s *node;
 	for (node = sec->touching_thinglist; node; node = node->m_snext)
@@ -2659,86 +2592,6 @@ void T_Scroll(scroll_t *s)
 	  }
 	}
       }
-#endif
-      /* Once I find out whether teleport landings should */
-      /* also get carried along on conveyors, I'll know */
-      /* which of the following algorithms to use! */
-#if 0
-      /* This loops through all of the thinkers and */
-      /* includes things like teleport landings. */
-      {
-	thinker_t*	thinker;
-	for (thinker = thinker_head;
-	      thinker != NULL;
-	      thinker = thinker->next)
-	{
-	  /* Cod/wad level 6 has some tricky steps for the conveyor */
-	  /* to go down, so we ignore the height if the thing is */
-	  /* already MF_SLIDE-ing. */
-
-	  if ((thinker->function.acp1 == (actionf_p1) P_MobjThinker)
-	   && ((thing = (mobj_t *) thinker)->subsector->sector == sec)
-	   && ((thing->flags & MF_NOCLIP) == 0)
-	   && ((thing->flags & MF_NOGRAVITY) == 0)
-	   && ((thing->flags & MF_SLIDE) || (thing->z <= height) || (thing->z < waterheight)))
-	  {
-	      /* If the object is above the floor then need to apply the */
-	      /* friction because P_XYMovement didn't do it. */
-
-	      if (thing->z > height)
-	      {
-		thing->momx = FixedMul (thing->momx, FRICTION);
-		thing->momy = FixedMul (thing->momy, FRICTION);
-	      }
-
-	      thing->momx += dx;
-	      thing->momy += dy;
-	      thing->flags |= MF_SLIDE;
-	  }
-	}
-      }
-#endif
-#ifndef USE_BOOM_P_ChangeSector
-      /* This follows the linked list of things in this sector and */
-      /* does not include stuff like teleport landings. */
-      thing = sec->thinglist;
-      if (thing)
-      {
-	do
-	{
-#if 0
-	  if (!(thing->flags & MF_NOCLIP) &&
-	   (!(thing->flags & MF_NOGRAVITY || thing->z > height) ||
-	      thing->z < waterheight))
-#endif
-	  /* Move objects only if on floor or underwater, */
-	  /* non-floating, and clipped. */
-
-	  /* Cod/wad level 6 has some tricky steps for the conveyor */
-	  /* to go down, so we ignore the height if the thing is */
-	  /* already MF_SLIDE-ing. */
-
-	  if (((thing->flags & MF_NOCLIP) == 0)
-	   && ((thing->flags & MF_NOGRAVITY) == 0)
-	   && ((thing->flags & MF_SLIDE) || (thing->z <= height) || (thing->z < waterheight)))
-	  {
-	      /* If the object is above the floor then need to apply the */
-	      /* friction because P_XYMovement didn't do it. */
-
-	      if (thing->z > height)
-	      {
-		thing->momx = FixedMul (thing->momx, FRICTION);
-		thing->momy = FixedMul (thing->momy, FRICTION);
-	      }
-
-	      thing->momx += dx;
-	      thing->momy += dy;
-	      thing->flags |= MF_SLIDE;
-	  }
-	  thing = thing -> snext;
-	} while (thing);
-      }
-#endif
       break;
 
     case sc_carry_ceiling:       /* to be added later */
