@@ -3016,7 +3016,7 @@ static void P_SpawnFriction(void)
 
 //
 // Add a push thinker to the thinker list
-static void Add_Pusher(int type, int x_mag, int y_mag, mobj_t *source, int affectee)
+static void Add_Pusher(push_type_t type, int x_mag, int y_mag, mobj_t *source, int affectee)
 {
     sector_t *sec;
     sec = &sectors[affectee];
@@ -3029,7 +3029,7 @@ static void Add_Pusher(int type, int x_mag, int y_mag, mobj_t *source, int affec
     pusher_t *p = Z_Calloc (sizeof(*p), PU_LEVSPEC, NULL);
 
     p->source = source;
-    p->type = (push_type_t) type;
+    p->type = type;
     p->x_mag = x_mag >> FRACBITS;
     p->y_mag = y_mag >> FRACBITS;
     p->magnitude = P_ApproxDistance(p->x_mag, p->y_mag);
