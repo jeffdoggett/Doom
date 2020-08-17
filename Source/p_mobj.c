@@ -225,8 +225,8 @@ void P_XYMovement (mobj_t* mo)
 	    // killough 08/11/98: bouncing off walls
 	    // killough 10/98:
 	    // Add ability for objects other than players to bounce on ice
-	    if (!(mo->flags & MF_MISSILE)
-		&& ((mo->flags & MF_BOUNCES)
+	    if (!(flags & MF_MISSILE)
+		&& ((flags & MF_BOUNCES)
 		    || (!player && blockline && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
 	    {
 		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
@@ -241,19 +241,19 @@ void P_XYMovement (mobj_t* mo)
 
 		// if under gravity, slow down in
 		// direction perpendicular to wall.
-		if (!(mo->flags & MF_NOGRAVITY))
+		if (!(flags & MF_NOGRAVITY))
 		{
 		    mo->momx = (mo->momx + x) / 2;
 		    mo->momy = (mo->momy + y) / 2;
 		}
 	    }
-	    else if ((player) || (mo->flags & MF_SLIDE))
+	    else if ((player) || (flags & MF_SLIDE))
 	    {
 		// try to slide along it
 		P_SlideMove(mo);
 		break;
 	    }
-	    else if (mo->flags & MF_MISSILE)
+	    else if (flags & MF_MISSILE)
 	    {
 		// explode a missile
 		if (ceilingline && ceilingline->backsector
