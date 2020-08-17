@@ -247,7 +247,7 @@ void P_XYMovement (mobj_t* mo)
 		    mo->momy = (mo->momy + y) / 2;
 		}
 	    }
-	    else if (player)
+	    else if ((player) || (mo->flags & MF_SLIDE))
 	    {
 		// try to slide along it
 		P_SlideMove(mo);
