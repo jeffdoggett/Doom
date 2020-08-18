@@ -2747,6 +2747,10 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	      {
 		P_PatchSwitchList (a_line + 15);
 	      }
+	      else if (strncasecmp (a_line+6, "SKY ", 4) == 0)
+	      {
+		R_PatchSky (a_line + 10);
+	      }
 	      else if (strncasecmp (a_line+6, "ORIGSCREENWIDTH ", 16) == 0)
 	      {
 		ORIGSCREENWIDTH = atoi (a_line+6+16);
@@ -2757,7 +2761,7 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	      }
 	      else if (strncasecmp (a_line+6, "MTF_MASK ", 9) == 0)
 	      {
-		mtf_mask = atoi (a_line+6+9);
+		mtf_mask = (unsigned int) strtol (a_line+6+9, NULL, 0);
 	      }
 	      else
 	      {
@@ -3322,7 +3326,7 @@ void G_Patch_Map (void)
 
       pq = pp + pos;
       while (*pq == ' ') pq++;
-      patch = atoi (pq);
+      patch = (unsigned int) strtol (pq, NULL, 0);
       while (*pp == ' ') pp++;
       if (strncasecmp (pp, "LINE ",5) == 0)
       {
@@ -3455,7 +3459,7 @@ void G_Patch_Map_Things (int thingnumber, mapthing_t * mt)
 
 	  pq = pp + pos;
 	  while (*pq == ' ') pq++;
-	  patch = atoi (pq);
+	  patch = (unsigned int) strtol (pq, NULL, 0);
 
 	  while (*pp && (*pp != ' ')) pp++;
 	  while (*pp == ' ') pp++;

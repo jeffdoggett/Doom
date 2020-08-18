@@ -614,7 +614,6 @@ void R_SetViewSize (int flag, int blocks, int detail)
 void R_ExecuteSetViewSize (void)
 {
     fixed_t	dy;
-    fixed_t	sis;
     int		i;
     int		j;
     int		level;
@@ -681,15 +680,8 @@ void R_ExecuteSetViewSize (void)
     }
 
     R_InitBuffer (scaledviewwidth, viewheight);
-
     R_InitTextureMapping ();
-
-    sis = (FRACUNIT*SCREENWIDTH/viewwidth)>>detailshift;
-    if (SCREENHEIGHT > 200)
-    {
-      sis = (sis * 200) / SCREENHEIGHT;
-    }
-    skyiscale = sis;
+    R_InitSkyMapScale ();
 
     // psprite scales
     // Try to fix for different aspect ratios, otherwise the sky looks really weird

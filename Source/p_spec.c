@@ -2593,9 +2593,10 @@ void T_Scroll(scroll_t *s)
 	}
       }
       break;
-
+#if 0
     case sc_carry_ceiling:       /* to be added later */
       break;
+#endif
   }
 }
 

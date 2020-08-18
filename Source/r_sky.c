@@ -53,6 +53,142 @@ const char sky_8 [] = "SKY8";
 const char sky_9 [] = "SKY9";
 extern char * finale_backdrops[];
 
+typedef struct skypatch_s
+{
+  struct skypatch_s * next;
+  char name [12];
+  fixed_t yscale;
+  fixed_t texturemid;
+} skypatch_t;
+
+static skypatch_t * list_head = NULL;
+static skypatch_t * current_sky_patch = NULL;
+
+/* -------------------------------------------------------------------------------------------- */
+
+static skypatch_t * find_skypatch (const char * skyname)
+{
+  skypatch_t * ptr = list_head;
+
+  while (ptr)
+  {
+    if (strcasecmp (skyname, ptr -> name) == 0)
+      break;
+    ptr = ptr -> next;
+  }
+
+  return (ptr);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+/*
+   Allow the sky size & position to be patched.
+   E.g. Phobos.wad   Patch Sky "Sky1" yscale=56173
+*/
+
+void R_PatchSky (const char * a_line)
+{
+  int pos;
+  char cc;
+  unsigned int value;
+  const char * qpos;
+  const char * vpos;
+  skypatch_t * ptr;
+  char skyname [12];
+
+  qpos = strchr (a_line, '\"');
+  if (qpos == 0)
+    return;
+
+  pos = 0;
+  ++qpos;
+  do
+  {
+    cc = *qpos++;
+    if (cc == '\"') cc = 0;
+    skyname[pos++] = cc;
+  } while (cc && (pos < sizeof (skyname)));
+
+  ptr = find_skypatch (skyname);
+  if (ptr == NULL)
+  {
+    ptr = malloc (sizeof (*ptr));
+    if (ptr == NULL)
+      return;
+    ptr -> next = list_head;
+    list_head = ptr;
+
+    strncpy (ptr -> name, skyname, sizeof (ptr -> name));
+    ptr -> yscale = FRACUNIT;
+    ptr -> texturemid = 100*FRACUNIT;
+  }
+
+  while (*qpos == ' ') qpos++;
+
+  vpos = strchr (qpos, '=');
+  if (vpos == NULL)
+    return;
+
+  ++vpos;
+  while (*vpos == ' ') vpos++;
+
+  value = (unsigned int) strtoul (vpos, NULL, 0);
+
+  if (strncasecmp (qpos, "yscale", 6) == 0)
+  {
+    ptr -> yscale = value;
+    return;
+  }
+
+  if (strncasecmp (qpos, "texturemid", 10) == 0)
+  {
+    ptr -> texturemid = value;
+    return;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+void R_InitSkyMapScale (void)
+{
+  fixed_t sis;
+  skypatch_t * ptr;
+
+  sis = (FRACUNIT*SCREENWIDTH/viewwidth)>>detailshift;
+  if (SCREENHEIGHT > 200)
+  {
+    sis = (sis * 200) / SCREENHEIGHT;
+  }
+
+  ptr = current_sky_patch;
+  if (ptr)
+  {
+    sis = FixedMul (sis, ptr->yscale);
+    skytexturemid = ptr->texturemid;
+  }
+
+  skyiscale = sis;
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
+static int patch_skytexture (const char * skyname)
+{
+  skypatch_t * ptr = list_head;
+
+  ptr = find_skypatch (skyname);
+  current_sky_patch = ptr;
+  if (ptr == NULL)
+    return (0);
+
+  // It's possible to be called before the viewsize has been set.
+  if (viewwidth == 0)
+    return (1);
+
+  R_InitSkyMapScale ();
+  return (1);
+}
+
 /* -------------------------------------------------------------------------------------------- */
 
 static int check_skytexture (const char * skyname)
@@ -63,9 +199,11 @@ static int check_skytexture (const char * skyname)
   i = R_CheckTextureNumForName (skyname);
   if (i != -1)
   {
+    if ((patch_skytexture (skyname))
+
     // For the time being ignore tall textures as these are only
     // for ports with mouselook.
-    if (textures[i].height == (0x80*FRACUNIT))
+     || (textures[i].height == (0x80*FRACUNIT)))
       return (i);
 
 #ifdef NORMALUNIX
@@ -91,11 +229,12 @@ static int check_skytexture (const char * skyname)
       j = R_CheckTextureNumForName (buffer);
       if ((j != -1)
        && (textures[j].height == (0x80*FRACUNIT))
-       && (textures[j].lump == textures[i].lump))
+       && (textures[j].pnames_lump == textures[i].pnames_lump))	// and in the same PNAMES directory?
       {
 #ifdef NORMALUNIX
 	printf ("Substituted sky (%s)\n", buffer);
 #endif
+	patch_skytexture (buffer);
 	return (j);
       }
     }
@@ -214,15 +353,6 @@ void R_InitSkyMap (map_dests_t * map_info_p)
   skytexturemid = 100*FRACUNIT;
   if ((skytexture = load_skytexture (map_info_p)) == -1)
     I_Error ("SKY texture missing");
-#if 0
-  // This is currently done in R_ExecuteSetViewSize()
-  sis = (FRACUNIT*SCREENWIDTH/viewwidth)>>detailshift;
-  if (SCREENHEIGHT > 200)
-  {
-    sis = (sis * 200) / SCREENHEIGHT;
-  }
-  skyiscale = sis;
-#endif
 }
 
 /* -------------------------------------------------------------------------------------------- */

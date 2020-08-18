@@ -50,6 +50,8 @@ extern const char sky_8 [];
 extern const char sky_9 [];
 
 void R_InitSkyMap (map_dests_t * map_info_p);
+void R_InitSkyMapScale (void);
+void R_PatchSky (const char * a_line);
 
 #endif
 //-----------------------------------------------------------------------------

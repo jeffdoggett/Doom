@@ -142,6 +142,10 @@ boolean	 dh_changing_pwad = false;
 
 /* ---------------------------------------------------------------------------- */
 
+#define dh_atoi(a)	((unsigned int)strtol(a,NULL,0))
+
+/* ---------------------------------------------------------------------------- */
+
 /* Put some pointers in for DeHackEd to follow */
 /* Doesn't work as the compiler puts them in the data segment */
 /* rather than the code segment. */
@@ -2517,7 +2521,7 @@ static unsigned int replace_text_levelx (char * orig, char * newt)
   unsigned int n;
 
   if ((dh_strcmp (orig, "level ") == 0)
-   && ((n = atoi (&orig[6])) < 100))
+   && ((n = dh_atoi (&orig[6])) < 100))
   {
     *(HU_access_mapname_E (255, n)) = newt;
     *(HU_access_mapname_E (254, n)) = newt; // Do TNT and Plutonia as well for completeness...
@@ -3124,7 +3128,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
   if (strncasecmp (ttext, "HUSTR_CHATMACRO", 15) == 0)
   {
-    counter1 = atoi (ttext+15);
+    counter1 = dh_atoi (ttext+15);
     return (&chat_macros[counter1]);
   }
 
@@ -3157,7 +3161,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
    && (ttext[6] <= '9'))
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
-    counter1 = atoi (ttext+6);
+    counter1 = dh_atoi (ttext+6);
     return (HU_access_mapname_E (255, counter1));
 //  return (HU_access_mapname_E (254, counter1));
 //  return (HU_access_mapname_E (253, counter1)); // Do TNT and Plutonia as well for completeness...
@@ -3168,7 +3172,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
    && (ttext[7] <= '9'))
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
-    counter1 = atoi (ttext+7);
+    counter1 = dh_atoi (ttext+7);
     return (HU_access_mapname_E (254, counter1));
   }
 
@@ -3177,7 +3181,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
    && (ttext[7] <= '9'))
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
-    counter1 = atoi (ttext+7);
+    counter1 = dh_atoi (ttext+7);
     return (HU_access_mapname_E (253, counter1));
   }
 
@@ -3189,7 +3193,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     if ((ttext [0] >= '0')
      && (ttext [0] <= '9'))
     {
-      counter1 = atoi (ttext);
+      counter1 = dh_atoi (ttext);
       if (counter1 <= 9)
 	return (&startup_messages [counter1]);
     }
@@ -3327,7 +3331,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
 
   if (strncasecmp (ttext, "QUITMSG", 7) == 0)
   {
-    counter1 = atoi (ttext+7);
+    counter1 = dh_atoi (ttext+7);
     if (counter1 < 30)			// Hard coded size, bad!
     {
       if (counter1 >= qty_endmsg_nums)
@@ -3482,7 +3486,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	cc = a_line [counter1++];
 	if (((cc >= '0') && (cc <= '9')) || (cc == '-'))
 	{
-	  params[counter2] = atoi (&a_line[counter1-1]);
+	  params[counter2] = dh_atoi (&a_line[counter1-1]);
 	  counter2++;
 
 	  do
@@ -3792,19 +3796,19 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      }
 	      else
 	      {
-		counter1 = atoi (string1);
+		counter1 = dh_atoi (string1);
 		while (((cc = *string1) >= '0') && (cc <= '9')) string1++;
 		while (((cc = *string1) != 0) && ((cc < '0') || (cc > '9'))) string1++;
 	      }
-	      counter2 = atoi (string1);
+	      counter2 = dh_atoi (string1);
 
 	      mapd_ptr = G_Access_MapInfoTab_E (counter1, counter2);
 	      string1 = next_arg (string1);
 	      while (((cc = *string1) != 0) && ((cc < '0') || (cc > '9'))) string1++;
-	      ptime = atoi (string1);
+	      ptime = dh_atoi (string1);
 	      while (((cc = *string1) >= '0') && (cc <= '9')) string1++;
 	      if (*string1 == ':')
-		ptime=(ptime*60)+atoi(string1+1);
+		ptime=(ptime*60)+dh_atoi(string1+1);
 	      ptime = (ptime + 4) / 5;
 	      if (ptime > 255) ptime = 255;
 	      mapd_ptr -> par_time_5 = ptime;
@@ -3827,7 +3831,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    if (counter2 == 0)
 	      break;
 
-	    counter2 = atoi (a_line + counter2);
+	    counter2 = dh_atoi (a_line + counter2);
 	    if (counter2 >= NUMSTATES)
 	    {
 	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
@@ -4131,7 +4135,7 @@ static char * read_map_num (unsigned int * episode, unsigned int * map, char * p
       case 'M':
 	if (((ptr[1] == 'a') || (ptr[1] == 'A'))
 	 && ((ptr [2] == 'p') || (ptr[2] == 'P')))
-	  *map = atoi (ptr+3);
+	  *map = dh_atoi (ptr+3);
 	while (*ptr > ' ')
 	  ptr++;
 	return (ptr);
@@ -4150,7 +4154,7 @@ static unsigned int read_int (char * ptr)
   while (((cc = *ptr) != 0) && ((cc < '0') || (cc > '9')))
     ptr++;
 
-  return (atoi (ptr));
+  return (dh_atoi (ptr));
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -5881,7 +5885,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       while (((cc = *ptr) < '0') || (cc > '9')) ptr++;
       if (episode == 255)
       {
-	j = atoi (ptr);
+	j = dh_atoi (ptr);
 	mdest_ptr -> normal_exit_to_map = j;
       }
       else
@@ -5898,7 +5902,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       while (((cc = *ptr) < '0') || (cc > '9')) ptr++;
       if (episode == 255)
       {
-	j = atoi (ptr);
+	j = dh_atoi (ptr);
 	mdest_ptr -> secret_exit_to_map = j;
       }
       else
@@ -5932,7 +5936,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
     else if (strncasecmp (ptr, "partime", 7) == 0)
     {
       while (((cc = *ptr) < '0') || (cc > '9')) ptr++;
-      j = atoi (ptr);
+      j = dh_atoi (ptr);
       j = (j + 4) / 5;
       if (j > 255) j = 255;
       mdest_ptr -> par_time_5 = j;
@@ -6338,7 +6342,7 @@ static void Parse_Lockdefs (char * ptr, char * top)
     if (strncasecmp (ptr, "Lock ", 5) == 0)
     {
       if (dh_instr (ptr, "doom"))
-	locknum = atoi (ptr + 5);
+	locknum = dh_atoi (ptr + 5);
     }
     else if (strncasecmp (ptr, "RedCard", 7) == 0)
     {
@@ -6375,11 +6379,11 @@ static void Parse_Lockdefs (char * ptr, char * top)
     else if (strncasecmp (ptr, "Mapcolor ", 9) == 0)
     {
       ptr += 9;
-      r = atoi (ptr);
+      r = dh_atoi (ptr);
       while (((cc = *ptr++) != ' ') && (cc != ','));
-      g = atoi (ptr);
+      g = dh_atoi (ptr);
       while (((cc = *ptr++) != ' ') && (cc != ','));
-      b = atoi (ptr);
+      b = dh_atoi (ptr);
     }
     else if (*ptr == '}')
     {

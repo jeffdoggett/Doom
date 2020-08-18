@@ -221,7 +221,7 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 	for (j = 1; j * 2 <= texture->width; j <<= 1);
 	texture->widthmask = j - 1;
 	textures[texbase+i].height = texture->height << FRACBITS;
-	textures[texbase+i].lump = names_lump;
+	textures[texbase+i].pnames_lump = names_lump;
 	i++;	// Done here so that 'continue' misses it out...
     }
 

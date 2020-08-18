@@ -45,7 +45,7 @@ typedef struct
   texture_t *	texture;
   fixed_t	height;		// for texture pegging
   int		translation;	// for global animation
-  int		lump;
+  int		pnames_lump;	// Lump number of the PNAMES lump that references this texture.
 } texture_info_t;
 
 // needed for pre rendering (fracs)
