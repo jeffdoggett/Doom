@@ -27,6 +27,7 @@
 enum
 {
   sg_none,
+  sg_one,	// Spare for DeHackEd use.
   sg_itemup,
   sg_wpnup,
   sg_oof,

@@ -5027,6 +5027,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 
     if (strncasecmp (ptr, "defaultmap", 10) == 0)
     {
+      memset (&default_mapinfo, 0, sizeof (default_mapinfo));
       doing_default = 1;
     }
     else if (strncasecmp (ptr, "episode ", 8) == 0)

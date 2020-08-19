@@ -3361,7 +3361,7 @@ void G_Patch_Map (void)
 	{
 	  while (*pp && (*pp != ' ')) pp++;
 	  while (*pp == ' ') pp++;
-	  sector = &sector [index];
+	  sector = &sectors [index];
 	  if (strncasecmp (pp, "TAG", 3) == 0)
 	  {
 	    sector -> tag = patch;
@@ -3369,6 +3369,14 @@ void G_Patch_Map (void)
 	  else if (strncasecmp (pp, "SPECIAL", 7) == 0)
 	  {
 	    sector -> special = patch;
+	  }
+	  else if (strncasecmp (pp, "CEILING", 7) == 0)
+	  {
+	    sector -> ceilingheight = patch << FRACBITS;
+	  }
+	  else if (strncasecmp (pp, "FLOOR", 5) == 0)
+	  {
+	    sector -> floorheight = patch << FRACBITS;
 	  }
 	}
       }

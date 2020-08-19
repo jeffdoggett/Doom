@@ -518,7 +518,7 @@ static boolean R_SpriteValid (lumpinfo_t* lump_ptr)
      && (fgetc (handle) == 'G'))
     {
       if (M_CheckParm ("-showunknown"))
-	printf ("Sprite %s is a PNG\n", lump_ptr -> name);
+	printf ("Sprite %.8s is a PNG\n", lump_ptr -> name);
       return (false);
     }
   }
