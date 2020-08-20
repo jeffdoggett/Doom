@@ -2136,13 +2136,13 @@ AM_drawThingsDifferently (void)
 		shape = &pentacle_shape;
 		break;
 	      // Key cards
-	      case 5 : colour = mapcolour.bkey; shape = &key_shape; break;
-	      case 6 : colour = mapcolour.ykey; shape = &key_shape; break;
-	      case 13: colour = mapcolour.rkey; shape = &key_shape; break;
+	      case 5 : colour = mapcolour.bcard; shape = &key_shape; break;
+	      case 6 : colour = mapcolour.ycard; shape = &key_shape; break;
+	      case 13: colour = mapcolour.rcard; shape = &key_shape; break;
 	      // Skull keys
-	      case 40: colour = mapcolour.bkey; shape = &skullkey_shape; break;
-	      case 39: colour = mapcolour.ykey; shape = &skullkey_shape; break;
-	      case 38: colour = mapcolour.rkey; shape = &skullkey_shape; break;
+	      case 40: colour = mapcolour.bskull; shape = &skullkey_shape; break;
+	      case 39: colour = mapcolour.yskull; shape = &skullkey_shape; break;
+	      case 38: colour = mapcolour.rskull; shape = &skullkey_shape; break;
 #endif
 	      // Pillars
 	      case 30: case 31: case 32: case 33: case 36: case 37:

@@ -344,7 +344,11 @@ boolean P_Move (mobj_t*	actor)
 
 	if ((actor->flags & MF_FLOAT) && floatok)
 	{
-	    actor->z += (actor->z < tmfloorz ? FLOATSPEED : -FLOATSPEED); // must adjust height
+	    // must adjust height
+	    if (actor->z < tmfloorz)
+		actor->z += FLOATSPEED;
+	    else
+		actor->z -= FLOATSPEED;
 	    actor->flags |= MF_INFLOAT;
 	    return true;
 	}
