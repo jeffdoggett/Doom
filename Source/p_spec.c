@@ -2795,16 +2795,23 @@ static void P_SpawnFriction(void)
 	if (l->special == 223)
 	{
 	    int length = P_ApproxDistance(l->dx, l->dy) >> FRACBITS;
-	    int friction = BETWEEN(0, (0x1EB8 * length) / 0x80 + 0xD000, FRACUNIT);
 	    int movefactor;
+	    int friction = (0x1EB8 * length) / 0x80 + 0xD000;
+	    if (friction < 0)
+	      friction = 0;
+	    else if (friction > FRACUNIT)
+	      friction = FRACUNIT;
 
 	    // The following check might seem odd. At the time of movement,
 	    // the move distance is multiplied by 'friction/0x10000', so a
 	    // higher friction value actually means 'less friction'.
 	    if (friction > ORIG_FRICTION)       // ice
-		movefactor = MAX(32, ((0x10092 - friction) * 0x70) / 0x0158);
+		movefactor = ((0x10092 - friction) * 0x70) / 0x0158;
 	    else
-		movefactor = MAX(32, ((friction - 0xDB34) * 0x0A) / 0x80);
+		movefactor = ((friction - 0xDB34) * 0x0A) / 0x80;
+
+	    if (movefactor < 32)
+	      movefactor = 32;
 
 	    for (int s = -1; (s = P_FindSectorFromLineTag(l, s)) >= 0;)
 	    {

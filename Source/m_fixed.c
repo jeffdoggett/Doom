@@ -44,6 +44,9 @@ int ABS (int a)
   return ((a ^ b) - b);
 }
 
+#if 0
+// Not currently used
+
 int MAX (int a, int b)
 {
   b = a - b;
@@ -56,11 +59,11 @@ int MIN (int a, int b)
   return (b + (a & (a >> 31)));
 }
 
-// Not currently used
 int BETWEEN(int a, int b, int c)
 {
     return MAX(a, MIN(b, c));
 }
+#endif
 
 int SIGN (int a)
 {

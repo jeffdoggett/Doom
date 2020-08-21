@@ -252,41 +252,53 @@ static void R_DrawMaskedColumn(const rpatch_t *patch, const rcolumn_t *column)
 	int		length = post->length;
 	int		topdelta = post->topdelta;
 	fixed_t		frac;
+	int		limit,yl,yh,ylim;
 
 	// calculate unclipped screen coordinates for post
 	topscreen = (int64_t)sprtopscreen + (int64_t)spryscale * (int64_t)topdelta + (int64_t)1;
 
-	dc_yl = MAX((int)((topscreen + FRACUNIT) >> FRACBITS), mceilingclip[dc_x] + 1);
-	dc_yh = MIN((int)((topscreen + (int64_t)spryscale * (int64_t)length) >> FRACBITS), mfloorclip[dc_x] - 1);
+	// Use in-line code and local variables for speed.
+	limit = (int) ((topscreen + FRACUNIT) >> FRACBITS);
+	yl = mceilingclip[dc_x] + 1;
+	if (yl < limit)
+	  yl = limit;
 
-	if (dc_yl <= dc_yh && dc_yh < viewheight)
+	limit = (int) ((topscreen + (int64_t)spryscale * (int64_t)length) >> FRACBITS);
+	yh = mfloorclip[dc_x] - 1;
+	if (yh > limit)
+	  yh = limit;
+
+	if ((yl <= yh) && (yh < viewheight))
 	{
 	    frac = dc_texturemid - (topdelta << FRACBITS) +
-			FixedMul((dc_yl - centery) << FRACBITS, dc_iscale);
+			FixedMul((yl - centery) << FRACBITS, dc_iscale);
 
-	    dc_ylim = length << FRACBITS;
-	    if ((unsigned) frac >= (unsigned) dc_ylim)
+	    ylim = length << FRACBITS;
+	    if ((unsigned) frac >= (unsigned) ylim)
 	    {
 	      fixed_t mask;
 
-	      mask = dc_ylim - 1;
-	      if ((dc_ylim & mask) == 0)	/* Power of 2 height? */
+	      mask = ylim - 1;
+	      if ((ylim & mask) == 0)		/* Power of 2 height? */
 	      {
 		frac &= mask;			/* Yes. Can just mask off. */
 	      }
 	      else if (frac < 0)
 	      {
 		frac = -frac;
-		frac = (unsigned) frac % (unsigned) dc_ylim;
-		frac = dc_ylim - frac;
+		frac = (unsigned) frac % (unsigned) ylim;
+		frac = ylim - frac;
 	      }
 	      else
 	      {
-		frac = (unsigned) frac % (unsigned) dc_ylim;
+		frac = (unsigned) frac % (unsigned) ylim;
 	      }
 	    }
 	    dc_texturefrac = frac;
 	    dc_source = column->pixels + topdelta;
+	    dc_yl = yl;
+	    dc_yh = yh;
+	    dc_ylim = ylim;
 	    colfunc();
 	}
     }
