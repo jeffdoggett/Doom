@@ -93,6 +93,7 @@ static fixed_t weapon_bottom (void)
 void P_SetPsprite (player_t* player, pspdef_t* psp, statenum_t stnum)
 {
   state_t*	state;
+  fixed_t	y;
 
   do
   {
@@ -111,7 +112,10 @@ void P_SetPsprite (player_t* player, pspdef_t* psp, statenum_t stnum)
     {
       // coordinate set
       psp->sx = (fixed_t) (state->misc1 << FRACBITS);
-      psp->sy = (fixed_t) (state->misc2 << FRACBITS);
+      y = (fixed_t) (state->misc2 << FRACBITS);
+      if (weaponscale <= 1)		// Mayhem19.wad uses this for the
+        y += (100*FRACUNIT);		// replacement for the BFG.
+      psp->sy = y;
     }
 
     // Call action routine.

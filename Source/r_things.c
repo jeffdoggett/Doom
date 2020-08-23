@@ -126,6 +126,13 @@ R_InstallSpriteLump
   {
     // make 0 based
     // Appears to be 0,8,1,9,2,10,3,11,4,12,5,13,6,14,7,15
+    // Note: Lookup table not required as the ARM compiler only
+    // uses four instructions for the following 4 lines.
+    // E3580008 : CMP     R8,#8
+    // E1A01088 : MOV     R1,R8,LSL #1
+    // 92418002 : SUBLS   R8,R1,#2
+    // 82418011 : SUBHI   R8,R1,#&11	; =17
+
     if (rotation > 8)
       rotation = ((rotation - 9) * 2) + 1;
     else
