@@ -309,7 +309,8 @@ boolean PIT_CheckLine (line_t* ld)
 	return false;		// one sided line
     }
 
-    if (!(tmthing->flags & MF_MISSILE) )
+    // killough 08/10/98: allow bouncing objects to pass through as missiles
+    if (!(tmthing->flags & (MF_MISSILE | MF_BOUNCES)))
     {
 	if ( ld->flags & ML_BLOCKING )
 	    return false;	// explicitly blocking everything
@@ -432,7 +433,8 @@ boolean PIT_CheckThing (mobj_t* thing)
 
 
     // missiles can hit other things
-    if (tmthing->flags & MF_MISSILE)
+    // killough 08/10/98: bouncing non-solid things can hit other things too
+    if ((tmflags & MF_MISSILE) || ((tmflags & MF_BOUNCES) && !(tmflags & MF_SOLID)))
     {
 	// see if it went over / under
 	if (tmthing->z > thing->z + thing->height)
@@ -1586,8 +1588,12 @@ boolean PIT_RadiusAttack (mobj_t* thing)
     fixed_t     dz;
     fixed_t     dist;
 
-    if (!(thing->flags & MF_SHOOTABLE))
-	return (true);
+    // killough 08/20/98: allow bouncers to take damage
+    // (missile bouncers are already excluded with MF_NOBLOCKMAP)
+    if (!(thing->flags & (MF_SHOOTABLE | MF_BOUNCES))
+     // [BH] allow corpses to react to blast damage
+     && !(thing->flags & MF_CORPSE))
+        return true;
 
     // Boss spider and cyborg
     // take no damage from concussion.

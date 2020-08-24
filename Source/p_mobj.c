@@ -159,7 +159,6 @@ void P_ExplodeMissile (mobj_t* mo)
 
 void P_XYMovement (mobj_t* mo)
 {
-    int		flags;
     fixed_t 	ptryx;
     fixed_t	ptryy;
     player_t*	player;
@@ -169,15 +168,13 @@ void P_XYMovement (mobj_t* mo)
     fixed_t	stopspeed;
     sector_t *	sector;
 
-    flags = mo->flags;
-
     if ((mo->momx | mo->momy) == 0)
     {
-	mo->flags = flags & ~MF_SLIDE;
-	if (flags & MF_SKULLFLY)
+	mo->flags = mo->flags & ~MF_SLIDE;
+	if (mo->flags & MF_SKULLFLY)
 	{
 	    // the skull slammed into something
-	    mo->flags = flags & ~MF_SKULLFLY;
+	    mo->flags = mo->flags & ~MF_SKULLFLY;
 	    mo->momx = mo->momy = mo->momz = 0;
 
 	    P_SetMobjState (mo, (statenum_t) mo->info->spawnstate);
@@ -222,9 +219,9 @@ void P_XYMovement (mobj_t* mo)
 	    // killough 08/11/98: bouncing off walls
 	    // killough 10/98:
 	    // Add ability for objects other than players to bounce on ice
-	    if (!(flags & MF_MISSILE)
-		&& ((flags & MF_BOUNCES)
-		    || (!player && blockline && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
+	    if ((blockline)
+	     && ((mo->flags & MF_BOUNCES)
+	      || (!(mo->flags & MF_MISSILE) && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
 	    {
 		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
 			    / ((blockline->dx >> FRACBITS) * (blockline->dx >> FRACBITS)
@@ -238,24 +235,24 @@ void P_XYMovement (mobj_t* mo)
 
 		// if under gravity, slow down in
 		// direction perpendicular to wall.
-		if (!(flags & MF_NOGRAVITY))
+		if (!(mo->flags & MF_NOGRAVITY))
 		{
 		    mo->momx = (mo->momx + x) / 2;
 		    mo->momy = (mo->momy + y) / 2;
 		}
 	    }
-	    else if ((player) || (flags & MF_SLIDE))
+	    else if ((player) || (mo->flags & MF_SLIDE))
 	    {
 		// try to slide along it
 		P_SlideMove(mo);
 		break;
 	    }
-	    else if (flags & MF_MISSILE)
+	    else if (mo->flags & MF_MISSILE)
 	    {
 		// explode a missile
 		if (ceilingline && ceilingline->backsector
-		    && ceilingline->backsector->ceilingpic == skyflatnum
-		    && mo->z > ceilingline->backsector->ceilingheight)
+		 && ceilingline->backsector->ceilingpic == skyflatnum
+		 && mo->z > ceilingline->backsector->ceilingheight)
 		{
 		    // Hack to prevent missiles exploding
 		    // against the sky.
@@ -287,14 +284,14 @@ void P_XYMovement (mobj_t* mo)
 	return;
     }
 
-    if ((flags & (MF_MISSILE | MF_SKULLFLY) )	// no friction for missiles ever
-     || ((mo->z > mo->floorz)			// no friction when airborne
+    if ((mo->flags & (MF_MISSILE | MF_SKULLFLY) )// no friction for missiles ever
+     || ((mo->z > mo->floorz)			 // no friction when airborne
       && !(mo->flags2 & MF2_ONMOBJ)))
     {
 	return;
     }
 
-    if (flags & MF_CORPSE)
+    if (mo->flags & MF_CORPSE)
     {
 	// do not stop sliding
 	//  if halfway off a step with some momentum
