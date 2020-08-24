@@ -221,7 +221,7 @@ void P_XYMovement (mobj_t* mo)
 	    // Add ability for objects other than players to bounce on ice
 	    if ((blockline)
 	     && ((mo->flags & MF_BOUNCES)
-	      || (!(mo->flags & MF_MISSILE) && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
+	      || (!player && !(mo->flags & MF_MISSILE) && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
 	    {
 		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
 			    / ((blockline->dx >> FRACBITS) * (blockline->dx >> FRACBITS)
