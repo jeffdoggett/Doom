@@ -216,38 +216,13 @@ void P_XYMovement (mobj_t* mo)
 	if (!P_TryMove(mo, ptryx, ptryy))
 	{
 	    // blocked move
-	    // killough 08/11/98: bouncing off walls
-	    // killough 10/98:
-	    // Add ability for objects other than players to bounce on ice
-	    if ((blockline)
-	     && ((mo->flags & MF_BOUNCES)
-	      || (!player && !(mo->flags & MF_MISSILE) && mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
-	    {
-		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
-			    / ((blockline->dx >> FRACBITS) * (blockline->dx >> FRACBITS)
-			    + (blockline->dy >> FRACBITS) * (blockline->dy >> FRACBITS));
-		fixed_t x = FixedMul(r, blockline->dx);
-		fixed_t y = FixedMul(r, blockline->dy);
-
-		// reflect momentum away from wall
-		mo->momx = x * 2 - mo->momx;
-		mo->momy = y * 2 - mo->momy;
-
-		// if under gravity, slow down in
-		// direction perpendicular to wall.
-		if (!(mo->flags & MF_NOGRAVITY))
-		{
-		    mo->momx = (mo->momx + x) / 2;
-		    mo->momy = (mo->momy + y) / 2;
-		}
-	    }
-	    else if ((player) || (mo->flags & MF_SLIDE))
+	    if ((player) || (mo->flags & MF_SLIDE))
 	    {
 		// try to slide along it
-		P_SlideMove(mo);
+		P_SlideMove (mo);
 		break;
 	    }
-	    else if (mo->flags & MF_MISSILE)
+	    if (mo->flags & MF_MISSILE)
 	    {
 		// explode a missile
 		if (ceilingline && ceilingline->backsector
@@ -267,6 +242,32 @@ void P_XYMovement (mobj_t* mo)
 		}
 
 		P_ExplodeMissile(mo);
+	    }
+
+	    // killough 08/11/98: bouncing off walls
+	    // killough 10/98:
+	    // Add ability for objects other than players to bounce on ice
+	    else if ((blockline)
+	     && ((mo->flags & MF_BOUNCES)
+	      || (mo->z <= mo->floorz && P_GetFriction(mo, NULL) > ORIG_FRICTION)))
+	    {
+		fixed_t r = ((blockline->dx >> FRACBITS) * mo->momx + (blockline->dy >> FRACBITS) * mo->momy)
+			    / ((blockline->dx >> FRACBITS) * (blockline->dx >> FRACBITS)
+			    + (blockline->dy >> FRACBITS) * (blockline->dy >> FRACBITS));
+		fixed_t x = FixedMul(r, blockline->dx);
+		fixed_t y = FixedMul(r, blockline->dy);
+
+		// reflect momentum away from wall
+		mo->momx = x * 2 - mo->momx;
+		mo->momy = y * 2 - mo->momy;
+
+		// if under gravity, slow down in
+		// direction perpendicular to wall.
+		if (!(mo->flags & MF_NOGRAVITY))
+		{
+		    mo->momx = (mo->momx + x) / 2;
+		    mo->momy = (mo->momy + y) / 2;
+		}
 	    }
 	    else
 	    {
