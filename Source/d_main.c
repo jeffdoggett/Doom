@@ -1945,58 +1945,70 @@ static void D_LoadWads (void)
 
 //-----------------------------------------------------------------------------
 
-static void D_ShowStartupMessage (void)
+static int D_ShowMessage (const char * msg)
 {
-  unsigned int	p,q;
   unsigned int	len;
   char *	p1;
   char *	p2;
   char *	linebuf;
 
+  if ((msg == NULL) || (msg[0] == 0))
+    return (0);
+
+  len = strlen (msg);
+  linebuf = malloc (len+10);
+  if (linebuf == NULL)
+    return (0);
+
+  p1 = linebuf;
+  sprintf (p1, msg, GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+
+  do
+  {
+    p2 = strchr (p1, '\n');
+    if (p2) *p2 = 0;
+    if (*p1 != ' ')
+    {
+      len = strlen (p1);
+      if (len < 80)
+      {
+	len = (80 - len) / 2;
+	while (len)
+	{
+	  putchar (' ');
+	  len--;
+	}
+      }
+    }
+    printf ("%s\n", p1);
+    if (p2 == NULL)
+      break;
+    putchar ('\n');		// Write the LF that we clobbered.
+    p1 = p2 + 1;
+  } while (*p1);
+
+  free (linebuf);
+
+  return (1);
+}
+
+//-----------------------------------------------------------------------------
+
+static void D_ShowStartupMessage (void)
+{
+  unsigned int	p,q;
+
   q = 0;
   p = 0;
   do
   {
-    if (startup_messages [p] && startup_messages[p][0])
-    {
-      len = strlen (startup_messages [p]);
-      linebuf = malloc (len+10);
-      if (linebuf == NULL)
-	break;
-      p1 = linebuf;
-      sprintf (p1, startup_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
-      do
-      {
-	p2 = strchr (p1, '\n');
-	if (p2) *p2 = 0;
-	if (*p1 != ' ')
-	{
-	  len = strlen (p1);
-	  if (len < 80)
-	  {
-	    len = (80 - len) / 2;
-	    while (len)
-	    {
-	      putchar (' ');
-	      len--;
-	    }
-	  }
-	}
-	printf ("%s\n", p1);
-	if (p2 == NULL)
-	  break;
-	putchar ('\n');		// Write the LF that we clobbered.
-	p1 = p2 + 1;
-      } while (*p1);
-      free (linebuf);
-      q++;
-    }
+    q += D_ShowMessage (startup_messages [p]);
   } while (++p < ARRAY_SIZE(startup_messages));
 
   if (q == 0)
   {
     p = D_Startup_msg_number ();
-    printf (dmain_messages[p], GAME_ENGINE_VERSION/100,GAME_ENGINE_VERSION%100);
+    D_ShowMessage (dmain_messages[p]);
   }
 
   printf ("\n\nScreen resolution is %d x %d\n", SCREENWIDTH, SCREENHEIGHT);

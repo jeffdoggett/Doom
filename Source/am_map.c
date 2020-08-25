@@ -81,6 +81,7 @@ typedef struct
   unsigned char rskulldoor;
   unsigned char bskulldoor;
   unsigned char yskulldoor;
+  unsigned char lockeddoor;
   unsigned char tele;
   unsigned char secr;
   unsigned char exit;
@@ -125,6 +126,7 @@ static mapcolour_t mapcolour =
   175,		// rskulldoor	red door colour
   204,		// bskulldoor	blue door colour
   231,		// yskulldoor	yellow door colour
+  208,		// lockeddoor	any or all key door colour
   119,		// tele		teleporter line colour
   252,		// secr		secret sector boundary colour
   112,		// exit		jff 4/23/98 add exit line colour
@@ -1454,8 +1456,8 @@ static int AM_DoorColour(int type)
 	case YSkull:
 	  return (mapcolour.yskulldoor);
 
-	default:
-	  return (mapcolour.clsd);
+	default:			// AnyKey, AllKeys
+	  return (mapcolour.lockeddoor);
       }
     }
 
