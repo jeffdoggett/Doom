@@ -4937,7 +4937,7 @@ mobjinfo_t mobjinfo[] =
     400,							// mass
     0,								// damage
     sfx_dmact,							// activesound
-    MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,// flags
+    MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,	// flags
     MF2_PASSMOBJ,						// flags2
     S_HEAD_RAISE1,						// raisestate
     FRACUNIT,							// scale
@@ -5217,8 +5217,8 @@ mobjinfo_t mobjinfo[] =
     400,							// mass
     0,								// damage
     sfx_dmact,							// activesound
-    MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,// flags
-    0,								// flags2
+    MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,	// flags
+    MF2_PASSMOBJ,						// flags2
     S_PAIN_RAISE1,						// raisestate
     FRACUNIT,							// scale
     "Pain Elemental"						// name1
@@ -5427,7 +5427,7 @@ mobjinfo_t mobjinfo[] =
     100,							// mass
     3,								// damage
     sfx_None,							// activesound
-    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_NOCLIP,// flags
+    MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_NOCLIP,	// flags
     0,								// flags2
     S_NULL,							// raisestate
     FRACUNIT,							// scale

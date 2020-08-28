@@ -1639,6 +1639,16 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
 
     case THING_Bits:
       ptr -> flags = value;
+
+      // Assume that the value of MF2_PASSMOBJ tracks MF_FLOAT
+      // except for the player.
+      if (number > 1)
+      {
+        if (value & MF_FLOAT)
+          ptr -> flags |= MF2_PASSMOBJ;
+        else
+          ptr -> flags &= ~MF2_PASSMOBJ;
+      }
       break;
 
     case THING_Respawn_frame:

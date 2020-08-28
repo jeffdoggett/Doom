@@ -106,7 +106,8 @@ boolean PIT_StompThing (mobj_t* thing)
 
     if (telefrag == false)
     {
-      if (tmthing->flags2 & MF2_PASSMOBJ)
+      if ((tmthing->flags2 & MF2_PASSMOBJ)
+       || (thing->flags2 & MF2_PASSMOBJ))
       {
 	if (tmz > thing->z + thing->height)
 	  return true; // overhead
@@ -408,7 +409,8 @@ boolean PIT_CheckThing (mobj_t* thing)
 
     // check if a mobj passed over/under another object
 
-    if (tmthing->flags2 & MF2_PASSMOBJ)
+    if ((tmthing->flags2 & MF2_PASSMOBJ)
+     || (thing->flags2 & MF2_PASSMOBJ))
     {
 	if (tmthing->z >= thing->z + thing->height)
 	    return true;	// over thing
