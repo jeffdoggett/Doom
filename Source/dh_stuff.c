@@ -1645,9 +1645,9 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       if (number > 1)
       {
         if (value & MF_FLOAT)
-          ptr -> flags |= MF2_PASSMOBJ;
+          ptr -> flags2 |= MF2_PASSMOBJ;
         else
-          ptr -> flags &= ~MF2_PASSMOBJ;
+          ptr -> flags2 &= ~MF2_PASSMOBJ;
       }
       break;
 
