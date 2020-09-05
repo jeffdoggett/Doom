@@ -216,7 +216,7 @@ static map_dests_t next_level_tab_1 [][10] =
     { 0, 6, 0, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M5
     { 0, 7, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M6
     { 0, 8, 0, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M8
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M8
     { 0, 4, 0, 4, 1, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_0, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E0M9
   },
   {
@@ -228,7 +228,7 @@ static map_dests_t next_level_tab_1 [][10] =
     { 1, 6, 1, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M5
     { 1, 7, 1, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M6
     { 1, 8, 1, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,  30/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M8
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 165/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M8
     { 1, 4, 1, 4, 1, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_1, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E1M9
   },
   {
@@ -240,7 +240,7 @@ static map_dests_t next_level_tab_1 [][10] =
     { 2, 6, 2, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M5
     { 2, 7, 2, 9, 0, 0, 0, 0, 0, 0, 360/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M6
     { 2, 8, 2, 9, 0, 0, 0, 0, 0, 0, 240/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,  30/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M8
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 135/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M8
     { 2, 6, 2, 6, 1, 0, 0, 0, 0, 0, 170/5, 60, 0, (char*) mapname_1, (char*) sky_2, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E2M9
   },
   {
@@ -252,20 +252,20 @@ static map_dests_t next_level_tab_1 [][10] =
     { 3, 6, 3, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M5
     { 3, 7, 3, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M6
     { 3, 8, 3, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,  30/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M8
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 105/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M8
     { 3, 7, 3, 7, 1, 0, 0, 0, 0, 0, 135/5, 60, 0, (char*) mapname_1, (char*) sky_3, (char*) wilv, (char*) enterpic_1, (char*) enterpic_1, (char*) borderpatch_1, NULL },  // E3M9
   },
   {
     { 4, 1, 4, 1, 0, 0, 0, 0, 0, 0,   0/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M0
-    { 4, 2, 4, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M1
-    { 4, 3, 4, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M2
-    { 4, 4, 4, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M3
-    { 4, 5, 4, 9, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M4
-    { 4, 6, 4, 9, 0, 0, 0, 0, 0, 0, 150/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M5
-    { 4, 7, 4, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M6
-    { 4, 8, 4, 9, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M7
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M8
-    { 4, 3, 4, 3, 1, 0, 0, 0, 0, 0,  90/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M9
+    { 4, 2, 4, 9, 0, 0, 0, 0, 0, 0, 165/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M1
+    { 4, 3, 4, 9, 0, 0, 0, 0, 0, 0, 255/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M2
+    { 4, 4, 4, 9, 0, 0, 0, 0, 0, 0, 135/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M3
+    { 4, 5, 4, 9, 0, 0, 0, 0, 0, 0, 150/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M4
+    { 4, 6, 4, 9, 0, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M5
+    { 4, 7, 4, 9, 0, 0, 0, 0, 0, 0, 390/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M6
+    { 4, 8, 4, 9, 0, 0, 0, 0, 0, 0, 135/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M7
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 360/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M8
+    { 4, 3, 4, 3, 1, 0, 0, 0, 0, 0, 180/5, 60, 0, (char*) mapname_1, (char*) sky_4, (char*) wilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_1, NULL },  // E4M9
   },
   {
     // 2002ado Wad has map E5M1
