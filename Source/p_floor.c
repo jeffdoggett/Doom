@@ -283,7 +283,7 @@ static unsigned int find_shortest_lower_texture (sector_t* sec, int secnum, int 
 
 //-----------------------------------------------------------------------------
 
-static void queue_do_change_texture_or_special (floormove_t* floor, sector_t* sec, unsigned int mode)
+static void queue_do_change_texture_or_special (floormove_t* floor, sector_t* sec, floorchange_e mode)
 {
   switch (mode)
   {
@@ -305,7 +305,7 @@ static void queue_do_change_texture_or_special (floormove_t* floor, sector_t* se
 
 //-----------------------------------------------------------------------------
 
-static void queue_change_texture_or_special (floormove_t* floor, int secnum, unsigned int mode)
+static void queue_change_texture_or_special (floormove_t* floor, int secnum, floorchange_e mode)
 {
   sector_t* sec;
 
@@ -315,52 +315,73 @@ static void queue_change_texture_or_special (floormove_t* floor, int secnum, uns
 }
 
 //-----------------------------------------------------------------------------
+
+static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t* current_sector, line_t* line, floorchange_e mode, int recurse)
+{
+  unsigned int i;
+  line_t* next_line;
+  sector_t* donor;
+  sector_t* next_donor;
+  sector_t* next_sector;
+
+  donor = line->frontsector;
+
+  // Is it different?
+  switch (mode)
+  {
+    case FNoChg:	// Change nothing - we already checked this so should never happen.
+      return (donor);
+
+    case FChgTyp:	// Both
+      if ((donor->floorpic != orig_sector->floorpic)
+       || (donor->special  != orig_sector->special))
+	return (donor);
+      break;
+
+    default:
+    // case FChgZero:	// Zero
+    // case FChgTxt:	// Texture only
+      if (donor->floorpic != orig_sector->floorpic)
+	return (donor);
+      break;
+  }
+
+  if (recurse > 40)			// Try to avoid getting stuck in a loop.
+    return (NULL);
+
+  next_sector = getNextSector (line, current_sector);
+  if (next_sector != NULL)
+  {
+    // We need to find the next special line in the sequence.
+    for (i = 0; i < next_sector->linecount; i++)
+    {
+      next_line = next_sector->lines[i];
+      if ((next_line != line)
+       && (next_line->special == line->special))
+      {
+	next_donor = find_next_texture_and_special (orig_sector, next_sector, next_line, mode, recurse+1);
+	if (next_donor) return (next_donor);
+      }
+    }
+  }
+
+  return (NULL);
+}
+
+//-----------------------------------------------------------------------------
 // Map 12 of Doom2 and E2M2 of Doomu have a series of platforms that rise from
 // the slime in the correct order. If the player steps info the slime and raises
 // a floor out of sequence then the texture & type are wrong.
 
-static int find_next_texture_and_special (floormove_t* floor, sector_t* sector, line_t* line, int recurse)
+static sector_t * find_donor_texture_and_special (sector_t* sector, line_t* line, floorchange_e mode)
 {
-  int rc;
-  unsigned int i;
-  int newspecial;
-  int newtexture;
-  line_t* next_line;
   sector_t* donor;
-  sector_t* next_sector;
 
-  if (recurse > 40)			// Try to avoid getting stuck in a loop.
-    return (0);
+  donor = find_next_texture_and_special (sector, sector, line, mode, 0);
+  if (donor == NULL)
+    donor = line->frontsector;
 
-  donor = line->frontsector;
-  newtexture = donor->floorpic;
-  newspecial = donor->special;
-
-  // Is it different?
-  if ((newtexture == floor->newtexture)
-   && (newspecial == floor->newspecial))
-  {
-    next_sector = getNextSector (line, sector);
-    if (next_sector != NULL)
-    {
-      // We need to find the next special line in the sequence.
-      for (i = 0; i < next_sector->linecount; i++)
-      {
-	next_line = next_sector->lines[i];
-	if ((next_line != line)
-	 && (next_line->special == line->special))
-	{
-	  rc = find_next_texture_and_special (floor, next_sector, next_line, recurse+1);
-	  if (rc) return (rc);
-	}
-      }
-    }
-    return (0);
-  }
-
-  floor->newtexture = newtexture;
-  floor->newspecial = newspecial;
-  return (1);
+  return (donor);
 }
 
 //-----------------------------------------------------------------------------
@@ -399,10 +420,11 @@ EV_DoFloor
   int		secnum;
   int		rtn;
   int		itype;
-  unsigned int	mode;
+  floorchange_e	mode;
   unsigned int	offset;
   fixed_t	newheight;
   sector_t*	sec;
+  sector_t*	donor;
   floormove_t*	floor;
 
   rtn = 0;
@@ -495,9 +517,9 @@ EV_DoFloor
 	/* The change is done *first* before the floor is moved. */
 	/* I guess that if the change is required afterwards then */
 	/* the Boom Fby24 would be used. */
-	find_next_texture_and_special (floor, sec, line, 0);
-	sec->floorpic = floor->newtexture;
-	sec->special  = floor->newspecial;
+	donor = find_donor_texture_and_special (sec, line, FChgTyp);
+	floor->newtexture = sec->floorpic = donor->floorpic;
+	floor->newspecial = sec->special  = donor->special;
 	break;
 
       case raiseToTexture:
@@ -516,7 +538,7 @@ EV_DoFloor
 	floor->direction = -1;
 //	floor->speed = FLOORSPEED;
 	floor->floordestheight = P_FindLowestFloorSurrounding(sec);
-	queue_change_texture_or_special (floor, secnum, 3);
+	queue_change_texture_or_special (floor, secnum, FChgTyp);
 	break;
 
       case lowerFloor24:
@@ -617,12 +639,13 @@ EV_DoFloor
 	  if (itype & FloorCrush)
 	    floor->crush = true;
 
-	  mode = (itype >> FloorChangeShift) & 3;
-	  if (mode)
+	  mode = (floorchange_e) ((itype >> FloorChangeShift) & 3);
+	  if (mode != FNoChg)
 	  {
 	    if ((itype & FloorModel) == 0)
 	    {
-	      queue_do_change_texture_or_special (floor, line->frontsector, mode);
+	      donor = find_donor_texture_and_special (sec, line, mode);
+	      queue_do_change_texture_or_special (floor, donor, mode);
 	    }
 	    else
 	    {
