@@ -315,6 +315,55 @@ static void queue_change_texture_or_special (floormove_t* floor, int secnum, uns
 }
 
 //-----------------------------------------------------------------------------
+// Map 12 of Doom2 and E2M2 of Doomu have a series of platforms that rise from
+// the slime in the correct order. If the player steps info the slime and raises
+// a floor out of sequence then the texture & type are wrong.
+
+static int find_next_texture_and_special (floormove_t* floor, sector_t* sector, line_t* line, int recurse)
+{
+  int rc;
+  unsigned int i;
+  int newspecial;
+  int newtexture;
+  line_t* next_line;
+  sector_t* donor;
+  sector_t* next_sector;
+
+  if (recurse > 40)			// Try to avoid getting stuck in a loop.
+    return (0);
+
+  donor = line->frontsector;
+  newtexture = donor->floorpic;
+  newspecial = donor->special;
+
+  // Is it different?
+  if ((newtexture == floor->newtexture)
+   && (newspecial == floor->newspecial))
+  {
+    next_sector = getNextSector (line, sector);
+    if (next_sector != NULL)
+    {
+      // We need to find the next special line in the sequence.
+      for (i = 0; i < next_sector->linecount; i++)
+      {
+	next_line = next_sector->lines[i];
+	if ((next_line != line)
+	 && (next_line->special == line->special))
+	{
+	  rc = find_next_texture_and_special (floor, next_sector, next_line, recurse+1);
+	  if (rc) return (rc);
+	}
+      }
+    }
+    return (0);
+  }
+
+  floor->newtexture = newtexture;
+  floor->newspecial = newspecial;
+  return (1);
+}
+
+//-----------------------------------------------------------------------------
 /*
   Init a floor movement structure to some safe defaults.
 */
@@ -446,8 +495,9 @@ EV_DoFloor
 	/* The change is done *first* before the floor is moved. */
 	/* I guess that if the change is required afterwards then */
 	/* the Boom Fby24 would be used. */
-	floor->newtexture = sec->floorpic = line->frontsector->floorpic;
-	floor->newspecial = sec->special = line->frontsector->special;
+	find_next_texture_and_special (floor, sec, line, 0);
+	sec->floorpic = floor->newtexture;
+	sec->special  = floor->newspecial;
 	break;
 
       case raiseToTexture:
@@ -943,37 +993,37 @@ void T_MoveElevator (elevator_t *elevator)
 {
     result_e    res;
 
-    if (elevator->direction < 0)                // moving down
+    if (elevator->direction < 0)		// moving down
     {
-        // jff 4/7/98 reverse order of ceiling/floor
-        res = T_MoveCeilingPlane (elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
+	// jff 4/7/98 reverse order of ceiling/floor
+	res = T_MoveCeilingPlane (elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
 
-        // jff 4/7/98 don't move ceil if blocked
-        if (res == ok || res == pastdest)
-            T_MoveFloorPlane (elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
+	// jff 4/7/98 don't move ceil if blocked
+	if (res == ok || res == pastdest)
+	    T_MoveFloorPlane (elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
     }
-    else                                        // up
+    else					// up
     {
-        // jff 4/7/98 reverse order of ceiling/floor
-        res = T_MoveFloorPlane(elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
+	// jff 4/7/98 reverse order of ceiling/floor
+	res = T_MoveFloorPlane(elevator->sector, elevator->speed, elevator->floordestheight, false, elevator->direction);
 
-        // jff 4/7/98 don't move floor if blocked
-        if (res == ok || res == pastdest)
-            T_MoveCeilingPlane(elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
+	// jff 4/7/98 don't move floor if blocked
+	if (res == ok || res == pastdest)
+	    T_MoveCeilingPlane(elevator->sector, elevator->speed, elevator->ceilingdestheight, false, elevator->direction);
     }
 
     // make floor move sound
     if (!(leveltime & 7))
-        S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_stnmov);
+	S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_stnmov);
 
-    if (res == pastdest)                        // if destination height achieved
+    if (res == pastdest)			// if destination height achieved
     {
-        elevator->sector->floordata = NULL;
-        elevator->sector->ceilingdata = NULL;
-        P_RemoveThinker (&elevator->thinker);     // remove elevator from actives
+	elevator->sector->floordata = NULL;
+	elevator->sector->ceilingdata = NULL;
+	P_RemoveThinker (&elevator->thinker);     // remove elevator from actives
 
-        // make floor stop sound
-        S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_pstop);
+	// make floor stop sound
+	S_StartSound ((mobj_t *)&elevator->sector->soundorg, sfx_pstop);
     }
 }
 
