@@ -120,102 +120,146 @@
 typedef enum
 {
     // Call P_SpecialThing when touched.
-    MF_SPECIAL		= 1,
+    M_SPECIAL,
     // Blocks.
-    MF_SOLID		= 2,
+    M_SOLID,
     // Can be hit.
-    MF_SHOOTABLE	= 4,
+    M_SHOOTABLE,
     // Don't use the sector links (invisible but touchable).
-    MF_NOSECTOR		= 8,
+    M_NOSECTOR,
     // Don't use the blocklinks (inert but displayable)
-    MF_NOBLOCKMAP	= 16,
+    M_NOBLOCKMAP,
 
     // Not to be activated by sound, deaf monster.
-    MF_AMBUSH		= 32,
+    M_AMBUSH,
     // Will try to attack right back.
-    MF_JUSTHIT		= 64,
+    M_JUSTHIT,
     // Will take at least one step before attacking.
-    MF_JUSTATTACKED	= 128,
+    M_JUSTATTACKED,
     // On level spawning (initial position),
     //  hang from ceiling instead of stand on floor.
-    MF_SPAWNCEILING	= 256,
+    M_SPAWNCEILING,
     // Don't apply gravity (every tic),
     //  that is, object will float, keeping current height
     //  or changing it actively.
-    MF_NOGRAVITY	= 512,
+    M_NOGRAVITY,
 
     // Movement flags.
     // This allows jumps from high places.
-    MF_DROPOFF		= 0x400,
+    M_DROPOFF,
     // For players, will pick up items.
-    MF_PICKUP		= 0x800,
+    M_PICKUP,
     // Player cheat. ???
-    MF_NOCLIP		= 0x1000,
+    M_NOCLIP,
     // Player: keep info about sliding along walls.
-    MF_SLIDE		= 0x2000,
+    M_SLIDE,
     // Allow moves to any height, no gravity.
     // For active floaters, e.g. cacodemons, pain elementals.
-    MF_FLOAT		= 0x4000,
+    M_FLOAT,
     // Don't cross lines
     //   ??? or look at heights on teleport.
-    MF_TELEPORT		= 0x8000,
+    M_TELEPORT,
     // Don't hit same species, explode on block.
     // Player missiles as well as fireballs of various kinds.
-    MF_MISSILE		= 0x10000,
+    M_MISSILE,
     // Dropped by a demon, not level spawned.
     // E.g. ammo clips dropped by dying former humans.
-    MF_DROPPED		= 0x20000,
+    M_DROPPED,
     // Use fuzzy draw (shadow demons or spectres),
     //  temporary player invisibility powerup.
-    MF_SHADOW		= 0x40000,
+    M_SHADOW,
     // Flag: don't bleed when shot (use puff),
     //  barrels and shootable furniture shall not bleed.
-    MF_NOBLOOD		= 0x80000,
+    M_NOBLOOD,
     // Don't stop moving halfway off a step,
     //  that is, have dead bodies slide down all the way.
-    MF_CORPSE		= 0x100000,
+    M_CORPSE,
     // Floating to a height for a move, ???
     //  don't auto float to target's height.
-    MF_INFLOAT		= 0x200000,
+    M_INFLOAT,
 
     // On kill, count this enemy object
     //  towards intermission kill total.
     // Happy gathering.
-    MF_COUNTKILL	= 0x400000,
+    M_COUNTKILL,
 
     // On picking up, count this item object
     //  towards intermission item total.
-    MF_COUNTITEM	= 0x800000,
+    M_COUNTITEM,
 
     // Special handling: skull in flight.
     // Neither a cacodemon nor a missile.
-    MF_SKULLFLY		= 0x1000000,
+    M_SKULLFLY,
 
     // Don't spawn this object
     //  in death match mode (e.g. key cards).
-    MF_NOTDMATCH    	= 0x2000000,
+    M_NOTDMATCH,
 
     // Player sprites in multiplayer modes are modified
     //  using an internal color lookup table for re-indexing.
     // If 0x4 0x8 or 0xc,
     //  use a translation table for player colormaps
-    MF_TRANSLATION  	= 0xc000000,
-    // Hmm ???.
-    MF_TRANSSHIFT	= 26,
+    M_TRANSLATION_1,
+    M_TRANSLATION_2,
 
-    MF_TOUCHY = 0x10000000,	// killough 11/98: dies when solids touch it
-    MF_BOUNCES = 0x20000000,	// killough 7/11/98: for beta BFG fireballs
-    MF_FRIEND =  0x40000000,	// killough 7/18/98: friendly monsters
+    M_TOUCHY,		// killough 11/98: dies when solids touch it
+    M_BOUNCES,		// killough 7/11/98: for beta BFG fireballs
+    M_FRIEND,		// killough 7/18/98: friendly monsters
 
+    M_TRANSLUCENT	// apply translucency to sprite (BOOM)
+} mobjflagnum_t;
+
+
+
+typedef enum
+{
+    MF_SPECIAL		= (1U << M_SPECIAL),
+    MF_SOLID		= (1U << M_SOLID),
+    MF_SHOOTABLE	= (1U << M_SHOOTABLE),
+    MF_NOSECTOR		= (1U << M_NOSECTOR),
+    MF_NOBLOCKMAP	= (1U << M_NOBLOCKMAP),
+    MF_AMBUSH		= (1U << M_AMBUSH),
+    MF_JUSTHIT		= (1U << M_JUSTHIT),
+    MF_JUSTATTACKED	= (1U << M_JUSTATTACKED),
+    MF_SPAWNCEILING	= (1U << M_SPAWNCEILING),
+    MF_NOGRAVITY	= (1U << M_NOGRAVITY),
+    MF_DROPOFF		= (1U << M_DROPOFF),
+    MF_PICKUP		= (1U << M_PICKUP),
+    MF_NOCLIP		= (1U << M_NOCLIP),
+    MF_SLIDE		= (1U << M_SLIDE),
+    MF_FLOAT		= (1U << M_FLOAT),
+    MF_TELEPORT		= (1U << M_TELEPORT),
+    MF_MISSILE		= (1U << M_MISSILE),
+    MF_DROPPED		= (1U << M_DROPPED),
+    MF_SHADOW		= (1U << M_SHADOW),
+    MF_NOBLOOD		= (1U << M_NOBLOOD),
+    MF_CORPSE		= (1U << M_CORPSE),
+    MF_INFLOAT		= (1U << M_INFLOAT),
+    MF_COUNTKILL	= (1U << M_COUNTKILL),
+    MF_COUNTITEM	= (1U << M_COUNTITEM),
+    MF_SKULLFLY		= (1U << M_SKULLFLY),
+    MF_NOTDMATCH    	= (1U << M_NOTDMATCH),
+    MF_TRANSLATION  	= (1U << M_TRANSLATION_1) | (1U << M_TRANSLATION_2),
+    MF_TRANSSHIFT	= M_TRANSLATION_1,
+    MF_TOUCHY		= (1U << M_TOUCHY),
+    MF_BOUNCES		= (1U << M_BOUNCES),
+    MF_FRIEND		= (1U << M_FRIEND),
 /*  ARM Compiler generates - Error: signed constant overflow: 'enum' */
-    MF_TRANSLUCENT = (signed)0x80000000	// apply translucency to sprite (BOOM)
+    MF_TRANSLUCENT	= (signed)(1U << M_TRANSLUCENT)
 } mobjflag_t;
 
 typedef enum
 {
-  MF2_PASSMOBJ		= 1,
-  MF2_ONMOBJ		= 2,
-  MF2_MASSACRE		= 0x10000000
+  M2_PASSMOBJ,
+  M2_ONMOBJ,
+  M2_MASSACRE		= 28
+} mobjflag2num_t;
+
+typedef enum
+{
+  MF2_PASSMOBJ		= (1U << M2_PASSMOBJ),
+  MF2_ONMOBJ		= (1U << M2_ONMOBJ),
+  MF2_MASSACRE		= (1U << M2_MASSACRE)
 } mobjflag2_t;
 
 // Map Object definition.

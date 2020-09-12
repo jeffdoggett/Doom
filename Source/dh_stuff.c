@@ -498,6 +498,7 @@ static const codeptrs_t codeptr_frames [] =
   { "Detonate",		A_Detonate },
   { "Mushroom",		A_Mushroom },
   { "Die",		A_Die },
+  { "Suicide",		A_Die },
   { "Spawn",		A_Spawn },
   { "Turn",		A_Turn },
   { "Face",		A_Face },
@@ -832,47 +833,49 @@ typedef struct
 
 static const bit_names_t dehack_thing_bit_names [] =
 {
-  { "SPECIAL",		MF_SPECIAL},
-  { "SOLID",		MF_SOLID},
-  { "SHOOTABLE",	MF_SHOOTABLE},
-  { "NOSECTOR",		MF_NOSECTOR},
-  { "NOBLOCKMAP",	MF_NOBLOCKMAP},
-  { "AMBUSH",		MF_AMBUSH},
-  { "JUSTHIT",		MF_JUSTHIT},
-  { "JUSTATTACKED",	MF_JUSTATTACKED},
-  { "SPAWNCEILING",	MF_SPAWNCEILING},
-  { "NOGRAVITY",	MF_NOGRAVITY},
-  { "DROPOFF",		MF_DROPOFF},
-  { "PICKUP",		MF_PICKUP},
-  { "NOCLIP",		MF_NOCLIP},
-  { "SLIDE",		MF_SLIDE},
-  { "FLOAT",		MF_FLOAT},
-  { "TELEPORT",		MF_TELEPORT},
-  { "MISSILE",		MF_MISSILE},
-  { "DROPPED",		MF_DROPPED},
-  { "SHADOW",		MF_SHADOW},
-  { "NOBLOOD",		MF_NOBLOOD},
-  { "CORPSE",		MF_CORPSE},
-  { "INFLOAT",		MF_INFLOAT},
-  { "COUNTKILL",	MF_COUNTKILL},
-  { "COUNTITEM",	MF_COUNTITEM},
-  { "SKULLFLY",		MF_SKULLFLY},
-  { "NOTDMATCH",	MF_NOTDMATCH},
+  { "SPECIAL",		M_SPECIAL},
+  { "SOLID",		M_SOLID},
+  { "SHOOTABLE",	M_SHOOTABLE},
+  { "NOSECTOR",		M_NOSECTOR},
+  { "NOBLOCKMAP",	M_NOBLOCKMAP},
+  { "AMBUSH",		M_AMBUSH},
+  { "JUSTHIT",		M_JUSTHIT},
+  { "JUSTATTACKED",	M_JUSTATTACKED},
+  { "SPAWNCEILING",	M_SPAWNCEILING},
+  { "NOGRAVITY",	M_NOGRAVITY},
+  { "DROPOFF",		M_DROPOFF},
+  { "PICKUP",		M_PICKUP},
+  { "NOCLIP",		M_NOCLIP},
+  { "SLIDE",		M_SLIDE},
+  { "FLOAT",		M_FLOAT},
+  { "TELEPORT",		M_TELEPORT},
+  { "MISSILE",		M_MISSILE},
+  { "DROPPED",		M_DROPPED},
+  { "SHADOW",		M_SHADOW},
+  { "NOBLOOD",		M_NOBLOOD},
+  { "CORPSE",		M_CORPSE},
+  { "INFLOAT",		M_INFLOAT},
+  { "COUNTKILL",	M_COUNTKILL},
+  { "COUNTITEM",	M_COUNTITEM},
+  { "SKULLFLY",		M_SKULLFLY},
+  { "NOTDMATCH",	M_NOTDMATCH},
 
   // killough 10/98: TRANSLATION consists of 2 bits, not 1:
-  { "TRANSLATION",	0x04000000},	// for BOOM bug-compatibility
-  { "TRANSLATION1",	0x04000000},	// use translation table for colour (players)
-  { "TRANSLATION2",	0x08000000},	// use translation table for colour (players)
+  { "TRANSLATION",	M_TRANSLATION_1},	// for BOOM bug-compatibility
+  { "TRANSLATION1",	M_TRANSLATION_1},	// use translation table for colour (players)
+  { "TRANSLATION2",	M_TRANSLATION_2},	// use translation table for colour (players)
 
-  { "UNUSED1",		0x08000000},	// unused bit # 1 -- For BOOM bug-compatibility
-  { "UNUSED2",		0x10000000},	// unused bit # 2 -- For BOOM compatibility
-  { "UNUSED3",		0x20000000},	// unused bit # 3 -- For BOOM compatibility
-  { "UNUSED4",		0x40000000},	// unused bit # 4 -- For BOOM compatibility
+  { "UNUSED1",		M_TOUCHY},		// unused bit # 1 -- For BOOM bug-compatibility
+  { "UNUSED2",		M_BOUNCES},		// unused bit # 2 -- For BOOM compatibility
+  { "UNUSED3",		M_FRIEND},		// unused bit # 3 -- For BOOM compatibility
+  { "UNUSED4",		M_TRANSLUCENT},		// unused bit # 4 -- For BOOM compatibility
 
-  { "TOUCHY",		MF_TOUCHY},	// dies on contact with solid objects (MBF)
-  { "BOUNCES",		MF_BOUNCES},	// bounces off floors, ceilings and maybe walls
-  { "FRIEND",		MF_FRIEND},	// a friend of the player(s) (MBF)
-  { "TRANSLUCENT",	MF_TRANSLUCENT}	// apply translucency to sprite (BOOM)
+  { "TOUCHY",		M_TOUCHY},		// dies on contact with solid objects (MBF)
+  { "BOUNCES",		M_BOUNCES},		// bounces off floors, ceilings and maybe walls
+  { "FRIEND",		M_FRIEND},		// a friend of the player(s) (MBF)
+  { "TRANSLUCENT",	M_TRANSLUCENT},		// apply translucency to sprite (BOOM)
+
+  { "BOSS", 		M2_MASSACRE+32+1}	// Unused bit
 };
 
 /* ---------------------------------------------------------------------------- */
@@ -1354,12 +1357,14 @@ static void write_all_things (FILE * fout)
 
 /* ---------------------------------------------------------------------------- */
 
-static const char * find_thing_bitname (unsigned int * result, const char * str)
+static const char * find_thing_bitname (int * thing_ptr, char operator, const char * str)
 {
   char cc;
   unsigned int rc;
   unsigned int len;
   unsigned int count;
+  unsigned int pos;
+  unsigned int bit;
   const bit_names_t * ptr;
   char buf [40];
 
@@ -1387,7 +1392,8 @@ static const char * find_thing_bitname (unsigned int * result, const char * str)
 
   if (!isalpha(buf[0]))			// Symbolic bits?
   {
-    rc = (unsigned int) strtol (buf,NULL,0);// No.
+    pos = 0;				// No.
+    bit = (unsigned int) strtol (buf,NULL,0);
   }
   else
   {
@@ -1397,7 +1403,8 @@ static const char * find_thing_bitname (unsigned int * result, const char * str)
     {
       if (strcasecmp (ptr->name, buf) == 0)
       {
-	rc = ptr -> value;
+        pos = ptr->value / 32;
+        bit = (1U << (ptr->value & 31));
 	break;
       }
       ptr++;
@@ -1405,34 +1412,45 @@ static const char * find_thing_bitname (unsigned int * result, const char * str)
       {
 	if (M_CheckParm ("-showunknown"))
 	  fprintf (stderr, "DeHackEd:Failed to match bitname (%s)\n", buf);
-	break;
+	return (str);
       }
     } while (1);
   }
 
-  *result = rc;
+  switch (operator)
+  {
+    case '|': thing_ptr [pos] |= bit; break;
+    case '+': thing_ptr [pos] += bit; break;
+    case '&': thing_ptr [pos] &= bit; break;
+  }
+
   return (str);
 }
 
 /* ---------------------------------------------------------------------------- */
 
-static void decode_things_bits (unsigned int * params, const char * string1)
+static void decode_things_bits (unsigned int number, thing_element_t record, const char * string1)
 {
   char operator;
-  unsigned int flag;
+  int * ptr;
 
-  params [0] = 0;
+  if ((number == 0)
+   || (number >= NUMMOBJTYPES))
+  {
+    fprintf (stderr, "Invalid thing number %u\n", number);
+    return;
+  }
+
+  // printf ("Thing %u bits (%s) = ", number, string1);
+
+  ptr = &mobjinfo[number-1].flags;
+  ptr[0] = 0;
+  ptr[1] = 0;
   operator = '|';
 
   do
   {
-    string1 = find_thing_bitname (&flag, string1);
-    switch (operator)
-    {
-      case '|': params [0] |= flag; break;
-      case '+': params [0] += flag; break;
-      case '&': params [0] &= flag; break;
-    }
+    string1 = find_thing_bitname (ptr, operator, string1);
     while (*string1 == ' ')
       string1++;
     if (*string1 == 0)
@@ -1441,6 +1459,16 @@ static void decode_things_bits (unsigned int * params, const char * string1)
     while (*string1 == ' ')
       string1++;
   } while (*string1);
+
+  // printf ("%08X %08X\n", ptr[0], ptr[1]);
+
+  // Assume that the value of MF2_PASSMOBJ tracks MF_FLOAT
+  // except for the player.
+  if ((number == 1)
+   || (ptr[0] & MF_FLOAT))
+    ptr[1] |= MF2_PASSMOBJ;
+  else
+    ptr[1] &= ~MF2_PASSMOBJ;
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1637,18 +1665,7 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       ptr -> activesound = value;
       break;
 
-    case THING_Bits:
-      ptr -> flags = value;
-
-      // Assume that the value of MF2_PASSMOBJ tracks MF_FLOAT
-      // except for the player.
-      if (number > 1)
-      {
-        if (value & MF_FLOAT)
-          ptr -> flags2 |= MF2_PASSMOBJ;
-        else
-          ptr -> flags2 &= ~MF2_PASSMOBJ;
-      }
+    case THING_Bits:		// We already did this
       break;
 
     case THING_Respawn_frame:
@@ -3475,7 +3492,9 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
       printf ("DH %u:%s\n", dh_line_number, a_line);
 #endif
 
-      if (a_line [0] == '#')
+      if (((cc = a_line [0]) == '#')
+       || ((cc == '/') && (cc == a_line [1]))
+       || ((cc == '\\') && (cc == a_line [1])))
 	continue;
 
       /* Find the numbers in the line */
@@ -3707,7 +3726,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  if (counter2)
 		  {
 		    string1 = next_arg (a_line+counter2);
-		    decode_things_bits (params, string1);
+		    decode_things_bits (job_params[0], (thing_element_t) counter1, string1);
 		  }
 		  break;
 
@@ -4511,7 +4530,7 @@ static void show_thing_obits (void)
     do
     {
       if (ptr->obits[onum])
-        printf ("Thing %u obit[%u] = '%s'\n", counter, onum, ptr->obits[onum]);
+	printf ("Thing %u obit[%u] = '%s'\n", counter, onum, ptr->obits[onum]);
     } while (++onum < ARRAY_SIZE(ptr->obits));
     ++ptr;
   } while (++counter < NUMMOBJTYPES);
