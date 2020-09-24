@@ -316,7 +316,7 @@ static void queue_change_texture_or_special (floormove_t* floor, int secnum, flo
 
 //-----------------------------------------------------------------------------
 
-static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t* current_sector, line_t* line, floorchange_e mode, int recurse)
+static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t* current_sector, line_t* line, floorchange_e mode, int stairlock)
 {
   unsigned int i;
   line_t* next_line;
@@ -346,8 +346,10 @@ static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t
       break;
   }
 
-  if (recurse > 40)			// Try to avoid getting stuck in a loop.
+  if (donor->stairlock == stairlock)		// Seen this one before?
     return (NULL);
+
+  donor->stairlock = stairlock;
 
   next_sector = getNextSector (line, current_sector);
   if (next_sector != NULL)
@@ -359,7 +361,7 @@ static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t
       if ((next_line != line)
        && (next_line->special == line->special))
       {
-	next_donor = find_next_texture_and_special (orig_sector, next_sector, next_line, mode, recurse+1);
+	next_donor = find_next_texture_and_special (orig_sector, next_sector, next_line, mode, stairlock);
 	if (next_donor) return (next_donor);
       }
     }
@@ -375,9 +377,11 @@ static sector_t * find_next_texture_and_special (sector_t* orig_sector, sector_t
 
 static sector_t * find_donor_texture_and_special (sector_t* sector, line_t* line, floorchange_e mode)
 {
+  int stairlock;
   sector_t* donor;
 
-  donor = find_next_texture_and_special (sector, sector, line, mode, 0);
+  stairlock = gametic;		// Magic number
+  donor = find_next_texture_and_special (sector, sector, line, mode, stairlock);
   if (donor == NULL)
     donor = line->frontsector;
 
@@ -690,7 +694,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
   fixed_t	stairsize;
   floormove_t*	floor;
 
-  stairlock = sec -> stairlock + 1;	// Magic number
+  stairlock = gametic + (int) doit;	// Magic number
 
   if (doit == false)
   {
@@ -827,7 +831,7 @@ EV_BuildStairs
   while ((secnum = P_FindSectorFromLineTag (line,secnum)) >= 0)
   {
     sec = &sectors [secnum];
-    if (make_stairs (sec, buildtype, false) == true)	// Can we do it?
+    if (make_stairs (sec, buildtype, false))		// Can we do it?
     {
       (void) make_stairs (sec, buildtype, true);	// Yes.
       rtn = 1;
