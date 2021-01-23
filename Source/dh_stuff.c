@@ -935,6 +935,23 @@ int dh_strcmp (char * s1, char * s2)
   return (strncasecmp (s1, s2, strlen(s2)));
 }
 #endif
+
+int dh_strncmp (char * s1, char * s2, size_t len)
+{
+  int rc;
+  char cc;
+
+  rc = strncasecmp (s1, s2, len);
+  if (rc)
+    return (rc);
+
+  cc = s1[len];
+  if ((cc == ' ') || (cc == '\t') || (cc == '='))
+    return (rc);
+
+  return 1;
+}
+
 /* ---------------------------------------------------------------------------- */
 /*
    Works out whether the file pointer has reached (or nearly reached) the
@@ -4661,10 +4678,14 @@ void DH_remove_duplicate_mapinfos (void)
 	  printf ("Enter = NULL\n");
 	else
 	  printf ("Enter = %s\n", cp->entertext);
-	if (cp->exittext == 0)
-	  printf ("Exit = NULL\n");
+	if (cp->normal_exittext == 0)
+	  printf ("Normal Exit = NULL\n");
 	else
-	  printf ("Exit = %s\n", cp->exittext);
+	  printf ("Normal Exit = %s\n", cp->normal_exittext);
+	if (cp->secret_exittext == 0)
+	  printf ("Secret Exit = NULL\n");
+	else
+	  printf ("Secret Exit = %s\n", cp->secret_exittext);
 	if (cp->music == 0)
 	  printf ("Music = NULL\n");
 	else
@@ -4863,7 +4884,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
      && ((cp = F_Create_ClusterDef (intertext)) != NULL))
     {
       if (doexit)
-	cp->exittext = newtext;
+	cp->normal_exittext = newtext;
       else
 	cp->entertext = newtext;
       finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
@@ -4884,6 +4905,9 @@ static void replace_map_name (const char * ptr, unsigned int episode, unsigned i
   char * newname;
   char buf1 [12];
   char buf2 [12];
+
+  while (((cc = *ptr) == ' ') || (cc == '\t'))
+    ++ptr;
 
   pos = 0;
   do
@@ -4916,6 +4940,7 @@ static char * replace_titletext (char * ptr, unsigned int episode, unsigned int 
   map_dests_t * mdest_ptr;
   char buf [12];
 
+  while (*ptr == ' ') ptr++;
   if (*ptr == '=') ptr++;
   while (*ptr == ' ') ptr++;
   if (*ptr == '\"') ptr++;
@@ -4959,6 +4984,7 @@ static char * replace_map_text (char ** dest, char * ptr)
   char * rc;
   char * newtext;
 
+  while (*ptr == ' ') ptr++;
   if (*ptr == '=') ptr++;
   while (*ptr == ' ') ptr++;
   if (*ptr == '\"') ptr++;
@@ -5158,22 +5184,23 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       memset (&default_mapinfo, 0, sizeof (default_mapinfo));
       doing_default = 1;
     }
-    else if (strncasecmp (ptr, "episode ", 8) == 0)
+
+    else if (dh_strncmp (ptr, "episode", 8) == 0)
     {
-      ptr = read_map_num (&episode, &map, ptr+8);
+      ptr = read_map_num (&episode, &map, ptr+7);
       if (episode == 255)
 	episode = M_GetNextEpi (map);
       doing_episode = 1;
       doing_default = 0;
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "name ", 5) == 0)
+    else if (dh_strncmp (ptr, "name", 4) == 0)
     {
       /* Note: Nerve.wad gets to here. */
       if ((doing_episode) && (episode < 10)
        && (dh_instr (ptr, "HUSTR_E") == 0))
       {
-	ptr += 5;
+	ptr += 4;
 	while ((*ptr == ' ') || (*ptr == '=')) ptr++;
 	if (*ptr == '\"')
 	{
@@ -5200,11 +5227,11 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "picname ", 8) == 0)
+    else if (dh_strncmp (ptr, "picname", 7) == 0)
     {
       if ((doing_episode) && (episode < 10))
       {
-	ptr += 8;
+	ptr += 7;
 	while ((*ptr == ' ') || (*ptr == '=')) ptr++;
 	if (*ptr == '\"')
 	{
@@ -5224,7 +5251,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "key ", 4) == 0)
+    else if (dh_strncmp (ptr, "key", 3) == 0)
     {
       if ((doing_episode) && (episode < 10))
       {
@@ -5237,13 +5264,13 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "map ", 4) == 0)
+    else if (dh_strncmp (ptr, "map", 3) == 0)
     {
       doing_episode = 0;
       doing_default = 0;
       intertext = -1;
-      ptr2 = read_map_num (&episode, &map, ptr+4);
-      replace_map_name (ptr+4, episode, map);
+      ptr2 = read_map_num (&episode, &map, ptr+3);
+      replace_map_name (ptr+3, episode, map);
       ptr = ptr2;
       i = dh_inchar (ptr, '"');
       if ((i) && (dh_instr (ptr, "lookup \"HUSTR") == 0))
@@ -5289,9 +5316,9 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
       WriteDefaultMapInfo (episode, map, &default_mapinfo, inwad);
     }
-    else if (strncasecmp (ptr, "next ", 5) == 0)
+    else if (dh_strncmp (ptr, "next", 4) == 0)
     {
-      ptr += 5;
+      ptr += 4;
       j = dh_inchar (ptr, '='); if (j) ptr += j;
       j = dh_inchar (ptr, '"'); if (j) ptr += j;
       while (*ptr <= ' ') ptr++;
@@ -5325,9 +5352,9 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       // printf ("Map %u %u has exit to %u %u\n", episode, map, i, j);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "secretnext ", 11) == 0)
+    else if (dh_strncmp (ptr, "secretnext", 10) == 0)
     {
-      ptr += 11;
+      ptr += 10;
       j = dh_inchar (ptr, '='); if (j) ptr += j;
       j = dh_inchar (ptr, '"'); if (j) ptr += j;
       while (*ptr <= ' ') ptr++;
@@ -5380,13 +5407,13 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       mdest_ptr -> nointermission = 1;
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "par ", 4) == 0)
+    else if (dh_strncmp (ptr, "par", 3) == 0)
     {
       if (doing_default)
 	mdest_ptr = &default_mapinfo;
       else
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      l = read_int (ptr+4);
+      l = read_int (ptr+3);
       l = (l+4)/5;
       if (l > 255) l = 255;
       mdest_ptr -> par_time_5 = l;
@@ -5394,13 +5421,13 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       // printf ("Map %u %u par time %u\n", episode, map, l);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "sucktime ", 9) == 0)
+    else if (dh_strncmp (ptr, "sucktime", 8) == 0)
     {
       if (doing_default)
 	mdest_ptr = &default_mapinfo;
       else
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      l = read_int (ptr+9);
+      l = read_int (ptr+8);
       if (l > 255) l = 255;
       mdest_ptr -> time_sucks = l;
       // printf ("Map %u %u sucks time %u\n", episode, map, l);
@@ -5474,10 +5501,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     }
     else if (strncasecmp (ptr, "titlepatch", 10) == 0)
     {
-      ptr = replace_titletext (ptr+11, episode, map);
+      ptr = replace_titletext (ptr+10, episode, map);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "enterpic ", 9) == 0)
+    else if (dh_strncmp (ptr, "enterpic", 8) == 0)
     {
       /* Picture used as the backdrop for the 'entering level' screen. */
       /* If starts with a $ then the lump is an 'intermission script' */
@@ -5493,10 +5520,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       }
 
-      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+9);
+      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+8);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "exitpic ", 8) == 0)
+    else if (dh_strncmp (ptr, "exitpic", 7) == 0)
     {
       if (doing_default)
       {
@@ -5508,10 +5535,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       }
-      ptr = replace_map_text (&mdest_ptr->exitpic, ptr+8);
+      ptr = replace_map_text (&mdest_ptr->exitpic, ptr+7);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "interpic ", 9) == 0)
+    else if (dh_strncmp (ptr, "interpic", 8) == 0)
     {
       if (doing_default)
       {
@@ -5524,11 +5551,11 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       }
-      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+9);
+      ptr = replace_map_text (&mdest_ptr->enterpic, ptr+8);
       mdest_ptr->exitpic = mdest_ptr->enterpic;
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "bordertexture ", 14) == 0)
+    else if (dh_strncmp (ptr, "bordertexture", 13) == 0)
     {
       if (doing_default)
       {
@@ -5540,12 +5567,12 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       }
-      ptr = replace_map_text (&mdest_ptr->bordertexture, ptr+14);
+      ptr = replace_map_text (&mdest_ptr->bordertexture, ptr+13);
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "music ", 6) == 0)
+    else if (dh_strncmp (ptr, "music", 5) == 0)
     {
-      ptr += 6;
+      ptr += 5;
       if (intertext == -1)
       {
 	j = dh_instr (ptr, "$MUSIC_");
@@ -5570,6 +5597,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       else
       {
+	while (*ptr == ' ') ptr++;
 	if (*ptr == '=') ptr++;
 	while (*ptr == ' ') ptr++;
 	if (*ptr == '\"') ptr++;
@@ -5610,7 +5638,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	}
       }
     }
-    else if (strncasecmp (ptr, "sky1 ", 5) == 0)
+    else if (dh_strncmp (ptr, "sky1", 4) == 0)
     {
       fixed_t skydelta;
 
@@ -5628,7 +5656,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	mdest_ptr = G_Access_MapInfoTab_E (episode, map);
       }
 
-      ptr = replace_map_text (&mdest_ptr -> sky, ptr + 5);
+      ptr = replace_map_text (&mdest_ptr -> sky, ptr + 4);
 
       /* Wiki says a comma separates the args, but most wads */
       /* seem to use a space. Also Voe.wad has '0' instead of '0.0'. */
@@ -5748,9 +5776,9 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "specialaction ", 14) == 0)
+    else if (dh_strncmp (ptr, "specialaction", 13) == 0)
     {
-      ptr += 14;
+      ptr += 13;
       while (*ptr && (*ptr != '\"')) ptr++;
       if (*ptr)
       {
@@ -5781,9 +5809,9 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       if ((bd_ptr) && (bd_ptr -> func)) bd_ptr = NULL;
       intertext = -1;
     }
-    else if (strncasecmp (ptr, "cluster ", 8) == 0)
+    else if (dh_strncmp (ptr, "cluster", 7) == 0)
     {
-      ptr += 8;
+      ptr += 7;
       while (*ptr == ' ') ptr++;
       if ((clusterdefpresent)
        || (*ptr == '='))		// If the = sign is missing then it's a clusterdef
@@ -5806,9 +5834,9 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	textislump = 0;
       }
     }
-    else if (strncasecmp (ptr, "clusterdef ", 11) == 0)
+    else if (dh_strncmp (ptr, "clusterdef", 10) == 0)
     {
-      intertext = read_int (ptr + 11);
+      intertext = read_int (ptr + 10);
       textislump = 0;
     }
     else if (strncasecmp (ptr, "entertextislump", 15) == 0)
@@ -5827,9 +5855,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       ptr = set_enter_exit_text (ptr+8, 1, intertext, textislump & 2);
     }
-    else if (strncasecmp (ptr, "flat ", 5) == 0)
+    else if (dh_strncmp (ptr, "flat", 4) == 0)
     {
-      ptr += 5;
+      ptr += 4;
+      while (*ptr == ' ') ptr++;
       if (*ptr == '=') ptr++;
       while (*ptr == ' ') ptr++;
       if (*ptr == '\"') ptr++;
@@ -5869,9 +5898,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	}
       }
     }
-    else if (strncasecmp (ptr, "pic ", 4) == 0)
+    else if (dh_strncmp (ptr, "pic", 3) == 0)
     {
-      ptr += 4;
+      ptr += 3;
+      while (*ptr == ' ') ptr++;
       if (*ptr == '=') ptr++;
       while (*ptr == ' ') ptr++;
       if (*ptr == '\"') ptr++;
@@ -5903,9 +5933,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	}
       }
     }
-    else if (strncasecmp (ptr, "CastName ", 9) == 0)
+    else if (dh_strncmp (ptr, "CastName", 8) == 0)
     {
-      ptr += 9;
+      ptr += 8;
+      while (*ptr == ' ') ptr++;
       if (*ptr == '=') ptr++;
       while (*ptr == ' ') ptr++;
       if (*ptr == '\"') ptr++;
@@ -5924,6 +5955,10 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	add_to_cast_list (ptr);
       }
+    }
+    else if (M_CheckParm ("-showunknownmapinfo"))
+    {
+      printf ("MAPINFO (%0.8s)\n", ptr);
     }
     ptr = dh_next_line (ptr,top);
   } while (ptr < top);
@@ -6218,6 +6253,55 @@ static char * ReadUnquotedArg (char ** ptr)
 
 /* ---------------------------------------------------------------------------- */
 
+static char * NextArg (char * ptr)
+{
+  char cc;
+  char * nextarg;
+
+  nextarg = dh_strchr (ptr, '=', false);
+  if (nextarg)
+  {
+    ++nextarg;
+    while (((cc = *nextarg) == ' ') || (cc == '\t'))
+      ++nextarg;
+  }
+
+  return (nextarg);
+}
+
+/* ---------------------------------------------------------------------------- */
+	// Need to join the lines.
+
+static char * Parse_InterText (char ** ptr, char * top)
+{
+  char * newtext;
+
+  newtext = strchr (*ptr, '\"');
+  if (newtext == NULL)
+    return (top);
+  *ptr = newtext;
+  newtext = strchr (newtext, '\n');
+  while (newtext)
+  {
+    while (*newtext < ' ') --newtext;
+    if (*newtext != ',')
+      break;
+    char * nextline = strchr (newtext, '\"');
+    if (nextline == NULL)
+      break;
+    while (*newtext != '\"') --newtext;
+    *newtext++ = '\n';
+    size_t diff = ++nextline - newtext;
+    memcpy (newtext, nextline, top-nextline);
+    top -= diff;
+    newtext = strchr (newtext, '\n');
+  }
+
+  return (top);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
 {
   unsigned int i,j;
@@ -6243,7 +6327,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
       removeBoss = true;
       ++intertext;
     }
-    else if (strncasecmp (ptr, "LevelName ", 10) == 0)
+    else if (strncasecmp (ptr, "LevelName", 9) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
@@ -6251,17 +6335,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	set_map_name (episode, map, newtext);
       }
     }
-    else if (strncasecmp (ptr, "Next ", 5) == 0)
-    {
-      newtext = ReadQuotedArg (&ptr, false);
-      if (newtext)
-      {
-	read_map_num (&i, &j, newtext);
-	mdest_ptr->normal_exit_to_episode = i;
-	mdest_ptr->normal_exit_to_map = j;
-      }
-    }
-    else if (strncasecmp (ptr, "NextSecret ", 11) == 0)
+    else if (strncasecmp (ptr, "NextSecret", 10) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
@@ -6271,7 +6345,17 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	mdest_ptr->secret_exit_to_map = j;
       }
     }
-    else if (strncasecmp (ptr, "EndGame ", 8) == 0)
+    else if (strncasecmp (ptr, "Next", 4) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	read_map_num (&i, &j, newtext);
+	mdest_ptr->normal_exit_to_episode = i;
+	mdest_ptr->normal_exit_to_map = j;
+      }
+    }
+    else if (strncasecmp (ptr, "EndGame", 7) == 0)
     {
       newtext = ReadUnquotedArg (&ptr);
       if (newtext)
@@ -6288,7 +6372,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "EndBunny ", 9) == 0)
+    else if (strncasecmp (ptr, "EndBunny", 8) == 0)
     {
       newtext = ReadUnquotedArg (&ptr);
       if (newtext)
@@ -6302,7 +6386,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "EndCast ", 8) == 0)
+    else if (strncasecmp (ptr, "EndCast", 7) == 0)
     {
       newtext = ReadUnquotedArg (&ptr);
       if (newtext)
@@ -6316,16 +6400,18 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "ParTime ", 8) == 0)
+    else if (strncasecmp (ptr, "ParTime", 7) == 0)
     {
       newtext = ReadUnquotedArg (&ptr);
       if (newtext)
       {
 	i = atoi (newtext);
-	mdest_ptr->par_time_5 = (i + 4) / 5;
+	i = (i + 4) / 5;
+	if (i > 255) i = 255;
+	mdest_ptr->par_time_5 = i;
       }
     }
-    else if (strncasecmp (ptr, "SkyTexture ", 10) == 0)
+    else if (strncasecmp (ptr, "SkyTexture", 9) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if ((newtext) && (strcmp (newtext, mdest_ptr -> sky)))
@@ -6335,7 +6421,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	  mdest_ptr -> sky = t;
       }
     }
-    else if (strncasecmp (ptr, "Music ", 6) == 0)
+    else if (strncasecmp (ptr, "Music", 5) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if ((newtext) && (strcmp (newtext, mdest_ptr -> music)))
@@ -6345,7 +6431,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	  mdest_ptr -> music = t;
       }
     }
-    else if (strncasecmp (ptr, "EnterPic ", 9) == 0)
+    else if (strncasecmp (ptr, "EnterPic", 8) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if ((newtext) && (strcmp (newtext, mdest_ptr -> enterpic)))
@@ -6355,7 +6441,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	  mdest_ptr -> enterpic = t;
       }
     }
-    else if (strncasecmp (ptr, "ExitPic ", 8) == 0)
+    else if (strncasecmp (ptr, "ExitPic", 7) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if ((newtext) && (strcmp (newtext, mdest_ptr -> exitpic)))
@@ -6365,7 +6451,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	  mdest_ptr -> exitpic = t;
       }
     }
-    else if (strncasecmp (ptr, "EndPic ", 7) == 0)
+    else if (strncasecmp (ptr, "EndPic", 6) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
@@ -6397,17 +6483,14 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	mdest_ptr -> secret_exit_to_map = 255;
       }
     }
-    else if (strncasecmp (ptr, "LevelPic ", 9) == 0)
+    else if (strncasecmp (ptr, "LevelPic", 8) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       replace_titletext (newtext, episode, map);
     }
-    else if (strncasecmp (ptr, "Episode ", 8) == 0)
+    else if (strncasecmp (ptr, "Episode", 7) == 0)
     {
-      newtext = next_arg (ptr);
-      if (*newtext == '=')
-	newtext = next_arg (newtext);
-
+      newtext = NextArg (ptr);
       if (strncasecmp (newtext, "clear", 5) == 0)
       {
 
@@ -6443,7 +6526,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "NoIntermission ", 15) == 0)
+    else if (strncasecmp (ptr, "NoIntermission", 14) == 0)
     {
       newtext = ReadUnquotedArg (&ptr);
       if (newtext)
@@ -6458,12 +6541,9 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "InterText ", 10) == 0)
+    else if (strncasecmp (ptr, "InterTextSecret", 15) == 0)
     {
-      newtext = next_arg (ptr);
-      if (*newtext == '=')
-	newtext = next_arg (newtext);
-
+      newtext = NextArg (ptr);
       if (strncasecmp (newtext, "clear", 5) == 0)
       {
 	mdest_ptr->nointermission = 1;
@@ -6471,23 +6551,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
       else
       {
 	// Need to join the lines.
-	newtext = strchr (ptr, '\n');
-	while (newtext)
-	{
-	  while (*newtext < ' ') --newtext;
-	  if (*newtext != ',')
-	    break;
-	  char * nextline = strchr (newtext, '\"');
-	  if (nextline == NULL)
-	    break;
-	  while (*newtext != '\"') --newtext;
-	  *newtext++ = '\n';
-	  size_t diff = ++nextline - newtext;
-	  memcpy (newtext, nextline, top-nextline);
-	  top -= diff;
-	  newtext = strchr (newtext, '\n');
-	}
-
+	top = Parse_InterText (&ptr, top);
 	newtext = ReadQuotedArg (&ptr, true);
 	if (newtext)
 	{
@@ -6498,27 +6562,42 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	    char * t = malloc (i + 10);
 	    strncpy_convert_backslash_chars (t, newtext, i+10);
 	    dh_remove_americanisms (t);
-	    cp->exittext = t;
+	    cp->secret_exittext = t;
+	    mdest_ptr -> cluster = intertext;
 	    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
 	  }
 	}
       }
     }
-    else if (strncasecmp (ptr, "InterTextSecret ", 16) == 0)
+    else if (strncasecmp (ptr, "InterText", 9) == 0)
     {
-      newtext = next_arg (ptr);
-      if (*newtext == '=')
-	newtext = next_arg (newtext);
-
+      newtext = NextArg (ptr);
       if (strncasecmp (newtext, "clear", 5) == 0)
       {
 	mdest_ptr->nointermission = 1;
       }
       else
       {
+	// Need to join the lines.
+	top = Parse_InterText (&ptr, top);
+	newtext = ReadQuotedArg (&ptr, true);
+	if (newtext)
+	{
+	  cp = F_Create_ClusterDef (intertext);
+	  if (cp)
+	  {
+	    i = strlen (newtext);
+	    char * t = malloc (i + 10);
+	    strncpy_convert_backslash_chars (t, newtext, i+10);
+	    dh_remove_americanisms (t);
+	    cp->normal_exittext = t;
+	    mdest_ptr -> cluster = intertext;
+	    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	  }
+	}
       }
     }
-    else if (strncasecmp (ptr, "InterMusic ", 11) == 0)
+    else if (strncasecmp (ptr, "InterMusic", 10) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
@@ -6532,7 +6611,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "InterBackdrop ", 14) == 0)
+    else if (strncasecmp (ptr, "InterBackdrop", 13) == 0)
     {
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
@@ -6546,7 +6625,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	}
       }
     }
-    else if (strncasecmp (ptr, "BossAction ", 11) == 0)
+    else if (strncasecmp (ptr, "BossAction", 10) == 0)
     {
       unsigned int tag;
       unsigned int action;
@@ -6558,10 +6637,7 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 	removeBoss = false;
       }
 
-      ptr = next_arg (ptr);
-      if (*ptr == '=')
-	ptr = next_arg (ptr);
-
+      ptr = NextArg (ptr);
       newtext = strchr (ptr, ',');
       if (newtext)
       {
@@ -6618,31 +6694,70 @@ void Load_Mapinfo (void)
   map_dests_t * mptr;
   char mapname [12];
 
+  foundmapinfo = 0;
+  if (M_CheckParm ("-noumapinfo") == 0)
+  {
+    lump = 0;
+    do
+    {
+      if (strncasecmp (lumpinfo[lump].name, "UMAPINFO", 8) == 0)	// e.g. fork.wad
+      {
+	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	if (dh_changing_pwad == false)
+	  found = 1;
+	else
+	  found = 2;
+
+	/* Only load if not already loaded a better one. */
+	if ((found & foundmapinfo) == 0)
+	{
+	  foundmapinfo |= found;
+	  ptr = malloc (W_LumpLength (lump) + 4);
+	  if (ptr)
+	  {
+	    W_ReadLump (lump, ptr);
+	    top = ptr + W_LumpLength (lump);
+	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
+	    Parse_UMapinfo (ptr, top, 255, 0);
+	    free (ptr);
+	  }
+	}
+      }
+    } while (++lump < numlumps);
+  }
   // DTWID-LE requires both MAPINFO & ZMAPINFO, whereas D2TWID requires only one....
 
-  foundmapinfo = 0;
-  lump = 0;
-  do
+  if (((foundmapinfo & 2) == 0)
+   && (M_CheckParm ("-nomapinfo") == 0))
   {
-    if ((strncasecmp (lumpinfo[lump].name, "MAPINFO", 8) == 0)
-     || (strncasecmp (lumpinfo[lump].name, "ZMAPINFO", 8) == 0))
+    lump = 0;
+    do
     {
-      dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-      if (dh_changing_pwad == false)
-	foundmapinfo |= 1;
-      else
-	foundmapinfo |= 2;
-      ptr = malloc (W_LumpLength (lump) + 4);	// Allow extra because some mapinfos lack a trailing CR/LF
-      if (ptr)
+      if ((strncasecmp (lumpinfo[lump].name, "MAPINFO", 8) == 0)
+       || (strncasecmp (lumpinfo[lump].name, "ZMAPINFO", 8) == 0))
       {
-	W_ReadLump (lump, ptr);
-	top = ptr + W_LumpLength (lump);
-	*top++ = '\n';
-	Parse_Mapinfo (ptr, top, true);
-	free (ptr);
+	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	if (dh_changing_pwad == false)
+	  found = 1;
+	else
+	  found = 2;
+	/* Only load if not already loaded a better one. */
+	if ((found & foundmapinfo) == 0)
+	{
+	  foundmapinfo |= found;
+	  ptr = malloc (W_LumpLength (lump) + 4);	// Allow extra because some mapinfos lack a trailing CR/LF
+	  if (ptr)
+	  {
+	    W_ReadLump (lump, ptr);
+	    top = ptr + W_LumpLength (lump);
+	    *top++ = '\n';
+	    Parse_Mapinfo (ptr, top, true);
+	    free (ptr);
+	  }
+	}
       }
-    }
-  } while (++lump < numlumps);
+    } while (++lump < numlumps);
+  }
 
   // CodLev.wad has individual mapinfos.
 
@@ -6727,38 +6842,6 @@ void Load_Mapinfo (void)
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
 	    Parse_IndivMapinfo (ptr, top, 255, 0);
-	    free (ptr);
-	  }
-	}
-      }
-    } while (++lump < numlumps);
-  }
-
-  // The UMAPINFO appears to be a poor mans version of the others.
-  if ((foundmapinfo & 2) == 0)
-  {
-    lump = 0;
-    do
-    {
-      if (strncasecmp (lumpinfo[lump].name, "UMAPINFO", 8) == 0)	// e.g. fork.wad
-      {
-	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
-	if (dh_changing_pwad == false)
-	  found = 1;
-	else
-	  found = 2;
-
-	/* Only load if not already loaded a better one. */
-	if ((found & foundmapinfo) == 0)
-	{
-	  foundmapinfo |= found;
-	  ptr = malloc (W_LumpLength (lump) + 4);
-	  if (ptr)
-	  {
-	    W_ReadLump (lump, ptr);
-	    top = ptr + W_LumpLength (lump);
-	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
-	    Parse_UMapinfo (ptr, top, 255, 0);
 	    free (ptr);
 	  }
 	}

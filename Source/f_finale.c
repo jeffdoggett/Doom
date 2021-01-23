@@ -280,7 +280,10 @@ static void F_DetermineIntermissionTexts (void)
     {
       if (cp_p)
       {
-	finaletext = cp_p -> exittext;
+	if ((secretexit) && (cp_p -> secret_exittext))
+	  finaletext = cp_p -> secret_exittext;
+	else
+	  finaletext = cp_p -> normal_exittext;
 	finaleflat = cp_p -> flat;
 	finalemusic = cp_p -> music;
 	if ((cp_p -> pic)
@@ -312,6 +315,8 @@ static void F_DetermineIntermissionTexts (void)
        // level is in the same cluster, then it is probably
        // wrong to show the exit text.
        || ((secretexit != 0)
+
+	&& (cp_p -> secret_exittext == NULL)
 
 	&& (G_MapLump (map_info_p -> normal_exit_to_episode,
 		       map_info_p -> normal_exit_to_map) != -1)
@@ -739,13 +744,24 @@ void F_DrawBackgroundFlat (const char * flat)
   {
     w = W_LumpLength (c);
 
-    /* Assume that if the flat is > 4096 bytes then it's */
-    /* a patch that doesn't need to be tiled.  */
+    /* Assume that if the flat is != 4096 bytes then it's a patch.  */
     src = W_CacheLumpNum (c, PU_CACHE);
 
-    if ((w > 4096) && (modifiedgame))
+    if ((w != 4096) && (modifiedgame))
     {
-      V_DrawPatchScaled (0,0,0, (patch_t*)src);
+      patch_t * patch;
+      patch = (patch_t*)src;
+      y = 0;
+      do
+      {
+        x = 0;
+        do
+        {
+	  V_DrawPatchScaled (x,y,0, patch);
+          x += SHORT(patch->width);
+        } while (x < 320);
+        y += SHORT(patch->height);
+      } while (y < 200);
     }
     else
     {

@@ -760,8 +760,7 @@ extern int	screenblocks;
 
 void R_Init (void)
 {
-    if (M_CheckParm ("-nomapinfo") == 0)
-      Load_Mapinfo ();
+    Load_Mapinfo ();
 
     if (M_CheckParm ("-nolockdefs") == 0)
       Load_Lockdefs ();

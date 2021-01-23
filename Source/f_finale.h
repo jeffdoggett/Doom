@@ -119,7 +119,8 @@ typedef struct clusterdefs_s
   struct clusterdefs_s * next;
   unsigned int cnumber;
   char * entertext;
-  char * exittext;
+  char * normal_exittext;
+  char * secret_exittext;
   char * flat;
   char * pic;
   char * music;
