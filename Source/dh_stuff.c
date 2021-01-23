@@ -6364,10 +6364,10 @@ static void Parse_UMapinfo (char * ptr, char * top)
   episode = 255;
   map = 0;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-  while (*ptr < ' ') ++ptr;
 
   do
   {
+    while (*ptr <= ' ') ++ptr;
     // printf ("Decoding '%0.10s'\n", ptr);
     if (strncasecmp (ptr, "MAP ", 4) == 0)
     {
@@ -6518,12 +6518,14 @@ static void Parse_UMapinfo (char * ptr, char * top)
 
 	if (j == 0)
 	{
-	  i = endPic + 4;
-	  j = endPic + BG_ENDPIC;
+	  i = endPic + BG_ENDPIC;
+	  j = endPic + 4;
 	  ++endPic;
 	  char * t = strdup (newtext);
 	  if (t)
+	  {
 	    finale_backdrops[i] = t;
+	  }
 	}
 
 	mdest_ptr -> normal_exit_to_episode = j;
