@@ -923,7 +923,8 @@ static const spellings_t spelling_corrections [] =
   { "traveling", "travelling" },
   { "traveled", "travelled" },
   { "fense", "fence" },			// defence, offence
-  { "license", "licence" }
+  { "license", "licence" },
+  { "gray", "grey" }
 };
 
 /* ---------------------------------------------------------------------------- */
@@ -1017,7 +1018,7 @@ static char * next_arg (char * ptr)
   while (*ptr > ' ')
     ptr++;
 
-  while (*ptr == ' ')
+  while ((*ptr == ' ') || (*ptr == '\t'))
     ptr++;
 
   return (ptr);
@@ -1108,6 +1109,25 @@ unsigned int dh_rinchar (const char * text, char search_char)
   }
 
   return (j);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static char * dh_strchr (char * ptr, char search, boolean multiLine)
+{
+  char cc;
+
+  do
+  {
+    cc = *ptr;
+    if (cc == search)
+      return (ptr);
+    if ((multiLine == false) && ((cc == '\n') || (cc == '\r')))
+      break;
+    ++ptr;
+  } while (cc);
+
+  return (NULL);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -1403,8 +1423,8 @@ static const char * find_thing_bitname (int * thing_ptr, char operator, const ch
     {
       if (strcasecmp (ptr->name, buf) == 0)
       {
-        pos = ptr->value / 32;
-        bit = (1U << (ptr->value & 31));
+	pos = ptr->value / 32;
+	bit = (1U << (ptr->value & 31));
 	break;
       }
       ptr++;
@@ -3071,6 +3091,7 @@ static void strncpy_convert_backslash_chars (char * dest, const char * source, u
 	case 't': cc = '\t'; break;
 	case 'n': cc = '\n'; break;
 	case 'r': cc = '\r'; break;
+	case '\"': cc = '\"'; break;
 	default: *dest++ = '\\';
       }
     }
@@ -4189,6 +4210,40 @@ static void EV_DoNothing (void)
 
 /* ---------------------------------------------------------------------------- */
 
+static void A_BossAction (line_t * line, unsigned int action)
+{
+  mobj_t *mo;
+  mo = players[consoleplayer].mo;
+  line->special = action;
+  if (line->special == 0)
+    return;
+  if (!P_UseSpecialLine (mo, line, 0))
+    P_CrossSpecialLine (line, 0, mo);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void remove_boss_actions (unsigned int episode, unsigned int map)
+{
+  bossdeath_t * bd_ptr;
+
+  bd_ptr = boss_death_actions_head;
+  do
+  {
+    if ((bd_ptr -> episode == episode)
+     && (bd_ptr -> map == map))
+    {
+      bd_ptr -> monster = MT_NULL;
+//    bd_ptr -> tag = 0;		// and this inhibits the -nomonster cheat in A_Activate_Death_Sectors
+//    bd_ptr -> func = (actionf2) EV_DoNothing;	// For safety!
+//    printf ("Removed duplicate boss action from %u,%u (%X %X)\n", bd_ptr_1 -> episode, bd_ptr_1 -> map, bd_ptr_1 -> monsterbits,bd_ptr -> monsterbits);
+    }
+    bd_ptr = bd_ptr -> next;
+  } while (bd_ptr);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static bossdeath_t * new_bossdeath_action (void)
 {
   bossdeath_t * bd_ptr;
@@ -4276,6 +4331,7 @@ static const boss_names_t boss_names [] =
   { "PAIN",	MT_PAIN},
   { "REVEN",	MT_UNDEAD},
   { "MANCU",	MT_FATSO},
+  { "FATSO",	MT_FATSO},
   { "ARCH",	MT_VILE},
   { "Spider",	MT_SPIDER},
   { "Cyber",	MT_CYBORG}
@@ -4300,7 +4356,7 @@ static bossdeath_t * find_boss_type (const char * name, unsigned int episode, un
     }
     ptr++;
   } while (--count);
-  fprintf (stderr, "DeHackEd:Failed to match text (%s)\n", name);
+  fprintf (stderr, "DeHackEd:Failed to match text (%0.8s)\n", name);
   return (bd_ptr);
 }
 
@@ -4399,6 +4455,11 @@ static const char * find_boss_action_func_name (actionf2 function, unsigned int 
       return (ptr -> name);
     ++ptr;
   } while (--counter);
+
+  if (function == (actionf2) A_BossAction)
+  {
+    return ("Special Action");
+  }
 
   return ("Unknown operation");
 }
@@ -4752,7 +4813,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   newtext = NULL;
 
   length = strlen (ptr);
-//printf ("length = %d, ptr = (%s)\n", length, ptr);
+  // printf ("length = %d, ptr = (%s)\n", length, ptr);
   if (length)
   {
     if ((length < 9)
@@ -4876,7 +4937,7 @@ static char * replace_titletext (char * ptr, unsigned int episode, unsigned int 
     if (episode && map) sprintf (buf, mdest_ptr -> titlepatch, episode-1, map-1);
   }
 
-  // printf ("replace_titletext (%s) (%s)\n", ptr, buf)
+  // printf ("replace_titletext (%s) (%s)\n", ptr, buf);
   if (strcasecmp (ptr, buf))
   {
     newtext = strdup (ptr);
@@ -5006,6 +5067,49 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
   if ((ptr = msource_ptr->exitpic) != NULL)		mdest_ptr->exitpic = ptr;
   if ((ptr = msource_ptr->bordertexture) != NULL)	mdest_ptr->bordertexture = ptr;
   if ((ptr = msource_ptr->music) != NULL)		mdest_ptr->music = ptr;
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void set_map_name (unsigned int episode, unsigned int map, char * ptr)
+{
+  char * newtext;
+  unsigned int j;
+  unsigned int len;
+
+  len = strlen (ptr);
+
+  if (episode != 255)
+  {
+    newtext = malloc (len+16);	// +6 for the "ExMx: " and +10 for the american/british conv
+    if (newtext)
+    {
+      j = sprintf (newtext, "E%dM%d: ", episode, map);
+      strcpy (newtext+j, ptr);
+      dh_remove_americanisms (newtext);
+      *(HU_access_mapname_E (episode,map)) = newtext;
+      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
+    }
+  }
+  else
+  {
+    newtext = malloc (len+20);
+    if (newtext)
+    {
+      sprintf (newtext, " %d:", map);			// Do not prepend "Level xx:" if there appears
+      if (dh_instr (ptr, newtext))			// to be an xx: already there.
+	j = 0;
+      else
+	j = sprintf (newtext, "Level %d: ", map);
+      strcpy (newtext+j, ptr);
+      dh_remove_americanisms (newtext);
+      *(HU_access_mapname_E (255,map)) = newtext;
+      *(HU_access_mapname_E (254,map)) = newtext;	// Do TNT and Plutonia as well for completeness...
+      *(HU_access_mapname_E (253,map)) = newtext;
+      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
+    }
+  }
+  // printf ("Map %u %u has text (%s)\n", episode, map, newtext);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -6065,6 +6169,442 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 
 /* ---------------------------------------------------------------------------- */
 
+static char * ReadQuotedArg (char ** ptr, boolean multiLine)
+{
+  char * squote;
+  char * equote;
+
+  squote = dh_strchr (*ptr, '\"', multiLine);
+  if (squote == NULL)
+    return (NULL);
+  ++squote;
+  equote = dh_strchr (squote, '\"', multiLine);
+  if (equote == NULL)
+    return (NULL);
+
+  while (equote [-1] == '\\')
+  {
+    equote = dh_strchr (equote+1, '\"', multiLine);
+    if (equote == NULL)
+      return (NULL);
+  }
+
+  *ptr = equote + 1;
+  *equote = 0;
+  return (squote);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static char * ReadUnquotedArg (char ** ptr)
+{
+  char * stext;
+  char * etext;
+
+  stext = dh_strchr (*ptr, '=', false);
+  if (stext == NULL)
+    return NULL;
+
+  ++stext;
+  while (*stext == ' ') ++stext;
+
+  etext = stext;
+  while (*etext > ' ') ++etext;
+
+  *ptr = etext + 1;
+  *etext = 0;
+  return (stext);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
+{
+  unsigned int i,j;
+  unsigned int endPic;
+  unsigned int intertext;
+  char * newtext;
+  clusterdefs_t * cp;
+  map_dests_t * mdest_ptr;
+  boolean removeBoss = true;
+
+  endPic = 0;
+  intertext = 0;
+  mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+  while (*ptr < ' ') ++ptr;
+
+  do
+  {
+    // printf ("Decoding '%0.10s'\n", ptr);
+    if (strncasecmp (ptr, "MAP ", 4) == 0)
+    {
+      ptr = read_map_num (&episode, &map, ptr+4);
+      mdest_ptr = G_Access_MapInfoTab_E (episode, map);
+      removeBoss = true;
+      ++intertext;
+    }
+    else if (strncasecmp (ptr, "LevelName ", 10) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	set_map_name (episode, map, newtext);
+      }
+    }
+    else if (strncasecmp (ptr, "Next ", 5) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	read_map_num (&i, &j, newtext);
+	mdest_ptr->normal_exit_to_episode = i;
+	mdest_ptr->normal_exit_to_map = j;
+      }
+    }
+    else if (strncasecmp (ptr, "NextSecret ", 11) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	read_map_num (&i, &j, newtext);
+	mdest_ptr->secret_exit_to_episode = i;
+	mdest_ptr->secret_exit_to_map = j;
+      }
+    }
+    else if (strncasecmp (ptr, "EndGame ", 8) == 0)
+    {
+      newtext = ReadUnquotedArg (&ptr);
+      if (newtext)
+      {
+	if (strcasecmp (newtext, "false") == 0)
+	{
+	}
+	else if (strcasecmp (newtext, "true") == 0)
+	{
+	  mdest_ptr->normal_exit_to_episode = 255;
+	  mdest_ptr->normal_exit_to_map = 255;
+	  mdest_ptr->secret_exit_to_episode = 255;
+	  mdest_ptr->secret_exit_to_map = 255;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "EndBunny ", 9) == 0)
+    {
+      newtext = ReadUnquotedArg (&ptr);
+      if (newtext)
+      {
+	if (strcasecmp (newtext, "true") == 0)
+	{
+	  mdest_ptr->normal_exit_to_episode = 3;
+	  mdest_ptr->normal_exit_to_map = 255;
+	  mdest_ptr->secret_exit_to_episode = 3;
+	  mdest_ptr->secret_exit_to_map = 255;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "EndCast ", 8) == 0)
+    {
+      newtext = ReadUnquotedArg (&ptr);
+      if (newtext)
+      {
+	if (strcasecmp (newtext, "true") == 0)
+	{
+	  mdest_ptr->normal_exit_to_episode = 5;
+	  mdest_ptr->normal_exit_to_map = 255;
+	  mdest_ptr->secret_exit_to_episode = 5;
+	  mdest_ptr->secret_exit_to_map = 255;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "ParTime ", 8) == 0)
+    {
+      newtext = ReadUnquotedArg (&ptr);
+      if (newtext)
+      {
+	i = atoi (newtext);
+	mdest_ptr->par_time_5 = (i + 4) / 5;
+      }
+    }
+    else if (strncasecmp (ptr, "SkyTexture ", 10) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if ((newtext) && (strcmp (newtext, mdest_ptr -> sky)))
+      {
+	char * t = strdup (newtext);
+	if (t)
+	  mdest_ptr -> sky = t;
+      }
+    }
+    else if (strncasecmp (ptr, "Music ", 6) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if ((newtext) && (strcmp (newtext, mdest_ptr -> music)))
+      {
+	char * t = strdup (newtext);
+	if (t)
+	  mdest_ptr -> music = t;
+      }
+    }
+    else if (strncasecmp (ptr, "EnterPic ", 9) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if ((newtext) && (strcmp (newtext, mdest_ptr -> enterpic)))
+      {
+	char * t = strdup (newtext);
+	if (t)
+	  mdest_ptr -> enterpic = t;
+      }
+    }
+    else if (strncasecmp (ptr, "ExitPic ", 8) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if ((newtext) && (strcmp (newtext, mdest_ptr -> exitpic)))
+      {
+	char * t = strdup (newtext);
+	if (t)
+	  mdest_ptr -> exitpic = t;
+      }
+    }
+    else if (strncasecmp (ptr, "EndPic ", 7) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	j = 0;
+	i = BG_ENDPIC;
+	do
+	{
+	  if (strcasecmp (newtext,  finale_backdrops[i]) == 0)
+	  {
+	    j = (i - BG_ENDPIC) + 4;
+	    break;
+	  }
+	} while (++i <= BG_ENDPIC9);
+
+	if (j == 0)
+	{
+	  i = endPic + 4;
+	  j = endPic + BG_ENDPIC;
+	  ++endPic;
+	  char * t = strdup (newtext);
+	  if (t)
+	    finale_backdrops[i] = t;
+	}
+
+	mdest_ptr -> normal_exit_to_episode = j;
+	mdest_ptr -> normal_exit_to_map = 255;
+	mdest_ptr -> secret_exit_to_episode = j;
+	mdest_ptr -> secret_exit_to_map = 255;
+      }
+    }
+    else if (strncasecmp (ptr, "LevelPic ", 9) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      replace_titletext (newtext, episode, map);
+    }
+    else if (strncasecmp (ptr, "Episode ", 8) == 0)
+    {
+      newtext = next_arg (ptr);
+      if (*newtext == '=')
+	newtext = next_arg (newtext);
+
+      if (strncasecmp (newtext, "clear", 5) == 0)
+      {
+
+      }
+      else
+      {
+	// E.g  Episode = "M_EPFORK", "Fork in the Road", "F"
+	if (episode == 255)
+	  i = M_GetNextEpi (map);
+	else
+	  i = episode;
+
+	newtext = ReadQuotedArg (&ptr, false);
+	if (newtext)
+	{
+	  M_SetEpiName (i, newtext, strlen(newtext)+1);
+	  newtext = ReadQuotedArg (&ptr, false);
+	  if (newtext)
+	  {
+	    char * t = malloc (strlen(ptr)+6);
+	    if (t)
+	    {
+	      strcpy (t, newtext);
+	      dh_remove_americanisms (t);
+	      episode_names [i] = t;
+	      newtext = ReadQuotedArg (&ptr, false);
+	      if (newtext)
+	      {
+		M_SetEpiKey (i, *newtext);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "NoIntermission ", 15) == 0)
+    {
+      newtext = ReadUnquotedArg (&ptr);
+      if (newtext)
+      {
+	if (strcasecmp (newtext, "false") == 0)
+	{
+	  mdest_ptr->nointermission = 0;
+	}
+	else if (strcasecmp (newtext, "true") == 0)
+	{
+	  mdest_ptr->nointermission = 1;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "InterText ", 10) == 0)
+    {
+      newtext = next_arg (ptr);
+      if (*newtext == '=')
+	newtext = next_arg (newtext);
+
+      if (strncasecmp (newtext, "clear", 5) == 0)
+      {
+	mdest_ptr->nointermission = 1;
+      }
+      else
+      {
+	// Need to join the lines.
+	newtext = strchr (ptr, '\n');
+	while (newtext)
+	{
+	  while (*newtext < ' ') --newtext;
+	  if (*newtext != ',')
+	    break;
+	  char * nextline = strchr (newtext, '\"');
+	  if (nextline == NULL)
+	    break;
+	  while (*newtext != '\"') --newtext;
+	  *newtext++ = '\n';
+	  size_t diff = ++nextline - newtext;
+	  memcpy (newtext, nextline, top-nextline);
+	  top -= diff;
+	  newtext = strchr (newtext, '\n');
+	}
+
+	newtext = ReadQuotedArg (&ptr, true);
+	if (newtext)
+	{
+	  cp = F_Create_ClusterDef (intertext);
+	  if (cp)
+	  {
+	    i = strlen (newtext);
+	    char * t = malloc (i + 10);
+	    strncpy_convert_backslash_chars (t, newtext, i+10);
+	    dh_remove_americanisms (t);
+	    cp->exittext = t;
+	    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	  }
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "InterTextSecret ", 16) == 0)
+    {
+      newtext = next_arg (ptr);
+      if (*newtext == '=')
+	newtext = next_arg (newtext);
+
+      if (strncasecmp (newtext, "clear", 5) == 0)
+      {
+	mdest_ptr->nointermission = 1;
+      }
+      else
+      {
+      }
+    }
+    else if (strncasecmp (ptr, "InterMusic ", 11) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	cp = F_Create_ClusterDef (intertext);
+	if (cp)
+	{
+	  char * t = strdup (newtext);
+	  if (t)
+	    cp->music = t;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "InterBackdrop ", 14) == 0)
+    {
+      newtext = ReadQuotedArg (&ptr, false);
+      if (newtext)
+      {
+	cp = F_Create_ClusterDef (intertext);
+	if (cp)
+	{
+	  char * t = strdup (newtext);
+	  if (t)
+	    cp->flat = t;
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "BossAction ", 11) == 0)
+    {
+      unsigned int tag;
+      unsigned int action;
+      bossdeath_t * bd_ptr;
+
+      if (removeBoss)
+      {
+	remove_boss_actions (episode, map);
+	removeBoss = false;
+      }
+
+      ptr = next_arg (ptr);
+      if (*ptr == '=')
+	ptr = next_arg (ptr);
+
+      newtext = strchr (ptr, ',');
+      if (newtext)
+      {
+	++newtext;
+	while (*newtext <= ' ') ++newtext;
+	action = atoi (newtext);
+	newtext = strchr (newtext, ',');
+	if (newtext)
+	{
+	  ++newtext;
+	  while (*newtext <= ' ') ++newtext;
+	  tag = atoi (newtext);
+	  bd_ptr = find_boss_type (ptr, episode, map, NULL);
+	  if (bd_ptr)
+	  {
+	    // printf ("BossAction %u %u\n", action, tag);
+	    bd_ptr->func = (actionf2) A_BossAction;
+	    bd_ptr->action = action;
+	    bd_ptr->tag = tag;
+	  }
+	}
+      }
+    }
+    else if (strncasecmp (ptr, "{", 1) == 0)
+    {
+    }
+    else if (strncasecmp (ptr, "}", 1) == 0)
+    {
+    }
+    else if (strncasecmp (ptr, "//", 2) == 0)
+    {
+    }
+    else if (M_CheckParm ("-showunknown"))
+    {
+      printf ("UMAPINFO (%0.8s)\n", ptr);
+    }
+
+    ptr = dh_next_line (ptr,top);
+  } while (ptr < top);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 void Load_Mapinfo (void)
 {
   int lump;
@@ -6179,6 +6719,7 @@ void Load_Mapinfo (void)
 	/* Only load if not already loaded a better one. */
 	if ((found & foundmapinfo) == 0)
 	{
+	  foundmapinfo |= found;
 	  ptr = malloc (W_LumpLength (lump) + 4);
 	  if (ptr)
 	  {
@@ -6186,6 +6727,38 @@ void Load_Mapinfo (void)
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
 	    Parse_IndivMapinfo (ptr, top, 255, 0);
+	    free (ptr);
+	  }
+	}
+      }
+    } while (++lump < numlumps);
+  }
+
+  // The UMAPINFO appears to be a poor mans version of the others.
+  if ((foundmapinfo & 2) == 0)
+  {
+    lump = 0;
+    do
+    {
+      if (strncasecmp (lumpinfo[lump].name, "UMAPINFO", 8) == 0)	// e.g. fork.wad
+      {
+	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	if (dh_changing_pwad == false)
+	  found = 1;
+	else
+	  found = 2;
+
+	/* Only load if not already loaded a better one. */
+	if ((found & foundmapinfo) == 0)
+	{
+	  foundmapinfo |= found;
+	  ptr = malloc (W_LumpLength (lump) + 4);
+	  if (ptr)
+	  {
+	    W_ReadLump (lump, ptr);
+	    top = ptr + W_LumpLength (lump);
+	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
+	    Parse_UMapinfo (ptr, top, 255, 0);
 	    free (ptr);
 	  }
 	}
