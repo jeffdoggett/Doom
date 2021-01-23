@@ -5184,8 +5184,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       memset (&default_mapinfo, 0, sizeof (default_mapinfo));
       doing_default = 1;
     }
-
-    else if (dh_strncmp (ptr, "episode", 8) == 0)
+    else if (dh_strncmp (ptr, "episode", 7) == 0)
     {
       ptr = read_map_num (&episode, &map, ptr+7);
       if (episode == 255)
@@ -6302,11 +6301,59 @@ static char * Parse_InterText (char ** ptr, char * top)
 
 /* ---------------------------------------------------------------------------- */
 
-static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
+static void Parse_CommaSeparatedQuotedText (char * dest, char ** source)
+{
+  char cc;
+  char *ptr;
+  byte doing_quotes;
+
+  ptr = *source;
+  doing_quotes = 0;
+  do
+  {
+    cc = *ptr++;
+    if (cc == '\\')
+    {
+      cc = *ptr++;
+      switch (cc)
+      {
+	case 't': cc = '\t'; break;
+	case 'n': cc = '\n'; break;
+	case 'r': cc = '\r'; break;
+	case '\"': cc = '\"'; break;
+	default: *dest++ = '\\';
+      }
+      *dest++ = cc;
+    }
+    else if ((cc == ',') || (cc == '\r') || (cc == '\n'))
+    {
+      if (doing_quotes == 0)
+        break;
+      *dest++ = cc;
+    }
+    else if (cc == '\"')
+    {
+      doing_quotes ^= 1;
+    }
+    else if (doing_quotes)
+    {
+      *dest++ = cc;
+    }
+  } while (cc);
+
+  *source = ptr;
+  *dest = 0;
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void Parse_UMapinfo (char * ptr, char * top)
 {
   unsigned int i,j;
   unsigned int endPic;
   unsigned int intertext;
+  unsigned int episode;
+  unsigned int map;
   char * newtext;
   clusterdefs_t * cp;
   map_dests_t * mdest_ptr;
@@ -6314,6 +6361,8 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
 
   endPic = 0;
   intertext = 0;
+  episode = 255;
+  map = 0;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
   while (*ptr < ' ') ++ptr;
 
@@ -6498,31 +6547,37 @@ static void Parse_UMapinfo (char * ptr, char * top, unsigned int episode, unsign
       else
       {
 	// E.g  Episode = "M_EPFORK", "Fork in the Road", "F"
+	char buffer [100];
 	if (episode == 255)
 	  i = M_GetNextEpi (map);
 	else
 	  i = episode;
 
-	newtext = ReadQuotedArg (&ptr, false);
-	if (newtext)
+        Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	if (buffer[0])
 	{
-	  M_SetEpiName (i, newtext, strlen(newtext)+1);
-	  newtext = ReadQuotedArg (&ptr, false);
-	  if (newtext)
+	  // printf ("Episode lump name = %s\n", buffer);
+	  M_SetEpiName (i, buffer, strlen(buffer)+1);
+	}
+
+        Parse_CommaSeparatedQuotedText (buffer, &ptr);
+        if (buffer[0])
+        {
+	  char * t = malloc (strlen(buffer)+6);
+	  if (t)
 	  {
-	    char * t = malloc (strlen(ptr)+6);
-	    if (t)
-	    {
-	      strcpy (t, newtext);
-	      dh_remove_americanisms (t);
-	      episode_names [i] = t;
-	      newtext = ReadQuotedArg (&ptr, false);
-	      if (newtext)
-	      {
-		M_SetEpiKey (i, *newtext);
-	      }
-	    }
+	    strcpy (t, buffer);
+	    dh_remove_americanisms (t);
+	    episode_names [i] = t;
+	    // printf ("Episode text name = %s\n", t);
 	  }
+	}
+
+        Parse_CommaSeparatedQuotedText (buffer, &ptr);
+        if (buffer[0])
+        {
+	  // printf ("Episode key name = %c\n", buffer[0]);
+	  M_SetEpiKey (i, buffer[0]);
 	}
       }
     }
@@ -6718,7 +6773,7 @@ void Load_Mapinfo (void)
 	    W_ReadLump (lump, ptr);
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
-	    Parse_UMapinfo (ptr, top, 255, 0);
+	    Parse_UMapinfo (ptr, top);
 	    free (ptr);
 	  }
 	}
@@ -6869,6 +6924,29 @@ void Change_To_Mapinfo (FILE * fin)
     size = fread (ptr, 1, size, fin);
     ptr [size++] = '\n';
     Parse_Mapinfo (ptr, ptr+size, false);
+    free (ptr);
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
+void Change_To_UMapinfo (FILE * fin)
+{
+  long int pos;
+  size_t size;
+  char * ptr;
+
+  pos = ftell (fin);
+  fseek (fin, 0, SEEK_END);
+  size = (size_t) (ftell (fin) - pos);
+  fseek (fin, pos, SEEK_SET);
+
+  ptr = malloc (size + 4);	// Extra 'cos we add a line terminator and a null.
+  if (ptr)
+  {
+    size = fread (ptr, 1, size, fin);
+    ptr [size++] = '\n';
+    Parse_UMapinfo (ptr, ptr+size);
     free (ptr);
   }
 }

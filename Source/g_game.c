@@ -2684,6 +2684,14 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 	  }
 	  break;
 
+	case 'U':
+	case 'u':
+	  if (strcasecmp (a_line, "UMAPINFO") == 0)
+	  {
+	    Change_To_UMapinfo (fin);
+	  }
+	  break;
+
 	case 'D':
 	case 'd':
 	  if (strcasecmp(a_line, "DEHACKED") == 0)

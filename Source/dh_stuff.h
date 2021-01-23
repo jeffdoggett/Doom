@@ -18,6 +18,7 @@ char * dh_next_line (char * ptr, char * top);
 void dh_fgets (char * a_line, unsigned int max_length, FILE * fin);
 void Load_Mapinfo (void);
 void Change_To_Mapinfo (FILE * fin);
+void Change_To_UMapinfo (FILE * fin);
 void DH_remove_duplicate_mapinfos (void);
 void Load_Lockdefs (void);
 
