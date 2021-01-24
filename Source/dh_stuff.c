@@ -6546,44 +6546,47 @@ static void Parse_UMapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "Episode", 7) == 0)
     {
       newtext = NextArg (ptr);
-      if (strncasecmp (newtext, "clear", 5) == 0)
+      if (newtext)
       {
+	if (strncasecmp (newtext, "clear", 5) == 0)
+	{
 
-      }
-      else
-      {
-	// E.g  Episode = "M_EPFORK", "Fork in the Road", "F"
-	char buffer [100];
-	if (episode == 255)
-	  i = M_GetNextEpi (map);
+	}
 	else
-	  i = episode;
-
-	Parse_CommaSeparatedQuotedText (buffer, &ptr);
-	if (buffer[0])
 	{
-	  // printf ("Episode lump name = %s\n", buffer);
-	  M_SetEpiName (i, buffer, strlen(buffer)+1);
-	}
+	  // E.g  Episode = "M_EPFORK", "Fork in the Road", "F"
+	  char buffer [100];
+	  if (episode == 255)
+	    i = M_GetNextEpi (map);
+	  else
+	    i = episode;
 
-	Parse_CommaSeparatedQuotedText (buffer, &ptr);
-	if (buffer[0])
-	{
-	  char * t = malloc (strlen(buffer)+6);
-	  if (t)
+	  Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	  if (buffer[0])
 	  {
-	    strcpy (t, buffer);
-	    dh_remove_americanisms (t);
-	    episode_names [i] = t;
-	    // printf ("Episode text name = %s\n", t);
+	    // printf ("Episode lump name = %s\n", buffer);
+	    M_SetEpiName (i, buffer, strlen(buffer)+1);
 	  }
-	}
 
-	Parse_CommaSeparatedQuotedText (buffer, &ptr);
-	if (buffer[0])
-	{
-	  // printf ("Episode key name = %c\n", buffer[0]);
-	  M_SetEpiKey (i, buffer[0]);
+	  Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	  if (buffer[0])
+	  {
+	    char * t = malloc (strlen(buffer)+6);
+	    if (t)
+	    {
+	      strcpy (t, buffer);
+	      dh_remove_americanisms (t);
+	      episode_names [i] = t;
+	      // printf ("Episode text name = %s\n", t);
+	    }
+	  }
+
+	  Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	  if (buffer[0])
+	  {
+	    // printf ("Episode key name = %c\n", buffer[0]);
+	    M_SetEpiKey (i, buffer[0]);
+	  }
 	}
       }
     }
@@ -6605,27 +6608,33 @@ static void Parse_UMapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "InterTextSecret", 15) == 0)
     {
       newtext = NextArg (ptr);
-      if (strncasecmp (newtext, "clear", 5) == 0)
+      if (newtext)
       {
-	mdest_ptr->nointermission = 1;
-      }
-      else
-      {
-	// Need to join the lines.
-	top = Parse_InterText (&ptr, top);
-	newtext = ReadQuotedArg (&ptr, true);
-	if (newtext)
+	if (strncasecmp (newtext, "clear", 5) == 0)
 	{
-	  cp = F_Create_ClusterDef (intertext);
-	  if (cp)
+	  mdest_ptr->nointermission = 1;
+	}
+	else
+	{
+	  // Need to join the lines.
+	  top = Parse_InterText (&ptr, top);
+	  newtext = ReadQuotedArg (&ptr, true);
+	  if (newtext)
 	  {
-	    i = strlen (newtext);
-	    char * t = malloc (i + 10);
-	    strncpy_convert_backslash_chars (t, newtext, i+10);
-	    dh_remove_americanisms (t);
-	    cp->secret_exittext = t;
-	    mdest_ptr -> cluster = intertext;
-	    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	    cp = F_Create_ClusterDef (intertext);
+	    if (cp)
+	    {
+	      i = strlen (newtext);
+	      char * t = malloc (i + 10);
+	      if (t)
+	      {
+		strncpy_convert_backslash_chars (t, newtext, i+10);
+		dh_remove_americanisms (t);
+		cp->secret_exittext = t;
+		mdest_ptr -> cluster = intertext;
+		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	      }
+	    }
 	  }
 	}
       }
@@ -6633,27 +6642,33 @@ static void Parse_UMapinfo (char * ptr, char * top)
     else if (strncasecmp (ptr, "InterText", 9) == 0)
     {
       newtext = NextArg (ptr);
-      if (strncasecmp (newtext, "clear", 5) == 0)
+      if (newtext)
       {
-	mdest_ptr->nointermission = 1;
-      }
-      else
-      {
-	// Need to join the lines.
-	top = Parse_InterText (&ptr, top);
-	newtext = ReadQuotedArg (&ptr, true);
-	if (newtext)
+	if (strncasecmp (newtext, "clear", 5) == 0)
 	{
-	  cp = F_Create_ClusterDef (intertext);
-	  if (cp)
+	  mdest_ptr->nointermission = 1;
+	}
+	else
+	{
+	  // Need to join the lines.
+	  top = Parse_InterText (&ptr, top);
+	  newtext = ReadQuotedArg (&ptr, true);
+	  if (newtext)
 	  {
-	    i = strlen (newtext);
-	    char * t = malloc (i + 10);
-	    strncpy_convert_backslash_chars (t, newtext, i+10);
-	    dh_remove_americanisms (t);
-	    cp->normal_exittext = t;
-	    mdest_ptr -> cluster = intertext;
-	    finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	    cp = F_Create_ClusterDef (intertext);
+	    if (cp)
+	    {
+	      i = strlen (newtext);
+	      char * t = malloc (i + 10);
+	      if (t)
+	      {
+		strncpy_convert_backslash_chars (t, newtext, i+10);
+		dh_remove_americanisms (t);
+		cp->normal_exittext = t;
+		mdest_ptr -> cluster = intertext;
+		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
+	      }
+	    }
 	  }
 	}
       }
@@ -6693,32 +6708,35 @@ static void Parse_UMapinfo (char * ptr, char * top)
       bossdeath_t * bd_ptr;
 
       ptr = NextArg (ptr);
-      if (strncasecmp (ptr, "clear", 5) == 0)
+      if (ptr)
       {
-	remove_boss_actions (episode, map, true);	// Remove all actions.
-      }
-      else
-      {
-	remove_boss_actions (episode, map, false);	// Remove old style actions.
-	newtext = strchr (ptr, ',');
-	if (newtext)
+	if (strncasecmp (ptr, "clear", 5) == 0)
 	{
-	  ++newtext;
-	  while (*newtext <= ' ') ++newtext;
-	  action = atoi (newtext);
-	  newtext = strchr (newtext, ',');
+	  remove_boss_actions (episode, map, true);	// Remove all actions.
+	}
+	else
+	{
+	  remove_boss_actions (episode, map, false);	// Remove old style actions.
+	  newtext = strchr (ptr, ',');
 	  if (newtext)
 	  {
 	    ++newtext;
 	    while (*newtext <= ' ') ++newtext;
-	    tag = atoi (newtext);
-	    bd_ptr = find_boss_type (ptr, episode, map, NULL);
-	    if (bd_ptr)
+	    action = atoi (newtext);
+	    newtext = strchr (newtext, ',');
+	    if (newtext)
 	    {
-	      // printf ("BossAction %u %u\n", action, tag);
-	      bd_ptr->func = (actionf2) A_BossAction;
-	      bd_ptr->action = action;
-	      bd_ptr->tag = tag;
+	      ++newtext;
+	      while (*newtext <= ' ') ++newtext;
+	      tag = atoi (newtext);
+	      bd_ptr = find_boss_type (ptr, episode, map, NULL);
+	      if (bd_ptr)
+	      {
+		// printf ("BossAction %u %u\n", action, tag);
+		bd_ptr->func = (actionf2) A_BossAction;
+		bd_ptr->action = action;
+		bd_ptr->tag = tag;
+	      }
 	    }
 	  }
 	}
