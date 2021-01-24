@@ -131,6 +131,7 @@ extern void A_SkullPop (mobj_t* mo, pspdef_t *psp);
 extern void A_LineEffect (mobj_t* mo, pspdef_t *psp);
 
 extern void P_Massacre (void);
+extern unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag);
 
 #endif
 //-----------------------------------------------------------------------------

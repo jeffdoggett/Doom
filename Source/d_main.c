@@ -2485,6 +2485,18 @@ void D_DoomMain (void)
       }
   }
 
+  p = M_CheckParm ("-mapnames");
+  if (p)
+  {
+      // the parms after p are map sequence file names,
+      // until end of parms or another - preceded parm
+      while (++p < myargc && myargv[p][0] != '-')
+      {
+	if (already_in_wadlist (myargv[p], "hst") == 0)
+	  G_ReadHstFile (myargv[p]);
+      }
+  }
+
   DH_remove_duplicate_mapinfos ();
 
   // printf ("M_Init: Init miscellaneous info.\n");

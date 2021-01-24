@@ -4229,13 +4229,9 @@ static void EV_DoNothing (void)
 
 static void A_BossAction (line_t * line, unsigned int action)
 {
-  mobj_t *mo;
+  mobj_t * mo;
   mo = players[consoleplayer].mo;
-  line->special = action;
-  if (line->special == 0)
-    return;
-  if (!P_UseSpecialLine (mo, line, 0))
-    P_CrossSpecialLine (line, 0, mo);
+  A_LineAction (mo, action, line->tag);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4248,7 +4244,8 @@ static void remove_boss_actions (unsigned int episode, unsigned int map)
   do
   {
     if ((bd_ptr -> episode == episode)
-     && (bd_ptr -> map == map))
+     && (bd_ptr -> map == map)
+     && (bd_ptr -> func != (actionf2) A_BossAction))
     {
       bd_ptr -> monster = MT_NULL;
 //    bd_ptr -> tag = 0;		// and this inhibits the -nomonster cheat in A_Activate_Death_Sectors
@@ -6357,7 +6354,6 @@ static void Parse_UMapinfo (char * ptr, char * top)
   char * newtext;
   clusterdefs_t * cp;
   map_dests_t * mdest_ptr;
-  boolean removeBoss = true;
 
   endPic = 0;
   intertext = 0;
@@ -6373,7 +6369,6 @@ static void Parse_UMapinfo (char * ptr, char * top)
     {
       ptr = read_map_num (&episode, &map, ptr+4);
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      removeBoss = true;
       ++intertext;
     }
     else if (strncasecmp (ptr, "LevelName", 9) == 0)
@@ -6505,33 +6500,43 @@ static void Parse_UMapinfo (char * ptr, char * top)
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
       {
-	j = 0;
-	i = BG_ENDPIC;
-	do
-	{
-	  if (strcasecmp (newtext,  finale_backdrops[i]) == 0)
-	  {
-	    j = (i - BG_ENDPIC) + 4;
-	    break;
-	  }
-	} while (++i <= BG_ENDPIC9);
-
-	if (j == 0)
-	{
+        // Been here before?
+        j = mdest_ptr -> normal_exit_to_episode;
+        if ((j != 255)
+         && (j == mdest_ptr -> secret_exit_to_episode)
+         && (mdest_ptr -> normal_exit_to_map == 255)
+         && (mdest_ptr -> secret_exit_to_map == 255))
+        {
+          i = (j - 4) + BG_ENDPIC;
+        }
+        else
+        {
 	  i = endPic + BG_ENDPIC;
 	  j = endPic + 4;
-	  ++endPic;
+	  if (i > BG_ENDPIC9)
+	  {
+	    fprintf (stderr, "UMAPINFO: Too many endPics\n");
+	    i = BG_ENDPIC9;
+	    j = (i - BG_ENDPIC) + 4;
+	  }
+	  else
+	  {
+	    ++endPic;
+	  }
+	  mdest_ptr -> normal_exit_to_episode = j;
+	  mdest_ptr -> normal_exit_to_map = 255;
+	  mdest_ptr -> secret_exit_to_episode = j;
+	  mdest_ptr -> secret_exit_to_map = 255;
+        }
+
+	if (strcasecmp (newtext, finale_backdrops[i]))
+        {
 	  char * t = strdup (newtext);
 	  if (t)
 	  {
 	    finale_backdrops[i] = t;
 	  }
-	}
-
-	mdest_ptr -> normal_exit_to_episode = j;
-	mdest_ptr -> normal_exit_to_map = 255;
-	mdest_ptr -> secret_exit_to_episode = j;
-	mdest_ptr -> secret_exit_to_map = 255;
+        }
       }
     }
     else if (strncasecmp (ptr, "LevelPic", 8) == 0)
@@ -6688,11 +6693,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       unsigned int action;
       bossdeath_t * bd_ptr;
 
-      if (removeBoss)
-      {
-	remove_boss_actions (episode, map);
-	removeBoss = false;
-      }
+      remove_boss_actions (episode, map);	// Remove old style actions.
 
       ptr = NextArg (ptr);
       newtext = strchr (ptr, ',');

@@ -2762,20 +2762,26 @@ void A_RandomJump (mobj_t *mo, pspdef_t* psp)
 //
 void A_LineEffect (mobj_t *mo, pspdef_t* psp)
 {
+  mo->state->misc1 = A_LineAction (mo, (dushort_t)mo->state->misc1, (dushort_t)mo->state->misc2);
+}
+
+unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag)
+{
   static line_t	junk;
   player_t	player;
   player_t	*oldplayer;
 
   junk = *lines;
-  oldplayer = mo->player;
-  mo->player = &player;
-  player.health = 100;
-  junk.special = (dushort_t)mo->state->misc1;
-  if (!junk.special)
-    return;
-  junk.tag = (dushort_t)mo->state->misc2;
-  if (!P_UseSpecialLine (mo, &junk, 0))
-    P_CrossSpecialLine (&junk, 0, mo);
-  mo->state->misc1 = junk.special;
-  mo->player = oldplayer;
+  junk.special = special;
+  if (junk.special)
+  {
+    oldplayer = mo->player;
+    mo->player = &player;
+    player.health = 100;
+    junk.tag = tag;
+    if (!P_UseSpecialLine (mo, &junk, 0))
+      P_CrossSpecialLine (&junk, 0, mo);
+    mo->player = oldplayer;
+  }
+  return (junk.special);
 }

@@ -3012,6 +3012,23 @@ void G_ParseMapSeq (char * filename, FILE * fin, int docheck)
 
 /* -------------------------------------------------------------------------------------------- */
 
+void G_ReadHstFile (char * filename)
+{
+  FILE * fin;
+
+  fin = fopen (filename, "r");
+  if (fin == 0)
+  {
+    fprintf (stderr, "Couldn't open file %s for reading\n", filename);
+    return;
+  }
+
+  G_ParseMapSeq (filename, fin, 0);
+  fclose (fin);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+
 void G_ReadMapSeq (char * filename)
 {
   FILE * fin;

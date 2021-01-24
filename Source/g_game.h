@@ -164,6 +164,7 @@ void G_MapName (char * name, int episode, int map);
 int G_MapLump (int episode, int map);
 void G_ParseMapSeq (char * filename, FILE * fin, int docheck);
 void G_ReadMapSeq (char * filename);
+void G_ReadHstFile (char * filename);
 void G_parse_map_seq_wad_file (const char * wadfile, const char * extension, boolean do_it);
 const char * leafname (const char * path);
 void dirname (char * dest, const char * path);
