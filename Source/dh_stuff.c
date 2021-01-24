@@ -4236,7 +4236,7 @@ static void A_BossAction (line_t * line, unsigned int action)
 
 /* ---------------------------------------------------------------------------- */
 
-static void remove_boss_actions (unsigned int episode, unsigned int map)
+static void remove_boss_actions (unsigned int episode, unsigned int map, boolean all)
 {
   bossdeath_t * bd_ptr;
 
@@ -4245,7 +4245,7 @@ static void remove_boss_actions (unsigned int episode, unsigned int map)
   {
     if ((bd_ptr -> episode == episode)
      && (bd_ptr -> map == map)
-     && (bd_ptr -> func != (actionf2) A_BossAction))
+     && (all || (bd_ptr -> func != (actionf2) A_BossAction)))
     {
       bd_ptr -> monster = MT_NULL;
 //    bd_ptr -> tag = 0;		// and this inhibits the -nomonster cheat in A_Activate_Death_Sectors
@@ -6325,7 +6325,7 @@ static void Parse_CommaSeparatedQuotedText (char * dest, char ** source)
     else if ((cc == ',') || (cc == '\r') || (cc == '\n'))
     {
       if (doing_quotes == 0)
-        break;
+	break;
       *dest++ = cc;
     }
     else if (cc == '\"')
@@ -6347,15 +6347,14 @@ static void Parse_CommaSeparatedQuotedText (char * dest, char ** source)
 static void Parse_UMapinfo (char * ptr, char * top)
 {
   unsigned int i,j;
-  unsigned int endPic;
   unsigned int intertext;
   unsigned int episode;
   unsigned int map;
   char * newtext;
   clusterdefs_t * cp;
   map_dests_t * mdest_ptr;
+  static unsigned int endPic = 0;
 
-  endPic = 0;
   intertext = 0;
   episode = 255;
   map = 0;
@@ -6500,17 +6499,17 @@ static void Parse_UMapinfo (char * ptr, char * top)
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
       {
-        // Been here before?
-        j = mdest_ptr -> normal_exit_to_episode;
-        if ((j != 255)
-         && (j == mdest_ptr -> secret_exit_to_episode)
-         && (mdest_ptr -> normal_exit_to_map == 255)
-         && (mdest_ptr -> secret_exit_to_map == 255))
-        {
-          i = (j - 4) + BG_ENDPIC;
-        }
-        else
-        {
+	// Been here before?
+	j = mdest_ptr -> normal_exit_to_episode;
+	if ((j != 255)
+	 && (j == mdest_ptr -> secret_exit_to_episode)
+	 && (mdest_ptr -> normal_exit_to_map == 255)
+	 && (mdest_ptr -> secret_exit_to_map == 255))
+	{
+	  i = (j - 4) + BG_ENDPIC;
+	}
+	else
+	{
 	  i = endPic + BG_ENDPIC;
 	  j = endPic + 4;
 	  if (i > BG_ENDPIC9)
@@ -6527,16 +6526,16 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  mdest_ptr -> normal_exit_to_map = 255;
 	  mdest_ptr -> secret_exit_to_episode = j;
 	  mdest_ptr -> secret_exit_to_map = 255;
-        }
+	}
 
 	if (strcasecmp (newtext, finale_backdrops[i]))
-        {
+	{
 	  char * t = strdup (newtext);
 	  if (t)
 	  {
 	    finale_backdrops[i] = t;
 	  }
-        }
+	}
       }
     }
     else if (strncasecmp (ptr, "LevelPic", 8) == 0)
@@ -6560,16 +6559,16 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	else
 	  i = episode;
 
-        Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	Parse_CommaSeparatedQuotedText (buffer, &ptr);
 	if (buffer[0])
 	{
 	  // printf ("Episode lump name = %s\n", buffer);
 	  M_SetEpiName (i, buffer, strlen(buffer)+1);
 	}
 
-        Parse_CommaSeparatedQuotedText (buffer, &ptr);
-        if (buffer[0])
-        {
+	Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	if (buffer[0])
+	{
 	  char * t = malloc (strlen(buffer)+6);
 	  if (t)
 	  {
@@ -6580,9 +6579,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  }
 	}
 
-        Parse_CommaSeparatedQuotedText (buffer, &ptr);
-        if (buffer[0])
-        {
+	Parse_CommaSeparatedQuotedText (buffer, &ptr);
+	if (buffer[0])
+	{
 	  // printf ("Episode key name = %c\n", buffer[0]);
 	  M_SetEpiKey (i, buffer[0]);
 	}
@@ -6693,28 +6692,34 @@ static void Parse_UMapinfo (char * ptr, char * top)
       unsigned int action;
       bossdeath_t * bd_ptr;
 
-      remove_boss_actions (episode, map);	// Remove old style actions.
-
       ptr = NextArg (ptr);
-      newtext = strchr (ptr, ',');
-      if (newtext)
+      if (strncasecmp (ptr, "clear", 5) == 0)
       {
-	++newtext;
-	while (*newtext <= ' ') ++newtext;
-	action = atoi (newtext);
-	newtext = strchr (newtext, ',');
+	remove_boss_actions (episode, map, true);	// Remove all actions.
+      }
+      else
+      {
+	remove_boss_actions (episode, map, false);	// Remove old style actions.
+	newtext = strchr (ptr, ',');
 	if (newtext)
 	{
 	  ++newtext;
 	  while (*newtext <= ' ') ++newtext;
-	  tag = atoi (newtext);
-	  bd_ptr = find_boss_type (ptr, episode, map, NULL);
-	  if (bd_ptr)
+	  action = atoi (newtext);
+	  newtext = strchr (newtext, ',');
+	  if (newtext)
 	  {
-	    // printf ("BossAction %u %u\n", action, tag);
-	    bd_ptr->func = (actionf2) A_BossAction;
-	    bd_ptr->action = action;
-	    bd_ptr->tag = tag;
+	    ++newtext;
+	    while (*newtext <= ' ') ++newtext;
+	    tag = atoi (newtext);
+	    bd_ptr = find_boss_type (ptr, episode, map, NULL);
+	    if (bd_ptr)
+	    {
+	      // printf ("BossAction %u %u\n", action, tag);
+	      bd_ptr->func = (actionf2) A_BossAction;
+	      bd_ptr->action = action;
+	      bd_ptr->tag = tag;
+	    }
 	  }
 	}
       }
