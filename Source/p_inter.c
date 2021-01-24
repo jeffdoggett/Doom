@@ -1078,7 +1078,7 @@ static char * find_obit_killer (mobj_t* victim, mobj_t* killer, unsigned int obi
   mobjinfo_t * mptr;
 
   mptr = killer->info;
-  killername = mptr->name1;
+  killername = mptr->names[0];
   obit = mptr->obits[obitnum];
 
   if (killer == victim)
@@ -1107,9 +1107,9 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
     char * sourcename = NULL;
     char * inflictorname = NULL;
     if (source)
-      sourcename = source->info->name1;
+      sourcename = source->info->names[0];
     if (inflictor)
-      inflictorname = inflictor->info->name1;
+      inflictorname = inflictor->info->names[0];
     if (sourcename == NULL)
       sourcename = "unknown";
     if (inflictorname == NULL)

@@ -1162,6 +1162,10 @@ unsigned int dh_qty_match (const char * s1, const char * s2)
     c2 = toupper (*s2); s2++;
   } while (c1 && (c1 == c2) && (++len));
 
+  // Perfect match gets the best score.
+  if ((c1 == 0) && (c2 == 0))
+    len = ~0;
+
   return (len);
 }
 
@@ -1342,7 +1346,7 @@ static void write_all_things (FILE * fout)
   thing_no = 0;
   do
   {
-    name = ptr -> name1;
+    name = ptr -> names[0];
     if (name == NULL)
     {
       if ((thing_no >= MT_EXTRA00) && (thing_no <= MT_EXTRA99))
@@ -1528,18 +1532,31 @@ static void decode_things_name (unsigned int number, thing_element_t record, cha
   switch (record)
   {
     case THING_Name1:
-      if ((ptr -> name1 == NULL)
-       || (strcmp (ptr -> name1, value)))
+      if ((ptr -> names[0] == NULL)
+       || (strcmp (ptr -> names[0], value)))
       {
 	newtext = strdup (value);
 	if (newtext)
 	{
-	  ptr -> name1 = newtext;
+	  ptr -> names[0] = newtext;
 	  // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
 	}
       }
       break;
-    //case THING_Name2:
+
+    case THING_Name2:
+      if ((ptr -> names[1] == NULL)
+       || (strcmp (ptr -> names[1], value)))
+      {
+	newtext = strdup (value);
+	if (newtext)
+	{
+	  ptr -> names[1] = newtext;
+	  // printf ("Setting thing name %u to \"%s\"\n", number, newtext);
+	}
+      }
+      break;
+
     //case THING_Plural1:
     //case THING_Plural2:
   }
@@ -2661,7 +2678,7 @@ static unsigned int replace_finale_text (char * orig, char * newt)
   {
     if (is_all_spaces (newt))
       newt [0] = 0;
-    mobjinfo [castorder[counter]].name1 = newt;
+    mobjinfo [castorder[counter]].names[0] = newt;
     return (0);
   }
 
@@ -3417,7 +3434,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   counter1 = dh_search_str_tab_a (dehack_cast_strings, ttext);
   if (counter1 != -1)
   {
-    return (&mobjinfo[castorder[counter1]].name1);
+    return (&mobjinfo[castorder[counter1]].names[0]);
   }
 
   counter1 = dh_search_str_tab_a (dehack_tag_strings, ttext);
@@ -3427,7 +3444,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     if (counter1 == MT_PLAYER)
       return (&null_name);
 
-    return (&mobjinfo[dehack_tag_nums[counter1]].name1);
+    return (&mobjinfo[dehack_tag_nums[counter1]].names[0]);
   }
 
   counter1 = dh_search_str_tab_a (screenshot_message_names, ttext);
@@ -4330,47 +4347,89 @@ typedef struct
 
 static const boss_names_t boss_names [] =
 {
-  { "Zombie",	MT_POSSESSED},		// Need to fill the correct
-  { "SHOTGUN",	MT_SHOTGUY},		// names...
   { "HEAVY",	MT_CHAINGUY},
-  { "WOLF",	MT_WOLFSS},
   { "IMP",	MT_TROOP},
-  { "DEMON",	MT_SERGEANT},
-  { "SPECTRE",	MT_SHADOWS},
-  { "LOST",	MT_SKULL},
-  { "CACO",	MT_HEAD},
-  { "HELL",	MT_KNIGHT},
-  { "BARON",	MT_BRUISER},
-  { "ARACH",	MT_BABY},
-  { "PAIN",	MT_PAIN},
-  { "REVEN",	MT_UNDEAD},
-  { "MANCU",	MT_FATSO},
-  { "FATSO",	MT_FATSO},
-  { "ARCH",	MT_VILE},
-  { "Spider",	MT_SPIDER},
-  { "Cyber",	MT_CYBORG}
+  { "MANCU",	MT_FATSO}
 };
 
-static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
+static mobjtype_t find_boss_mobytype (const char * name)
 {
+  char cc;
+  mobjtype_t best;
+  mobjinfo_t * mobjptr;
+  unsigned int pos;
+  unsigned int len;
   unsigned int count;
+  unsigned int best_len;
   const boss_names_t * ptr;
+  char buffer [100];
 
-//printf ("Looking for %d chars (%s)\n", len, name);
+  len = 0;
+  do
+  {
+    cc = name[len];
+    if ((!isalnum(cc)) || (len > (sizeof (buffer)-2)))
+    {
+      cc = 0;
+    }
+    buffer [len++] = cc;
+  } while (cc);
+
+  dh_remove_americanisms (buffer);
+
+  count = 0;
+  best_len = 0;
+  mobjptr = &mobjinfo[0];
+  do
+  {
+    pos = 0;
+    do
+    {
+      len = dh_qty_match (buffer, mobjptr->names[pos]);
+      if (len > best_len)
+      {
+        best_len = len;
+        best = (mobjtype_t) count;
+      }
+    } while (++pos < ARRAY_SIZE(mobjptr->names));
+    ++mobjptr;
+  } while (++count < NUMMOBJTYPES);
+
+  if (best_len >= 4)
+  {
+    // printf ("Found '%s' at '%s', len %u\n", buffer, mobjinfo[best].names[1], best_len);
+    return (best);
+  }
+
+  // printf ("Failed to find '%s'\n", buffer);
   ptr = boss_names;
   count = ARRAY_SIZE(boss_names);
   do
   {
-    if (dh_qty_match (name, ptr->name) > 2)		// Three chars is plenty!
+    if (dh_qty_match (buffer, ptr->name) > 2)		// Three chars is plenty!
     {
-      bd_ptr = access_boss_actions (episode, map, bd_ptr);
-      if (bd_ptr)
-	bd_ptr -> monster = ptr->mt_number;
-      return (bd_ptr);
+      return (ptr->mt_number);
     }
     ptr++;
   } while (--count);
+
   fprintf (stderr, "DeHackEd:Failed to match text (%0.8s)\n", name);
+  return (MT_NULL);
+}
+
+static bossdeath_t * find_boss_type (const char * name, unsigned int episode, unsigned int map, bossdeath_t * bd_ptr)
+{
+  mobjtype_t mt_num;
+
+//printf ("Looking for %d chars (%s)\n", len, name);
+  mt_num = find_boss_mobytype (name);
+  if (mt_num != MT_NULL)
+  {
+    bd_ptr = access_boss_actions (episode, map, bd_ptr);
+    if (bd_ptr)
+      bd_ptr -> monster = mt_num;
+  }
+
   return (bd_ptr);
 }
 
@@ -4575,13 +4634,13 @@ static void show_thing_drops (void)
     if (((unsigned int) m1 < NUMMOBJTYPES)
      && ((unsigned int) m2 < NUMMOBJTYPES))
     {
-      name1 = mobjinfo [m1].name1;
+      name1 = mobjinfo [m1].names[0];
       if (name1 == NULL)
 	name1 = "Unknown";
 
-      name2 = mobjinfo [m2].name1;
-      if (name1 == NULL)
-	name1 = "Unknown";
+      name2 = mobjinfo [m2].names[0];
+      if (name2 == NULL)
+	name2 = "Unknown";
 
       printf ("Thing %u (%s) drops item %u (%s)\n", m1, name1, m2, name2);
     }

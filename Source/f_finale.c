@@ -1002,8 +1002,8 @@ static char * F_CastName (mobjtype_t rtype)
     return (castlist -> cast_name);
 
   mobj_ptr = &mobjinfo [rtype];
-  if ((mobj_ptr->name1) && (mobj_ptr->name1[0]))
-    return (mobj_ptr -> name1);
+  if ((mobj_ptr->names[0]) && (mobj_ptr->names[0][0]))
+    return (mobj_ptr -> names[0]);
 
   return ("Unknown");
 }
@@ -1017,7 +1017,7 @@ static boolean F_FindCastByName (const char * castName)
 
   do
   {
-    if (strcasecmp (mobj_ptr->name1, castName) == 0)
+    if (strcasecmp (mobj_ptr->names[0], castName) == 0)
     {
       casttype = cast_num;
       return (true);
@@ -1031,7 +1031,7 @@ static boolean F_FindCastByName (const char * castName)
   mobj_ptr = &mobjinfo[0];
   do
   {
-    if (dh_qty_match (mobj_ptr->name1, castName) > 8)
+    if (dh_qty_match (mobj_ptr->names[0], castName) > 8)
     {
       casttype = cast_num;
       return (true);
@@ -1044,7 +1044,7 @@ static boolean F_FindCastByName (const char * castName)
   mobj_ptr = &mobjinfo[0];
   do
   {
-    if (dh_instr (mobj_ptr->name1, castName))
+    if (dh_instr (mobj_ptr->names[0], castName))
     {
       casttype = cast_num;
       return (true);
@@ -1111,7 +1111,7 @@ static void F_NextCast (boolean restart)
       cast_ptr = &castorder[0];
     }
     mobj_ptr = &mobjinfo [casttype = *cast_ptr];
-    if ((mobj_ptr -> name1) && (mobj_ptr -> name1[0]))
+    if ((mobj_ptr -> names[0]) && (mobj_ptr -> names[0][0]))
       break;
   } while (--attempts);
 }

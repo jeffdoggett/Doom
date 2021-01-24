@@ -349,7 +349,7 @@ static void init_text_messages (void)
     c_ptr = cast_names_copy;
     do
     {
-      mobjinfo[*ptr_s].name1 = *c_ptr;
+      mobjinfo[*ptr_s].names[0] = *c_ptr;
       ptr_s++;
       c_ptr++;
     } while (*c_ptr);

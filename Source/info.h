@@ -320,7 +320,7 @@ typedef struct
   int	flags2;
   int	raisestate;
   int	scale;
-  char* name1;
+  char* names[2];
   char* obits[2];
 } mobjinfo_t;
 

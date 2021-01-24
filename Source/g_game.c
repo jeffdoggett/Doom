@@ -2533,7 +2533,7 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
       counter = 0;
       do
       {
-        if (strcasecmp (src, mobjinfo [counter].name1) == 0)
+        if (strcasecmp (src, mobjinfo [counter].names[0]) == 0)
 	  return ((mobjtype_t)counter);
         counter++;
       } while (counter < NUMMOBJTYPES);
