@@ -4498,17 +4498,11 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 static const char * find_boss_action_name (mobjtype_t boss)
 {
-  uint32_t counter;
-  const boss_names_t * ptr;
+  char * ptr;
 
-  ptr = boss_names;
-  counter = ARRAY_SIZE(boss_names);
-  do
-  {
-    if (boss == ptr -> mt_number)
-      return (ptr -> name);
-    ++ptr;
-  } while (--counter);
+  ptr = mobjinfo[boss].names[1];
+  if (ptr)
+    return (ptr);
 
   return ("Unknown");
 }
