@@ -5331,7 +5331,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	  }
 	  else if ((l == 'C') || (l == 'c'))
 	  {
-	    i = 10;
+	    i = FINALE_MAX_ENDNUM;
 	  }
 	}
       }
@@ -5367,7 +5367,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	  }
 	  else if ((l == 'C') || (l == 'c'))
 	  {
-	    i = 10;
+	    i = FINALE_MAX_ENDNUM;
 	  }
 	}
       }
@@ -6242,7 +6242,7 @@ static char * ReadUnquotedArg (char ** ptr)
   etext = stext;
   while (*etext > ' ') ++etext;
 
-  *ptr = etext + 1;
+  *ptr = etext;
   *etext = 0;
   return (stext);
 }
@@ -6344,18 +6344,43 @@ static void Parse_CommaSeparatedQuotedText (char * dest, char ** source)
 
 /* ---------------------------------------------------------------------------- */
 
+static unsigned int FindExitPicSlot (map_dests_t * mdest_ptr, const char * newname)
+{
+  unsigned int i,j;
+
+  // Been here before?
+  j = mdest_ptr -> normal_exit_to_episode;
+  if ((j != 255)
+    && (j == mdest_ptr -> secret_exit_to_episode)
+    && (mdest_ptr -> normal_exit_to_map == 255)
+    && (mdest_ptr -> secret_exit_to_map == 255))
+  {
+    return (j);
+  }
+
+  i = BG_ENDPIC;
+  do
+  {
+    if (strcasecmp (newname, finale_backdrops[i]) == 0)
+      return ((i - BG_ENDPIC) + 4);
+  } while (++i <= BG_ENDPICE);
+
+  return (0);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void Parse_UMapinfo (char * ptr, char * top)
 {
   unsigned int i,j;
-  unsigned int intertext;
   unsigned int episode;
   unsigned int map;
   char * newtext;
   clusterdefs_t * cp;
   map_dests_t * mdest_ptr;
   static unsigned int endPic = 0;
+  static unsigned int intertext = 0;
 
-  intertext = 0;
   episode = 255;
   map = 0;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
@@ -6436,9 +6461,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if (strcasecmp (newtext, "true") == 0)
 	{
-	  mdest_ptr->normal_exit_to_episode = 5;
+	  mdest_ptr->normal_exit_to_episode = FINALE_MAX_ENDNUM;
 	  mdest_ptr->normal_exit_to_map = 255;
-	  mdest_ptr->secret_exit_to_episode = 5;
+	  mdest_ptr->secret_exit_to_episode = FINALE_MAX_ENDNUM;
 	  mdest_ptr->secret_exit_to_map = 255;
 	}
       }
@@ -6500,11 +6525,8 @@ static void Parse_UMapinfo (char * ptr, char * top)
       if (newtext)
       {
 	// Been here before?
-	j = mdest_ptr -> normal_exit_to_episode;
-	if ((j != 255)
-	 && (j == mdest_ptr -> secret_exit_to_episode)
-	 && (mdest_ptr -> normal_exit_to_map == 255)
-	 && (mdest_ptr -> secret_exit_to_map == 255))
+	j = FindExitPicSlot (mdest_ptr, newtext);
+	if (j)
 	{
 	  i = (j - 4) + BG_ENDPIC;
 	}
@@ -6512,10 +6534,10 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	{
 	  i = endPic + BG_ENDPIC;
 	  j = endPic + 4;
-	  if (i > BG_ENDPIC9)
+	  if (i > BG_ENDPICE)
 	  {
 	    fprintf (stderr, "UMAPINFO: Too many endPics\n");
-	    i = BG_ENDPIC9;
+	    i = BG_ENDPICE;
 	    j = (i - BG_ENDPIC) + 4;
 	  }
 	  else
@@ -6528,6 +6550,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  mdest_ptr -> secret_exit_to_map = 255;
 	}
 
+	// printf ("EndPic %u '%s' to '%s'\n", i, finale_backdrops[i], newtext);
 	if (strcasecmp (newtext, finale_backdrops[i]))
 	{
 	  char * t = strdup (newtext);
@@ -6621,9 +6644,12 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  newtext = ReadQuotedArg (&ptr, true);
 	  if (newtext)
 	  {
-	    cp = F_Create_ClusterDef (intertext);
+	    if ((j = mdest_ptr -> cluster) == 0)
+	      j = intertext;
+	    cp = F_Create_ClusterDef (j);
 	    if (cp)
 	    {
+	      mdest_ptr -> cluster = j;
 	      i = strlen (newtext);
 	      char * t = malloc (i + 10);
 	      if (t)
@@ -6631,7 +6657,6 @@ static void Parse_UMapinfo (char * ptr, char * top)
 		strncpy_convert_backslash_chars (t, newtext, i+10);
 		dh_remove_americanisms (t);
 		cp->secret_exittext = t;
-		mdest_ptr -> cluster = intertext;
 		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
 	      }
 	    }
@@ -6655,9 +6680,12 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  newtext = ReadQuotedArg (&ptr, true);
 	  if (newtext)
 	  {
-	    cp = F_Create_ClusterDef (intertext);
+	    if ((j = mdest_ptr -> cluster) == 0)
+	      j = intertext;
+	    cp = F_Create_ClusterDef (j);
 	    if (cp)
 	    {
+	      mdest_ptr -> cluster = j;
 	      i = strlen (newtext);
 	      char * t = malloc (i + 10);
 	      if (t)
@@ -6665,7 +6693,6 @@ static void Parse_UMapinfo (char * ptr, char * top)
 		strncpy_convert_backslash_chars (t, newtext, i+10);
 		dh_remove_americanisms (t);
 		cp->normal_exittext = t;
-		mdest_ptr -> cluster = intertext;
 		finale_message_changed = (boolean)((int)finale_message_changed|(int)dh_changing_pwad);
 	      }
 	    }
@@ -6678,7 +6705,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
       {
-	cp = F_Create_ClusterDef (intertext);
+	if ((j = mdest_ptr -> cluster) == 0)
+	  j = intertext;
+	cp = F_Create_ClusterDef (j);
 	if (cp)
 	{
 	  char * t = strdup (newtext);
@@ -6692,7 +6721,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
       newtext = ReadQuotedArg (&ptr, false);
       if (newtext)
       {
-	cp = F_Create_ClusterDef (intertext);
+	if ((j = mdest_ptr -> cluster) == 0)
+	  j = intertext;
+	cp = F_Create_ClusterDef (j);
 	if (cp)
 	{
 	  char * t = strdup (newtext);

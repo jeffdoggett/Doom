@@ -119,13 +119,24 @@ char *	finale_backdrops_orig [] =
   "HELP1",
   "HELP2",
   "VICTORY2",
-  "ENDPIC",
-  "ENDPIC5",
-  "ENDPIC6",
-  "ENDPIC7",
-  "ENDPIC8",
-  "ENDPIC9",
   "TITLEPIC",
+  "ENDPIC",
+  "ENDPIC05",
+  "ENDPIC06",
+  "ENDPIC07",
+  "ENDPIC08",
+  "ENDPIC09",
+  "ENDPIC10",
+  "ENDPIC11",
+  "ENDPIC12",
+  "ENDPIC13",
+  "ENDPIC14",
+  "ENDPIC15",
+  "ENDPIC16",
+  "ENDPIC17",
+  "ENDPIC18",
+  "ENDPIC19",
+  "ENDPIC20",
   NULL
 };
 
@@ -525,7 +536,7 @@ void F_StartFinale (int always)
 	      finalestage = 1;
 	      break;
 
-	    case 10:
+	    case FINALE_MAX_ENDNUM:
 	      F_StartCast ();
 	      break;
 
@@ -692,7 +703,7 @@ void F_Ticker (void)
 	    S_StartMusic (mus_bunny);
 	    break;
 
-	  case 10:
+	  case FINALE_MAX_ENDNUM:
 	    F_StartCast ();
 	    break;
 
@@ -1620,7 +1631,7 @@ void F_Drawer (void)
       default:
 	endmode = finaleendgame;
 	if ((endmode < 1)
-	 || (endmode > 10))
+	 || (endmode > FINALE_MAX_ENDNUM))
 	  endmode = gameepisode;
 
 	switch (endmode)
@@ -1641,24 +1652,22 @@ void F_Drawer (void)
 	    break;
 
 	  default:
+	    if (endmode < FINALE_MAX_ENDNUM)
+	    {
+	      pos = endmode + (BG_ENDPIC - 4);
+	      do
+	      {
+	        if (W_CheckNumForName (finale_backdrops[pos]) != -1)
+		  break;
+	      } while (--pos > BG_ENDPIC);
+	      D_PageDrawer (finale_backdrops[pos]);
+	    }
+	    			// Fall through.
+	  case 0:
 	    D_PageDrawer (finale_backdrops[BG_ENDPIC]);
 	    break;
 
-	  case 5:
-	  case 6:
-	  case 7:
-	  case 8:
-	  case 9:
-	    pos = endmode + (BG_ENDPIC - 4);
-	    do
-	    {
-	      if (W_CheckNumForName (finale_backdrops[pos]) != -1)
-		break;
-	    } while (--pos > BG_ENDPIC);
-	    D_PageDrawer (finale_backdrops[pos]);
-	    break;
-
-	  case 10:
+	  case FINALE_MAX_ENDNUM:
 	    D_PageDrawer (finalepic);
 	    F_CastDrawer ();
 	    break;
