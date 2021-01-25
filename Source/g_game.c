@@ -1463,7 +1463,7 @@ static mobjtype_t G_SprNum (spritenum_t sprite)
     ptr++;
   } while (++count < NUMMOBJTYPES);
 
-  return ((mobjtype_t)-1);
+  return (MT_NULL);
 }
 
 /* -------------------------------------------------------------------------------------------- */
@@ -1478,7 +1478,7 @@ static void G_SpawnObject (fixed_t x, fixed_t y, spritenum_t sprite)
   mobjtype_t num;
 
   num = G_SprNum (sprite);
-  if (num != (mobjtype_t)-1)
+  if (num != MT_NULL)
   {
     if (mobjinfo[num].flags & MF_SPAWNCEILING)
       z = ONCEILINGZ;
@@ -2467,9 +2467,9 @@ static const char * const cast_mtconv [NUMMOBJTYPES+1] =
   "MISC67", "MISC68", "MISC69", "MISC70", "MISC71", "MISC72",
   "MISC73", "MISC74", "MISC75", "MISC76", "MISC77", "MISC78",
   "MISC79", "MISC80", "MISC81", "MISC82", "MISC83", "MISC84",
-  "MISC85", "MISC86", "MT_PUSH", "MT_PULL", "MT_DOGS", "MT_PLASMA1",
-  "MT_PLASMA2", "MT_SCEPTRE", "MT_BIBLE", "MT_MUSICSOURCE","MT_GIBDTH",
-  "MT_BLUEBLOOD","MT_GREENBLOOD","MT_FUZZYBLOOD","MT_TRAIL",
+  "MISC85", "MISC86", "PUSH", "PULL", "DOGS", "PLASMA1",
+  "PLASMA2", "SCEPTRE", "BIBLE", "MUSICSOURCE", "GIBDTH",
+  "BLUEBLOOD", "GREENBLOOD", "FUZZYBLOOD", "TRAIL",
   NULL
 };
 
@@ -2508,7 +2508,7 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
       if (strcasecmp (src, cmp [counter]) == 0)
       {
 	num = G_SprNum ((spritenum_t) counter);
-	if (num != (mobjtype_t)-1)
+	if (num != MT_NULL)
 	  return (num);
       }
       counter++;
@@ -2527,6 +2527,11 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
 	  return ((mobjtype_t)counter);
         counter++;
       } while (cmp[counter]);
+      if (strncasecmp (src, "EXTRA", 5) == 0)
+      {
+        counter = atoi (src+5);
+        return ((mobjtype_t) (MT_EXTRA00 + counter));
+      }
     }
     else
     {
@@ -2537,14 +2542,20 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
 	  return ((mobjtype_t)counter);
         counter++;
       } while (counter < NUMMOBJTYPES);
+      counter = 0;
+      do
+      {
+        if (strcasecmp (src, mobjinfo [counter].names[1]) == 0)
+	  return ((mobjtype_t)counter);
+        counter++;
+      } while (counter < NUMMOBJTYPES);
     }
   }
-
 
   fprintf (stderr, "Failed to match %s at line %d of file %s\n",
 	    		buffer, line_number, filename);
 
-  return ((mobjtype_t)-1);
+  return (MT_NULL);
 }
 
 /* -------------------------------------------------------------------------------------------- */
