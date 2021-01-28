@@ -527,24 +527,24 @@ void F_StartFinale (int always)
 
 	if (lump == -1)
 	{
-	  switch (finaleendgame)
+	  if (finaleendgame == 0)
 	  {
-	    case 1:
-	    case 2:
-	    case 3:
-	    case 4:
-	      finalestage = 1;
-	      break;
-
-	    case FINALE_MAX_ENDNUM:
+	    if (gamemode == commercial)
+	    {
 	      F_StartCast ();
-	      break;
-
-	    default:
-	      if (gamemode == commercial)
-		F_StartCast ();
-	      else
-		finalestage = 1;
+	    }
+	    else
+	    {
+	      finalestage = 1;
+	    }
+	  }
+	  else if (finaleendgame < FINALE_MAX_ENDNUM)
+	  {
+	    finalestage = 1;
+	  }
+	  else
+	  {
+	    F_StartCast ();
 	  }
 	}
 	else
@@ -627,14 +627,17 @@ void F_Ticker (void)
 	  {
 	    case 3:
 	      S_StartMusic (mus_bunny);
-
-	    case 1:
-	    case 2:
-	    case 4:
 	      finalestage = 1;
 	      break;
 
 	    default:
+	      if (finaleendgame < FINALE_MAX_ENDNUM)
+	      {
+	        finalestage = 1;
+	        break;
+	      }
+
+	    case 0:
 	      F_StartCast ();
 	  }
 	}
@@ -1652,17 +1655,20 @@ void F_Drawer (void)
 	    break;
 
 	  default:
-	    if (endmode < FINALE_MAX_ENDNUM)
+	    if (endmode >= FINALE_MAX_ENDNUM)
 	    {
-	      pos = endmode + (BG_ENDPIC - 4);
-	      do
-	      {
-	        if (W_CheckNumForName (finale_backdrops[pos]) != -1)
-		  break;
-	      } while (--pos > BG_ENDPIC);
-	      D_PageDrawer (finale_backdrops[pos]);
+	      D_PageDrawer (finale_backdrops[BG_ENDPIC]);
+	      break;
 	    }
-	    			// Fall through.
+	    pos = endmode + (BG_ENDPIC - 4);
+	    do
+	    {
+	      if (W_CheckNumForName (finale_backdrops[pos]) != -1)
+	        break;
+	    } while (--pos > BG_ENDPIC);
+	    D_PageDrawer (finale_backdrops[pos]);
+	    break;
+
 	  case 0:
 	    D_PageDrawer (finale_backdrops[BG_ENDPIC]);
 	    break;
