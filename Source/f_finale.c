@@ -160,7 +160,7 @@ static boolean F_CastResponder (event_t *ev);
 
 // --------------------------------------------------------------------------------------------
 
-clusterdefs_t * F_Create_ClusterDef (unsigned int num)
+clusterdefs_t * F_Create_ClusterDef (unsigned int num, char * default_flat)
 {
   clusterdefs_t * cp;
   clusterdefs_t ** cpp;
@@ -180,6 +180,7 @@ clusterdefs_t * F_Create_ClusterDef (unsigned int num)
     *cpp = cp;
     memset (cp, 0, sizeof (clusterdefs_t));
     cp -> cnumber = num;
+    cp -> flat = default_flat;
   }
 
   return (cp);
@@ -527,7 +528,8 @@ void F_StartFinale (int always)
 
 	if (lump == -1)
 	{
-	  if (finaleendgame == 0)
+	  if ((finaleendgame == 0)
+	   || (finaleendgame > FINALE_MAX_ENDNUM))
 	  {
 	    if (gamemode == commercial)
 	    {
@@ -1670,6 +1672,7 @@ void F_Drawer (void)
 	    break;
 
 	  case 0:
+	  case 4:
 	    D_PageDrawer (finale_backdrops[BG_ENDPIC]);
 	    break;
 

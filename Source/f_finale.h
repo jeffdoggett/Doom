@@ -140,7 +140,7 @@ typedef struct clusterdefs_s
 } clusterdefs_t;
 
 clusterdefs_t * F_Access_ClusterDef (unsigned int num);
-clusterdefs_t * F_Create_ClusterDef (unsigned int num);
+clusterdefs_t * F_Create_ClusterDef (unsigned int num, char * default_flat);
 
 typedef struct castlist_s
 {

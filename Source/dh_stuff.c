@@ -4931,7 +4931,7 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
   else
   {
     if ((intertext != -1)			// Just in case!
-     && ((cp = F_Create_ClusterDef (intertext)) != NULL))
+     && ((cp = F_Create_ClusterDef (intertext, NULL)) != NULL))
     {
       if (doexit)
 	cp->normal_exittext = newtext;
@@ -5381,6 +5381,11 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	  if ((l >= '0') && (l <= '9'))
 	  {
 	    i = l - '0';
+	    l = ptr[8];			// 2nd digit not part of spec!
+	    if ((l >= '0') && (l <= '9'))
+	    {
+	      i = (i * 10) + (l - '0');
+	    }
 	  }
 	  else if ((l == 'C') || (l == 'c'))
 	  {
@@ -5417,6 +5422,11 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	  if ((l >= '0') && (l <= '9'))
 	  {
 	    i = l - '0';
+	    l = ptr[8];			// 2nd digit not part of spec!
+	    if ((l >= '0') && (l <= '9'))
+	    {
+	      i = (i * 10) + (l - '0');
+	    }
 	  }
 	  else if ((l == 'C') || (l == 'c'))
 	  {
@@ -5677,7 +5687,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	{
 	  if (intertext != -1)
 	  {
-	    cp = F_Create_ClusterDef (intertext);
+	    cp = F_Create_ClusterDef (intertext, NULL);
 	    if (cp)
 	    {
 	      cp->music = newtext;
@@ -5938,7 +5948,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	if (intertext != -1)
 	{
-	  cp = F_Create_ClusterDef (intertext);
+	  cp = F_Create_ClusterDef (intertext, NULL);
 	  if (cp)
 	  {
 	    cp->flat = newtext;
@@ -5968,7 +5978,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       }
       else
       {
-	cp = F_Create_ClusterDef (intertext);
+	cp = F_Create_ClusterDef (intertext, NULL);
 	if (cp)
 	{
 	  l = strlen (ptr);
@@ -6196,7 +6206,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	else
 	  intertext = (episode*10)+map;
 
-	cp = F_Create_ClusterDef (intertext);
+	cp = F_Create_ClusterDef (intertext, NULL);
 	if (cp)
 	{
 	  mdest_ptr -> cluster = intertext;
@@ -6585,8 +6595,8 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	}
 	else
 	{
-	  i = endPic + BG_ENDPIC;
-	  j = endPic + 4;
+	  i = endPic + 1 + BG_ENDPIC;
+	  j = endPic + 1 + 4;
 	  if (i > BG_ENDPICE)
 	  {
 	    fprintf (stderr, "UMAPINFO: Too many endPics\n");
@@ -6699,7 +6709,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  {
 	    if ((j = mdest_ptr -> cluster) == 0)
 	      j = intertext;
-	    cp = F_Create_ClusterDef (j);
+	    cp = F_Create_ClusterDef (j, "FLOOR7_2");
 	    if (cp)
 	    {
 	      mdest_ptr -> cluster = j;
@@ -6735,7 +6745,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  {
 	    if ((j = mdest_ptr -> cluster) == 0)
 	      j = intertext;
-	    cp = F_Create_ClusterDef (j);
+	    cp = F_Create_ClusterDef (j, "FLOOR7_2");
 	    if (cp)
 	    {
 	      mdest_ptr -> cluster = j;
@@ -6760,7 +6770,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if ((j = mdest_ptr -> cluster) == 0)
 	  j = intertext;
-	cp = F_Create_ClusterDef (j);
+	cp = F_Create_ClusterDef (j, "FLOOR7_2");
 	if (cp)
 	{
 	  char * t = strdup (newtext);
@@ -6776,7 +6786,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if ((j = mdest_ptr -> cluster) == 0)
 	  j = intertext;
-	cp = F_Create_ClusterDef (j);
+	cp = F_Create_ClusterDef (j, NULL);
 	if (cp)
 	{
 	  char * t = strdup (newtext);
