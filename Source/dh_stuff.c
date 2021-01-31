@@ -6709,7 +6709,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  {
 	    if ((j = mdest_ptr -> cluster) == 0)
 	      j = intertext;
-	    cp = F_Create_ClusterDef (j, "FLOOR7_2");
+	    cp = F_Create_ClusterDef (j, "FLOOR4_8");
 	    if (cp)
 	    {
 	      mdest_ptr -> cluster = j;
@@ -6745,7 +6745,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	  {
 	    if ((j = mdest_ptr -> cluster) == 0)
 	      j = intertext;
-	    cp = F_Create_ClusterDef (j, "FLOOR7_2");
+	    cp = F_Create_ClusterDef (j, "FLOOR4_8");
 	    if (cp)
 	    {
 	      mdest_ptr -> cluster = j;
@@ -6770,7 +6770,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if ((j = mdest_ptr -> cluster) == 0)
 	  j = intertext;
-	cp = F_Create_ClusterDef (j, "FLOOR7_2");
+	cp = F_Create_ClusterDef (j, "FLOOR4_8");
 	if (cp)
 	{
 	  char * t = strdup (newtext);
