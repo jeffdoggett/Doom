@@ -5124,7 +5124,8 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 //  reset_kit_etc_on_entering;
 //  intermission_text;
 
-  if ((temp = msource_ptr->cluster) != 0)		mdest_ptr->cluster = temp;
+  if ((temp = msource_ptr->cluster) != 0)
+    mdest_ptr->cluster = temp;
 
 //  nointermission;
 
@@ -6712,9 +6713,10 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	    cp = F_Create_ClusterDef (j, "FLOOR4_8");
 	    if (cp)
 	    {
+	      char * t;
 	      mdest_ptr -> cluster = j;
 	      i = strlen (newtext);
-	      char * t = malloc (i + 10);
+	      t = malloc (i + 10);
 	      if (t)
 	      {
 		strncpy_convert_backslash_chars (t, newtext, i+10);
@@ -6773,7 +6775,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	cp = F_Create_ClusterDef (j, "FLOOR4_8");
 	if (cp)
 	{
-	  char * t = strdup (newtext);
+	  char * t;
+	  mdest_ptr -> cluster = j;
+	  t = strdup (newtext);
 	  if (t)
 	    cp->music = t;
 	}
@@ -6789,7 +6793,9 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	cp = F_Create_ClusterDef (j, NULL);
 	if (cp)
 	{
-	  char * t = strdup (newtext);
+	  char * t;
+	  mdest_ptr -> cluster = j;
+	  t = strdup (newtext);
 	  if (t)
 	    cp->flat = t;
 	}
