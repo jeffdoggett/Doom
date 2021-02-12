@@ -7948,7 +7948,7 @@ mobjinfo_t mobjinfo[] =
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Brown Stub",
-    .names[1] = "Slalagtite"
+    .names[1] = "Stalagtite"
   },
 
   {					// MT_MISC48
