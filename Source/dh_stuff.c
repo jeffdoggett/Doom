@@ -4827,6 +4827,32 @@ void DH_remove_duplicate_mapinfos (void)
 
 /* ---------------------------------------------------------------------------- */
 
+void DH_pistol_start (void)
+{
+  unsigned int e,m;
+  map_dests_t * map_ptr;
+
+  e = 0;
+  do
+  {
+    m = 0;
+    do
+    {
+      map_ptr = G_Access_MapInfoTab_E (e, m);
+      map_ptr -> reset_kit_etc_on_entering |= 3;
+    } while (++m < 10);
+  } while (++e < 10);
+
+  m = 0;
+  do
+  {
+    map_ptr = G_Access_MapInfoTab_E (255, m);
+    map_ptr -> reset_kit_etc_on_entering |= 3;
+  } while (++m < 100);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int intertext, unsigned int islump)
 {
   char cc;

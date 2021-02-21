@@ -2497,6 +2497,9 @@ void D_DoomMain (void)
       }
   }
 
+  if (M_CheckParm ("-pistolstart"))
+    DH_pistol_start ();
+
   DH_remove_duplicate_mapinfos ();
 
   // printf ("M_Init: Init miscellaneous info.\n");
