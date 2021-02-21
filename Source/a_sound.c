@@ -245,6 +245,13 @@ typedef struct mus_dir_s
 static mus_dir_t * music_directory_head;
 static mus_dir_t * amp_current;
 
+static const mus_dir_t play_mus =
+{
+  "fred",
+  "",
+  NULL
+};
+
 static const mus_dir_t wimp_temp =
 {
   "fred",
@@ -1319,9 +1326,10 @@ void I_ReleaseMusic(void)
 
 /* ------------------------------------------------------------ */
 
-static int I_PlayMusicFile (const char * lumpname)
+static mus_dir_t * I_FindMusicFile (const char * lumpname)
 {
   mus_dir_t * ptr;
+  char wadname [40];
 
   ptr = music_directory_head;
   if (ptr != NULL)
@@ -1330,19 +1338,39 @@ static int I_PlayMusicFile (const char * lumpname)
     {
 //    printf ("Comparing (%s) with (%s)\n", ptr -> musname, lumpname);
       if (strcasecmp (ptr -> musname, lumpname) == 0)
-      {
-	if ((Mus_AMP_load (ptr -> filename) == 0)
-	 && (Mus_AMP_playing () == 3))		// 3 = magic number from AMPlayer_Info
-	{
-	  amp_current = ptr;
-//	  printf ("Playing %s\n", ptr -> filename);
-	  music_available |= AMP_PLAYING;
-	  return (0);
-	}
-	break;
-      }
+        return (ptr);
       ptr = ptr -> next;
     } while (ptr);
+  }
+
+  D_GetSaveGameFilename (wadname);
+  ptr = (mus_dir_t *) &play_mus;
+  strcpy (ptr->musname, lumpname);
+  sprintf (ptr->filename, "<DoomMusDir>.%s.%s", wadname, lumpname);
+  printf ("Checking %s\n", ptr->filename);
+  if (access (ptr->filename, R_OK) == 0)
+    return (ptr);
+
+  return (NULL);
+}
+
+/* ------------------------------------------------------------ */
+
+static int I_PlayMusicFile (const char * lumpname)
+{
+  mus_dir_t * ptr;
+
+  ptr = I_FindMusicFile (lumpname);
+  if (ptr)
+  {
+    if ((Mus_AMP_load (ptr -> filename) == 0)
+     && (Mus_AMP_playing () == 3))		// 3 = magic number from AMPlayer_Info
+    {
+      amp_current = ptr;
+//    printf ("Playing %s\n", ptr -> filename);
+      music_available |= AMP_PLAYING;
+      return (0);
+    }
   }
 
   if (M_CheckParm ("-showunknown"))
@@ -1394,6 +1422,9 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
 
   data = (byte*) music->data;
   size = W_LumpLength (music->lumpnum);
+
+  if (size < 4)
+    return -1;
 
   if ((mp3priority == 0)
    && (M_CheckParm ("-mp3")))
