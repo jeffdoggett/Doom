@@ -1347,7 +1347,7 @@ static mus_dir_t * I_FindMusicFile (const char * lumpname)
   ptr = (mus_dir_t *) &play_mus;
   strcpy (ptr->musname, lumpname);
   sprintf (ptr->filename, "<DoomMusDir>.%s.%s", wadname, lumpname);
-  printf ("Checking %s\n", ptr->filename);
+//printf ("Checking %s\n", ptr->filename);
   if (access (ptr->filename, R_OK) == 0)
     return (ptr);
 
