@@ -30,6 +30,7 @@ static const char rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $"
 
 #include "includes.h"
 
+extern boolean PIT_RadiusAttack (mobj_t* thing);
 extern void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y);
 
 //-----------------------------------------------------------------------------
@@ -525,24 +526,74 @@ P_BlockThingsIterator
   int			y,
   boolean(*func)(mobj_t*) )
 {
-    mobj_t*		mobj;
+    if (x < 0 || y < 0 || x >= bmapwidth || y >= bmapheight)
+        return true;
 
-    if ( x<0
-	 || y<0
-	 || x>=bmapwidth
-	 || y>=bmapheight)
-    {
-	return true;
-    }
+    for (mobj_t *mobj = blocklinks[y * bmapwidth + x]; mobj; mobj = mobj->bnext)
+        if (!func(mobj))
+            return false;
 
+    if (func == PIT_RadiusAttack)	// Don't do for explosions
+        return true;
 
-    for (mobj = blocklinks[y*bmapwidth+x] ;
-	 mobj ;
-	 mobj = mobj->bnext)
-    {
-	if (!func( mobj ) )
-	    return false;
-    }
+    // Blockmap bug fix by Terry Hearst
+
+    // (-1, -1)
+    if (x > 0 && y > 0)
+        for (mobj_t *mobj = blocklinks[(y - 1) * bmapwidth + x - 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x + mobj->radius - bmaporgx) >> MAPBLOCKSHIFT && y == (mobj->y + mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (0, -1)
+    if (y > 0)
+        for (mobj_t *mobj = blocklinks[(y - 1) * bmapwidth + x]; mobj; mobj = mobj->bnext)
+            if (y == (mobj->y + mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (1, -1)
+    if (x < bmapwidth - 1 && y > 0)
+        for (mobj_t *mobj = blocklinks[(y - 1) * bmapwidth + x + 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x - mobj->radius - bmaporgx) >> MAPBLOCKSHIFT && y == (mobj->y + mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (1, 0)
+    if (x < bmapwidth - 1)
+        for (mobj_t *mobj = blocklinks[y * bmapwidth + x + 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x - mobj->radius - bmaporgx) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (1, 1)
+    if (x < bmapwidth - 1 && y < bmapheight - 1)
+        for (mobj_t *mobj = blocklinks[(y + 1) * bmapwidth + x + 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x - mobj->radius - bmaporgx) >> MAPBLOCKSHIFT && y == (mobj->y - mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (0, 1)
+    if (y < bmapheight - 1)
+        for (mobj_t *mobj = blocklinks[(y + 1) * bmapwidth + x]; mobj; mobj = mobj->bnext)
+            if (y == (mobj->y - mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (-1, 1)
+    if (x > 0 && y < bmapheight - 1)
+        for (mobj_t *mobj = blocklinks[(y + 1) * bmapwidth + x - 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x + mobj->radius - bmaporgx) >> MAPBLOCKSHIFT && y == (mobj->y - mobj->radius - bmaporgy) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
+    // (-1, 0)
+    if (x > 0)
+        for (mobj_t *mobj = blocklinks[y * bmapwidth + x - 1]; mobj; mobj = mobj->bnext)
+            if (x == (mobj->x + mobj->radius - bmaporgx) >> MAPBLOCKSHIFT)
+                if (!func(mobj))
+                    return false;
+
     return true;
 }
 
