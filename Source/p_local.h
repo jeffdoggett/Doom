@@ -223,6 +223,8 @@ void 	P_UseLines (player_t* player);
 
 boolean P_ChangeSector (sector_t* sector, boolean crunch);
 
+boolean PIT_RadiusAttack (mobj_t* thing);
+
 extern mobj_t*	linetarget;	// who got hit (or NULL)
 
 fixed_t

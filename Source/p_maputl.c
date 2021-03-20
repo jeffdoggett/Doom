@@ -30,7 +30,6 @@ static const char rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $"
 
 #include "includes.h"
 
-extern boolean PIT_RadiusAttack (mobj_t* thing);
 extern void P_CreateSecNodeList(mobj_t *thing, fixed_t x, fixed_t y);
 
 //-----------------------------------------------------------------------------

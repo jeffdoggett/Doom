@@ -492,6 +492,8 @@ static unsigned char episode_num [ARRAY_SIZE(EpisodeMenu)] =
   1,2,3,4,5,6,7,8,9,0
 };
 
+static int epi;
+static unsigned char episode_menu_inhibited = 0;
 
 static menu_t  EpiDef =
 {
@@ -813,6 +815,30 @@ unsigned int M_GetNextEpi (unsigned int map)
   }
 
   return (nextepisode);
+}
+
+/* ----------------------------------------------------------------------- */
+/*
+   Reset the episode tables
+*/
+
+void M_ClearEpiSel (unsigned int episode)
+{
+  uint8_t num;
+
+  EpiDef.numitems = 0;
+  episode_menu_inhibited = 1;	// Possibly inhibited if nothing added later.
+  epi = episode;
+
+  num = 0;
+  do
+  {
+    char * str;
+    if ((str = episode_names [num]) != NULL)
+      free (str);
+    episode_names [num] = NULL;
+    episode_num [num] = num + 1;
+  } while (++num < ARRAY_SIZE(episode_num));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1281,7 +1307,6 @@ void M_NewGame(int choice)
 //
 //      M_Episode
 //
-static int epi;
 
 void M_DrawEpisode(void)
 {
@@ -2584,44 +2609,48 @@ void M_Init (void)
 
     case registered:
     case retail:
-      // We are fine.
-      // See if this Wad file contains any
-      // extra episodes (e.g. DTWID-LE or VOE).
-      episode = 0;
-      menu_pos = 0;
-      m_ptr = &EpisodeMenu[0];
-      do
+      if ((EpiDef.numitems != 0)		// Has the MAPINFO reader inhibited
+       || (episode_menu_inhibited == 0))	// the episode menu?
       {
-	//printf ("Checking episode %u\n", episode);
-	if (M_EpisodePresent (menu_lump_names[m_ptr -> namenum], episode))
+	// We are fine.
+	// See if this Wad file contains any
+	// extra episodes (e.g. DTWID-LE or VOE).
+	episode = 0;
+	menu_pos = 0;
+	m_ptr = &EpisodeMenu[0];
+	do
 	{
-	  episode_num [menu_pos++] = episode;
-
-	  /* If the episode maps are in a pwad and the episode_names[] has */
-	  /* been provided but not an M_EPIx lump then destroy the lump. */
-	  if ((episode_names[episode] != NULL)
-	   && ((lump1 = W_CheckNumForName (menu_lump_names[m_ptr -> namenum])) != -1)
-	   && ((lump2 = G_MapLump (episode, 1)) != -1)
-	   && (lumpinfo[lump1].handle == lumpinfo[0].handle)
-	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
+	  //printf ("Checking episode %u\n", episode);
+	  if (M_EpisodePresent (menu_lump_names[m_ptr -> namenum], episode))
 	  {
-	    // printf ("Destroyed menu lump %u\n", pos);
-	    menu_lump_names[m_ptr -> namenum][0] = 0xFF;
-	  }
-	  m_ptr++;
-	}
-	else
-	{
-	  uintptr_t size;
-	  menuitem_t * top;
-	  top = &EpisodeMenu[(ARRAY_SIZE (EpisodeMenu))-1];
-	  size = (unsigned char *) top - (unsigned char *) m_ptr;
-	  if (size)
-	    memcpy (m_ptr, m_ptr+1, size);
-	}
-      } while (++episode < ARRAY_SIZE (EpisodeMenu));
+	    episode_num [menu_pos++] = episode;
 
-      EpiDef.numitems = menu_pos;
+	    /* If the episode maps are in a pwad and the episode_names[] has */
+	    /* been provided but not an M_EPIx lump then destroy the lump. */
+	    if ((episode_names[episode] != NULL)
+	     && ((lump1 = W_CheckNumForName (menu_lump_names[m_ptr -> namenum])) != -1)
+	     && ((lump2 = G_MapLump (episode, 1)) != -1)
+	     && (lumpinfo[lump1].handle == lumpinfo[0].handle)
+	     && (lumpinfo[lump2].handle != lumpinfo[0].handle))
+	    {
+	      // printf ("Destroyed menu lump %u\n", pos);
+	      menu_lump_names[m_ptr -> namenum][0] = 0xFF;
+	    }
+	    m_ptr++;
+	  }
+	  else
+	  {
+	    uintptr_t size;
+	    menuitem_t * top;
+	    top = &EpisodeMenu[(ARRAY_SIZE (EpisodeMenu))-1];
+	    size = (unsigned char *) top - (unsigned char *) m_ptr;
+	    if (size)
+	      memcpy (m_ptr, m_ptr+1, size);
+	  }
+	} while (++episode < ARRAY_SIZE (EpisodeMenu));
+
+	EpiDef.numitems = menu_pos;
+      }
       M_SetEpisodeMenuPos ();
       break;
 

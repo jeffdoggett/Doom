@@ -6190,6 +6190,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       j = (j + 4) / 5;
       if (j > 255) j = 255;
       mdest_ptr -> par_time_5 = j;
+      par_changed = (boolean)((int)par_changed|(int)dh_changing_pwad);
     }
     else if (strncasecmp (ptr, "levelpic", 8) == 0)
     {
@@ -6567,6 +6568,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	i = (i + 4) / 5;
 	if (i > 255) i = 255;
 	mdest_ptr->par_time_5 = i;
+	par_changed = (boolean)((int)par_changed|(int)dh_changing_pwad);
       }
     }
     else if (strncasecmp (ptr, "SkyTexture", 9) == 0)
@@ -6663,7 +6665,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if (strncasecmp (newtext, "clear", 5) == 0)
 	{
-
+	  M_ClearEpiSel (episode);
 	}
 	else
 	{
