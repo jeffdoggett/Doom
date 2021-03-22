@@ -799,10 +799,17 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
    Return the next available episode slot
 */
 
-unsigned int M_GetNextEpi (unsigned int map)
+unsigned int M_GetNextEpi (unsigned int episode, unsigned int map)
 {
   unsigned int nextepisode;
   map_starts_t * map_info_p;
+
+  if (episode != 255)
+  {
+    map_info_p = G_Access_MapStartTab (episode);
+    map_info_p -> start_map = map;
+    return (episode);
+  }
 
   nextepisode = EpiDef.numitems;
   if (nextepisode < ARRAY_SIZE(episode_num))

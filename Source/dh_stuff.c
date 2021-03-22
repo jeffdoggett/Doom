@@ -5264,8 +5264,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     else if (dh_strncmp (ptr, "episode", 7) == 0)
     {
       ptr = read_map_num (&episode, &map, ptr+7);
-      if (episode == 255)
-	episode = M_GetNextEpi (map);
+      episode = M_GetNextEpi (episode, map);
       doing_episode = 1;
       doing_default = 0;
       intertext = -1;
@@ -6671,10 +6670,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	{
 	  // E.g  Episode = "M_EPFORK", "Fork in the Road", "F"
 	  char buffer [100];
-	  if (episode == 255)
-	    i = M_GetNextEpi (map);
-	  else
-	    i = episode;
+	  i = M_GetNextEpi (episode, map);
 
 	  Parse_CommaSeparatedQuotedText (buffer, &ptr);
 	  if (buffer[0])
