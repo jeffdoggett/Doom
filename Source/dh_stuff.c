@@ -4388,8 +4388,8 @@ static mobjtype_t find_boss_mobytype (const char * name)
       len = dh_qty_match (buffer, mobjptr->names[pos]);
       if (len > best_len)
       {
-        best_len = len;
-        best = (mobjtype_t) count;
+	best_len = len;
+	best = (mobjtype_t) count;
       }
     } while (++pos < ARRAY_SIZE(mobjptr->names));
     ++mobjptr;
@@ -5213,6 +5213,48 @@ static void set_map_name (unsigned int episode, unsigned int map, char * ptr)
     }
   }
   // printf ("Map %u %u has text (%s)\n", episode, map, newtext);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void set_map_label (unsigned int episode, unsigned int map, char * ptr)
+{
+  unsigned int e1,e2;
+  char * oldtext;
+  char * newtext;
+  char * pos;
+  char ** map_ptr;
+
+  if (episode != 255)
+  {
+    e1 = e2 = episode;
+  }
+  else
+  {
+    e1 = 253;
+    e2 = 255;
+  }
+
+  do
+  {
+    map_ptr = HU_access_mapname_E (e1,map);
+    oldtext = *map_ptr;
+    pos = strstr (oldtext, ": ");
+    if (pos)
+    {
+      newtext = malloc (strlen (ptr) + strlen (pos) + 6);
+      if (newtext)
+      {
+        if (ptr[0] == 0)
+          strcpy (newtext, pos + 2);
+        else
+	  sprintf (newtext, "%s: %s", ptr, pos + 2);
+	dh_remove_americanisms (newtext);
+	*map_ptr = newtext;
+//	printf ("Map %u %u has text (%s)\n", e1, map, newtext);
+      }
+    }
+  } while (++e1 < e2);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -6491,6 +6533,25 @@ static void Parse_UMapinfo (char * ptr, char * top)
       if (newtext)
       {
 	set_map_name (episode, map, newtext);
+      }
+    }
+    else if (strncasecmp (ptr, "Label", 5) == 0)
+    {
+      newtext = NextArg (ptr);
+      if (newtext)
+      {
+	if (strncasecmp (newtext, "clear", 5) == 0)
+	{
+	  set_map_label (episode, map, "");
+	}
+	else
+	{
+	  newtext = ReadQuotedArg (&ptr, false);
+	  if (newtext)
+	  {
+	    set_map_label (episode, map, newtext);
+	  }
+	}
       }
     }
     else if (strncasecmp (ptr, "NextSecret", 10) == 0)
