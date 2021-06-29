@@ -339,7 +339,8 @@ typedef enum
     sfx_secret,
     sfx_gibdth,
     sfx_scrsht,
-    NUMSFX
+    sfx_extra001 = 500,
+    NUMSFX = 700	// 200 extra sounds
 } sfxenum_t;
 
 #endif
