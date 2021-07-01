@@ -305,6 +305,7 @@ static int		saveSlot;	// which slot to save in
 static char		saveOldString[SAVESTRINGSIZE];
 
 boolean			inhelpscreens;
+static int		helpscreennum;
 boolean			menuactive;
 
 #define SKULLXOFF	-12
@@ -1164,7 +1165,19 @@ void M_QuickLoad(void)
 //
 void M_DrawReadThis1(void)
 {
+    char patchname [10];
+
     inhelpscreens = true;
+
+    sprintf (patchname, finale_backdrops[BG_HELPxx], 1);
+    if (W_CheckNumForName (patchname) != -1)
+    {
+      helpscreennum = 1;
+      D_PageDrawer (patchname);
+      return;
+    }
+
+    helpscreennum = 0;
 
     switch ( gamemode )
     {
@@ -1198,6 +1211,14 @@ void M_DrawReadThis2(void)
     // and find which colour maps to black.
 
     memset (screens[0], 0, SCREENHEIGHT*SCREENWIDTH);
+
+    if (helpscreennum)
+    {
+      char patchname [10];
+      sprintf (patchname, finale_backdrops[BG_HELPxx], helpscreennum);
+      D_PageDrawer (patchname);
+      return;
+    }
 
     switch ( gamemode )
     {
@@ -1482,7 +1503,18 @@ void M_ReadThis(int choice)
 
 void M_ReadThis2(int choice)
 {
+    char patchname [10];
+
     choice = 0;
+
+    if (helpscreennum)
+    {
+      sprintf (patchname, finale_backdrops[BG_HELPxx], ++helpscreennum);
+      if (W_CheckNumForName (patchname) == -1)
+      {
+	helpscreennum = 0;
+      }
+    }
     M_SetupNextMenu(&ReadDef2);
 }
 
@@ -1490,7 +1522,20 @@ void M_ReadThis2(int choice)
 
 void M_FinishReadThis(int choice)
 {
+    char patchname [10];
+
     choice = 0;
+
+    if (helpscreennum)
+    {
+      sprintf (patchname, finale_backdrops[BG_HELPxx], ++helpscreennum);
+      if (W_CheckNumForName (patchname) != -1)
+      {
+        return;
+      }
+      helpscreennum = 0;
+    }
+
     M_SetupNextMenu(&MainDef);
 }
 

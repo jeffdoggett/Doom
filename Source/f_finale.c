@@ -118,6 +118,7 @@ char *	finale_backdrops_orig [] =
   "HELP",
   "HELP1",
   "HELP2",
+  "HELP%02u",
   "VICTORY2",
   "TITLEPIC",
   "ENDPIC",

@@ -104,6 +104,7 @@ typedef enum
   BG_HELP,
   BG_HELP1,
   BG_HELP2,
+  BG_HELPxx,
   BG_VICTORY2,
   BG_TITLEPIC,
   BG_ENDPIC,
