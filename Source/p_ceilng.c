@@ -272,9 +272,9 @@ EV_DoCeiling
 
       case silentCrushAndRaise:
       case crushAndRaise:
-	ceiling->crush = true;
 //	ceiling->topheight = sec->ceilingheight;
       case lowerAndCrush:
+	ceiling->crush = true;
 	ceiling->bottomheight += 8*FRACUNIT;
       case lowerToFloor:
 //	ceiling->bottomheight = sec->floorheight;
