@@ -2182,7 +2182,7 @@ void P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t spe
   {
     if (M_CheckParm ("-showunknown"))
       printf ("P_PlayerInSpecialSector: unknown special %i\n", special);
-    sector->special = special & ~0xEC00;
+    sector->special = special & ~0xCC00;
   }
 }
 
