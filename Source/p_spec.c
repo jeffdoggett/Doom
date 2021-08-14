@@ -2021,115 +2021,144 @@ void P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t spe
   if (player->mo->z != sector->floorheight)
     return;
 
-  // Has hitten ground.
-
-  switch (special & 0x1F)
+  // Has hit ground.
+  // jff add if to handle old vs generalized types
+  if (special < 32)   // regular sector specials
   {
-    case 0:
-      break;
+    switch (special)
+    {
+      case 0:
+	break;
 
-    case 5:
-      // HELLSLIME DAMAGE
-      if (!player->powers[pw_ironfeet])
+      case 5:
+	// HELLSLIME DAMAGE
+	if (!player->powers[pw_ironfeet])
 	  if (!(leveltime&0x1f))
-	      P_DamageMobj (player->mo, NULL, NULL, 10);
-      break;
+	    P_DamageMobj (player->mo, NULL, NULL, 10);
+	break;
 
-    case 7:
+      case 7:
       // NUKAGE DAMAGE
-      if (!player->powers[pw_ironfeet])
+	if (!player->powers[pw_ironfeet])
 	  if (!(leveltime&0x1f))
-	      P_DamageMobj (player->mo, NULL, NULL, 5);
-      break;
+	    P_DamageMobj (player->mo, NULL, NULL, 5);
+	break;
 
-    case 16:
-      // SUPER HELLSLIME DAMAGE
-    case 4:
-      // STROBE HURT
-      if (!player->powers[pw_ironfeet]
-	  || (P_Random()<5) )
-      {
+      case 16:
+	// SUPER HELLSLIME DAMAGE
+      case 4:
+	// STROBE HURT
+	if (!player->powers[pw_ironfeet]
+	 || (P_Random()<5) )
+	{
 	  if (!(leveltime&0x1f))
-	      P_DamageMobj (player->mo, NULL, NULL, 20);
-      }
-      break;
+	    P_DamageMobj (player->mo, NULL, NULL, 20);
+	}
+	break;
 
-    case 9:
-      // SECRET SECTOR
-      player->secretcount++;
-      sector->special = special & ~31;
-      sector->oldspecial |= 9;
-      if (player == &players[consoleplayer])
-      {
-	player->message = special_effects_messages [PS_FOUND_SECRET];
-	S_StartSound (NULL, sfx_secret);
-      }
-      break;
-
-    case 11:
-      // EXIT SUPER DAMAGE! (for E1M8 finale)
-      player->cheats &= ~CF_GODMODE;
-
-      if ((!(leveltime&0x1f))
-       && (player->health > 10))
-      {
-	damage = 20;
-	if (player->health < 30)
-	  damage = player->health - 10;
-	P_DamageMobj (player->mo, NULL, NULL, damage);
-      }
-
-      if (player->health <= 10)
-      {
-	G_ExitLevel();
+      case 9:
+	// SECRET SECTOR
+	player->secretcount++;
 	sector->special = special & ~31;
-      }
-      break;
+	sector->oldspecial |= 9;
+	if (player == &players[consoleplayer])
+	{
+	  player->message = special_effects_messages [PS_FOUND_SECRET];
+	  S_StartSound (NULL, sfx_secret);
+	}
+	break;
+
+      case 11:
+	// EXIT SUPER DAMAGE! (for E1M8 finale)
+	player->cheats &= ~CF_GODMODE;
+
+	if ((!(leveltime&0x1f))
+	 && (player->health > 10))
+	{
+	  damage = 20;
+	  if (player->health < 30)
+	    damage = player->health - 10;
+	  P_DamageMobj (player->mo, NULL, NULL, damage);
+	}
+
+	if (player->health <= 10)
+	{
+	  G_ExitLevel();
+	  sector->special = special & ~31;
+	}
+	break;
 
 #if 0
-    case 18:			// Appears to be another damage sector (COD level 6, sector 410)
-      break;
+      case 18:			// Appears to be another damage sector (COD level 6, sector 410)
+	break;
 #endif
 
-    case 19:			// Healing sector (COD level 11)
-      if (!(leveltime&0x1f))
-	P_GiveBody (player, 1);
-      break;
+      case 19:			// Healing sector (COD level 11)
+	if (!(leveltime&0x1f))
+	  P_GiveBody (player, 1);
+	break;
 
-    default:
-      if (M_CheckParm ("-showunknown"))
-	printf ("P_PlayerInSpecialSector: unknown special %i\n", special);
-      sector->special = special & ~31;
+      default:
+	if (M_CheckParm ("-showunknown"))
+	  printf ("P_PlayerInSpecialSector: unknown special %i\n", special);
+	sector->special = 0;
+    }
   }
-
-  switch (sector->special & 0x60)
+  else if (special & DEATH_MASK)
   {
-    case 0x20: /* 2/5 damage per 31 ticks */
-      if (!player->powers[pw_ironfeet])
-	if (!(leveltime&0x1f))
-	  P_DamageMobj (player->mo, NULL, NULL, 5);
-      break;
+    switch ((special & DAMAGE_MASK) >> DAMAGE_SHIFT)
+    {
+      case 0:
+	if (!player->powers[pw_invulnerability] && !player->powers[pw_ironfeet])
+	  P_DamageMobj(player->mo, NULL, NULL, 10000);
+	break;
 
-    case 0x40: /* 5/10 damage per 31 ticks */
-      if (!player->powers[pw_ironfeet])
-	if (!(leveltime&0x1f))
-	  P_DamageMobj (player->mo, NULL, NULL, 10);
-      break;
+      case 1:
+	P_DamageMobj(player->mo, NULL, NULL, 10000);
+	break;
 
-    case 0x60: /* 10/20 damage per 31 ticks */
-      if (!player->powers[pw_ironfeet]
-	|| (P_Random()<5))
-      {
-	/* take damage even with suit */
-	if (!(leveltime&0x1f))
-	  P_DamageMobj (player->mo, NULL, NULL, 20);
-      }
+      case 2:
+	P_DamageMobj(player->mo, NULL, NULL, 10000);
+	G_ExitLevel();
+	break;
+
+      case 3:
+	P_DamageMobj(player->mo, NULL, NULL, 10000);
+	G_SecretExitLevel();
+	break;
+    }
+  }
+  else
+  {
+    switch ((special & DAMAGE_MASK) >> DAMAGE_SHIFT)
+    {
+      case 1: /* 2/5 damage per 31 ticks */
+	if (!player->powers[pw_ironfeet])
+	  if (!(leveltime&0x1f))
+	    P_DamageMobj (player->mo, NULL, NULL, 5);
+	break;
+
+      case 2: /* 5/10 damage per 31 ticks */
+	if (!player->powers[pw_ironfeet])
+	  if (!(leveltime&0x1f))
+	    P_DamageMobj (player->mo, NULL, NULL, 10);
+	break;
+
+      case 3: /* 10/20 damage per 31 ticks */
+	if (!player->powers[pw_ironfeet]
+	 || (P_Random()<5))
+	{
+	  /* take damage even with suit */
+	  if (!(leveltime&0x1f))
+	    P_DamageMobj (player->mo, NULL, NULL, 20);
+	}
+    }
   }
 
-  if (sector->special & SECRET_MASK)
+  if (special & SECRET_MASK)
   {
     player->secretcount++;
-    sector->special &= ~SECRET_MASK;
+    sector->special = special & ~SECRET_MASK;
     sector->oldspecial |= SECRET_MASK;
     if (player == &players[consoleplayer])
     {
@@ -2139,21 +2168,21 @@ void P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t spe
   }
 
 #if 0
-  if (sector->special & FRICTION_MASK)	// Icy
+  if (special & FRICTION_MASK)	// Icy
   {
   }
 #endif
 #if 0
-  if (sector->special & PUSH_MASK)	// Wind/current/pushers/pullers are enabled for this sector
-  {					// Nova Map 27 has this bit set
+  if (special & PUSH_MASK)	// Wind/current/pushers/pullers are enabled for this sector
+  {				// Nova Map 27 has this bit set
   }
 #endif
 
-  if (sector->special & 0xFC00)		// Anything else
+  if (special & 0xEC00)		// Anything else
   {
     if (M_CheckParm ("-showunknown"))
-      printf ("P_PlayerInSpecialSector: unknown special %i\n", sector->special);
-    sector->special &= ~0xFC00;
+      printf ("P_PlayerInSpecialSector: unknown special %i\n", special);
+    sector->special = special & ~0xEC00;
   }
 }
 

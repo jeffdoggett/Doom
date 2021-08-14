@@ -442,15 +442,18 @@ void P_NoMoreSectorDamage (sector_t* sector)
   int sp;
 
   sp = sector->special;
-  switch (sp & 0x1F)
+  if (sp < 32)
   {
-    case 4:
-    case 5:
-    case 7:
-    case 16:
-      sp &= ~0x1F;
+    switch (sp)
+    {
+      case 4:
+      case 5:
+      case 7:
+      case 16:
+	sp &= ~0x1F;
+    }
   }
-  sector->special = sp & ~0x60;
+  sector->special = sp & ~(DAMAGE_MASK | DEATH_MASK);
 }
 
 //-----------------------------------------------------------------------------
@@ -1144,18 +1147,20 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
     return (write_obit (obituary_messages[OB_CRUSH], "ceiling", NULL, victim));
 
   special = victim->subsector->sector->special;
-  switch (special & 0x1F)
+  if (special < 32)
   {
-    case 4:
-    case 5:
-    case 7:
-    case 16:
-      return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
-
-    default:
-      if (special & 0x60)
-	return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
+    switch (special)
+    {
+      case 4:
+      case 5:
+      case 7:
+      case 16:
+        return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
+    }
   }
+
+  if (special & (DAMAGE_MASK | DEATH_MASK))
+    return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
 
   return (write_obit (obituary_messages[OB_DEFAULT], "bad luck", NULL, victim));
 }

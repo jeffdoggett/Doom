@@ -1849,7 +1849,9 @@ boolean P_BoomSpecialLine (mobj_t* thing, line_t* line, int side, triggered_e tr
     {
       case 0:
       case 1:
-	ceilingtype = lowerAndCrush;
+	ceilingtype = crushAndRaise;
+	if (special & CrusherSilent)
+	  ceilingtype = silentCrushAndRaise;
 	break;
       default:
 	ceilingtype = fastCrushAndRaise;
