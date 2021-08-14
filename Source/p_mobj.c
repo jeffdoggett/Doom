@@ -554,6 +554,8 @@ P_NightmareRespawn (mobj_t* mobj)
 //
 void P_MobjThinker (mobj_t* mobj)
 {
+    sector_t *sector;
+
     // momentum movement
     if (mobj->momx
 	|| mobj->momy
@@ -608,6 +610,17 @@ void P_MobjThinker (mobj_t* mobj)
 	    return;		// mobj was removed
     }
 
+    sector = mobj->subsector->sector;
+    if ((sector->special & KILL_MONSTERS_MASK)
+     && mobj->z == mobj->floorz
+     && !mobj->player && (mobj->flags & MF_SHOOTABLE)
+     && !(mobj->flags & MF_FLOAT))
+    {
+	P_DamageMobj(mobj, NULL, NULL, 10000);
+
+	if (mobj->thinker.function.aci == -1)
+	    return;		// mobj was removed
+    }
 
     // cycle through states,
     // calling action functions at transitions
