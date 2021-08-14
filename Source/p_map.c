@@ -313,8 +313,11 @@ boolean PIT_CheckLine (line_t* ld)
     // killough 08/10/98: allow bouncing objects to pass through as missiles
     if (!(tmthing->flags & (MF_MISSILE | MF_BOUNCES)))
     {
-	if ( ld->flags & ML_BLOCKING )
-	    return false;	// explicitly blocking everything
+        // explicitly blocking everything
+        // or blocking player
+	if ((ld->flags & ML_BLOCKING)
+	 || (tmthing->player && (ld->flags & ML_BLOCKPLAYERS)))
+	    return false;
 
 	// killough 8/9/98: monster-blockers don't affect friends
         // MBF21: Block land monsters
