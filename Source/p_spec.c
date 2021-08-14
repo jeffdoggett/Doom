@@ -2764,6 +2764,34 @@ static void P_SpawnScrollers(void)
       case 85:				/* jff 1/30/98 2-way scroll */
 	Add_Scroller(sc_side, -FRACUNIT, 0, -1, lines[i].sidenum[0], accel);
 	break;
+
+      // MBF21
+      case 1024:
+      case 1025:
+      case 1026:
+      {
+	int s;
+
+	if (!l->tag)
+	{
+	  printf ("Line %d is missing a tag!\n", i);
+	  break;
+	}
+
+	if (special > 1024)
+	  control = sides[*l->sidenum].sector - sectors;
+
+	if (special == 1026)
+	  accel = 1;
+
+	s = lines[i].sidenum[0];
+	dx = -sides[s].textureoffset;
+	dy = sides[s].rowoffset;
+	for (s = -1; (s = P_FindLineFromTag(l->tag, s)) >= 0;)
+	  if (s != i)
+	    Add_Scroller(sc_side, dx, dy, control, lines[s].sidenum[0], accel);
+	break;
+      }
     }
   }
 }
