@@ -2178,7 +2178,7 @@ void P_PlayerInSpecialSector (player_t* player, sector_t * sector, dushort_t spe
   }
 #endif
 
-  if (special & 0xEC00)		// Anything else
+  if (special & 0xCC00)		// Anything else
   {
     if (M_CheckParm ("-showunknown"))
       printf ("P_PlayerInSpecialSector: unknown special %i\n", special);

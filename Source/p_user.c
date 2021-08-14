@@ -306,7 +306,7 @@ void P_PlayerThink (player_t* player)
   P_CalcHeight (player);
 
   sector = mo->subsector->sector;
-  special = sector -> special & ~(FRICTION_MASK | PUSH_MASK); // Not interested in these.
+  special = sector -> special & ~(FRICTION_MASK | PUSH_MASK | KILL_MONSTERS_MASK); // Not interested in these.
   if (special)
     P_PlayerInSpecialSector (player, sector, special);
 

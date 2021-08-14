@@ -137,6 +137,9 @@ typedef struct
 // Set if further lines can be used after this one (Boom extension)
 #define ML_PASSUSE		512
 
+// MBF21
+#define ML_BLOCKLANDMONSTERS    4096
+
 
 // Sector definition, from editing.
 typedef	struct
