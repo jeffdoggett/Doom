@@ -102,6 +102,8 @@ char * menu_lump_names_orig [] =
   "M_OPTION",
   "M_LOADG",
   "M_SAVEG",
+  "M_LGTTL",
+  "M_SGTTL",
   "M_RDTHIS",
   "M_QUITG",
   "M_EPI0",
@@ -163,6 +165,8 @@ typedef enum
   ML_OPTION,
   ML_LOADG,
   ML_SAVEG,
+  ML_LGTTL,
+  ML_SGTTL,
   ML_RDTHIS,
   ML_QUITG,
   ML_EPI0,
@@ -936,7 +940,7 @@ void M_DrawLoad(void)
   int i,y;
   patch_t * loadpatch;
 
-  loadpatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_LOADG],PU_CACHE);
+  loadpatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_LGTTL],PU_CACHE);
   y = LoadDef.y - (SHORT(loadpatch->height) + 9);
   if (y < 0) y = 0;
   V_DrawPatchScaled (72,y,0,loadpatch);
@@ -1008,7 +1012,7 @@ void M_DrawSave(void)
   int i,x,y;
   patch_t * savepatch;
 
-  savepatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_SAVEG],PU_CACHE);
+  savepatch = (patch_t *) W_CacheLumpName(menu_lump_names[ML_SGTTL],PU_CACHE);
   y = LoadDef.y - (SHORT(savepatch->height) + 9);
   if (y < 0) y = 0;
   V_DrawPatchScaled (72,y,0,savepatch);
@@ -2590,6 +2594,41 @@ static void M_SetEpisodeMenuPos (void)
 }
 
 /* ----------------------------------------------------------------------- */
+/*
+   If the Load/Save titles are in the PWAD then use them.
+*/
+
+static void M_SetLoadSaveLumps (int menu_lump_num, int title_lump_num)
+{
+  int menu_lump;
+  int title_lump;
+
+  menu_lump = W_CheckNumForName (menu_lump_names [menu_lump_num]);
+  title_lump = W_CheckNumForName (menu_lump_names [title_lump_num]);
+
+  if (title_lump < 0)
+  {
+    menu_lump_names [title_lump_num] = menu_lump_names [menu_lump_num];
+    return;
+  }
+
+  if (menu_lump < 0)	// Cannot happen!
+  {
+    menu_lump_names [menu_lump_num] = menu_lump_names [title_lump_num];
+    return;
+  }
+
+  if ((lumpinfo[0].handle == lumpinfo[title_lump].handle)  // If the title lump is in a PWAD then use it.
+   && (lumpinfo[0].handle != lumpinfo[menu_lump].handle))  // If the menu lump is in a PWAD then use it.
+  {
+    menu_lump_names [title_lump_num] = menu_lump_names [menu_lump_num];
+    return;
+  }
+
+//printf ("Using %s\n", menu_lump_names [title_lump_num]);
+}
+
+/* ----------------------------------------------------------------------- */
 //
 // M_Init
 //
@@ -2599,6 +2638,9 @@ void M_Init (void)
   unsigned int episode;
   unsigned int lump1,lump2;
   menuitem_t * m_ptr;
+
+  M_SetLoadSaveLumps (ML_LOADG, ML_LGTTL);
+  M_SetLoadSaveLumps (ML_SAVEG, ML_SGTTL);
 
   currentMenu = &MainDef;
   menuactive = false;
