@@ -2609,20 +2609,15 @@ static void M_SetLoadSaveLumps (int menu_lump_num, int title_lump_num)
   if (title_lump < 0)
   {
     menu_lump_names [title_lump_num] = menu_lump_names [menu_lump_num];
-    return;
   }
-
-  if (menu_lump < 0)	// Cannot happen!
+  else if (menu_lump < 0)	// Cannot happen!
   {
     menu_lump_names [menu_lump_num] = menu_lump_names [title_lump_num];
-    return;
   }
-
-  if ((lumpinfo[0].handle == lumpinfo[title_lump].handle)  // If the title lump is in a PWAD then use it.
-   && (lumpinfo[0].handle != lumpinfo[menu_lump].handle))  // If the menu lump is in a PWAD then use it.
+  else if ((lumpinfo[0].handle == lumpinfo[title_lump].handle)  // If the title lump is in a PWAD then use it.
+        && (lumpinfo[0].handle != lumpinfo[menu_lump].handle))  // If the menu lump is in a PWAD then use it.
   {
     menu_lump_names [title_lump_num] = menu_lump_names [menu_lump_num];
-    return;
   }
 
 //printf ("Using %s\n", menu_lump_names [title_lump_num]);
