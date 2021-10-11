@@ -4876,6 +4876,21 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
     ptr++;
   } while (*ptr);
 
+  if (*ptr == 0)			// Is text on the next line?
+  {
+    l = 1;
+    do
+    {
+      cc = ptr[l];
+      if (cc == '\"')
+      {
+        ptr += l;
+        break;
+      }
+      ++l;
+    } while (cc < '0');
+  }
+
   lookup = 0;
 
   if (strncasecmp (ptr, "lookup", 6) == 0)
