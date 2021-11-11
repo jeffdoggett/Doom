@@ -4586,7 +4586,7 @@ static void show_map_dests (map_dests_t * map_ptr)
 
   skydelta = 0;
   if (map_ptr -> skydelta)
-    skydelta = -(((double)map_ptr -> skydelta) / FRACUNIT);
+    skydelta = -(((double)map_ptr -> skydelta) / 256);
 
   printf ("%u,%u %u,%u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
@@ -5812,7 +5812,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	skd = atof (ptr);
 	/* Move left = positive value, right = negative */
 	/* So, yes, it is backwards! */
-	skydelta = (fixed_t) (-skd * FRACUNIT);
+	skydelta = (fixed_t) (-skd * 256);
 //	printf ("Sky delta = '%s' %f (%X)\n", ptr, skd, skydelta);
       }
 
