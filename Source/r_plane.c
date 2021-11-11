@@ -499,7 +499,6 @@ void R_DrawPlanes(void)
       {
 	int	 x;
 	int	 texture;
-	int	 offset;
 	angle_t  an, flip;
 	rpatch_t *tex_patch;
 
@@ -552,7 +551,6 @@ void R_DrawPlanes(void)
 	dc_ylim = textures[texture].height;
 	dc_iscale = skyiscale;
 	tex_patch = R_CacheTextureCompositePatchNum (texture);
-	offset = skycolumnoffset >> FRACBITS;
 
 	for (x = pl->minx; x <= pl->maxx; x++)
 	{
@@ -563,7 +561,7 @@ void R_DrawPlanes(void)
 	    {
 		dc_x = x;
 		dc_source = R_GetTextureColumn(tex_patch,
-		    (((an + xtoviewangle[x]) ^ flip) >> ANGLETOSKYSHIFT) + offset);
+		    ((((an + xtoviewangle[dc_x]) ^ flip) / (1 << (ANGLETOSKYSHIFT - FRACBITS))) + skycolumnoffset) / FRACUNIT);
 		dc_texturefrac = R_CalcFrac ();
 		colfunc();
 	    }
