@@ -561,7 +561,7 @@ void R_DrawPlanes(void)
 	    {
 		dc_x = x;
 		dc_source = R_GetTextureColumn(tex_patch,
-		    ((((an + xtoviewangle[dc_x]) ^ flip) / (1 << (ANGLETOSKYSHIFT - FRACBITS))) + skycolumnoffset) / FRACUNIT);
+		    ((((an + xtoviewangle[x]) ^ flip) / (1 << (ANGLETOSKYSHIFT - FRACBITS))) + skycolumnoffset) / FRACUNIT);
 		dc_texturefrac = R_CalcFrac ();
 		colfunc();
 	    }
