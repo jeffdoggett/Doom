@@ -2771,10 +2771,10 @@ unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag)
   player_t	player;
   player_t	*oldplayer;
 
-  junk = *lines;
-  junk.special = special;
-  if (junk.special)
+  if (special)
   {
+    junk = *lines;
+    junk.special = special;
     oldplayer = mo->player;
     mo->player = &player;
     player.health = 100;
@@ -2782,6 +2782,8 @@ unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag)
     if (!P_UseSpecialLine (mo, &junk, 0))
       P_CrossSpecialLine (&junk, 0, mo);
     mo->player = oldplayer;
+    special = junk.special;
   }
-  return (junk.special);
+
+  return (special);
 }
