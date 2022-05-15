@@ -337,7 +337,7 @@ static void S_StartSoundAtVolume (mobj_t* origin, int sfx_id, int volume)
   // check for bogus sound #
   if (sfx_id < 1 || sfx_id > NUMSFX)
   {
-    fprintf (stderr, "Bad sfx #: %d\n", sfx_id);
+//  fprintf (stderr, "Bad sfx #: %d\n", sfx_id);
     return;
   }
 

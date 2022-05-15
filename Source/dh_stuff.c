@@ -6499,7 +6499,7 @@ static char * Parse_InterText (char ** ptr, char * top)
   newtext = strchr (newtext, '\n');
   while (newtext)
   {
-    while (*newtext < ' ') --newtext;
+    while (*newtext <= ' ') --newtext;
     if (*newtext != ',')
       break;
     char * nextline = strchr (newtext, '\"');
