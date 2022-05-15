@@ -1211,7 +1211,7 @@ P_SpawnMissile
 // P_SpawnPlayerMissile
 // Tries to aim at a nearby monster
 //
-void
+mobj_t*
 P_SpawnPlayerMissile
 ( mobj_t*	source,
   mobjtype_t	type )
@@ -1257,6 +1257,93 @@ P_SpawnPlayerMissile
   th->momz = FixedMul( th->info->speed, slope);
 
   P_CheckMissileSpawn (th);
+  return (th);
+}
+
+/* -------------------------------------------------------------------------------------------- */
+//
+// MBF21: P_FaceMobj
+// Returns true if 'source' needs to turn clockwise, or false if 'source' needs
+// to turn counter clockwise. 'delta' is set to the amount 'source' needs to turn.
+//
+static boolean P_FaceMobj(mobj_t *source, mobj_t *target, angle_t *delta)
+{
+    angle_t         diff;
+    const angle_t   angle1 = source->angle;
+    const angle_t   angle2 = R_PointToAngle2(source->x, source->y, target->x, target->y);
+
+    if (angle2 > angle1)
+    {
+        if ((diff = angle2 - angle1) > ANG180)
+        {
+            *delta = ANGLE_MAX - diff;
+            return false;
+        }
+
+        *delta = diff;
+        return true;
+    }
+    else if ((diff = angle1 - angle2) > ANG180)
+    {
+        *delta = ANGLE_MAX - diff;
+        return true;
+    }
+
+    *delta = diff;
+    return false;
+}
+
+/* -------------------------------------------------------------------------------------------- */
+//
+// MBF21: P_SeekerMissile
+//
+boolean P_SeekerMissile(mobj_t *actor, mobj_t **seekTarget, angle_t thresh, angle_t turnmax, boolean seekcentre)
+{
+    int     dir;
+    angle_t delta;
+    angle_t angle;
+    mobj_t  *target = *seekTarget;
+
+    if (!target)
+        return false;
+
+    if (!(target->flags & MF_SHOOTABLE))
+    {
+        // Target died
+        *seekTarget = NULL;
+        return false;
+    }
+
+    dir = P_FaceMobj(actor, target, &delta);
+
+    if (delta > thresh)
+    {
+        delta >>= 1;
+
+        if (delta > turnmax)
+            delta = turnmax;
+    }
+
+    if (dir)
+        // Turn clockwise
+        actor->angle += delta;
+    else
+        // Turn counter clockwise
+        actor->angle -= delta;
+
+    angle = actor->angle >> ANGLETOFINESHIFT;
+    actor->momx = FixedMul(actor->info->speed, finecosine[angle]);
+    actor->momy = FixedMul(actor->info->speed, finesine[angle]);
+
+    // Need to seek vertically
+    if (actor->z + actor->height < target->z || target->z + target->height < actor->z || seekcentre)
+    {
+      fixed_t approx = P_ApproxDistance(target->x - actor->x, target->y - actor->y) / actor->info->speed;
+      if (approx < 1)
+        approx = 1;
+      actor->momz = (target->z + (seekcentre ? target->height / 2 : 0) - actor->z) / approx;
+    }
+    return true;
 }
 
 /* -------------------------------------------------------------------------------------------- */

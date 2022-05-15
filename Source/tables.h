@@ -65,10 +65,13 @@ extern const fixed_t*		finecosine;
 extern const fixed_t		finetangent[FINEANGLES/2];
 
 // Binary Angle Measument, BAM.
+#define ANG1			(ANG45 / 45)
+#define ANG5			(ANG90 / 18)
 #define ANG45			0x20000000
 #define ANG90			0x40000000
 #define ANG180			0x80000000
 #define ANG270			0xc0000000
+#define ANGLE_MAX           0xFFFFFFFF
 
 
 #define SLOPERANGE		2048
@@ -82,6 +85,30 @@ typedef unsigned angle_t;
 // The +1 size is to handle the case when x==y
 //  without additional checking.
 extern const angle_t		tantoangle[SLOPERANGE+1];
+
+// MBF21: More utility functions, courtesy of Quasar (James Haley).
+// These are straight from Eternity so demos stay in sync.
+static inline angle_t FixedToAngle(fixed_t a)
+{
+    return (angle_t)(((uint64_t)a * ANG1) >> FRACBITS);
+}
+
+static inline fixed_t AngleToFixed(angle_t a)
+{
+    return (fixed_t)(((uint64_t)a << FRACBITS) / ANG1);
+}
+
+// [XA] Clamped angle->slope, for convenience
+static inline fixed_t AngleToSlope(int a)
+{
+    return finetangent[(a > ANG90 ? 0 : (-a > ANG90 ? FINEANGLES / 2 - 1 : (ANG90 - a) >> ANGLETOFINESHIFT))];
+}
+
+// [XA] Ditto, using fixed-point-degrees input
+static inline fixed_t DegToSlope(fixed_t a)
+{
+    return AngleToSlope(a >= 0 ? FixedToAngle(a) : -(int)FixedToAngle(-a));
+}
 
 #endif
 //-----------------------------------------------------------------------------

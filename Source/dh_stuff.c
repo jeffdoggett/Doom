@@ -322,6 +322,15 @@ static const char * const dehack_frames [] =
   "Unknown 1",
   "Unknown 2",
   "Translucent",
+  "Args1",
+  "Args2",
+  "Args3",
+  "Args4",
+  "Args5",
+  "Args6",
+  "Args7",
+  "Args8",
+//"MBF21 bits",
   NULL
 };
 
@@ -506,7 +515,39 @@ static const codeptrs_t codeptr_frames [] =
   { "PlaySound",	A_PlaySound },
   { "RandomJump",	A_RandomJump },
   { "SkullPop",		A_SkullPop },
-  { "LineEffect",	A_LineEffect }
+  { "LineEffect",	A_LineEffect },
+
+  // [XA] New MBF21 codepointers
+  { "SpawnObject",		A_SpawnObject },
+  { "MonsterProjectile",	A_MonsterProjectile },
+  { "MonsterBulletAttack",	A_MonsterBulletAttack },
+  { "MonsterMeleeAttack",	A_MonsterMeleeAttack },
+  { "RadiusDamage",		A_RadiusDamage },
+  { "NoiseAlert",		A_NoiseAlert },
+  { "HealChase",		A_HealChase },
+  { "SeekTracer",		A_SeekTracer },
+  { "FindTracer",		A_FindTracer },
+  { "ClearTracer",		A_ClearTracer },
+  { "JumpIfHealthBelow",	A_JumpIfHealthBelow },
+  { "JumpIfTargetInSight",	A_JumpIfTargetInSight },
+  { "JumpIfTargetCloser",	A_JumpIfTargetCloser },
+  { "JumpIfTracerInSight",	A_JumpIfTracerInSight },
+  { "JumpIfTracerCloser",	A_JumpIfTracerCloser },
+  { "JumpIfFlagsSet",		A_JumpIfFlagsSet },
+  { "AddFlags",			A_AddFlags },
+  { "RemoveFlags",		A_RemoveFlags },
+
+  { "WeaponProjectile",		A_WeaponProjectile },
+  { "WeaponBulletAttack",	A_WeaponBulletAttack },
+  { "WeaponMeleeAttack",	A_WeaponMeleeAttack },
+  { "WeaponSound",		A_WeaponSound },
+  { "WeaponAlert",		A_WeaponAlert },
+  { "WeaponJump",		A_WeaponJump },
+  { "ConsumeAmmo",		A_ConsumeAmmo },
+  { "CheckAmmo",		A_CheckAmmo },
+  { "RefireTo",			A_RefireTo },
+  { "GunFlashTo",		A_GunFlashTo }
+
 };
 
 /* These tables are in the same order as the declarations of the messages */
@@ -1905,6 +1946,38 @@ static void dh_write_to_frame (unsigned int number, unsigned int record, unsigne
 	ptr -> frame |= FF_TRANSLUCENT;
       else
 	ptr -> frame &= ~FF_TRANSLUCENT;
+      break;
+
+    case  8:
+      ptr -> args[0] = value;
+      break;
+
+    case  9:
+      ptr -> args[1] = value;
+      break;
+
+    case  10:
+      ptr -> args[2] = value;
+      break;
+
+    case  11:
+      ptr -> args[3] = value;
+      break;
+
+    case  12:
+      ptr -> args[4] = value;
+      break;
+
+    case  13:
+      ptr -> args[5] = value;
+      break;
+
+    case  14:
+      ptr -> args[6] = value;
+      break;
+
+    case  15:
+      ptr -> args[7] = value;
       break;
 
     default:

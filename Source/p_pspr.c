@@ -88,6 +88,54 @@ static fixed_t weapon_bottom (void)
 
 //-----------------------------------------------------------------------------
 //
+// MBF21: P_SetPspritePtr
+//
+void P_SetPspritePtr(pspdef_t *psp, statenum_t stnum)
+{
+    fixed_t	y;
+
+    do
+    {
+        if (!stnum)
+        {
+            // object removed itself
+            psp->state = NULL;
+            break;
+        }
+        else
+        {
+            state_t *state = &states[stnum];
+
+            psp->state = state;
+            psp->tics = state->tics;    // could be 0
+
+            if (state->misc1)
+            {
+                // coordinate set
+                psp->sx = state->misc1 << FRACBITS;
+                y = state->misc2 << FRACBITS;
+	        if (weaponscale <= 1)
+	          y += (100*FRACUNIT);
+                psp->sy = y;
+            }
+
+            // Call action routine.
+            // Modified handling.
+            if (state->action.acp2)
+            {
+                state->action.acp2(viewplayer->mo, psp);
+
+                if (!psp->state)
+                    break;
+            }
+
+            stnum = psp->state->nextstate;
+        }
+    } while (!psp->tics);           // an initial state of 0 could cycle through
+}
+
+//-----------------------------------------------------------------------------
+//
 // P_SetPsprite
 //
 void P_SetPsprite (player_t* player, pspdef_t* psp, statenum_t stnum)
@@ -159,12 +207,8 @@ static void P_BringUpWeapon (player_t* player)
 }
 
 //-----------------------------------------------------------------------------
-//
-// P_CheckAmmo
-// Returns true if there is enough ammo to shoot.
-// If not, selects the next weapon to use.
-//
-static boolean P_CheckAmmo (player_t* player)
+
+static int P_AmmoPerShot (player_t* player)
 {
     ammotype_t		ammo;
     int			count;
@@ -178,6 +222,23 @@ static boolean P_CheckAmmo (player_t* player)
 	count = 2;	// Double barrel.
     else
 	count = 1;	// Regular.
+
+    return count;
+}
+
+//-----------------------------------------------------------------------------
+//
+// P_CheckAmmo
+// Returns true if there is enough ammo to shoot.
+// If not, selects the next weapon to use.
+//
+static boolean P_CheckAmmo (player_t* player)
+{
+    ammotype_t		ammo;
+    int			count;
+
+    count = P_AmmoPerShot (player);
+    ammo = weaponinfo[player->readyweapon].ammo;
 
     // Some do not need ammunition anyway.
     // Return if current ammunition sufficient.
@@ -722,11 +783,12 @@ void A_FirePlasma (mobj_t* mo, pspdef_t* psp)
 // the height of the intended target
 //
 
+static fixed_t	bulletslope;
+
 static fixed_t P_BulletSlope (mobj_t* mo)
 {
   int		mask;
   angle_t	an;
-  fixed_t	bulletslope;
 
   // see which target is to be aimed at
   an = mo->angle;
@@ -1021,6 +1083,310 @@ void P_MovePsprites (player_t* player)
 
   player->psprites[ps_flash].sx = player->psprites[ps_weapon].sx;
   player->psprites[ps_flash].sy = player->psprites[ps_weapon].sy;
+}
+
+//-----------------------------------------------------------------------------
+//
+// [XA] New MBF21 codepointers
+//
+
+//
+// A_WeaponProjectile
+// A parameterized player weapon projectile attack. Does not consume ammo.
+//   args[0]: Type of actor to spawn
+//   args[1]: Angle (degrees, in fixed point), relative to calling player's angle
+//   args[2]: Pitch (degrees, in fixed point), relative to calling player's pitch; approximated
+//   args[3]: X/Y spawn offset, relative to calling player's angle
+//   args[4]: Z spawn offset, relative to player's default projectile fire height
+//
+void A_WeaponProjectile(mobj_t *actor, pspdef_t *psp)
+{
+    mobj_t  *mo;
+    int     an;
+    state_t *state = psp->state;
+    player_t *player;
+
+    if ((player = actor->player) == NULL)
+      return;
+
+    if (!state || !state->args[0])
+        return;
+
+    mo = P_SpawnPlayerMissile(player->mo, (mobjtype_t)(state->args[0] - 1));
+    if (mo == NULL)
+        return;
+
+    // adjust angle
+    mo->angle += (angle_t)(((int64_t)state->args[1] << 16) / 360);
+    an = mo->angle >> ANGLETOFINESHIFT;
+    mo->momx = FixedMul(mo->info->speed, finecosine[an]);
+    mo->momy = FixedMul(mo->info->speed, finesine[an]);
+
+    // adjust pitch (approximated, using DOOM's ye olde finetangent table; same method as autoaim)
+    mo->momz += FixedMul(mo->info->speed, DegToSlope(state->args[2]));
+
+    // adjust position
+    an = (player->mo->angle - ANG90) >> ANGLETOFINESHIFT;
+    mo->x += FixedMul(state->args[3], finecosine[an]);
+    mo->y += FixedMul(state->args[3], finesine[an]);
+    mo->z += state->args[4];
+
+    // set tracer to the player's autoaim target,
+    // so player seeker missiles prioritizing the
+    // baddie the player is actually aiming at. ;)
+    mo->tracer = linetarget;
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_WeaponBulletAttack
+// A parameterized player weapon bullet attack. Does not consume ammo.
+//   args[0]: Horizontal spread (degrees, in fixed point)
+//   args[1]: Vertical spread (degrees, in fixed point)
+//   args[2]: Number of bullets to fire; if not set, defaults to 1
+//   args[3]: Base damage of attack (e.g. for 5d3, customize the 5); if not set, defaults to 5
+//   args[4]: Attack damage modulus (e.g. for 5d3, customize the 3); if not set, defaults to 3
+//
+void A_WeaponBulletAttack(mobj_t *actor, pspdef_t *psp)
+{
+    int     numbullets;
+    state_t *state = psp->state;
+    player_t *player;
+
+    if ((player = actor->player) == NULL)
+      return;
+
+    if (!state)
+        return;
+
+    numbullets = state->args[2];
+
+//  if (!(weaponinfo[player->readyweapon].flags & WPF_SILENT))
+        P_NoiseAlert(actor,actor);
+
+    P_BulletSlope(player->mo);
+
+    for (int i = 0; i < numbullets; i++)
+        P_LineAttack(player->mo, player->mo->angle + P_RandomHitscanAngle(state->args[0]), MISSILERANGE,
+            bulletslope + P_RandomHitscanSlope(state->args[1]), (M_Random() % state->args[4] + 1) * state->args[3]);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_WeaponMeleeAttack
+// A parameterized player weapon melee attack.
+//   args[0]: Base damage of attack (e.g. for 2d10, customize the 2); if not set, defaults to 2
+//   args[1]: Attack damage modulus (e.g. for 2d10, customize the 10); if not set, defaults to 10
+//   args[2]: Berserk damage multiplier (fixed point); if not set, defaults to 1.0 (no change).
+//   args[3]: Sound to play if attack hits
+//   args[4]: Range (fixed point); if not set, defaults to player mobj's melee range
+//
+void A_WeaponMeleeAttack(mobj_t *actor, pspdef_t *psp)
+{
+    int     range;
+    angle_t angle;
+    int     slope;
+    int     damage;
+    state_t *state = psp->state;
+    player_t *player;
+
+    if ((player = actor->player) == NULL)
+      return;
+
+    if (!state)
+        return;
+
+    range = state->args[4];
+    if (!range)
+        range = player->mo->info->meleethreshold;
+
+    damage = (M_Random() % state->args[1] + 1) * state->args[0];
+
+    if (player->powers[pw_strength])
+        damage = (damage * state->args[2]) >> FRACBITS;
+
+    // slight randomization; weird vanillaism here. :P
+    angle = player->mo->angle + (M_SubRandom() << 18);
+
+    // make autoaim prefer enemies
+    slope = P_AimLineAttack(player->mo, angle, range, MF_FRIEND);
+
+    if (!linetarget)
+        slope = P_AimLineAttack(player->mo, angle, range, 0);
+
+    // attack, dammit!
+    P_LineAttack(player->mo, angle, range, slope, damage);
+
+    // missed? ah, welp.
+    if (!linetarget)
+        return;
+
+//  if (!(weaponinfo[player->readyweapon].flags & WPF_SILENT))
+        P_NoiseAlert(actor,actor);
+
+    // un-missed!
+    S_StartSound(player->mo, state->args[3]);
+
+    // turn to face target
+    player->mo->angle = R_PointToAngle2(player->mo->x, player->mo->y, linetarget->x, linetarget->y);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_WeaponSound
+// Plays a sound. Usable from weapons, unlike A_PlaySound
+//   args[0]: ID of sound to play
+//   args[1]: If 1, play sound at full volume (may be useful in DM?)
+//
+void A_WeaponSound(mobj_t *actor, pspdef_t *psp)
+{
+    state_t *state = psp->state;
+    player_t *player;
+
+    if ((player = actor->player) == NULL)
+      return;
+
+    if (!state)
+        return;
+
+    S_StartSound((state->args[1] ? NULL : player->mo), state->args[0]);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_WeaponAlert
+// Alerts monsters to the player's presence. Handy when combined with WPF_SILENT.
+//
+void A_WeaponAlert(mobj_t *actor, pspdef_t *psp)
+{
+    player_t *player;
+
+    if ((player = actor->player) == NULL)
+      return;
+
+    P_NoiseAlert(player->mo, player->mo);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_WeaponJump
+// Jumps to the specified state, with variable random chance.
+// Basically the same as A_RandomJump, but for weapons.
+//   args[0]: State number
+//   args[1]: Chance, out of 255, to make the jump
+//
+void A_WeaponJump(mobj_t *actor, pspdef_t *psp)
+{
+    state_t *state = psp->state;
+
+    if (!state)
+        return;
+
+    if (M_Random() < state->args[1])
+        P_SetPspritePtr(psp, (statenum_t) state->args[0]);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_ConsumeAmmo
+// Subtracts ammo from the player's "inventory". 'Nuff said.
+//   args[0]: Amount of ammo to consume. If zero, use the weapon's ammo-per-shot amount.
+//
+void A_ConsumeAmmo(mobj_t *actor, pspdef_t *psp)
+{
+    int			ammopershot;
+    state_t             *state = psp->state;
+    player_t *player;
+    if ((player = actor->player) == NULL)
+      return;
+
+    const weaponinfo_t  readyweapon = weaponinfo[player->readyweapon];
+    const ammotype_t    type = readyweapon.ammo;
+
+    if (!state || type == am_noammo)
+        return;
+
+    ammopershot = state->args[0];
+    if (ammopershot == 0)
+      ammopershot = P_AmmoPerShot (player);
+
+    // subtract ammo, but don't let it get below zero
+    A_DecrementAmmo (player, ammopershot);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_CheckAmmo
+// Jumps to a state if the player's ammo is lower than the specified amount.
+//   args[0]: State to jump to
+//   args[1]: Minimum required ammo to NOT jump. If zero, use the weapon's ammo-per-shot amount.
+//
+void A_CheckAmmo(mobj_t *actor, pspdef_t *psp)
+{
+    int			ammopershot;
+    state_t             *state = psp->state;
+    player_t *player;
+    if ((player = actor->player) == NULL)
+      return;
+    const weaponinfo_t  readyweapon = weaponinfo[player->readyweapon];
+    const ammotype_t    type = readyweapon.ammo;
+
+    if (!state || type == am_noammo)
+        return;
+
+    ammopershot = P_AmmoPerShot (player);
+
+    if (player->ammo[type] < (state->args[1] ? state->args[1] : ammopershot))
+        P_SetPspritePtr(psp, (statenum_t) state->args[0]);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_RefireTo
+// Jumps to a state if the player is holding down the fire button
+//   args[0]: State to jump to
+//   args[1]: If nonzero, skip the ammo check
+//
+void A_RefireTo(mobj_t *actor, pspdef_t *psp)
+{
+    state_t *state = psp->state;
+
+    if (!state)
+        return;
+
+    player_t *player;
+    if ((player = actor->player) == NULL)
+      return;
+
+    if ((state->args[1] || P_CheckAmmo(player))
+        && (player->cmd.buttons & BT_ATTACK)
+        && player->pendingweapon == wp_nochange
+        && player->health > 0)
+        P_SetPspritePtr(psp, (statenum_t) state->args[0]);
+}
+
+//-----------------------------------------------------------------------------
+//
+// A_GunFlashTo
+// Sets the weapon flash layer to the specified state.
+//   args[0]: State number
+//   args[1]: If nonzero, don't change the player actor state
+//
+void A_GunFlashTo(mobj_t *actor, pspdef_t *psp)
+{
+    state_t *state = psp->state;
+
+    if (!state)
+        return;
+
+    player_t *player;
+    if ((player = actor->player) == NULL)
+      return;
+
+    if (!state->args[1])
+        P_SetMobjState(player->mo, S_PLAY_ATK2);
+
+    P_SetPsprite (player, &player->psprites[ps_flash], (statenum_t) state->args[0]);
 }
 
 //-----------------------------------------------------------------------------

@@ -31,6 +31,7 @@
 // Returns a number from 0 to 255,
 // from a lookup table.
 int M_Random (void);
+int M_SubRandom (void);
 
 // As M_Random, but used only by the play simulation.
 int P_Random (void);
@@ -38,6 +39,8 @@ int P_Random (void);
 // Fix randoms for demos.
 void M_ClearRandom (void);
 
+int P_RandomHitscanAngle(fixed_t spread);
+int P_RandomHitscanSlope(fixed_t spread);
 
 #endif
 //-----------------------------------------------------------------------------

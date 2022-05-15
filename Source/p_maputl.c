@@ -1290,3 +1290,153 @@ int P_GetSafeBlockY (int coord)
 }
 
 //-----------------------------------------------------------------------------
+//
+// MBF21: RoughBlockCheck
+// [XA] adapted from Hexen -- used by P_RoughTargetSearch
+//
+static mobj_t *RoughBlockCheck(mobj_t *mo, int index, angle_t fov)
+{
+    mobj_t  *link = blocklinks[index];
+
+    while (link)
+    {
+        // skip non-shootable actors
+        if (!(link->flags & MF_SHOOTABLE))
+        {
+            link = link->bnext;
+            continue;
+        }
+
+        // skip the projectile's owner
+        if (link == mo->target)
+        {
+            link = link->bnext;
+            continue;
+        }
+
+        // skip actors on the same "team", unless infighting
+        if (mo->target && !((link->flags ^ mo->target->flags) & MF_FRIEND)
+            && mo->target->target != link && !(link->player && mo->target->player))
+        {
+            link = link->bnext;
+            continue;
+        }
+
+        // skip actors outside of specified FOV
+        if (fov > 0 && !P_CheckFOV(mo, link, fov))
+        {
+            link = link->bnext;
+            continue;
+        }
+
+        // skip actors not in line of sight
+        if (!P_CheckSight(mo, link))
+        {
+            link = link->bnext;
+            continue;
+        }
+
+        // all good! return it.
+        return link;
+    }
+
+    // couldn't find a valid target
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+//
+// MBF21: P_RoughTargetSearch
+// Searches though the surrounding mapblocks for monsters/players
+// based on Hexen's P_RoughMonsterSearch
+//
+// distance is in MAPBLOCKUNITS
+mobj_t *P_RoughTargetSearch(mobj_t *mo, angle_t fov, int distance)
+{
+    const int   startx = (mo->x - bmaporgx) >> MAPBLOCKSHIFT;
+    const int   starty = (mo->y - bmaporgy) >> MAPBLOCKSHIFT;
+    mobj_t      *target;
+
+    if (startx >= 0 && startx < bmapwidth && starty >= 0 && starty < bmapheight
+        && ((target = RoughBlockCheck(mo, starty * bmapwidth + startx, fov))!=0))
+        return target;  // found a target right away
+
+    for (int count = 1; count <= distance; count++)
+    {
+        int blockx, blocky;
+        int blockindex;
+        int firststop = startx + count;
+        int secondstop;
+        int thirdstop;
+        int finalstop;
+
+        if (firststop < 0)
+            continue;
+
+        if ((secondstop = starty + count) < 0)
+            continue;
+
+        if (firststop >= bmapwidth)
+            firststop = bmapwidth - 1;
+
+        if (secondstop >= bmapheight)
+            secondstop = bmapheight - 1;
+
+	if (count > startx)
+	{
+	  blockx = 0;
+	}
+	else
+	{
+	  blockx = startx - count;
+	  if (blockx > (bmapwidth - 1))
+	  {
+	    blockx = (bmapwidth - 1);
+	  }
+	}
+
+	if (count > starty)
+	{
+	  blocky = 0;
+	}
+	else
+	{
+	  blocky = starty - count;
+	  if (blocky > (bmapheight - 1))
+	  {
+	    blocky = (bmapheight - 1);
+	  }
+	}
+
+        blockindex = blocky * bmapwidth + blockx;
+
+        thirdstop = secondstop * bmapwidth + blockx;
+        secondstop = secondstop * bmapwidth + firststop;
+        firststop += blocky * bmapwidth;
+        finalstop = blockindex;
+
+        // Trace the first block section (along the top)
+        for (; blockindex <= firststop; blockindex++)
+            if (((target = RoughBlockCheck(mo, blockindex, fov))!=0))
+                return target;
+
+        // Trace the second block section (right edge)
+        for (blockindex--; blockindex <= secondstop; blockindex += bmapwidth)
+            if (((target = RoughBlockCheck(mo, blockindex, fov))!=0))
+                return target;
+
+        // Trace the third block section (bottom edge)
+        for (blockindex -= bmapwidth; blockindex >= thirdstop; blockindex--)
+            if (((target = RoughBlockCheck(mo, blockindex, fov))!=0))
+                return target;
+
+        // Trace the final block section (left edge)
+        for (blockindex++; blockindex > finalstop; blockindex -= bmapwidth)
+            if (((target = RoughBlockCheck(mo, blockindex, fov))!=0))
+                return target;
+    }
+
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------

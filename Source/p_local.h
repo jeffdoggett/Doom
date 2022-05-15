@@ -123,8 +123,9 @@ void 	P_MobjThinker (mobj_t* mobj);
 void	P_SpawnPuff (fixed_t x, fixed_t y, fixed_t z);
 void 	P_SpawnBlood (fixed_t x, fixed_t y, fixed_t z, int damage);
 mobj_t* P_SpawnMissile (mobj_t* source, mobj_t* dest, mobjtype_t type);
-void	P_SpawnPlayerMissile (mobj_t* source, mobjtype_t type);
+mobj_t*	P_SpawnPlayerMissile (mobj_t* source, mobjtype_t type);
 void	P_CheckMissileSpawn (mobj_t* th);
+boolean P_SeekerMissile(mobj_t *actor, mobj_t **seekTarget, angle_t thresh, angle_t turnmax, boolean seekcentre);
 
 
 //
@@ -195,6 +196,7 @@ P_PathTraverse
 
 void P_UnsetThingPosition (mobj_t* thing);
 void P_SetThingPosition (mobj_t* thing);
+mobj_t *P_RoughTargetSearch(mobj_t *mo, angle_t fov, int distance);
 
 
 //
@@ -219,6 +221,7 @@ boolean P_TryMove (mobj_t* thing, fixed_t x, fixed_t y);
 boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean boss);
 void	P_SlideMove (mobj_t* mo);
 boolean P_CheckSight (mobj_t* t1, mobj_t* t2);
+boolean P_CheckFOV(mobj_t *t1, mobj_t *t2, angle_t fov);
 void 	P_UseLines (player_t* player);
 
 boolean P_ChangeSector (sector_t* sector, boolean crunch);

@@ -25,7 +25,7 @@
 static const char rcsid[] = "$Id: m_random.c,v 1.1 1997/02/03 22:45:11 b1 Exp $";
 #endif
 
-
+#include "includes.h"
 //
 // M_Random
 // Returns a 0-255 number
@@ -69,8 +69,38 @@ int M_Random (void)
   return rndtable[rndindex];
 }
 
+int M_SubRandom (void)
+{
+  int r = M_Random();
+  return (r - M_Random());
+}
+
 void M_ClearRandom (void)
 {
   rndindex = prndindex = 0;
+}
+
+// MBF21: [XA] Common random formulas used by codepointers
+
+//
+// P_RandomHitscanAngle
+// Outputs a random angle between (-spread, spread), as an int ('cause it can be negative).
+//   spread: Maximum angle (degrees, in fixed point -- not BAM!)
+//
+int P_RandomHitscanAngle(fixed_t spread)
+{
+    return (int)(((int64_t)(spread < 0 ? FixedToAngle(-spread) : FixedToAngle(spread)) * M_SubRandom()) / 255);
+}
+
+//
+// P_RandomHitscanSlope
+// Outputs a random angle between (-spread, spread), converted to values used for slope
+//   spread: Maximum vertical angle (degrees, in fixed point -- not BAM!)
+//
+int P_RandomHitscanSlope(fixed_t spread)
+{
+    int angle = P_RandomHitscanAngle(spread);
+
+    return finetangent[(angle > ANG90 ? 0 : (-angle > ANG90 ? FINEANGLES / 2 - 1 : (ANG90 - angle) >> ANGLETOFINESHIFT))];
 }
 

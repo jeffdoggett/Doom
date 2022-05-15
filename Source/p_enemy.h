@@ -130,6 +130,37 @@ extern void A_RandomJump (mobj_t* mo, pspdef_t *psp);
 extern void A_SkullPop (mobj_t* mo, pspdef_t *psp);
 extern void A_LineEffect (mobj_t* mo, pspdef_t *psp);
 
+// [XA] New MBF21 codepointers
+void A_SpawnObject(mobj_t *actor, pspdef_t *psp);
+void A_MonsterProjectile(mobj_t *actor, pspdef_t *psp);
+void A_MonsterBulletAttack(mobj_t *actor, pspdef_t *psp);
+void A_MonsterMeleeAttack(mobj_t *actor, pspdef_t *psp);
+void A_RadiusDamage(mobj_t *actor, pspdef_t *psp);
+void A_NoiseAlert(mobj_t *actor, pspdef_t *psp);
+void A_HealChase(mobj_t *actor, pspdef_t *psp);
+void A_SeekTracer(mobj_t *actor, pspdef_t *psp);
+void A_FindTracer(mobj_t *actor, pspdef_t *psp);
+void A_ClearTracer(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfHealthBelow(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfTargetInSight(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfTargetCloser(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfTracerInSight(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfTracerCloser(mobj_t *actor, pspdef_t *psp);
+void A_JumpIfFlagsSet(mobj_t *actor, pspdef_t *psp);
+void A_AddFlags(mobj_t *actor, pspdef_t *psp);
+void A_RemoveFlags(mobj_t *actor, pspdef_t *psp);
+
+void A_WeaponProjectile(mobj_t *actor, pspdef_t *psp);
+void A_WeaponBulletAttack(mobj_t *actor, pspdef_t *psp);
+void A_WeaponMeleeAttack(mobj_t *actor, pspdef_t *psp);
+void A_WeaponSound(mobj_t *actor, pspdef_t *psp);
+void A_WeaponAlert(mobj_t *actor, pspdef_t *psp);
+void A_WeaponJump(mobj_t *actor, pspdef_t *psp);
+void A_ConsumeAmmo(mobj_t *actor, pspdef_t *psp);
+void A_CheckAmmo(mobj_t *actor, pspdef_t *psp);
+void A_RefireTo(mobj_t *actor, pspdef_t *psp);
+void A_GunFlashTo(mobj_t *actor, pspdef_t *psp);
+
 extern void P_Massacre (void);
 extern unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag);
 

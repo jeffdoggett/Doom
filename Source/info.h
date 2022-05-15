@@ -207,15 +207,18 @@ typedef enum
   NUMSTATES = 4000
 } statenum_t;
 
+#define MAXSTATEARGS	8
+
 typedef struct
 {
   spritenum_t	sprite;
-  long		frame;
-  long		tics;
+  uint32_t	frame;
+  uint32_t	tics;
   // void	(*action) ();
   actionf_t	action;
   statenum_t	nextstate;
-  long		misc1, misc2;
+  uint32_t	misc1, misc2;
+  uint32_t	args[MAXSTATEARGS]; // MBF21
 } state_t;
 
 extern state_t	states[NUMSTATES];

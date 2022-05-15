@@ -67,6 +67,8 @@ static mobj_t* soundtarget;
 static mobj_t* current_actor;
 static boolean current_allaround;
 
+#define P_SetTarget(a,b) *a = actor;
+
 //-----------------------------------------------------------------------------
 /*
   Icarus level 24 (The Haunting) and Hr level 26 (Afterlife)
@@ -145,6 +147,30 @@ P_RecursiveSound
 	else
 	    P_RecursiveSound (other, soundblocks);
     }
+}
+
+//
+// P_CheckRange
+//
+static boolean P_CheckRange(mobj_t *actor, fixed_t range)
+{
+    mobj_t  *target = actor->target;
+
+    // killough 07/18/98: friendly monsters don't attack other friends
+    if (actor->flags & target->flags & MF_FRIEND)
+        return false;
+
+    if (P_ApproxDistance(target->x - actor->x, target->y - actor->y) >= range)
+        return false;
+
+    // [BH] check difference in height as well
+    if (target->z > actor->z + actor->height || actor->z > target->z + target->height)
+        return false;
+
+    if (!P_CheckSight(actor, target))
+        return false;
+
+    return true;
 }
 
 
@@ -1363,6 +1389,7 @@ mobj_t*		corpsehit;
 mobj_t*		vileobj;
 fixed_t		viletryx;
 fixed_t		viletryy;
+fixed_t		viletryradius;
 
 boolean PIT_VileCheck (mobj_t*	thing)
 {
@@ -2787,3 +2814,477 @@ unsigned int A_LineAction (mobj_t *mo, unsigned int special, unsigned int tag)
 
   return (special);
 }
+
+
+//
+// MBF21: P_HealCorpse
+// Check for resurrecting a body
+//
+static boolean P_HealCorpse(mobj_t *actor, int radius, statenum_t healstate, sfxenum_t healsound)
+{
+    int movedir = actor->movedir;
+
+    if (movedir != DI_NODIR)
+    {
+        int         xl;
+        int         xh;
+        int         yl;
+        int         yh;
+        const int   speed = actor->info->speed;
+
+        // check for corpses to raise
+        viletryx = actor->x + speed * xspeed[movedir];
+        viletryy = actor->y + speed * yspeed[movedir];
+        viletryradius = radius;
+
+        xl = P_GetSafeBlockX(viletryx - bmaporgx - MAXRADIUS * 2);
+        xh = P_GetSafeBlockX(viletryx - bmaporgx + MAXRADIUS * 2);
+        yl = P_GetSafeBlockY(viletryy - bmaporgy - MAXRADIUS * 2);
+        yh = P_GetSafeBlockY(viletryy - bmaporgy + MAXRADIUS * 2);
+
+        for (int bx = xl; bx <= xh; bx++)
+            for (int by = yl; by <= yh; by++)
+                // Call PIT_VileCheck() to check whether object is a corpse that can be raised.
+                if (!P_BlockThingsIterator(bx, by, &PIT_VileCheck))
+                {
+                    // got one!
+                    mobj_t      *prevtarget = actor->target;
+                    mobjinfo_t  *info = corpsehit->info;
+
+                    actor->target = corpsehit;
+                    A_FaceTarget(actor, NULL);
+                    actor->target = prevtarget;
+
+                    P_SetMobjState(actor, healstate);
+                    S_StartSound(corpsehit, healsound);
+
+                    P_SetMobjState(corpsehit, (statenum_t) info->raisestate);
+
+//                  if (compat_corpsegibs)
+                        corpsehit->height <<= 2;
+//                  else
+//                  {
+//                      // [BH] fix <https://doomwiki.org/wiki/Ghost_monster>
+//                      corpsehit->height = info->height;
+//                      corpsehit->radius = info->radius;
+//                  }
+
+                    // killough 07/18/98: friendliness is transferred from AV to raised corpse
+                    corpsehit->flags = ((info->flags & ~MF_FRIEND) | (actor->flags & MF_FRIEND));
+
+//                  corpsehit->flags2 &= ~MF2_MIRRORED;
+                    corpsehit->health = info->spawnhealth;
+//                  corpsehit->shadowoffset = info->shadowoffset;
+                    P_SetTarget(&corpsehit->target, NULL);
+
+                    // killough 09/09/98
+//                  P_SetTarget(&corpsehit->lastenemy, NULL);
+                    corpsehit->flags &= ~MF_JUSTHIT;
+
+                    viewplayer->killcount--;
+                    // killough 08/29/98: add to appropriate thread
+//                  P_UpdateThinker(&corpsehit->thinker);
+                    return true;
+                }
+    }
+
+    return false;
+}
+
+//
+// [XA] New MBF21 codepointers
+//
+
+//
+// A_SpawnObject
+// Basically just A_Spawn with better behavior and more args.
+//   args[0]: Type of actor to spawn
+//   args[1]: Angle (degrees, in fixed point), relative to calling actor's angle
+//   args[2]: X spawn offset (fixed point), relative to calling actor
+//   args[3]: Y spawn offset (fixed point), relative to calling actor
+//   args[4]: Z spawn offset (fixed point), relative to calling actor
+//   args[5]: X velocity (fixed point)
+//   args[6]: Y velocity (fixed point)
+//   args[7]: Z velocity (fixed point)
+//
+void A_SpawnObject(mobj_t *actor, pspdef_t *psp)
+{
+    angle_t an;
+    int     fan;
+    int     dx, dy;
+    mobj_t  *mo;
+
+    if (!actor->state->args[0])
+        return;
+
+    // calculate position offsets
+    an = actor->angle + (angle_t)(((int64_t)actor->state->args[1] << 16) / 360);
+    fan = an >> ANGLETOFINESHIFT;
+    dx = FixedMul(actor->state->args[2], finecosine[fan]) - FixedMul(actor->state->args[3], finesine[fan]);
+    dy = FixedMul(actor->state->args[2], finesine[fan]) + FixedMul(actor->state->args[3], finecosine[fan]);
+
+    // spawn it, yo
+    mo = P_SpawnMobj(actor->x + dx, actor->y + dy, actor->z + actor->state->args[4], (mobjtype_t)(actor->state->args[0] - 1));
+    if (!mo)
+        return;
+
+    // angle dangle
+    mo->angle = an;
+
+    // set velocity
+    mo->momx = FixedMul(actor->state->args[5], finecosine[fan]) - FixedMul(actor->state->args[6], finesine[fan]);
+    mo->momy = FixedMul(actor->state->args[5], finesine[fan]) + FixedMul(actor->state->args[6], finecosine[fan]);
+    mo->momz = actor->state->args[7];
+
+    // if spawned object is a missile, set target+tracer
+    if (mo->info->flags & (MF_MISSILE | MF_BOUNCES))
+    {
+        // if spawner is also a missile, copy 'em
+        if (actor->info->flags & (MF_MISSILE | MF_BOUNCES))
+        {
+            P_SetTarget(&mo->target, actor->target);
+            P_SetTarget(&mo->tracer, actor->tracer);
+        }
+        else
+        {
+            // otherwise, set 'em as if a monster fired 'em
+            P_SetTarget(&mo->target, actor);
+            P_SetTarget(&mo->tracer, actor->target);
+        }
+    }
+
+    // [XA] don't bother with the don't-inherit-friendliness hack
+    // that exists in A_Spawn, 'cause WTF is that about anyway?
+}
+
+//
+// A_MonsterProjectile
+// A parameterized monster projectile attack.
+//   args[0]: Type of actor to spawn
+//   args[1]: Angle (degrees, in fixed point), relative to calling actor's angle
+//   args[2]: Pitch (degrees, in fixed point), relative to calling actor's pitch; approximated
+//   args[3]: X/Y spawn offset, relative to calling actor's angle
+//   args[4]: Z spawn offset, relative to actor's default projectile fire height
+//
+void A_MonsterProjectile(mobj_t *actor, pspdef_t *psp)
+{
+    int     an;
+    mobj_t  *mo;
+    mobj_t  *target = actor->target;
+
+    if (!target || !actor->state->args[0])
+        return;
+
+    A_FaceTarget(actor, NULL);
+
+    mo = P_SpawnMissile(actor, target, (mobjtype_t)(actor->state->args[0] - 1));
+    if (!mo)
+        return;
+
+    // adjust angle
+    mo->angle += (angle_t)(((int64_t)actor->state->args[1] << 16) / 360);
+    an = mo->angle >> ANGLETOFINESHIFT;
+    mo->momx = FixedMul(mo->info->speed, finecosine[an]);
+    mo->momy = FixedMul(mo->info->speed, finesine[an]);
+
+    // adjust pitch (approximated, using DOOM's ye olde
+    // finetangent table; same method as monster aim)
+    mo->momz += FixedMul(mo->info->speed, DegToSlope(actor->state->args[2]));
+
+    // adjust position
+    an = (actor->angle - ANG90) >> ANGLETOFINESHIFT;
+    mo->x += FixedMul(actor->state->args[3], finecosine[an]);
+    mo->y += FixedMul(actor->state->args[3], finesine[an]);
+    mo->z += actor->state->args[4];
+
+    // always set the 'tracer' field, so this pointer
+    // can be used to fire seeker missiles at will.
+    P_SetTarget(&mo->tracer, target);
+}
+
+//
+// A_MonsterBulletAttack
+// A parameterized monster bullet attack.
+//   args[0]: Horizontal spread (degrees, in fixed point)
+//   args[1]: Vertical spread (degrees, in fixed point)
+//   args[2]: Number of bullets to fire; if not set, defaults to 1
+//   args[3]: Base damage of attack (e.g. for 3d5, customize the 3); if not set, defaults to 3
+//   args[4]: Attack damage modulus (e.g. for 3d5, customize the 5); if not set, defaults to 5
+//
+void A_MonsterBulletAttack(mobj_t *actor, pspdef_t *psp)
+{
+    int numbullets;
+    int aimslope;
+
+    if (!actor->target)
+        return;
+
+    numbullets = actor->state->args[2];
+
+    A_FaceTarget(actor, NULL);
+    S_StartSound(actor, actor->info->attacksound);
+
+    aimslope = P_AimLineAttack(actor, actor->angle, MISSILERANGE, 0);
+
+    for (int i = 0; i < numbullets; i++)
+        P_LineAttack(actor, actor->angle + P_RandomHitscanAngle(actor->state->args[0]), MISSILERANGE,
+            aimslope + P_RandomHitscanSlope(actor->state->args[1]), (M_Random() % actor->state->args[4] + 1) * actor->state->args[3]);
+}
+
+//
+// A_MonsterMeleeAttack
+// A parameterized monster melee attack.
+//   args[0]: Base damage of attack (e.g. for 3d8, customize the 3); if not set, defaults to 3
+//   args[1]: Attack damage modulus (e.g. for 3d8, customize the 8); if not set, defaults to 8
+//   args[2]: Sound to play if attack hits
+//   args[3]: Range (fixed point); if not set, defaults to monster's melee range
+//
+void A_MonsterMeleeAttack(mobj_t *actor, pspdef_t *psp)
+{
+    int     range;
+    mobj_t  *target = actor->target;
+
+    if (!target)
+        return;
+
+    range = actor->state->args[3];
+    if (!range)
+        range = actor->info->meleethreshold;
+
+    range += target->info->radius - 20 * FRACUNIT;
+
+    A_FaceTarget(actor, NULL);
+
+    if (!P_CheckRange(actor, range))
+        return;
+
+    S_StartSound(actor, actor->state->args[2]);
+
+    P_DamageMobj(target, actor, actor, (M_Random() % actor->state->args[1] + 1) * actor->state->args[0]);
+}
+
+//
+// A_RadiusDamage
+// A parameterized version of A_Explode. Friggin' finally. :P
+//   args[0]: Damage (int)
+//   args[1]: Radius (also int; no real need for fractional precision here)
+//
+void A_RadiusDamage(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor->state)
+        return;
+
+    P_RadiusAttack(actor, actor->target, actor->state->args[0]);
+}
+
+//
+// A_NoiseAlert
+// Alerts nearby monsters (via sound) to the calling actor's target's presence.
+//
+void A_NoiseAlert(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor->target)
+        return;
+
+    P_NoiseAlert(actor,actor);
+}
+
+//
+// A_HealChase
+// A parameterized version of A_VileChase.
+//   args[0]: State to jump to on the calling actor when resurrecting a corpse
+//   args[1]: Sound to play when resurrecting a corpse
+//
+
+void A_HealChase(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    if (!P_HealCorpse(actor, actor->info->radius, (statenum_t)actor->state->args[0], (sfxenum_t)actor->state->args[1]))
+        A_Chase(actor, NULL);
+}
+
+//
+// A_SeekTracer
+// A parameterized seeker missile function.
+//   args[0]: direct-homing threshold angle (degrees, in fixed point)
+//   args[1]: maximum turn angle (degrees, in fixed point)
+//
+void A_SeekTracer(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    P_SeekerMissile(actor, &actor->tracer, FixedToAngle(actor->state->args[0]), FixedToAngle(actor->state->args[1]), true);
+}
+
+//
+// A_FindTracer
+// Search for a valid tracer (seek target), if the calling actor doesn't already have one.
+//   args[0]: field-of-view to search in (degrees, in fixed point); if zero, will search in all directions
+//   args[1]: distance to search (map blocks, i.e. 128 units)
+//
+void A_FindTracer(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor || actor->tracer)
+        return;
+
+    actor->tracer = P_RoughTargetSearch(actor, FixedToAngle(actor->state->args[0]), actor->state->args[1]);
+}
+
+//
+// A_ClearTracer
+// Clear current tracer (seek target).
+//
+void A_ClearTracer(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    actor->tracer = NULL;
+}
+
+//
+// A_JumpIfHealthBelow
+// Jumps to a state if caller's health is below the specified threshold.
+//   args[0]: State to jump to
+//   args[1]: Health threshold
+//
+void A_JumpIfHealthBelow(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    if (actor->health < actor->state->args[1])
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_JumpIfTargetInSight
+// Jumps to a state if caller's target is in line-of-sight.
+//   args[0]: State to jump to
+//   args[1]: Field-of-view to check (degrees, in fixed point); if zero, will check in all directions
+//
+void A_JumpIfTargetInSight(mobj_t *actor, pspdef_t *psp)
+{
+    angle_t fieldofview;
+    mobj_t  *target;
+
+    if (!actor || ((target = actor->target) == 0))
+        return;
+
+    // Check FOV first since it's faster
+    if ((fieldofview = FixedToAngle(actor->state->args[1])) > 0 && !P_CheckFOV(actor, target, fieldofview))
+        return;
+
+    if (P_CheckSight(actor, target))
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_JumpIfTargetCloser
+// Jumps to a state if caller's target is closer than the specified distance.
+//   args[0]: State to jump to
+//   args[1]: Distance threshold
+//
+void A_JumpIfTargetCloser(mobj_t *actor, pspdef_t *psp)
+{
+    mobj_t  *target;
+
+    if (!actor || ((target = actor->target) == 0))
+        return;
+
+    if (actor->state->args[1] > P_ApproxDistance(actor->x - target->x, actor->y - target->y))
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_JumpIfTracerInSight
+// Jumps to a state if caller's tracer (seek target) is in line-of-sight.
+//   args[0]: State to jump to
+//   args[1]: Field-of-view to check (degrees, in fixed point); if zero, will check in all directions
+//
+void A_JumpIfTracerInSight(mobj_t *actor, pspdef_t *psp)
+{
+    angle_t fieldofview;
+
+    if (!actor || !actor->tracer)
+        return;
+
+    // Check FOV first since it's faster
+    if ((fieldofview = FixedToAngle(actor->state->args[1])) > 0 && !P_CheckFOV(actor, actor->tracer, fieldofview))
+        return;
+
+    if (P_CheckSight(actor, actor->tracer))
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_JumpIfTracerCloser
+// Jumps to a state if caller's tracer (seek target) is closer than the specified distance.
+//   args[0]: State to jump to
+//   args[1]: Distance threshold (fixed point)
+//
+void A_JumpIfTracerCloser(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor || !actor->tracer)
+        return;
+
+    if (actor->state->args[1] > P_ApproxDistance(actor->x - actor->tracer->x, actor->y - actor->tracer->y))
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_JumpIfFlagsSet
+// Jumps to a state if caller has the specified thing flags set.
+//   args[0]: State to jump to
+//   args[1]: Standard flag(s) to check
+//   args[2]: MBF21 flag(s) to check
+//
+void A_JumpIfFlagsSet(mobj_t *actor, pspdef_t *psp)
+{
+    int flags;
+//  int mbf21flags;
+
+    if (!actor)
+        return;
+
+    flags = actor->state->args[1];
+//  mbf21flags = actor->state->args[2];
+
+    if ((actor->flags & flags) == flags
+     /*&& (actor->mbf21flags & mbf21flags) == mbf21flags*/)
+        P_SetMobjState(actor, (statenum_t)actor->state->args[0]);
+}
+
+//
+// A_AddFlags
+// Adds the specified thing flags to the caller.
+//   args[0]: Standard flag(s) to add
+//   args[1]: MBF21 flag(s) to add
+//
+void A_AddFlags(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    actor->flags |= actor->state->args[0];
+//  actor->mbf21flags |= actor->state->args[1];
+}
+
+//
+// A_RemoveFlags
+// Removes the specified thing flags from the caller.
+//   args[0]: flag(s) to remove
+//   args[1]: MBF21 flag(s) to remove
+//
+void A_RemoveFlags(mobj_t *actor, pspdef_t *psp)
+{
+    if (!actor)
+        return;
+
+    actor->flags &= ~actor->state->args[0];
+//  actor->mbf21flags &= ~actor->state->args[1];
+}
+
