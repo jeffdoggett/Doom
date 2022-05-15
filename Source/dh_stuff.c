@@ -235,6 +235,7 @@ static const char * const dehack_things [] =
   "Missile chance multiplier",
   "Speed",
   "Width",
+  "Radius",
   "Height",
   "Mass",
   "Damage",
@@ -277,6 +278,7 @@ typedef enum
   THING_Missile_chance_multiplier,
   THING_Speed,
   THING_Width,
+  THING_Radius,
   THING_Height,
   THING_Mass,
   THING_Damage,
@@ -1739,6 +1741,7 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       break;
 
     case THING_Width:
+    case THING_Radius:
       ptr -> radius = value;
       ptr -> pickupradius = value;
       break;
