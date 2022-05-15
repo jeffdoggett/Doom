@@ -67,7 +67,7 @@ static mobj_t* soundtarget;
 static mobj_t* current_actor;
 static boolean current_allaround;
 
-#define P_SetTarget(a,b) *a = actor;
+#define P_SetTarget(a,b) *a = b;
 
 //-----------------------------------------------------------------------------
 /*
