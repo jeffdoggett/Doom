@@ -187,7 +187,7 @@ static boolean P_IsVisible (mobj_t *actor, mobj_t *mo, boolean allaround)
       angle_t an = R_PointToAngle2(actor->x, actor->y,
 				   mo->x, mo->y) - actor->angle;
       if (an > ANG90 && an < ANG270 &&
-	  P_ApproxDistance(mo->x-actor->x, mo->y-actor->y) > MELEERANGE)
+	  P_ApproxDistance(mo->x-actor->x, mo->y-actor->y) > actor->info->meleerange)
 	return false;
     }
   return P_CheckSight(actor, mo);
@@ -216,30 +216,12 @@ P_NoiseAlert
 //
 boolean P_CheckMeleeRange (mobj_t*	actor)
 {
-  mobj_t*	pl;
-  fixed_t	dist;
+    mobj_t  *target = actor->target;
 
-  pl = actor->target;
-  if (pl == NULL)
-    return false;
+    if (!target)
+        return false;
 
-  // killough 7/18/98: friendly monsters don't attack other friends
-  if (actor->flags & pl->flags & MF_FRIEND)
-    return false;
-
-  dist = P_ApproxDistance (pl->x-actor->x, pl->y-actor->y);
-
-  if (dist >= MELEERANGE-20*FRACUNIT+pl->info->radius)
-    return false;
-
-  // [BH] check height between actor and target
-  if (pl->z > actor->z + actor->height || actor->z > pl->z + pl->height)
-    return false;
-
-  if (! P_CheckSight (actor, actor->target) )
-    return false;
-
-  return true;
+    return P_CheckRange(actor, actor->info->meleerange + target->info->radius - 20 * FRACUNIT);
 }
 
 //
@@ -302,7 +284,7 @@ boolean P_CheckMissileRange (mobj_t* actor)
     if (dist > info->maxattackrange)
       return false;		// too far away
 
-    if (dist < info->meleethreshold)
+    if (dist < 196)
       return false;		// close for fist attack
 
     mult = info->missilechancemult;
@@ -3049,7 +3031,7 @@ void A_MonsterMeleeAttack(mobj_t *actor, pspdef_t *psp)
 
     range = actor->state->args[3];
     if (!range)
-        range = actor->info->meleethreshold;
+        range = actor->info->meleerange;
 
     range += target->info->radius - 20 * FRACUNIT;
 

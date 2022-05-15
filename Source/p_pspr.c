@@ -587,6 +587,7 @@ void A_Punch (mobj_t* mo, pspdef_t* psp)
     angle_t	angle;
     int		damage;
     int		slope;
+    int		range;
     int		t;
     player_t*	player;
 
@@ -597,12 +598,13 @@ void A_Punch (mobj_t* mo, pspdef_t* psp)
 	damage *= 10;
 
     angle = mo->angle;
+    range = player->mo->info->meleerange;
     t = P_Random();	/* remove dependence on order of evaluation */
     angle += (t-P_Random())<<18;
-    slope = P_AimLineAttack (mo, angle, MELEERANGE, MF_FRIEND);
+    slope = P_AimLineAttack (mo, angle, range, MF_FRIEND);
     if (!linetarget)
-      slope = P_AimLineAttack(mo, angle, MELEERANGE, 0);
-    P_LineAttack (mo, angle, MELEERANGE, slope, damage);
+      slope = P_AimLineAttack(mo, angle, range, 0);
+    P_LineAttack (mo, angle, range, slope, damage);
 
     // turn to face target
     if (linetarget)
@@ -624,18 +626,19 @@ void A_Saw (mobj_t* mo, pspdef_t* psp)
     angle_t	angle;
     int		damage;
     int		slope;
+    int		range;
     int		t;
 
     damage = 2*(P_Random ()%10+1);
     angle = mo->angle;
     t = P_Random();	/* remove dependence on order of evaluation */
     angle += (t-P_Random())<<18;
-
+    range = viewplayer->mo->info->meleerange + 1;
     // use meleerange + 1 se the puff doesn't skip the flash
-    slope = P_AimLineAttack (mo, angle, MELEERANGE+1, MF_FRIEND);
+    slope = P_AimLineAttack (mo, angle, range, MF_FRIEND);
     if (!linetarget)
-      slope = P_AimLineAttack(mo, angle, MELEERANGE+1, 0);
-    P_LineAttack (mo, angle, MELEERANGE+1, slope, damage);
+      slope = P_AimLineAttack(mo, angle, range, 0);
+    P_LineAttack (mo, angle, range, slope, damage);
 
     if (!linetarget)
     {
@@ -1198,7 +1201,7 @@ void A_WeaponMeleeAttack(mobj_t *actor, pspdef_t *psp)
 
     range = state->args[4];
     if (!range)
-        range = player->mo->info->meleethreshold;
+        range = player->mo->info->meleerange;
 
     damage = (M_Random() % state->args[1] + 1) * state->args[0];
 
