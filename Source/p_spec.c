@@ -2213,13 +2213,13 @@ void P_UpdateSpecials (void)
 
   for (anim = animhead; anim != NULL ; anim = anim->next)
   {
-    for (i=anim->basepic ; i<anim->basepic+anim->numpics ; i++)
+    for (i=0 ; i<anim->numpics ; ++i)
     {
       pic = anim->basepic + ( (leveltime/anim->speed + i)%anim->numpics );
       if (anim->istexture)
-	textures[i].translation = pic;
+	textures[anim->basepic+i].translation = pic;
       else
-	flatinfo[i].translation = pic;
+	flatinfo[anim->basepic+i].translation = pic;
     }
   }
 
