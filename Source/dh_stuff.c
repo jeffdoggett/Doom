@@ -7176,12 +7176,13 @@ void Load_Mapinfo (void)
   } while (++episode < 10);
 
   // The EMAPINFO appears to be a poor mans version of the others.
+
   if ((foundmapinfo & 2) == 0)
   {
     lump = 0;
     do
     {
-      if (strncasecmp (lumpinfo[lump].name, "EMAPINFO", 8) == 0)	// e.g. rf_1024.wad
+      if (strncasecmp (&lumpinfo[lump].name[1], "MAPINFO", 7) == 0)	// e.g. rf_1024.wad
       {
 	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
 	if (dh_changing_pwad == false)

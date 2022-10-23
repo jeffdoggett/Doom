@@ -795,6 +795,9 @@ void S_ChangeMusic (int musicnum, int looping)
     S_StopMusic ();
   }
 
+  if (snd_MusicVolume == 0)
+    return;
+
   // load & register it
   if ((music->handle = I_RegisterSong (music, namebuf)) < 0)
   {
