@@ -112,9 +112,10 @@ extern boolean		dh_changing_pwad;
 // The actual names can be found in DStrings.h.
 //
 
-static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) names.
+static char* mapnames1[QTY_EPISODES][QTY_MAPS_PER_EPISODE] =	// DOOM shareware/registered/retail (Ultimate) names.
 {
   {
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -137,6 +138,7 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     HUSTR_E1M7,
     HUSTR_E1M8,
     HUSTR_E1M9,
+    NULL,
   },
   {
     NULL,
@@ -149,6 +151,7 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     HUSTR_E2M7,
     HUSTR_E2M8,
     HUSTR_E2M9,
+    NULL,
   },
   {
     NULL,
@@ -161,6 +164,7 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     HUSTR_E3M7,
     HUSTR_E3M8,
     HUSTR_E3M9,
+    NULL,
   },
   {
     NULL,
@@ -173,10 +177,12 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     HUSTR_E4M7,
     HUSTR_E4M8,
     HUSTR_E4M9,
+    NULL,
   },
   {
     NULL,
     NULL,			// E5M1
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -197,10 +203,12 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     NULL,
     NULL,
     NULL,
+    NULL,
   },
   {
     NULL,
     NULL,			// E7M1
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -221,6 +229,7 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     NULL,
     NULL,
     NULL,
+    NULL,
   },
   {
     NULL,
@@ -233,6 +242,7 @@ static char* mapnames1[][10] =	// DOOM shareware/registered/retail (Ultimate) na
     NULL,
     NULL,
     NULL,
+    NULL
   }
 };
 
@@ -561,8 +571,8 @@ char ** HU_access_mapname (unsigned int episode, unsigned int map)
     case shareware:
     case registered:
     case retail:
-      if (episode > 9) episode = 9;
-      if (map > 9) map = 9;
+      if (episode >= QTY_EPISODES) episode = QTY_EPISODES-1;
+      if (map >= QTY_MAPS_PER_EPISODE) map = QTY_MAPS_PER_EPISODE-1;
       s = &mapnames1 [episode][map];
       break;
 
@@ -618,8 +628,8 @@ char ** HU_access_mapname_E (unsigned int episode, unsigned int map)
       break;
 
     default:
-      if (episode > 9) episode = 9;
-      if (map > 9) map = 9;
+      if (episode >= QTY_EPISODES) episode = QTY_EPISODES-1;
+      if (map >= QTY_MAPS_PER_EPISODE) map = QTY_MAPS_PER_EPISODE-1;
       s = &mapnames1 [episode][map];
       break;
   }

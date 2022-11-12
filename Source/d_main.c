@@ -2425,12 +2425,12 @@ void D_DoomMain (void)
 	    startmap = m;
 	    break;
 	  }
-	  if (++m > 9)
+	  if (++m >= QTY_MAPS_PER_EPISODE)
 	  {
 	    m = 0;
 	    e++;
 	  }
-	} while (e < 10);
+	} while (e < QTY_EPISODES);
       }
     }
     else

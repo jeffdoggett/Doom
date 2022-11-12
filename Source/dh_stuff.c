@@ -159,6 +159,10 @@ static const int * AmmoTableOffset = &maxammo [0];
 
 /* ---------------------------------------------------------------------------- */
 
+static char * read_map_num (unsigned int * episode, unsigned int * map, char * ptr);
+
+/* ---------------------------------------------------------------------------- */
+
 typedef enum
 {
   JOB_NULL,
@@ -3305,8 +3309,11 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   if ((strncasecmp (ttext, "HUSTR_E", 7) == 0)
    && (ttext [8] == 'M'))
   {
+    unsigned int episode;
+    unsigned int map;
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
-    return (HU_access_mapname_E (ttext[7]-'0', ttext[9]-'0'));
+    read_map_num (&episode, &map, ttext+6);
+    return (HU_access_mapname_E (episode, map));
   }
 
   if ((strncasecmp (ttext, "HUSTR_", 6) == 0)
@@ -4271,6 +4278,7 @@ char * dh_split_lines (char * ptr, char * top)
 
 static char * read_map_num (unsigned int * episode, unsigned int * map, char * ptr)
 {
+  char cc;
   *map = 0;
   *episode = 255;
 
@@ -4280,8 +4288,11 @@ static char * read_map_num (unsigned int * episode, unsigned int * map, char * p
     {
       case 'e':
       case 'E':
-	*episode = ptr [1] - '0';
-	*map = ptr [3] - '0';
+        ++ptr;
+	*episode = atoi (ptr);
+	while (((cc = *ptr) >= '0') && (cc <= '9'))
+	  ++ptr;
+	*map = atoi (ptr+1);
 	while (*ptr > ' ')
 	  ptr++;
 	return (ptr);
@@ -4746,7 +4757,7 @@ static void show_thing_obits (void)
 
 void DH_remove_duplicate_mapinfos (void)
 {
-  unsigned int i;
+  unsigned int i,j;
   clusterdefs_t * cp;
   bossdeath_t * bd_ptr;
   bossdeath_t * bd_ptr_1;
@@ -4825,13 +4836,16 @@ void DH_remove_duplicate_mapinfos (void)
     putchar ('\n');
 
     i = 0;
-    map_ptr = G_Access_MapInfoTab_E (1,0);
     do
     {
-      printf ("E%uM%u:", (i/10)+1,i%10);
-      show_map_dests (map_ptr);
-      map_ptr++;
-    } while (++i < (9*10));
+      j = 0;
+      do
+      {
+	map_ptr = G_Access_MapInfoTab_E (i,j);
+	printf ("E%uM%u:", i,j);
+	show_map_dests (map_ptr);
+      } while (++j < QTY_MAPS_PER_EPISODE);
+    } while (++i < QTY_EPISODES);
 
     i = 0;
     map_ptr = G_Access_MapInfoTab_E (255,0);
@@ -6187,7 +6201,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, unsigned int map)
 {
   char cc;
-  unsigned int i,j,l;
+  unsigned int j,l;
   unsigned int intertext;
   char * newtext;
   clusterdefs_t * cp;
@@ -6272,10 +6286,10 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       }
       else
       {
-	i = ptr [0] - '0';
-	j = ptr [2] - '0';
-	mdest_ptr -> normal_exit_to_episode = i;
-	mdest_ptr -> normal_exit_to_map = j;
+	unsigned int e,m;
+	read_map_num (&e, &m, ptr-1);
+	mdest_ptr -> normal_exit_to_episode = e;
+	mdest_ptr -> normal_exit_to_map = m;
       }
       //printf ("Map %u %u has exit to %u %u\n", episode, map, i, j);
     }
@@ -6289,10 +6303,10 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
       }
       else
       {
-	i = ptr [0] - '0';
-	j = ptr [2] - '0';
-	mdest_ptr -> secret_exit_to_episode = i;
-	mdest_ptr -> secret_exit_to_map = j;
+	unsigned int e,m;
+	read_map_num (&e, &m, ptr-1);
+	mdest_ptr -> secret_exit_to_episode = e;
+	mdest_ptr -> secret_exit_to_map = m;
       }
     }
     else if (strncasecmp (ptr, "skyname", 7) == 0)

@@ -889,11 +889,11 @@ ST_Responder (event_t* ev)
 		else
 		{
 		  map++;
-		  if (map > 9)
+		  if (map >= QTY_MAPS_PER_EPISODE)
 		  {
 		    map = 1;
 		    epsd++;
-		    if (epsd > 9)
+		    if (epsd >= QTY_EPISODES)
 		      break;
 		  }
 		}

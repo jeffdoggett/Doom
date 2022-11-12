@@ -37,6 +37,10 @@ typedef enum
 //
 // GAME
 //
+
+#define QTY_EPISODES		10		// Episodes 0 - 9
+#define QTY_MAPS_PER_EPISODE	11		// Maps 0 - 10
+
 typedef struct
 {
   unsigned char normal_exit_to_episode;
