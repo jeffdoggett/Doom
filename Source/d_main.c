@@ -2112,7 +2112,6 @@ void D_DoomMain (void)
 {
   unsigned int	p;
   wadfilelist_t * ptr;
-  map_starts_t *  map_info_p;
 
   respawnparm = (boolean) M_CheckParm ("-respawn");
   fastparm = (boolean) M_CheckParm ("-fast");
@@ -2273,13 +2272,8 @@ void D_DoomMain (void)
   // get skill / episode / map from parms
   startskill = sk_medium;
   startepisode = 1;
-  startmap = 0;
+  startmap = 1;
   autostart = false;
-
-  map_info_p = G_Access_MapStartTab (1);
-  startmap = map_info_p -> start_map;
-  if (gamemode != commercial)
-    startepisode = map_info_p -> start_episode;
 
   p = M_CheckParm ("-skill");
   if (p && p < myargc-1)
@@ -2295,7 +2289,7 @@ void D_DoomMain (void)
       startmap = 1;
       autostart = true;
   }
-
+  printf ("startmap = %u\n", startmap);
   p = M_CheckParm ("-timer");
   if (p && p < myargc-1 && deathmatch)
   {

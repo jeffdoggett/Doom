@@ -6884,6 +6884,10 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	    // printf ("Episode lump name = %s\n", buffer);
 	    M_SetEpiName (i, buffer, strlen(buffer)+1);
 	  }
+	  else
+	  {
+	    M_SetEpiName (i, NULL, 0);
+	  }
 
 	  Parse_CommaSeparatedQuotedText (buffer, &ptr);
 	  if (buffer[0])
@@ -6896,6 +6900,12 @@ static void Parse_UMapinfo (char * ptr, char * top)
 	      episode_names [i] = t;
 	      // printf ("Episode text name = %s\n", t);
 	    }
+	  }
+	  else
+	  {
+	    if (episode_names [i])
+	      free (episode_names [i]);
+	    episode_names [i] = NULL;
 	  }
 
 	  Parse_CommaSeparatedQuotedText (buffer, &ptr);

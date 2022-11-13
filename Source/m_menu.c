@@ -782,18 +782,25 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
     m_ptr = &EpisodeMenu [episode];
     lumpnum = m_ptr->namenum;
     // name = M_EPI5"  (ie has a trailing quote)
-    newname = malloc (len+1);
-    if (newname)
+    if (name == NULL)
     {
-      strncpy (newname, name, len);
-      newname [len] = 0;
-      if (strcasecmp (menu_lump_names[lumpnum], name) == 0)
+      menu_lump_names[lumpnum][0] = 0xFF;
+    }
+    else
+    {
+      newname = malloc (len+1);
+      if (newname)
       {
-	free (newname);		// No change - don't bother.
-      }
-      else
-      {
-	menu_lump_names[lumpnum] = newname;
+	strncpy (newname, name, len);
+	newname [len] = 0;
+	if (strcasecmp (menu_lump_names[lumpnum], name) == 0)
+	{
+	  free (newname);		// No change - don't bother.
+	}
+	else
+	{
+	  menu_lump_names[lumpnum] = newname;
+	}
       }
     }
   }
@@ -1311,6 +1318,26 @@ void M_DrawMainMenu(void)
 }
 
 /* ----------------------------------------------------------------------- */
+
+static int M_EpiListEmpty (void)
+{
+  unsigned int i;
+
+  if ((i = EpiDef.numitems) == 0)
+    return (1);
+
+  do
+  {
+    --i;
+    if ((episode_names [i] != NULL)
+     || (menu_lump_names[ML_EPI0+i][0] != 0xFF))
+      return (0);
+  } while (i);
+
+  return (1);
+}
+
+/* ----------------------------------------------------------------------- */
 //
 // M_NewGame
 //
@@ -1329,7 +1356,7 @@ void M_NewGame(int choice)
     }
 
 //  if ( gamemode == commercial )
-    if (EpiDef.numitems == 0)
+    if (M_EpiListEmpty ())
 	M_SetupNextMenu(&NewDef);
     else
 	M_SetupNextMenu(&EpiDef);
@@ -1535,7 +1562,7 @@ void M_FinishReadThis(int choice)
       sprintf (patchname, finale_backdrops[BG_HELPxx], ++helpscreennum);
       if (W_CheckNumForName (patchname) != -1)
       {
-        return;
+	return;
       }
       helpscreennum = 0;
     }
@@ -2535,6 +2562,7 @@ static void M_SetEpisodeMenuPos (void)
   unsigned int episode;
   char * str;
   menuitem_t * m_ptr;
+  map_starts_t *  map_info_p;
 
   episode = EpiDef.numitems;
 
@@ -2587,7 +2615,8 @@ static void M_SetEpisodeMenuPos (void)
       str = episode_names[episode_num [episode]];
       if (str != NULL)
 	printf (" (%s)", str);
-      putchar ('\n');
+      map_info_p = G_Access_MapStartTab (episode_num [episode]);
+      printf (" (%u,%u)\n", map_info_p->start_episode, map_info_p -> start_map);
       m_ptr++;
     } while (++episode < EpiDef.numitems);
   }
@@ -2615,7 +2644,7 @@ static void M_SetLoadSaveLumps (int menu_lump_num, int title_lump_num)
     menu_lump_names [menu_lump_num] = menu_lump_names [title_lump_num];
   }
   else if ((lumpinfo[0].handle == lumpinfo[title_lump].handle)  // If the title lump is in a PWAD then use it.
-        && (lumpinfo[0].handle != lumpinfo[menu_lump].handle))  // If the menu lump is in a PWAD then use it.
+	&& (lumpinfo[0].handle != lumpinfo[menu_lump].handle))  // If the menu lump is in a PWAD then use it.
   {
     menu_lump_names [title_lump_num] = menu_lump_names [menu_lump_num];
   }
