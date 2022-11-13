@@ -48,8 +48,6 @@
 //
 extern boolean	mapnameschanged;
 
-extern char ** HU_access_mapname (unsigned int episode, unsigned int map);
-extern char ** HU_access_mapname_E (unsigned int episode, unsigned int map);
 void HU_Init(void);
 void HU_Start(void);
 void HU_createWidgets (unsigned int update);

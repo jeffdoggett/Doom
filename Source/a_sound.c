@@ -201,6 +201,8 @@ extern muschangeinfo_t	muschangeinfo;
 
 extern void D_GetSaveGameFilename (char * dest);
 
+extern extramaps_t * extramaps_head;
+
 /* ------------------------------------------------------------ */
 
 /* Info about music playing */
@@ -984,11 +986,12 @@ static int Mus_AMP_playing (void)
 
 static int I_Validate_MusName (const char * musname)
 {
-  unsigned int i;
+  unsigned int i,j;
   musicinfo_t * sptr;
   map_dests_t * map_ptr;
   muschange_t * musc_ptr;
   clusterdefs_t * cluster;
+  extramaps_t * extra_maps;
 
   if (strncasecmp (musname, "D_", 2) == 0)
   {
@@ -1019,25 +1022,36 @@ static int I_Validate_MusName (const char * musname)
 
   /* Failed to find it in the standard tables - try the map tables */
 
-  i = 0;
-  map_ptr = G_Access_MapInfoTab_E (1,0);
+  i = 1;
   do
   {
-    if ((map_ptr -> music)
-     && (strcasecmp (map_ptr -> music, musname) == 0))
-      return (0);
-    map_ptr++;
-  } while (++i < (9*10));
+    j = 1;
+    do
+    {
+      map_ptr = G_Access_MapInfoTab_E (i,j);
+      if ((map_ptr -> music)
+       && (strcasecmp (map_ptr -> music, musname) == 0))
+	return (0);
+    } while (++j <= QTY_MAPS_PER_EPISODE);
+  } while (++i <= QTY_EPISODES);
 
-  i = 0;
-  map_ptr = G_Access_MapInfoTab_E (255,0);
+  i = 1;
   do
   {
+    map_ptr = G_Access_MapInfoTab_E (255,i);
     if ((map_ptr -> music)
      && (strcasecmp (map_ptr -> music, musname) == 0))
       return (0);
-    map_ptr++;
-  } while (++i < 100);
+  } while (++i <= 32);
+
+  extra_maps = extramaps_head;
+  while (extra_maps)
+  {
+    if ((extra_maps->mapdef.music)
+     && (strcasecmp (extra_maps->mapdef.music, musname) == 0))
+      return (0);
+    extra_maps = extra_maps->next;
+  }
 
   cluster = finale_clusterdefs_head;
   if (cluster)

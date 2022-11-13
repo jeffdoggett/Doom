@@ -38,8 +38,8 @@ typedef enum
 // GAME
 //
 
-#define QTY_EPISODES		10		// Episodes 0 - 9
-#define QTY_MAPS_PER_EPISODE	11		// Maps 0 - 10
+#define QTY_EPISODES		4		// Episodes 1 - 4
+#define QTY_MAPS_PER_EPISODE	9		// Maps 1 - 9
 
 typedef struct
 {
@@ -57,7 +57,8 @@ typedef struct
   unsigned char par_time_5;			// Par time divided by 5
   unsigned char	time_sucks;			// Par time for sucks in minutes
   fixed_t	skydelta;
-  char *	mapname;
+  char *	name;
+  char *	lumpname;
   char *	sky;
   char *	titlepatch;
   char *	enterpic;
@@ -65,6 +66,14 @@ typedef struct
   char *	bordertexture;
   char *	music;
 } map_dests_t;
+
+typedef struct extramaps_s
+{
+  unsigned char episode;
+  unsigned char map;
+  map_dests_t mapdef;
+  struct extramaps_s * next;
+} extramaps_t;
 
 typedef struct
 {
@@ -160,11 +169,13 @@ boolean G_Responder (event_t*	ev);
 
 void G_ScreenShot (void);
 
+map_dests_t * G_Find_Mapdef (unsigned int episode, unsigned int map);
 map_dests_t * G_Access_MapInfoTab (unsigned int episode, unsigned int map);
 map_dests_t * G_Access_MapInfoTab_E (unsigned int episode, unsigned int map);
 map_starts_t * G_Access_MapStartTab (unsigned int episode);
 map_starts_t * G_Access_MapStartTab_E (unsigned int episode);
 void G_MapName (char * name, int episode, int map);
+void G_MapName_E (char * name, int episode, int map);
 int G_MapLump (int episode, int map);
 void G_ParseMapSeq (char * filename, FILE * fin, int docheck);
 void G_ReadMapSeq (char * filename);
@@ -175,6 +186,9 @@ void dirname (char * dest, const char * path);
 unsigned int scan_dir (char * dirname, char * filename, boolean do_it, boolean allow_recurse);
 void G_Patch_Map (void);
 void G_Patch_Map_Things (int thingnumber, mapthing_t * mt);
+void G_InitMapNames (void);
+char ** G_AccessMapname (unsigned int episode, unsigned int map);
+char ** G_AccessMapname_E (unsigned int episode, unsigned int map);
 
 #endif
 //-----------------------------------------------------------------------------

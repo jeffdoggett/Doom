@@ -388,6 +388,8 @@ static void init_text_messages (void)
     *a_ptr++ = i_ptr -> action;
     i_ptr++;
   } while (--count);
+
+  G_InitMapNames ();
 }
 
 /* ----------------------------------------------------------- */
@@ -2125,9 +2127,9 @@ void D_DoomMain (void)
     deathmatch = 0;
 
   D_SetDebugOut ();
-  init_text_messages ();
   I_SetScreenSize ();
   IdentifyVersion ();
+  init_text_messages ();
 
   setbuf (stdout, NULL);
   modifiedgame = false;

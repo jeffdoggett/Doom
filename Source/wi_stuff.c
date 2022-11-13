@@ -1827,7 +1827,7 @@ static char * WI_GetMapName (int epi, int map)
   }
   else
   {
-    s = *(HU_access_mapname (epi, map));
+    s = *(G_AccessMapname (epi, map));
 
     if ((s == NULL) || (s[0] == 0))
       return (NULL);

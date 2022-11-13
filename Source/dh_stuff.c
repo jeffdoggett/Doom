@@ -140,6 +140,8 @@ boolean	 dh_changing_pwad = false;
 //extern map_dests_t * G_Access_MapInfoTab_E (unsigned int episode, unsigned int map);
 // static void DH_DetectPwads (void);
 
+extern extramaps_t * extramaps_head;
+
 /* ---------------------------------------------------------------------------- */
 /* Put some pointers in for DeHackEd to follow */
 /* Doesn't work as the compiler puts them in the data segment */
@@ -922,7 +924,7 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "FRIEND",		M_FRIEND},		// a friend of the player(s) (MBF)
   { "TRANSLUCENT",	M_TRANSLUCENT},		// apply translucency to sprite (BOOM)
 
-  { "BOSS", 		M2_MASSACRE+32+1}	// Unused bit
+  { "BOSS",		M2_MASSACRE+32+1}	// Unused bit
 };
 
 /* ---------------------------------------------------------------------------- */
@@ -2602,7 +2604,7 @@ static void write_all_texts (FILE * fout)
     map = 1;
     do
     {
-      s = *(HU_access_mapname_E (episode,map));
+      s = *(G_AccessMapname_E (episode,map));
       if ((s) && (*s))
       {
 	write_a_text_msg (fout, s, counter);
@@ -2614,14 +2616,14 @@ static void write_all_texts (FILE * fout)
   map = 1;
   do
   {
-    s = *(HU_access_mapname_E (255,map));
+    s = *(G_AccessMapname_E (255,map));
     if ((s) && (*s))
     {
       write_a_text_msg (fout, s, counter);
       counter++;
     }
   } while (++map < 33);
-
+#if 0
   map = 1;
   do
   {
@@ -2643,7 +2645,7 @@ static void write_all_texts (FILE * fout)
       counter++;
     }
   } while (++map < 33);
-
+#endif
   counter = write_a_text_bank (fout, (const char **)finale_messages, counter);
   counter = write_a_text_bank (fout, (const char **)finale_backdrops, counter);
   counter = write_a_text_bank (fout, (const char **)got_messages, counter);
@@ -2679,9 +2681,7 @@ static unsigned int replace_text_levelx (char * orig, char * newt)
   if ((dh_strcmp (orig, "level ") == 0)
    && ((n = atoi (&orig[6])) < 100))
   {
-    *(HU_access_mapname_E (255, n)) = newt;
-    *(HU_access_mapname_E (254, n)) = newt; // Do TNT and Plutonia as well for completeness...
-    *(HU_access_mapname_E (253, n)) = newt;
+    *(G_AccessMapname_E (255, n)) = newt;
     mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
     return (0);
   }
@@ -2703,7 +2703,7 @@ static unsigned int replace_text_exmx (char * orig, char * newt)
    && (orig[3] <= '9')
    && (orig[4] == ':'))
   {
-    *(HU_access_mapname_E (orig[1]-'0', orig[3]-'0')) = newt;
+    *(G_AccessMapname_E (orig[1]-'0', orig[3]-'0')) = newt;
     mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
     return (0);
   }
@@ -2968,6 +2968,7 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
   unsigned int map;
   const char * pp;
   map_dests_t * map_dests_ptr;
+  extramaps_t * extra_maps;
 
   pp = NULL;
 
@@ -3009,7 +3010,7 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
   episode = 1;
   do
   {
-    map = 0;
+    map = 1;
     do
     {
       map_dests_ptr = G_Access_MapInfoTab_E (episode, map);
@@ -3026,10 +3027,10 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
 	if (pp == map_dests_ptr -> bordertexture)
 	  map_dests_ptr -> bordertexture = newt;
       }
-    } while (++map < 10);
-  } while (++episode < 10);
+    } while (++map <= QTY_EPISODES);
+  } while (++episode <= QTY_MAPS_PER_EPISODE);
 
-  map = 0;
+  map = 1;
   do
   {
     map_dests_ptr = G_Access_MapInfoTab_E (255, map);
@@ -3046,7 +3047,23 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
       if (pp == map_dests_ptr -> bordertexture)
 	map_dests_ptr -> bordertexture = newt;
     }
-  } while (++map < 100);
+  } while (++map <= 32);
+
+  extra_maps = extramaps_head;
+  while (extra_maps)
+  {
+    if (pp == extra_maps->mapdef.sky)
+      extra_maps->mapdef.sky = newt;
+    if (pp == extra_maps->mapdef.titlepatch)
+      extra_maps->mapdef.titlepatch = newt;
+    if (pp == extra_maps->mapdef.enterpic)
+      extra_maps->mapdef.enterpic = newt;
+    if (pp == extra_maps->mapdef.exitpic)
+      extra_maps->mapdef.exitpic = newt;
+    if (pp == extra_maps->mapdef.bordertexture)
+      extra_maps->mapdef.bordertexture = newt;
+    extra_maps = extra_maps->next;
+  }
 
   return (0);
 }
@@ -3313,7 +3330,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     unsigned int map;
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
     read_map_num (&episode, &map, ttext+6);
-    return (HU_access_mapname_E (episode, map));
+    return (G_AccessMapname_E (episode, map));
   }
 
   if ((strncasecmp (ttext, "HUSTR_", 6) == 0)
@@ -3322,9 +3339,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
     counter1 = atoi (ttext+6);
-    return (HU_access_mapname_E (255, counter1));
-//  return (HU_access_mapname_E (254, counter1));
-//  return (HU_access_mapname_E (253, counter1)); // Do TNT and Plutonia as well for completeness...
+    return (G_AccessMapname_E (255, counter1));
   }
 
   if ((strncasecmp (ttext, "PHUSTR_", 7) == 0)
@@ -3333,7 +3348,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
     counter1 = atoi (ttext+7);
-    return (HU_access_mapname_E (254, counter1));
+    return (G_AccessMapname_E (254, counter1));
   }
 
   if ((strncasecmp (ttext, "THUSTR_", 7) == 0)
@@ -3342,7 +3357,7 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
   {
     mapnameschanged = (boolean)((int)mapnameschanged|(int)Changing);
     counter1 = atoi (ttext+7);
-    return (HU_access_mapname_E (253, counter1));
+    return (G_AccessMapname_E (253, counter1));
   }
 
   if (strncasecmp (ttext, "STARTUP", 7) == 0)
@@ -3950,29 +3965,37 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      unsigned int ptime;
 	      map_dests_t * mapd_ptr;
 
+	      // Freedoom has both par times in the dehacked file, so need to
+	      // work out what we are doing by counting the args.
+
+	      string1 = strchr (a_line, '#');
+	      if (string1)
+		*string1 = 0;
+
 	      string1 = next_arg (a_line);
-	      while (((cc = *string1) != 0) && ((cc < '0') || (cc > '9'))) string1++;
-	      if (gamemode == commercial)
+	      counter1 = atoi (string1);
+
+	      string1 = next_arg (string1);
+	      counter2 = atoi (string1);
+
+	      string1 = next_arg (string1);
+	      if (*string1 == 0)
 	      {
+		ptime = counter2;
+		counter2 = counter1;
 		counter1 = 255;
 	      }
 	      else
 	      {
-		counter1 = atoi (string1);
-		while (((cc = *string1) >= '0') && (cc <= '9')) string1++;
-		while (((cc = *string1) != 0) && ((cc < '0') || (cc > '9'))) string1++;
+		ptime = atoi (string1);
 	      }
-	      counter2 = atoi (string1);
 
-	      mapd_ptr = G_Access_MapInfoTab_E (counter1, counter2);
-	      string1 = next_arg (string1);
-	      while (((cc = *string1) != 0) && ((cc < '0') || (cc > '9'))) string1++;
-	      ptime = atoi (string1);
 	      while (((cc = *string1) >= '0') && (cc <= '9')) string1++;
 	      if (*string1 == ':')
 		ptime=(ptime*60)+atoi(string1+1);
 	      ptime = (ptime + 4) / 5;
 	      if (ptime > 255) ptime = 255;
+	      mapd_ptr = G_Access_MapInfoTab_E (counter1, counter2);
 	      mapd_ptr -> par_time_5 = ptime;
 	      // printf ("Par %u,%u = %u (%u)\n", counter1, counter2,mapd_ptr -> par_time_5,ptime*5);
 	      par_changed = (boolean)((int)par_changed|(int)dh_changing_pwad);
@@ -4288,7 +4311,7 @@ static char * read_map_num (unsigned int * episode, unsigned int * map, char * p
     {
       case 'e':
       case 'E':
-        ++ptr;
+	++ptr;
 	*episode = atoi (ptr);
 	while (((cc = *ptr) >= '0') && (cc <= '9'))
 	  ++ptr;
@@ -4654,10 +4677,14 @@ static void show_boss_action (void)
 static void show_map_dests (map_dests_t * map_ptr)
 {
   double skydelta;
+  char * mapname;
   char * sky;
   char * titlepatch;
   char * music;
 
+  mapname = map_ptr -> name;
+  if (mapname == NULL)
+    mapname = "";
 
   sky = map_ptr -> sky;
   if (sky == NULL)
@@ -4675,7 +4702,7 @@ static void show_map_dests (map_dests_t * map_ptr)
   if (map_ptr -> skydelta)
     skydelta = -(((double)map_ptr -> skydelta) / 256);
 
-  printf ("%u,%u %u,%u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
+  printf ("%u,%u %u,%u %u %u %u %2u %u %3u %u %.2f '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'\n",
 	map_ptr -> normal_exit_to_episode,
 	map_ptr -> normal_exit_to_map,
 	map_ptr -> secret_exit_to_episode,
@@ -4688,7 +4715,8 @@ static void show_map_dests (map_dests_t * map_ptr)
 	map_ptr -> par_time_5 * 5,			// Par time divided by 5
 	map_ptr -> time_sucks,
 	skydelta,
-	map_ptr -> mapname,
+	mapname,
+	map_ptr -> lumpname,
 	sky, titlepatch,
 	map_ptr -> enterpic,
 	map_ptr -> exitpic,
@@ -4762,6 +4790,7 @@ void DH_remove_duplicate_mapinfos (void)
   bossdeath_t * bd_ptr;
   bossdeath_t * bd_ptr_1;
   map_dests_t * map_ptr;
+  extramaps_t * extra_maps;
 
 
   bd_ptr = boss_death_actions_head;
@@ -4835,26 +4864,43 @@ void DH_remove_duplicate_mapinfos (void)
   {
     putchar ('\n');
 
-    i = 0;
-    do
+    extra_maps = extramaps_head;
+    while (extra_maps)
     {
-      j = 0;
+      if (extra_maps->episode == 255)
+	printf ("Map%02u:", extra_maps->map);
+      else
+	printf ("E%uM%u:", extra_maps->episode, extra_maps->map);
+      show_map_dests (&extra_maps->mapdef);
+      extra_maps = extra_maps->next;
+    }
+
+    if (gamemode != commercial)
+    {
+      i = 1;
       do
       {
-	map_ptr = G_Access_MapInfoTab_E (i,j);
-	printf ("E%uM%u:", i,j);
-	show_map_dests (map_ptr);
-      } while (++j < QTY_MAPS_PER_EPISODE);
-    } while (++i < QTY_EPISODES);
-
-    i = 0;
-    map_ptr = G_Access_MapInfoTab_E (255,0);
-    do
+	j = 1;
+	do
+	{
+	  map_ptr = G_Access_MapInfoTab_E (i,j);
+	  printf ("E%uM%u:", i,j);
+	  show_map_dests (map_ptr);
+	} while (++j <= QTY_MAPS_PER_EPISODE);
+      } while (++i <= QTY_EPISODES);
+    }
+    else
     {
-      printf ("Map%02u:", i);
-      show_map_dests (map_ptr);
-      map_ptr++;
-    } while (++i < 100);
+      i = 1;
+      map_ptr = G_Access_MapInfoTab_E (255,i);
+      do
+      {
+	printf ("Map%02u:", i);
+	show_map_dests (map_ptr);
+	map_ptr++;
+      } while (++i <= 32);
+    }
+    putchar ('\n');
   }
   if (M_CheckParm ("-showcastlist"))
   {
@@ -4974,8 +5020,8 @@ static char * set_enter_exit_text (char * ptr, unsigned int doexit, unsigned int
       cc = ptr[l];
       if (cc == '\"')
       {
-        ptr += l;
-        break;
+	ptr += l;
+	break;
       }
       ++l;
     } while (cc < '0');
@@ -5098,7 +5144,7 @@ static void replace_map_name (const char * ptr, unsigned int episode, unsigned i
     buf1 [pos++] = cc;
   } while (cc);
 
-  G_MapName (buf2, episode, map);
+  G_MapName_E (buf2, episode, map);
 
   if (strcasecmp (buf1, buf2))
   {
@@ -5106,7 +5152,7 @@ static void replace_map_name (const char * ptr, unsigned int episode, unsigned i
     if (newname)
     {
       mdest_ptr = G_Access_MapInfoTab_E (episode, map);
-      mdest_ptr -> mapname = newname;
+      mdest_ptr -> lumpname = newname;
       // printf ("Mapname changed to %s\n", newname);
     }
   }
@@ -5268,7 +5314,7 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 //  time_sucks;			// Par time for sucks in minutes
 
   if (msource_ptr->skydelta != 0x7FFFFFFF)		mdest_ptr->skydelta = msource_ptr->skydelta;
-  if ((ptr = msource_ptr->mapname) != NULL)		mdest_ptr->mapname = ptr;
+  if ((ptr = msource_ptr->lumpname) != NULL)		mdest_ptr->lumpname = ptr;
   if ((ptr = msource_ptr->sky) != NULL)			mdest_ptr->sky = ptr;
   if ((ptr = msource_ptr->titlepatch) != NULL)		mdest_ptr->titlepatch = ptr;
   if ((ptr = msource_ptr->enterpic) != NULL)		mdest_ptr->enterpic = ptr;
@@ -5295,7 +5341,7 @@ static void set_map_name (unsigned int episode, unsigned int map, char * ptr)
       j = sprintf (newtext, "E%dM%d: ", episode, map);
       strcpy (newtext+j, ptr);
       dh_remove_americanisms (newtext);
-      *(HU_access_mapname_E (episode,map)) = newtext;
+      *(G_AccessMapname_E (episode,map)) = newtext;
       mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
     }
   }
@@ -5311,9 +5357,7 @@ static void set_map_name (unsigned int episode, unsigned int map, char * ptr)
 	j = sprintf (newtext, "Level %d: ", map);
       strcpy (newtext+j, ptr);
       dh_remove_americanisms (newtext);
-      *(HU_access_mapname_E (255,map)) = newtext;
-      *(HU_access_mapname_E (254,map)) = newtext;	// Do TNT and Plutonia as well for completeness...
-      *(HU_access_mapname_E (253,map)) = newtext;
+      *(G_AccessMapname_E (255,map)) = newtext;
       mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
     }
   }
@@ -5342,7 +5386,7 @@ static void set_map_label (unsigned int episode, unsigned int map, char * ptr)
 
   do
   {
-    map_ptr = HU_access_mapname_E (e1,map);
+    map_ptr = G_AccessMapname_E (e1,map);
     oldtext = *map_ptr;
     pos = strstr (oldtext, ": ");
     if (pos)
@@ -5350,9 +5394,9 @@ static void set_map_label (unsigned int episode, unsigned int map, char * ptr)
       newtext = malloc (strlen (ptr) + strlen (pos) + 6);
       if (newtext)
       {
-        if (ptr[0] == 0)
-          strcpy (newtext, pos + 2);
-        else
+	if (ptr[0] == 0)
+	  strcpy (newtext, pos + 2);
+	else
 	  sprintf (newtext, "%s: %s", ptr, pos + 2);
 	dh_remove_americanisms (newtext);
 	*map_ptr = newtext;
@@ -5509,7 +5553,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	      strncpy (newtext+j, ptr+i, l);
 	      newtext [l+j-1] = 0;
 	      dh_remove_americanisms (newtext);
-	      *(HU_access_mapname_E (episode,map)) = newtext;
+	      *(G_AccessMapname_E (episode,map)) = newtext;
 	      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
 	    }
 	  }
@@ -5526,9 +5570,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 	      strncpy (newtext+j, ptr+i, l);
 	      newtext [l+j-1] = 0;
 	      dh_remove_americanisms (newtext);
-	      *(HU_access_mapname_E (255,map)) = newtext;
-	      *(HU_access_mapname_E (254,map)) = newtext;	// Do TNT and Plutonia as well for completeness...
-	      *(HU_access_mapname_E (253,map)) = newtext;
+	      *(G_AccessMapname_E (255,map)) = newtext;
 	      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
 	    }
 	  }
@@ -5743,7 +5785,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 
       if (doing_default)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	default_mapinfo.enterpic = mdest_ptr->enterpic;
 	mdest_ptr = &default_mapinfo;
       }
@@ -5759,7 +5801,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       if (doing_default)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	default_mapinfo.exitpic = mdest_ptr->exitpic;
 	mdest_ptr = &default_mapinfo;
       }
@@ -5774,7 +5816,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       if (doing_default)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	default_mapinfo.enterpic = mdest_ptr->enterpic;
 	default_mapinfo.exitpic = mdest_ptr->exitpic;
 	mdest_ptr = &default_mapinfo;
@@ -5791,7 +5833,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
     {
       if (doing_default)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	default_mapinfo.bordertexture = mdest_ptr->bordertexture;
 	mdest_ptr = &default_mapinfo;
       }
@@ -5816,7 +5858,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 
 	if (doing_default)
 	{
-	  mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	  mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	  default_mapinfo.music = mdest_ptr->music;
 	  mdest_ptr = &default_mapinfo;
 	}
@@ -5878,7 +5920,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
 
       if (doing_default)
       {
-	mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	default_mapinfo.sky = mdest_ptr->sky;
 	default_mapinfo.skydelta = mdest_ptr->skydelta;
 	mdest_ptr = &default_mapinfo;
@@ -6050,7 +6092,7 @@ static void Parse_Mapinfo (char * ptr, char * top, boolean inwad)
       {
 	if (doing_default)
 	{
-	  mdest_ptr = G_Access_MapInfoTab_E (255, 0);
+	  mdest_ptr = G_Access_MapInfoTab_E (255, 1);
 	  default_mapinfo.cluster = mdest_ptr->cluster;
 	  mdest_ptr = &default_mapinfo;
 	}
@@ -6251,7 +6293,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	  strncpy (newtext+j, ptr, l);
 	  newtext [l+j] = 0;
 	  dh_remove_americanisms (newtext);
-	  *(HU_access_mapname_E (episode,map)) = newtext;
+	  *(G_AccessMapname_E (episode,map)) = newtext;
 	  mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
 	}
       }
@@ -6268,9 +6310,7 @@ static void Parse_IndivMapinfo (char * ptr, char * top, unsigned int episode, un
 	  strncpy (newtext+j, ptr, l);
 	  newtext [l+j] = 0;
 	  dh_remove_americanisms (newtext);
-	  *(HU_access_mapname_E (255,map)) = newtext;
-	  *(HU_access_mapname_E (254,map)) = newtext;	// Do TNT and Plutonia as well for completeness...
-	  *(HU_access_mapname_E (253,map)) = newtext;
+	  *(G_AccessMapname_E (255,map)) = newtext;
 	  mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
 	  // printf ("Mapname %u changed to %s\n", map, newtext);
 	}
@@ -6619,7 +6659,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
   static unsigned int intertext = 0;
 
   episode = 255;
-  map = 0;
+  map = 1;
   mdest_ptr = G_Access_MapInfoTab_E (episode, map);
 
   do
@@ -7064,6 +7104,7 @@ void Load_Mapinfo (void)
   char * ptr;
   char * top;
   map_dests_t * mptr;
+  extramaps_t * extra_maps;
   char mapname [12];
 
   foundmapinfo = 0;
@@ -7087,6 +7128,10 @@ void Load_Mapinfo (void)
 	  ptr = malloc (W_LumpLength (lump) + 4);
 	  if (ptr)
 	  {
+	    if (M_CheckParm ("-showmaptables"))
+	    {
+	      printf ("Reading %0.8s\n", lumpinfo[lump].name);
+	    }
 	    W_ReadLump (lump, ptr);
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
@@ -7120,6 +7165,10 @@ void Load_Mapinfo (void)
 	  ptr = malloc (W_LumpLength (lump) + 4);	// Allow extra because some mapinfos lack a trailing CR/LF
 	  if (ptr)
 	  {
+	    if (M_CheckParm ("-showmaptables"))
+	    {
+	      printf ("Reading %0.8s\n", lumpinfo[lump].name);
+	    }
 	    W_ReadLump (lump, ptr);
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';
@@ -7133,11 +7182,11 @@ void Load_Mapinfo (void)
 
   // CodLev.wad has individual mapinfos.
 
-  map = 0;
+  map = 1;
   do
   {
     mptr = G_Access_MapInfoTab_E (255, map);
-    sprintf (mapname, mptr -> mapname, map);
+    sprintf (mapname, mptr -> lumpname, map);
     lump = W_CheckNumForName (mapname);
     if (lump != -1)
     {
@@ -7149,6 +7198,10 @@ void Load_Mapinfo (void)
 	ptr = malloc (W_LumpLength (lump) + 4);
 	if (ptr)
 	{
+	  if (M_CheckParm ("-showmaptables"))
+	  {
+	    printf ("Reading %0.8s\n", mapname);
+	  }
 	  W_ReadLump (lump, ptr);
 	  top = ptr + W_LumpLength (lump);
 	  *top++ = '\n';
@@ -7157,16 +7210,16 @@ void Load_Mapinfo (void)
 	}
       }
     }
-  } while (++map < 100);
+  } while (++map < 32);
 
-  episode = 0;
+  episode = 1;
   do
   {
-    map = 0;
+    map = 1;
     do
     {
       mptr = G_Access_MapInfoTab_E (episode, map);
-      sprintf (mapname, mptr -> mapname, episode, map);
+      sprintf (mapname, mptr -> lumpname, episode, map);
       lump = W_CheckNumForName (mapname);
       if (lump != -1)
       {
@@ -7178,6 +7231,10 @@ void Load_Mapinfo (void)
 	  ptr = malloc (W_LumpLength (lump) + 4);
 	  if (ptr)
 	  {
+	    if (M_CheckParm ("-showmaptables"))
+	    {
+	      printf ("Reading %0.8s\n", mapname);
+	    }
 	    W_ReadLump (lump, ptr);
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';
@@ -7186,8 +7243,41 @@ void Load_Mapinfo (void)
 	  }
 	}
       }
-    } while (++map < 10);
-  } while (++episode < 10);
+    } while (++map <= QTY_MAPS_PER_EPISODE);
+  } while (++episode <= QTY_EPISODES);
+
+  extra_maps = extramaps_head;
+  while (extra_maps)
+  {
+    episode = extra_maps->episode;
+    map = extra_maps->map;
+    mptr = &extra_maps->mapdef;
+    sprintf (mapname, mptr -> lumpname, episode, map);
+    lump = W_CheckNumForName (mapname);
+    if (lump != -1)
+    {
+      length = W_LumpLength (lump);
+      if (length)
+      {
+	dh_changing_pwad = (boolean) !W_SameWadfile (0, lump);
+	foundmapinfo = 3;
+	ptr = malloc (W_LumpLength (lump) + 4);
+	if (ptr)
+	{
+	  if (M_CheckParm ("-showmaptables"))
+	  {
+	    printf ("Reading %0.8s\n", mapname);
+	  }
+	  W_ReadLump (lump, ptr);
+	  top = ptr + W_LumpLength (lump);
+	  *top++ = '\n';
+	  Parse_IndivMapinfo (ptr, top, episode, map);
+	  free (ptr);
+	}
+      }
+    }
+    extra_maps = extra_maps->next;
+  }
 
   // The EMAPINFO appears to be a poor mans version of the others.
 
@@ -7211,6 +7301,10 @@ void Load_Mapinfo (void)
 	  ptr = malloc (W_LumpLength (lump) + 4);
 	  if (ptr)
 	  {
+	    if (M_CheckParm ("-showmaptables"))
+	    {
+	      printf ("Reading %0.8s\n", lumpinfo[lump].name);
+	    }
 	    W_ReadLump (lump, ptr);
 	    top = ptr + W_LumpLength (lump);
 	    *top++ = '\n';				// Add a guard line feed (needed for rf_1024.wad)
