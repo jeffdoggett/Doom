@@ -2289,7 +2289,7 @@ void D_DoomMain (void)
       startmap = 1;
       autostart = true;
   }
-  printf ("startmap = %u\n", startmap);
+
   p = M_CheckParm ("-timer");
   if (p && p < myargc-1 && deathmatch)
   {
