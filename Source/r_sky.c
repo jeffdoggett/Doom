@@ -51,6 +51,21 @@ const char sky_6 [] = "SKY6";
 const char sky_7 [] = "SKY7";
 const char sky_8 [] = "SKY8";
 const char sky_9 [] = "SKY9";
+
+const char * const skies [10] =
+{
+  sky_0,
+  sky_1,
+  sky_2,
+  sky_3,
+  sky_4,
+  sky_5,
+  sky_6,
+  sky_7,
+  sky_8,
+  sky_9
+};
+
 extern char * finale_backdrops[];
 
 typedef struct skypatch_s
@@ -255,7 +270,7 @@ static int check_skytexture (const char * skyname)
 
 static int load_skytexture (map_dests_t * map_info_p)
 {
-  int i;
+  int i,s;
 
   if (M_CheckParm ("-usedefaultsky") == 0)
   {
@@ -282,58 +297,16 @@ static int load_skytexture (map_dests_t * map_info_p)
   // depending on the current episode, and the game version.
 
   // Work backwards 'till we get one.
-  switch (gameepisode)
+
+  s = gameepisode;
+  do
   {
-    default:
-      i = check_skytexture (sky_9);
-      if (i != -1)
-	return (i);
+    i = check_skytexture (skies[s]);
+    if (i != -1)
+      return (i);
+  } while (--s >= 0);
 
-    case 8:
-      i = check_skytexture (sky_8);
-      if (i != -1)
-	return (i);
-
-    case 7:
-      i = check_skytexture (sky_7);
-      if (i != -1)
-	return (i);
-
-    case 6:
-      i = check_skytexture (sky_6);
-      if (i != -1)
-	return (i);
-
-    case 5:
-      i = check_skytexture (sky_5);
-      if (i != -1)
-	return (i);
-
-    case 4:
-      i = check_skytexture (sky_4);
-      if (i != -1)
-	return (i);
-
-    case 3:
-      i = check_skytexture (sky_3);
-      if (i != -1)
-	return (i);
-
-    case 2:
-      i = check_skytexture (sky_2);
-      if (i != -1)
-	return (i);
-
-    case 1:
-      return (check_skytexture (sky_1));	// Error if this fails!
-
-    case 0:
-      i = check_skytexture (sky_0);
-      if (i != -1)
-	return (i);
-
-      return (check_skytexture (sky_1));	// Error if this fails!
-  }
+  return (check_skytexture (sky_1));	// Error if this fails!
 }
 
 /* -------------------------------------------------------------------------------------------- */

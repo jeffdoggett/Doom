@@ -48,6 +48,7 @@ extern const char sky_6 [];
 extern const char sky_7 [];
 extern const char sky_8 [];
 extern const char sky_9 [];
+extern const char * const skies [10];
 
 void R_InitSkyMap (map_dests_t * map_info_p);
 void R_InitSkyMapScale (void);

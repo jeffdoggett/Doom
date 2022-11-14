@@ -259,15 +259,15 @@ static map_dests_t next_level_tab_1 [QTY_EPISODES][QTY_MAPS_PER_EPISODE] =
 
 static map_dests_t next_level_tab_2 [] =
 {//  x   M   x    M   S  R  I  C  N  T   Par  Suk  Name, Sky
-  { 255,  2, 255, 31, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, HUSTR_1, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 01
-  { 255,  3, 255, 31, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, HUSTR_2, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 02
-  { 255,  4, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_3, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 03
-  { 255,  5, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_4, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 04
-  { 255,  6, 255, 31, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, HUSTR_5, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 05
-  { 255,  7, 255, 31, 0, 0, 1, 0, 0, 0, 150/5, 60, 0, HUSTR_6, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 06
-  { 255,  8, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_7, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 07
-  { 255,  9, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_8, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 08
-  { 255, 10, 255, 31, 0, 0, 0, 0, 0, 0, 270/5, 60, 0, HUSTR_9, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 09
+  { 255,  2, 255, 31, 0, 0, 0, 0, 0, 0,  30/5, 60, 0, HUSTR_1,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 01
+  { 255,  3, 255, 31, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, HUSTR_2,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 02
+  { 255,  4, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_3,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 03
+  { 255,  5, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_4,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 04
+  { 255,  6, 255, 31, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, HUSTR_5,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 05
+  { 255,  7, 255, 31, 0, 0, 1, 0, 0, 0, 150/5, 60, 0, HUSTR_6,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 06
+  { 255,  8, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_7,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 07
+  { 255,  9, 255, 31, 0, 0, 0, 0, 0, 0, 120/5, 60, 0, HUSTR_8,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 08
+  { 255, 10, 255, 31, 0, 0, 0, 0, 0, 0, 270/5, 60, 0, HUSTR_9,  (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 09
   { 255, 11, 255, 31, 0, 0, 0, 0, 0, 0,  90/5, 60, 0, HUSTR_10, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 10
   { 255, 12, 255, 31, 0, 0, 2, 0, 0, 0, 210/5, 60, 0, HUSTR_11, (char*) lumpname_2, (char*) sky_1, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 11
   { 255, 13, 255, 31, 0, 0, 0, 0, 0, 0, 150/5, 60, 0, HUSTR_12, (char*) lumpname_2, (char*) sky_2, (char*) cwilv, (char*) enterpic_2, (char*) enterpic_2, (char*) borderpatch_2, NULL },	// Map 12
@@ -400,7 +400,7 @@ static map_starts_t start_doom2_tab [] =
 
 /* -------------------------------------------------------------------------------------------- */
 /*
-   We need to copy the mapnames for plutionia and tnt.
+   We need to copy the mapnames for plutonia and tnt.
 */
 
 void G_InitMapNames (void)
@@ -418,6 +418,7 @@ void G_InitMapNames (void)
     case pack_plut:
       mapnames = mapnamesp;
       break;
+
     case pack_tnt:
       mapnames = mapnamest;
       break;
@@ -479,6 +480,7 @@ map_dests_t * G_Access_MapInfoTab (unsigned int episode, unsigned int map)
 
 map_dests_t * G_Access_MapInfoTab_E (unsigned int episode, unsigned int map)
 {
+  unsigned int s;
   map_dests_t * ptr;
   extramaps_t * extra_map;
 
@@ -510,39 +512,10 @@ map_dests_t * G_Access_MapInfoTab_E (unsigned int episode, unsigned int map)
   if (episode != 255)
   {
     ptr->lumpname = (char*)lumpname_1;
-    switch (episode)
-    {
-      case 0:
-	ptr->sky = (char*)sky_0;
-	break;
-      case 1:
-	ptr->sky = (char*)sky_1;
-	break;
-      case 2:
-	ptr->sky = (char*)sky_2;
-	break;
-      case 3:
-	ptr->sky = (char*)sky_3;
-	break;
-      case 4:
-	ptr->sky = (char*)sky_4;
-	break;
-      case 5:
-	ptr->sky = (char*)sky_5;
-	break;
-      case 6:
-	ptr->sky = (char*)sky_6;
-	break;
-      case 7:
-	ptr->sky = (char*)sky_7;
-	break;
-      case 8:
-	ptr->sky = (char*)sky_8;
-	break;
-      default:
-	ptr->sky = (char*)sky_9;
-	break;
-    }
+    s = episode;
+    if (s >= ARRAY_SIZE(skies))
+      s = ARRAY_SIZE(skies) - 1;
+    ptr->sky = (char*)skies[s];
     ptr->titlepatch = (char*)wilv;
     ptr->enterpic = (char*)enterpic_2;
     ptr->exitpic = (char*)enterpic_2;

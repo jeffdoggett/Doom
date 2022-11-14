@@ -2964,35 +2964,17 @@ static unsigned int replace_saveg_text (char * orig, char * newt)
 
 static unsigned int replace_maptable_text (char * orig, char * newt)
 {
+  unsigned int s;
   unsigned int episode;
   unsigned int map;
   const char * pp;
+  const char * pq;
   map_dests_t * map_dests_ptr;
   extramaps_t * extra_maps;
 
   pp = NULL;
 
-  if (strcasecmp (orig, sky_0) == 0)
-    pp = sky_0;
-  else if (strcasecmp (orig, sky_1) == 0)
-    pp = sky_1;
-  else if (strcasecmp (orig, sky_2) == 0)
-    pp = sky_2;
-  else if (strcasecmp (orig, sky_3) == 0)
-    pp = sky_3;
-  else if (strcasecmp (orig, sky_4) == 0)
-    pp = sky_4;
-  else if (strcasecmp (orig, sky_5) == 0)
-    pp = sky_5;
-  else if (strcasecmp (orig, sky_6) == 0)
-    pp = sky_6;
-  else if (strcasecmp (orig, sky_7) == 0)
-    pp = sky_7;
-  else if (strcasecmp (orig, sky_8) == 0)
-    pp = sky_8;
-  else if (strcasecmp (orig, sky_9) == 0)
-    pp = sky_9;
-  else if (strcasecmp (orig, wilv) == 0)
+  if (strcasecmp (orig, wilv) == 0)
     pp = wilv;
   else if (strcasecmp (orig, cwilv) == 0)
     pp = cwilv;
@@ -3005,7 +2987,21 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
   else if (strcasecmp (orig, borderpatch_2) == 0)
     pp = borderpatch_2;
   else
-    return (1);
+  {
+    s = ARRAY_SIZE(skies);
+    do
+    {
+      --s;
+      pq = skies[s];
+      if (strcasecmp (orig, pq) == 0)
+      {
+        pp = pq;
+        break;
+      }
+      if (s == 0)
+	return (1);
+    } while (1);
+  }
 
   episode = 1;
   do
