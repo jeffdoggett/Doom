@@ -1319,20 +1319,19 @@ void M_DrawMainMenu(void)
 
 /* ----------------------------------------------------------------------- */
 
-static int M_EpiListEmpty (void)
+static inline int M_EpiListEmpty (void)
 {
   unsigned int i;
 
   if ((i = EpiDef.numitems) == 0)
     return (1);
 
-  do
-  {
-    --i;
-    if ((episode_names [i] != NULL)
-     || (menu_lump_names[ML_EPI0+i][0] != 0xFF))
-      return (0);
-  } while (i);
+  if (i > 1)
+    return (0);
+
+  if ((episode_names [0] != NULL)
+   || (menu_lump_names[ML_EPI0][0] != 0xFF))
+    return (0);
 
   return (1);
 }
