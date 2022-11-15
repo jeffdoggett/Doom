@@ -1318,25 +1318,6 @@ void M_DrawMainMenu(void)
 }
 
 /* ----------------------------------------------------------------------- */
-
-static inline int M_EpiListEmpty (void)
-{
-  unsigned int i;
-
-  if ((i = EpiDef.numitems) == 0)
-    return (1);
-
-  if (i > 1)
-    return (0);
-
-  if ((episode_names [0] != NULL)
-   || (menu_lump_names[ML_EPI0][0] != 0xFF))
-    return (0);
-
-  return (1);
-}
-
-/* ----------------------------------------------------------------------- */
 //
 // M_NewGame
 //
@@ -1355,7 +1336,7 @@ void M_NewGame(int choice)
     }
 
 //  if ( gamemode == commercial )
-    if (M_EpiListEmpty ())
+    if (EpiDef.numitems < 2)
 	M_SetupNextMenu(&NewDef);
     else
 	M_SetupNextMenu(&EpiDef);

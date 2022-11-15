@@ -5323,40 +5323,35 @@ static void WriteDefaultMapInfo (unsigned int episode, unsigned int map, map_des
 
 static void set_map_name (unsigned int episode, unsigned int map, char * ptr)
 {
+  char cc;
   char * newtext;
   unsigned int j;
   unsigned int len;
 
   len = strlen (ptr);
+  newtext = malloc (len+20);
+  if (newtext == NULL)
+    return;
 
-  if (episode != 255)
+  j = dh_inchar (ptr, ':');	// Do not prepend "Level xx:" if there appears
+  if ((j >= 5) && (j <= 10)	// to be an xx: already there.
+   && ((cc = ptr[j-2]) >= '0')
+   && (cc <= '9'))
   {
-    newtext = malloc (len+16);	// +6 for the "ExMx: " and +10 for the american/british conv
-    if (newtext)
-    {
-      j = sprintf (newtext, "E%dM%d: ", episode, map);
-      strcpy (newtext+j, ptr);
-      dh_remove_americanisms (newtext);
-      *(G_AccessMapname_E (episode,map)) = newtext;
-      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
-    }
+    j = 0;
   }
   else
   {
-    newtext = malloc (len+20);
-    if (newtext)
-    {
-      sprintf (newtext, " %d:", map);			// Do not prepend "Level xx:" if there appears
-      if (dh_instr (ptr, newtext))			// to be an xx: already there.
-	j = 0;
-      else
-	j = sprintf (newtext, "Level %d: ", map);
-      strcpy (newtext+j, ptr);
-      dh_remove_americanisms (newtext);
-      *(G_AccessMapname_E (255,map)) = newtext;
-      mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
-    }
+    if (episode != 255)
+      j = sprintf (newtext, "E%dM%d: ", episode, map);
+    else
+      j = sprintf (newtext, "Level %d: ", map);
   }
+
+  strcpy (newtext+j, ptr);
+  dh_remove_americanisms (newtext);
+  *(G_AccessMapname_E (episode,map)) = newtext;
+  mapnameschanged = (boolean)((int)mapnameschanged|(int)dh_changing_pwad);
   // printf ("Map %u %u has text (%s)\n", episode, map, newtext);
 }
 

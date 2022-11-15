@@ -132,17 +132,13 @@ STlib_drawNum
 
     x = n->x;
 
-    // in the special case of 0, you draw 0
-    if (!num)
-      STlib_drawPatch ((x - w), n->y, ST_FG, n->p [0]);
-
     // draw the new number
-    while (num && numdigits--)
+    do
     {
 	x -= w;
 	STlib_drawPatch (x, n->y, ST_FG, n->p [num % 10]);
 	num /= 10;
-    }
+    } while (num && --numdigits);
 
     // draw a minus sign if necessary
     if (neg)
