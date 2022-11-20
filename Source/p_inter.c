@@ -276,7 +276,6 @@ P_GiveWeapon
       if (player->weaponowned[weapon])
 	  return false;
 
-      player->bonuscount += BONUSADD;
       player->weaponowned[weapon] = true;
 
       if (deathmatch)
@@ -378,7 +377,6 @@ char * P_GiveCard
   if (player->cards[card])
     return (NULL);
 
-  player->bonuscount = BONUSADD;
   player->cards[card] = true;
   return (got_messages [(int)P_GOTBLUECARD+card]);
 }
@@ -489,7 +487,8 @@ P_TouchSpecialThing
   fixed_t	delta;
   int		sound;
   unsigned int	qtyammogiven;
-  char *	msg;
+  char *	msg = NULL;
+  boolean	removetouched = true;
 
   delta = special->z - toucher->z;
 
@@ -516,13 +515,13 @@ P_TouchSpecialThing
     case SPR_ARM1:
       if (!P_GiveArmour (player, Green_Armour_Class))
 	  return;
-      player->message = got_messages [P_GOTARMOUR];
+      msg = got_messages [P_GOTARMOUR];
       break;
 
     case SPR_ARM2:
       if (!P_GiveArmour (player, Blue_Armour_Class))
 	  return;
-      player->message = got_messages [P_GOTMEGA];
+      msg = got_messages [P_GOTMEGA];
       break;
 
       // bonus items
@@ -531,7 +530,7 @@ P_TouchSpecialThing
       if (player->health > Max_Health_200)
 	  player->health = Max_Health_200;
       player->mo->health = player->health;
-      player->message = got_messages [P_GOTHTHBONUS];
+      msg = got_messages [P_GOTHTHBONUS];
       break;
 
     case SPR_BON2:
@@ -540,7 +539,7 @@ P_TouchSpecialThing
 	  player->armourpoints = Max_Armour;
       if (player->armourtype == NOARMOUR)
 	  player->armourtype = GREENARMOUR;
-      player->message = got_messages [P_GOTARMBONUS];
+      msg = got_messages [P_GOTARMBONUS];
       break;
 
     case SPR_SOUL:
@@ -550,7 +549,7 @@ P_TouchSpecialThing
       if (player->health > Max_Soulsphere_Health)
 	  player->health = Max_Soulsphere_Health;
       player->mo->health = player->health;
-      player->message = got_messages [P_GOTSUPER];
+      msg = got_messages [P_GOTSUPER];
       sound = sfx_getpow;
       break;
 
@@ -570,7 +569,7 @@ P_TouchSpecialThing
 	if (mega_given == false)
 	  return;
 
-	player->message = got_messages [P_GOTMSPHERE];
+	msg = got_messages [P_GOTMSPHERE];
 	sound = sfx_getpow;
       }
       break;
@@ -579,51 +578,45 @@ P_TouchSpecialThing
       // leave cards for everyone
     case SPR_BKEY:
       msg = P_GiveCard (player, it_bluecard);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
     case SPR_YKEY:
       msg = P_GiveCard (player, it_yellowcard);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
     case SPR_RKEY:
       msg = P_GiveCard (player, it_redcard);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
     case SPR_BSKU:
       msg = P_GiveCard (player, it_blueskull);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
     case SPR_YSKU:
       msg = P_GiveCard (player, it_yellowskull);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
     case SPR_RSKU:
       msg = P_GiveCard (player, it_redskull);
-      if (msg) player->message = msg;
-      if (!netgame)
-	  break;
-      return;
+      if (netgame)
+	removetouched = false;
+      break;
 
       // medikits, heals
     case SPR_STIM:
       if (!P_GiveBody (player, 10))
 	  return;
-      player->message = got_messages [P_GOTSTIM];
+      msg = got_messages [P_GOTSTIM];
       break;
 
     case SPR_MEDI:
@@ -631,9 +624,9 @@ P_TouchSpecialThing
 	  return;
 
       if (player->health < 50)
-	  player->message = got_messages [P_GOTMEDINEED];
+	  msg = got_messages [P_GOTMEDINEED];
       else
-	  player->message = got_messages [P_GOTMEDIKIT];
+	  msg = got_messages [P_GOTMEDIKIT];
       break;
 
 
@@ -641,14 +634,14 @@ P_TouchSpecialThing
     case SPR_PINV:
       if (!P_GivePower (player, pw_invulnerability))
 	  return;
-      player->message = got_messages [P_GOTINVUL];
+      msg = got_messages [P_GOTINVUL];
       sound = sfx_getpow;
       break;
 
     case SPR_PSTR:
       if (!P_GivePower (player, pw_strength))
 	  return;
-      player->message = got_messages [P_GOTBERSERK];
+      msg = got_messages [P_GOTBERSERK];
       if (player->readyweapon != wp_fist)
       {
 	if ((netgame)
@@ -663,28 +656,28 @@ P_TouchSpecialThing
     case SPR_PINS:
       if (!P_GivePower (player, pw_invisibility))
 	  return;
-      player->message = got_messages [P_GOTINVIS];
+      msg = got_messages [P_GOTINVIS];
       sound = sfx_getpow;
       break;
 
     case SPR_SUIT:
       if (!P_GivePower (player, pw_ironfeet))
 	  return;
-      player->message = got_messages [P_GOTSUIT];
+      msg = got_messages [P_GOTSUIT];
       sound = sfx_getpow;
       break;
 
     case SPR_PMAP:
       if (!P_GivePower (player, pw_allmap))
 	  return;
-      player->message = got_messages [P_GOTMAP];
+      msg = got_messages [P_GOTMAP];
       sound = sfx_getpow;
       break;
 
     case SPR_PVIS:
       if (!P_GivePower (player, pw_infrared))
 	  return;
-      player->message = got_messages [P_GOTVISOR];
+      msg = got_messages [P_GOTVISOR];
       sound = sfx_getpow;
       break;
 
@@ -700,37 +693,37 @@ P_TouchSpecialThing
 	  if (!P_GiveAmmo (player,am_clip,1))
 	      return;
       }
-      player->message = got_messages [P_GOTCLIP];
+      msg = got_messages [P_GOTCLIP];
       break;
 
     case SPR_AMMO:
       if (!P_GiveAmmo (player, am_clip,5))
 	  return;
-      player->message = got_messages [P_GOTCLIPBOX];
+      msg = got_messages [P_GOTCLIPBOX];
       break;
 
     case SPR_ROCK:
       if (!P_GiveAmmo (player, am_misl,1))
 	  return;
-      player->message = got_messages [P_GOTROCKET];
+      msg = got_messages [P_GOTROCKET];
       break;
 
     case SPR_BROK:
       if (!P_GiveAmmo (player, am_misl,5))
 	  return;
-      player->message = got_messages [P_GOTROCKBOX];
+      msg = got_messages [P_GOTROCKBOX];
       break;
 
     case SPR_CELL:
       if (!P_GiveAmmo (player, am_cell,1))
 	  return;
-      player->message = got_messages [P_GOTCELL];
+      msg = got_messages [P_GOTCELL];
       break;
 
     case SPR_CELP:
       if (!P_GiveAmmo (player, am_cell,5))
 	  return;
-      player->message = got_messages [P_GOTCELLBOX];
+      msg = got_messages [P_GOTCELLBOX];
       break;
 
     case SPR_SHEL:
@@ -744,20 +737,16 @@ P_TouchSpecialThing
       if (msg == got_messages_orig [P_GOTSHELLS])
       {
 	if (qtyammogiven == 1)
-	  player->message = got_messages [P_GOT1SHELL];
+	  msg = got_messages [P_GOT1SHELL];
 	else
-	  player->message = HU_printf (got_messages [P_GOTNSHELLS], qtyammogiven);
-      }
-      else
-      {
-	player->message = msg;
+	  msg = HU_printf (got_messages [P_GOTNSHELLS], qtyammogiven);
       }
       break;
 
     case SPR_SBOX:
       if (!P_GiveAmmo (player, am_shell,5))
 	  return;
-      player->message = got_messages [P_GOTSHELLBOX];
+      msg = got_messages [P_GOTSHELLBOX];
       break;
 
     case SPR_BPAK:
@@ -772,56 +761,56 @@ P_TouchSpecialThing
 	  qtyammogiven += P_GiveAmmo (player, (ammotype_t) i, 1);
       if (qtyammogiven == 0)
 	return;
-      player->message = got_messages [P_GOTBACKPACK];
+      msg = got_messages [P_GOTBACKPACK];
       break;
 
       // weapons
     case SPR_BFUG:
       if (!P_GiveWeapon (player, wp_bfg, false) )
 	  return;
-      player->message = got_messages [P_GOTBFG9000];
+      msg = got_messages [P_GOTBFG9000];
       sound = sfx_wpnup;
       break;
 
     case SPR_MGUN:
       if (!P_GiveWeapon (player, wp_chaingun, (boolean)(special->flags&MF_DROPPED)))
 	  return;
-      player->message = got_messages [P_GOTCHAINGUN];
+      msg = got_messages [P_GOTCHAINGUN];
       sound = sfx_wpnup;
       break;
 
     case SPR_CSAW:
       if (!P_GiveWeapon (player, wp_chainsaw, false) )
 	  return;
-      player->message = got_messages [P_GOTCHAINSAW];
+      msg = got_messages [P_GOTCHAINSAW];
       sound = sfx_wpnup;
       break;
 
     case SPR_LAUN:
       if (!P_GiveWeapon (player, wp_missile, false) )
 	  return;
-      player->message = got_messages [P_GOTLAUNCHER];
+      msg = got_messages [P_GOTLAUNCHER];
       sound = sfx_wpnup;
       break;
 
     case SPR_PLAS:
       if (!P_GiveWeapon (player, wp_plasma, false) )
 	  return;
-      player->message = got_messages [P_GOTPLASMA];
+      msg = got_messages [P_GOTPLASMA];
       sound = sfx_wpnup;
       break;
 
     case SPR_SHOT:
       if (!P_GiveWeapon (player, wp_shotgun, (boolean)(special->flags&MF_DROPPED)))
 	  return;
-      player->message = got_messages [P_GOTSHOTGUN];
+      msg = got_messages [P_GOTSHOTGUN];
       sound = sfx_wpnup;
       break;
 
     case SPR_SGN2:
       if (!P_GiveWeapon (player, wp_supershotgun, (boolean)(special->flags&MF_DROPPED)))
 	  return;
-      player->message = got_messages [P_GOTSHOTGUN2];
+      msg = got_messages [P_GOTSHOTGUN2];
       sound = sfx_wpnup;
       break;
 
@@ -833,10 +822,17 @@ P_TouchSpecialThing
 
   if (special->flags & MF_COUNTITEM)
       player->itemcount++;
-  P_RemoveMobj (special);
-  player->bonuscount += BONUSADD;
-  if (player == &players[consoleplayer])
+
+  if (removetouched)
+    P_RemoveMobj (special);
+
+  if (player->mo == toucher)
+  {
+      player->bonuscount += BONUSADD;
+      if (msg)
+	player->message = msg;
       S_StartSound (NULL, sound);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1155,7 +1151,7 @@ static char * find_obit_msg (mobj_t* victim, mobj_t* inflictor, mobj_t* source)
       case 5:
       case 7:
       case 16:
-        return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
+	return (write_obit (obituary_messages[OB_SLIME], "lava", NULL, victim));
     }
   }
 
@@ -1460,19 +1456,23 @@ P_DamageMobj
 	  player->health = 0;
 
       player->attacker = source;
-      damagecount = player->damagecount + damage; // add damage after armour / invuln
 
-      if ((damage > 0) && (damagecount < 2))	// damagecount gets decremented before
-	damagecount = 2;			// being used so needs to be at least 2.
-      if (damagecount > 100)
-	damagecount = 100;			// teleport stomp does 10k points...
+      if (player->mo == target)
+      {
+        damagecount = player->damagecount + damage; // add damage after armour / invuln
 
-      player->damagecount = damagecount;
+        if ((damage > 0) && (damagecount < 2))	// damagecount gets decremented before
+	  damagecount = 2;			// being used so needs to be at least 2.
+        if (damagecount > 100)
+	  damagecount = 100;			// teleport stomp does 10k points...
 
-      temp = damage < 100 ? damage : 100;
+        player->damagecount = damagecount;
 
-      if (player == &players[consoleplayer])
+        temp = damage < 100 ? damage : 100;
+
+        if (player == &players[consoleplayer])
 	  I_Tactile (40,10,40+temp*2);
+      }
   }
 
   // do the damage
