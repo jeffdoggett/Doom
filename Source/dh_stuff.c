@@ -6861,7 +6861,7 @@ static void Parse_UMapinfo (char * ptr, char * top)
       {
 	if (strncasecmp (newtext, "clear", 5) == 0)
 	{
-	  M_ClearEpiSel (episode);
+	  M_ClearEpiSel (episode, map);
 	}
 	else
 	{

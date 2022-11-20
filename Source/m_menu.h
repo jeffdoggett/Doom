@@ -59,7 +59,7 @@ void M_SetEpiSel (unsigned int episode);
 void M_SetEpiName (unsigned int episode, char * name, unsigned int len);
 unsigned int M_GetNextEpi (unsigned int episode, unsigned int map);
 void M_SetNextEpiSel (unsigned int episode);
-void M_ClearEpiSel (unsigned int episode);
+void M_ClearEpiSel (unsigned int episode, unsigned int map);
 void M_DrawDisc (void);
 void M_RemoveDisc (void);
 int M_ScreenUpdated (void);

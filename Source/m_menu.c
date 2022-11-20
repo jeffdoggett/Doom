@@ -841,9 +841,10 @@ unsigned int M_GetNextEpi (unsigned int episode, unsigned int map)
    Reset the episode tables
 */
 
-void M_ClearEpiSel (unsigned int episode)
+void M_ClearEpiSel (unsigned int episode, unsigned int map)
 {
   uint8_t num;
+  map_starts_t * map_info_p;
 
   EpiDef.numitems = 0;
   episode_menu_inhibited = 1;	// Possibly inhibited if nothing added later.
@@ -858,6 +859,10 @@ void M_ClearEpiSel (unsigned int episode)
     episode_names [num] = NULL;
     episode_num [num] = num + 1;
   } while (++num < ARRAY_SIZE(episode_num));
+
+  // Assume, for the moment, that this map is the start map.
+  map_info_p = G_Access_MapStartTab_E (episode);
+  map_info_p -> start_map = map;
 }
 
 /* ----------------------------------------------------------------------- */
