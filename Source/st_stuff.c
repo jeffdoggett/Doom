@@ -1190,13 +1190,18 @@ static void ST_updateWidgets(void)
     {
       int k;
 
-      k = 0;
-      if (plyr->cards[i]) k |= 1;
-      if (plyr->cards[i+3]) k |= 2;
-      if (k == 0)
-	k = -1;
+      k = -1;			// Assume empty
+      if (plyr->cards[i] == 0)
+      {
+	if (plyr->cards[i+3])
+	  k = i + 3;
+      }
       else
-	k = ((k-1) * 3) + i;
+      {
+	k = i;
+	if (plyr->cards[i+3])
+	  k += 6;
+      }
       keyboxes[i] = k;
     }
 
