@@ -1543,7 +1543,7 @@ boolean	PTR_UseTraverse (intercept_t* in)
   // can't use for more than one special line
   // in a row unless ML_PASSUSE is set.
   if ((P_UseSpecialLine (usething, line, side))
-   && ((line -> flags & ML_PASSUSE) == 0))
+   || ((line -> flags & ML_PASSUSE) == 0))
     return (false);
 
   PTR_UseAnyway (line);

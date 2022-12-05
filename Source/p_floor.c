@@ -59,16 +59,12 @@ result_e T_MoveFloorPlane (sector_t* sector, fixed_t speed, fixed_t dest, boolea
       {
 	sector->floorheight = dest;
 	flag = P_ChangeSectorFunc(sector,crush);
-#if 0
-	/* Removed by JAD 13/10/2011 because a floor */
-	/* going downwards cannot possibly crush anything */
 	if (flag == true)
 	{
 	    sector->floorheight = lastpos;
 	    P_ChangeSectorFunc(sector,crush);
 	    //return crushed;
 	}
-#endif
 	return pastdest;
       }
       else
@@ -146,7 +142,6 @@ result_e T_MoveCeilingPlane (sector_t* sector, fixed_t speed, fixed_t dest, bool
       {
 	sector->ceilingheight = dest;
 	flag = P_ChangeSectorFunc(sector,crush);
-
 	if (flag == true)
 	{
 	    sector->ceilingheight = lastpos;
@@ -178,16 +173,12 @@ result_e T_MoveCeilingPlane (sector_t* sector, fixed_t speed, fixed_t dest, bool
       {
 	sector->ceilingheight = dest;
 	flag = P_ChangeSectorFunc(sector,crush);
-#if 0
-	/* Removed by JAD 13/10/2011 because a ceiling */
-	/* going upwards cannot possibly crush anything */
 	if (flag == true)
 	{
 	  sector->ceilingheight = lastpos;
 	  P_ChangeSectorFunc(sector,crush);
 	  //return crushed;
 	}
-#endif
 	return pastdest;
       }
       else
