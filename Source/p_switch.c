@@ -572,12 +572,6 @@ P_UseSpecialLine
 	}
 	break;
 
-      case 24:				// Gunned actions.
-      case 46:				// We just return true here to prevent
-      case 47:				// lines beyond this from being actioned.
-	rc = true;			// Hacx Map 17:
-	break;				// There's some switches behind shootable covers in this level.
-
       case 29:
 	// Raise Door
 	if (EV_DoDoor(line,normal))
@@ -1543,16 +1537,7 @@ P_UseSpecialLine
       default:
 	rc = P_BoomSpecialLine (thing, line, side, Switched);
 	if (rc == false)
-	{
 	  rc = P_BoomSpecialLine (thing, line, side, Pressed);
-	  if ((rc == false)			// We just return true here to prevent
-	   && (line -> special >= 0x2F80)	// lines beyond this from being actioned.
-	   && ((unsigned)line -> special < 0x8000)	// Hacx Map 17:
-	   && ((line -> special & 6) == (Gunned * 2)))
-	  {
-	    rc = true;
-	  }
-	}
     }
 
     return rc;

@@ -1540,13 +1540,14 @@ boolean	PTR_UseTraverse (intercept_t* in)
 
   side = P_PointOnLineSide (usething->x, usething->y, line);
 
+  if (!P_UseSpecialLine (usething, line, side))
+    PTR_UseAnyway (line);
+
   // can't use for more than one special line
   // in a row unless ML_PASSUSE is set.
-  if ((P_UseSpecialLine (usething, line, side))
-   || ((line -> flags & ML_PASSUSE) == 0))
+  if ((line -> flags & ML_PASSUSE) == 0)
     return (false);
 
-  PTR_UseAnyway (line);
   return (true);
 }
 
