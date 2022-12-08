@@ -251,6 +251,9 @@ static const char * const dehack_things [] =
   "Respawn frame",
   "Scale",
   "Dropped item",
+  "Blood color",
+  "Retro Bits",
+  "Name",
   "Name1",
   "Name2",
   "Plural1",
@@ -294,6 +297,9 @@ typedef enum
   THING_Respawn_frame,
   THING_Scale,
   THING_Dropped_item,
+  THING_Blood_Colour,
+  THING_Retro_Bits,
+  THING_Name,
   THING_Name1,
   THING_Name2,
   THING_Plural1,
@@ -1580,6 +1586,7 @@ static void decode_things_name (unsigned int number, thing_element_t record, cha
 
   switch (record)
   {
+    case THING_Name:
     case THING_Name1:
       if ((ptr -> names[0] == NULL)
        || (strcmp (ptr -> names[0], value)))
@@ -1784,7 +1791,11 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       dh_thing_drop ((mobjtype_t) (number-1), (mobjtype_t) (value-1));
       break;
 
-    case THING_Name1:		// We already did these.
+    case THING_Blood_Colour:	// Not implemented
+    case THING_Retro_Bits:
+
+    case THING_Name:		// We already did these.
+    case THING_Name1:
     case THING_Name2:
     case THING_Plural1:
     case THING_Plural2:
@@ -2853,7 +2864,7 @@ static unsigned int replace_startup_text (char * orig, char * newt)
     counter++;
   } while (dmain_messages_orig [counter]);
 
-  if (max > 20)
+  if (max > 18)
   {
     dmain_messages [max_pos] = newt;
     return (0);

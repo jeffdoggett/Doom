@@ -86,6 +86,11 @@ char * dmain_messages_orig [] =
 	    "                            Do not distribute!\n"
 	    "         Please report software piracy to the SPA: 1-800-388-PIR8\n"
 	    "===========================================================================\n",
+	    "\nYou cannot -file with the shareware version. Register!",
+	    "\nThis is not the registered version.",
+	    "\tregistered version.",
+	    "\tshareware version.",
+	    "\tcommercial version.",
 		NULL
 };
 
@@ -2346,15 +2351,14 @@ void D_DoomMain (void)
       int i;
 
       if ( gamemode == shareware)
-	  I_Error("\nYou cannot -file with the shareware "
-		  "version. Register!");
+	  I_Error(dmain_messages[D_CANNOT_FILE]);
 
       // Check for fake IWAD with right name,
       // but w/o all the lumps of the registered version.
       if (gamemode == registered)
 	  for (i = 0;i < 23; i++)
 	      if (W_CheckNumForName (name[i])<0)
-		  I_Error("\nThis is not the registered version.");
+		  I_Error(dmain_messages[D_NOT_REGISTERED]);
 
       // Iff additonal PWAD files are used, print modified banner
       printf (dmain_messages [D_MODIFIED]);
