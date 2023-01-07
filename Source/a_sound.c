@@ -643,7 +643,7 @@ static unsigned int Mus_CheckAndInit (void)
   if (_kernel_swi (MIDI_Init, &regs, &regs))
     return (0);
 
-  if (regs.r[1] == 0)
+  if (regs.r[0] == 0)
     return (0);
 
   regs.r[0] = 15;
@@ -661,6 +661,9 @@ static unsigned int Mus_CheckAndInit (void)
 static void Mus_ClearQueue (void)
 {
   _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+  _kernel_swi (MIDI_Init, &regs, &regs);
 
   regs.r[0] = 15;
   _kernel_swi (MIDI_Init, &regs, &regs);
