@@ -107,6 +107,15 @@
 #define MIDI_ClockStamp			0x404E9
 #define MIDI_Thru			0x404EA
 
+#define MIDIPlay_File			0x45340
+#define MIDIPlay_Start			0x45341
+#define MIDIPlay_Stop			0x45342
+#define MIDIPlay_Volume			0x45343
+#define MIDIPlay_Tempo			0x45344
+#define MIDIPlay_Info			0x45345
+#define MIDIPlay_Close			0x45346
+#define MIDIPlay_Test			0x45347
+#define MIDIPlay_Event			0x45348
 
 #define QTM_Load			0x47E40
 #define QTM_Start			0x47E41
@@ -218,6 +227,7 @@ static int 	music_midivol;		/* Main volume (-127..0)			*/
 static int	music_qtmvol;
 static int	music_timvol;
 static int	music_ampvol;
+static int	music_mplayvol;
 static int	qtm_channels_swiped = 0;/* Number of sound channels used by qtm		*/
 static int	timplayer_handle = 0;
 int		timplayer_vol_tab [] =
@@ -227,11 +237,12 @@ int		timplayer_vol_tab [] =
 };
 
 #define MIDI_AVAILABLE	0x01
-#define TIM_LOADED	0x02
-#define TIM_NOT_AVAIL	0x04
-#define TIM_PLAYING	0x08
-#define QTM_PLAYING	0x10
-#define AMP_PLAYING	0x20
+#define MPLAY_PLAYING	0x02
+#define TIM_LOADED	0x04
+#define TIM_NOT_AVAIL	0x08
+#define TIM_PLAYING	0x10
+#define QTM_PLAYING	0x20
+#define AMP_PLAYING	0x40
 
 /* ------------------------------------------------------------ */
 
@@ -710,6 +721,68 @@ static unsigned int Mus_TxCommand (unsigned int a, unsigned int b)
   {
     return (regs.r[0]);
   }
+}
+
+/* ------------------------------------------------------------ */
+
+static unsigned int Mus_MPlay_load (const char * filename)
+{
+  _kernel_swi_regs regs;
+  _kernel_oserror * rc;
+
+  regs.r[0] = 0;
+  regs.r[1] = (int) filename;
+  rc = _kernel_swi (MIDIPlay_File, &regs, &regs);
+  return ((unsigned int) rc);
+}
+
+static unsigned int Mus_MPlay_start (void)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = 0;
+  regs.r[1] = 0;
+  _kernel_swi (MIDIPlay_Start, &regs, &regs);
+  return (0);
+}
+
+static unsigned int Mus_MPlay_stop (void)
+{
+  _kernel_swi_regs regs;
+
+  return ((int)_kernel_swi (MIDIPlay_Close, &regs, &regs));
+}
+
+static unsigned int Mus_MPlay_pause (void)
+{
+  _kernel_swi_regs regs;
+
+  return ((int)_kernel_swi (MIDIPlay_Stop, &regs, &regs));
+}
+
+static unsigned int Mus_MPlay_clear (void)
+{
+  return (0);
+}
+
+static unsigned int Mus_MPlay_set_volume (unsigned int vol)
+{
+  _kernel_swi_regs regs;
+
+  regs.r[0] = vol;
+  return ((int)_kernel_swi (MIDIPlay_Volume, &regs, &regs));
+}
+
+static void Mus_MPlay_restart_song (void)
+{
+  Mus_MPlay_start ();
+}
+
+static int Mus_MPlay_playing (void)
+{
+  _kernel_swi_regs regs;
+  _kernel_swi (MIDIPlay_Info, &regs, &regs);
+  return (regs.r[2]);
 }
 
 /* ------------------------------------------------------------ */
@@ -1443,6 +1516,9 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
   if (size < 4)
     return -1;
 
+  if (M_CheckParm ("-showmusdir"))
+    printf ("I_RegisterSong %s (%04X)\n", lumpname, (((int*)data)[0]));
+
   if ((mp3priority == 0)
    && (M_CheckParm ("-mp3")))
   {
@@ -1462,7 +1538,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
     return (timplayer_handle);
   }
 
-  if (((int*)data)[0]==0x1a53554d)
+  if (((int*)data)[0]==0x1a53554d)	// MUS
   {
     if ((mp3priority)
      && (M_CheckParm ("-mp3")))
@@ -1487,9 +1563,34 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
     return (timplayer_handle);
   }
 
-//if (((int*)data)[0] == 0x6468544D)	// 'MThd'
-//{
-//}
+  if (strncmp ((char*)data,"MThd",4) == 0) // Standard MIDI file
+  {
+    if (((Mus_MPlay_set_volume (music_mplayvol) == 0)	// Is MIDIplayer loaded?
+     && (I_Save_MusFile (MUS_TEMP_FILE, data, size) == 0)))
+    {
+      if (Mus_MPlay_load (MUS_TEMP_FILE) == 0)
+      {
+	remove (MUS_TEMP_FILE);
+	music_available |= MPLAY_PLAYING;
+	return 1;
+      }
+      else
+      {
+	remove (MUS_TEMP_FILE);
+      }
+    }
+  }
+
+
+#if 0
+  if (strncmp ((char*)data,"OggS",4) == 0) // Ogg Vorbis
+  {
+    if (M_CheckParm ("-showunknown"))
+      printf ("OGG music not supported\n");
+    return -1;
+  }
+#endif
+
   if ((I_AmPlayer (data, size))
   && (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
    || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
@@ -1531,6 +1632,14 @@ void I_FillMusBuffer(int handle)
    && (music_loop))
   {
     Mus_AMP_restart_song (amp_current->filename);
+    return;
+  }
+
+  if ((music_available & MPLAY_PLAYING)
+   && (Mus_MPlay_playing () == 0)
+   && (music_loop))
+  {
+    Mus_MPlay_restart_song ();
     return;
   }
 
@@ -1613,6 +1722,13 @@ void I_PlaySong (int handle, int loop)
 
   // I_StopSong(handle);
 
+  if (music_available & MPLAY_PLAYING)
+  {
+    Mus_MPlay_start ();
+    music_loop=loop;
+    return;
+  }
+
   if (music_available & QTM_PLAYING)
   {
     Mus_QTM_start ();
@@ -1652,7 +1768,7 @@ void I_PlaySong (int handle, int loop)
 /* Is the song playing, even if paused? */
 int I_QrySongPlaying (int handle)
 {
-  if ((music_available & (QTM_PLAYING|TIM_PLAYING|AMP_PLAYING))
+  if ((music_available & (MPLAY_PLAYING|QTM_PLAYING|TIM_PLAYING|AMP_PLAYING))
    || (music_pos != NULL))
     return (1);
 
@@ -1668,6 +1784,8 @@ void I_SetMusicVolume (int volume) /* 0..15 */
   music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-63 */
   music_timvol  = timplayer_vol_tab [volume];	/* Convert volume 0-15 to 0-256 */
   music_ampvol  = volume << 3;	/* Convert volume 0-15 to 0-127 */
+  music_mplayvol = volume << 4;	/* Convert 0-15 to 0-255 */
+  Mus_MPlay_set_volume (music_mplayvol);
   Mus_QTM_set_volume (music_qtmvol);
   Mus_TIM_set_volume (music_timvol);
   Mus_AMP_set_volume (music_ampvol);
@@ -1677,6 +1795,12 @@ void I_SetMusicVolume (int volume) /* 0..15 */
 /* Pause song, be silent */
 void I_PauseSong (int handle)
 {
+  if (music_available & MPLAY_PLAYING)
+  {
+    Mus_MPlay_pause ();
+    return;
+  }
+
   if (music_available & QTM_PLAYING)
   {
     Mus_QTM_pause ();
@@ -1707,6 +1831,12 @@ void I_PauseSong (int handle)
 /* Resume song, obviously */
 void I_ResumeSong (int handle)
 {
+  if (music_available & MPLAY_PLAYING)
+  {
+    Mus_MPlay_start ();
+    return;
+  }
+
   if (music_available & QTM_PLAYING)
   {
     Mus_QTM_start ();
@@ -1738,6 +1868,14 @@ void I_ResumeSong (int handle)
 void I_StopSong (int handle)
 {
   int i,j;
+
+  if (music_available & MPLAY_PLAYING)
+  {
+    Mus_MPlay_stop ();
+    Mus_MPlay_clear ();
+    music_available &= ~MPLAY_PLAYING;
+    return;
+  }
 
   if (music_available & QTM_PLAYING)
   {
