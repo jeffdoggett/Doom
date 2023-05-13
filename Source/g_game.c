@@ -2241,7 +2241,7 @@ G_InitNew
 
   usergame = true;		// will be set false if a demo
   paused = false;
-//demoplayback = false;
+  demoplayback = false;
   automapactive = false;
   viewactive = true;
   gameepisode = episode;
@@ -2465,8 +2465,8 @@ void G_DoPlayDemo (void)
 
   // don't spend a lot of time in loadlevel
   precache = false;
-  demoplayback = true;
   G_InitNew (skill, episode, map);
+  demoplayback = true;
   precache = true;
   usergame = false;
 }

@@ -184,7 +184,6 @@ extern char*	chat_macros[];
 //-----------------------------------------------------------------------------
 #ifdef __riscos
 extern int	mp3priority;
-extern int	timplayer_vol_tab [16];
 #endif
 
 typedef struct
@@ -273,22 +272,6 @@ default_t	defaults[] =
 #else
   {"mp3priority", (int *) &mp3priority,  sizeof(int), (char *) 1},
 #endif
-  {"timplayer_vol0", (int *) &timplayer_vol_tab[0],  sizeof(int), (char *) 0x00},
-  {"timplayer_vol1", (int *) &timplayer_vol_tab[1],  sizeof(int), (char *) 0x04},
-  {"timplayer_vol2", (int *) &timplayer_vol_tab[2],  sizeof(int), (char *) 0x08},
-  {"timplayer_vol3", (int *) &timplayer_vol_tab[3],  sizeof(int), (char *) 0x0C},
-  {"timplayer_vol4", (int *) &timplayer_vol_tab[4],  sizeof(int), (char *) 0x10},
-  {"timplayer_vol5", (int *) &timplayer_vol_tab[5],  sizeof(int), (char *) 0x14},
-  {"timplayer_vol6", (int *) &timplayer_vol_tab[6],  sizeof(int), (char *) 0x18},
-  {"timplayer_vol7", (int *) &timplayer_vol_tab[7],  sizeof(int), (char *) 0x1C},
-  {"timplayer_vol8", (int *) &timplayer_vol_tab[8],  sizeof(int), (char *) 0x20},
-  {"timplayer_vol9", (int *) &timplayer_vol_tab[9],  sizeof(int), (char *) 0x24},
-  {"timplayer_vol10", (int *) &timplayer_vol_tab[10],  sizeof(int), (char *) 0x28},
-  {"timplayer_vol11", (int *) &timplayer_vol_tab[11],  sizeof(int), (char *) 0x2C},
-  {"timplayer_vol12", (int *) &timplayer_vol_tab[12],  sizeof(int), (char *) 0x30},
-  {"timplayer_vol13", (int *) &timplayer_vol_tab[13],  sizeof(int), (char *) 0x34},
-  {"timplayer_vol14", (int *) &timplayer_vol_tab[14],  sizeof(int), (char *) 0x38},
-  {"timplayer_vol15", (int *) &timplayer_vol_tab[15],  sizeof(int), (char *) 0x3C},
 #endif
 
   {"max_vissprites", (int *) &max_vissprites,  sizeof(int), (char *) 0},

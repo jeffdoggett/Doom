@@ -980,10 +980,9 @@ boolean PTR_SlideTraverse (intercept_t* in)
 {
     line_t*	li;
 
-    if (!in->isaline)
-	I_Error ("PTR_SlideTraverse: not a line?");
-
-    li = in->d.line;
+    li = in->line;
+    if (li == NULL)
+	return true;
 
     if ( ! (li->flags & ML_TWOSIDED) )
     {
@@ -1169,9 +1168,9 @@ PTR_AimTraverse (intercept_t* in)
     fixed_t	thingbottomslope;
     fixed_t	dist;
 
-    if (in->isaline)
+    li = in->line;
+    if (li)
     {
-	li = in->d.line;
 
 	if ( !(li->flags & ML_TWOSIDED) )
 	    return false;		// stop
@@ -1207,8 +1206,8 @@ PTR_AimTraverse (intercept_t* in)
     }
 
     // shoot a thing
-    th = in->d.thing;
-    if (th == shootthing)
+    th = in->thing;
+    if ((th == NULL) || (th == shootthing))
 	return true;			// can't shoot self
 
     if (!(th->flags&MF_SHOOTABLE))
@@ -1264,9 +1263,9 @@ boolean PTR_ShootTraverse (intercept_t* in)
     fixed_t	thingtopslope;
     fixed_t	thingbottomslope;
 
-    if (in->isaline)
+    li = in->line;
+    if (li)
     {
-	li = in->d.line;
 
 	if (li->special)
 	    P_ShootSpecialLine (shootthing, li);
@@ -1325,8 +1324,8 @@ boolean PTR_ShootTraverse (intercept_t* in)
     }
 
     // shoot a thing
-    th = in->d.thing;
-    if (th == shootthing)
+    th = in->thing;
+    if ((th == NULL) || (th == shootthing))
 	return true;		// can't shoot self
 
     if (!(th->flags&MF_SHOOTABLE))
@@ -1355,7 +1354,7 @@ boolean PTR_ShootTraverse (intercept_t* in)
 
     // Spawn bullet puffs or blod spots,
     // depending on target type.
-    if (in->d.thing->flags & MF_NOBLOOD)
+    if (th->flags & MF_NOBLOOD)
 	P_SpawnPuff (x,y,z);
     else
 	P_SpawnBlood (x,y,z, la_damage);
@@ -1520,7 +1519,9 @@ boolean	PTR_UseTraverse (intercept_t* in)
   int		side;
   line_t *	line;
 
-  line = in->d.line;
+  line = in->line;
+  if (line == NULL)
+      return (true);
 
   if (!line->special)
   {

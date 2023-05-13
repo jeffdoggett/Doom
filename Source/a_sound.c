@@ -223,18 +223,37 @@ static int	music_loop;		/* Loop flag if playing				*/
 static int 	music_time;		/* Current music time if playing		*/
 static int 	music_vel[16];		/* Previous velocity on midichannel		*/
 static int	music_pause=0;		/* Time that music was paused, or 0 if it isn't	*/
-static int 	music_midivol;		/* Main volume (-127..0)			*/
-static int	music_qtmvol;
-static int	music_timvol;
-static int	music_ampvol;
-static int	music_mplayvol;
+static int	music_volume;		/* Main music volume				*/
 static int	qtm_channels_swiped = 0;/* Number of sound channels used by qtm		*/
 static int	timplayer_handle = 0;
-int		timplayer_vol_tab [] =
+
+/* ------------------------------------------------------------ */
+
+static const int vol_tab_m128 [] =
 {
-  0x00,0x04,0x08,0x0C,0x10,0x14,0x18,0x1C,
-  0x20,0x24,0x28,0x2C,0x30,0x34,0x38,0x3C
+  -127,-118,-110,-101, -93, -84, -76, -67,
+   -59, -50, -42, -33, -25, -16, -8,    0
 };
+
+static const int vol_tab_64 [] =
+{
+  0x00,0x04,0x08,0x0C,0x11,0x15,0x19,0x1D,
+  0x22,0x26,0x2A,0x2E,0x33,0x37,0x3B,0x3F
+};
+
+static const int vol_tab_128 [] =
+{
+  0x00,0x08,0x11,0x19,0x22,0x2A,0x33,0x3B,
+  0x44,0x4C,0x55,0x5D,0x66,0x6E,0x77,0x7F
+};
+
+static const int vol_tab_256 [] =
+{
+  0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
+  0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF
+};
+
+/* ------------------------------------------------------------ */
 
 #define MIDI_AVAILABLE	0x01
 #define MPLAY_PLAYING	0x02
@@ -769,7 +788,7 @@ static unsigned int Mus_MPlay_set_volume (unsigned int vol)
 {
   _kernel_swi_regs regs;
 
-  regs.r[0] = vol;
+  regs.r[0] = vol_tab_256[vol]; /* Convert 0-15 to 0-255 */
   return ((int)_kernel_swi (MIDIPlay_Volume, &regs, &regs));
 }
 
@@ -845,7 +864,7 @@ static unsigned int Mus_QTM_set_volume (unsigned int vol)
 {
   _kernel_swi_regs regs;
 
-  regs.r[0] = vol;
+  regs.r[0] = vol_tab_64[vol];	/* Convert volume 0-15 to 0-63 */
   return ((int)_kernel_swi (QTM_Volume, &regs, &regs));
 }
 
@@ -925,7 +944,7 @@ static unsigned int Mus_TIM_set_volume (unsigned int vol)
   if (music_available & TIM_PLAYING)
   {
     regs.r[0] = timplayer_handle;
-    regs.r[1] = vol;
+    regs.r[1] = vol_tab_256[vol]; /* Convert volume 0-15 to 0-256 */
     return ((int)_kernel_swi (TimPlayer_SongVolume, &regs, &regs));
   }
   return (0);
@@ -1012,7 +1031,7 @@ static unsigned int Mus_AMP_set_volume (unsigned int vol)
 
   regs.r[0] = 0;
 //regs.r[1] = 0;
-  regs.r[1] = vol; // Docs say R2, Actually R1
+  regs.r[1] = vol_tab_128[vol]; // Docs say R2, Actually R1
   return ((int)_kernel_swi (AMPlayer_Control, &regs, &regs));
 }
 
@@ -1258,9 +1277,9 @@ static void I_InitMusicDirectory (void)
   char buffer [200];
   char filename [100];
 
-  if ((Mus_AMP_set_volume (music_ampvol))
+  if ((Mus_AMP_set_volume (music_volume))
    && ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer"))
-    || (Mus_AMP_set_volume (music_ampvol))))
+    || (Mus_AMP_set_volume (music_volume))))
   {
     printf ("Failed to initialise AMPlayer\n");
     return;
@@ -1517,7 +1536,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
     return -1;
 
   if (M_CheckParm ("-showmusdir"))
-    printf ("I_RegisterSong %s (%04X)\n", lumpname, (((int*)data)[0]));
+    printf ("I_RegisterSong %s %0.4s (%04X)\n", lumpname, data, (((int*)data)[0]));
 
   if ((mp3priority == 0)
    && (M_CheckParm ("-mp3")))
@@ -1565,7 +1584,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
 
   if (strncmp ((char*)data,"MThd",4) == 0) // Standard MIDI file
   {
-    if (((Mus_MPlay_set_volume (music_mplayvol) == 0)	// Is MIDIplayer loaded?
+    if (((Mus_MPlay_set_volume (music_volume) == 0)	// Is MIDIplayer loaded?
      && (I_Save_MusFile (MUS_TEMP_FILE, data, size) == 0)))
     {
       if (Mus_MPlay_load (MUS_TEMP_FILE) == 0)
@@ -1592,9 +1611,9 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
 #endif
 
   if ((I_AmPlayer (data, size))
-  && (((Mus_AMP_set_volume (music_ampvol) == 0)	// Is Amplayer loaded?
+  && (((Mus_AMP_set_volume (music_volume) == 0)	// Is Amplayer loaded?
    || ((RmLoad_Module ("System:Modules.Audio.MP3.AMPlayer") == 0)
-    && (Mus_AMP_set_volume (music_ampvol) == 0)))
+    && (Mus_AMP_set_volume (music_volume) == 0)))
    && (I_Save_MusFile (MUS_TEMP_FILE, data, size) == 0)))
   {
     if ((Mus_AMP_load (MUS_TEMP_FILE) == 0)
@@ -1626,6 +1645,7 @@ int I_RegisterSong (musicinfo_t * music, const char * lumpname)
 void I_FillMusBuffer(int handle)
 {
   int free,cmd,delay,ch,par1,par2;
+  int music_midivol;
 
   if ((music_available & AMP_PLAYING)
    && (amp_current)
@@ -1656,6 +1676,7 @@ void I_FillMusBuffer(int handle)
 	break;
       case 1: /* NoteOn */
 	par1=*music_pos++;
+	music_midivol = vol_tab_m128 [music_volume];
 	if (par1 &128)
 	  par2=(music_vel[ch]=*music_pos++)+music_midivol;
 	else
@@ -1738,7 +1759,7 @@ void I_PlaySong (int handle, int loop)
   if (music_available & TIM_PLAYING)
   {
     Mus_TIM_start ();
-    Mus_TIM_set_volume (music_timvol);
+    Mus_TIM_set_volume (music_volume);
     Mus_TIM_loop (loop);
     return;
   }
@@ -1746,7 +1767,7 @@ void I_PlaySong (int handle, int loop)
   if (music_available & AMP_PLAYING)
   {
     Mus_AMP_start ();
-    Mus_AMP_set_volume (music_ampvol);
+    Mus_AMP_set_volume (music_volume);
     music_loop=loop;
     return;
   }
@@ -1780,15 +1801,11 @@ int I_QrySongPlaying (int handle)
 void I_SetMusicVolume (int volume) /* 0..15 */
 {
   if (volume > 15) volume = 15;
-  music_midivol = (volume-15)*127/15;
-  music_qtmvol  = volume << 2;	/* Convert volume 0-15 to 0-63 */
-  music_timvol  = timplayer_vol_tab [volume];	/* Convert volume 0-15 to 0-256 */
-  music_ampvol  = volume << 3;	/* Convert volume 0-15 to 0-127 */
-  music_mplayvol = volume << 4;	/* Convert 0-15 to 0-255 */
-  Mus_MPlay_set_volume (music_mplayvol);
-  Mus_QTM_set_volume (music_qtmvol);
-  Mus_TIM_set_volume (music_timvol);
-  Mus_AMP_set_volume (music_ampvol);
+  music_volume = volume;
+  Mus_MPlay_set_volume (volume);
+  Mus_QTM_set_volume (volume);
+  Mus_TIM_set_volume (volume);
+  Mus_AMP_set_volume (volume);
 }
 
 /* ------------------------------------------------------------ */

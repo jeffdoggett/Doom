@@ -149,11 +149,8 @@ typedef struct
 typedef struct
 {
     fixed_t	frac;		// along trace line
-    boolean	isaline;
-    union {
-	mobj_t*	thing;
-	line_t*	line;
-    }			d;
+    mobj_t*	thing;
+    line_t*	line;
 } intercept_t;
 
 typedef boolean (*traverser_t) (intercept_t *in);
