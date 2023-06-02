@@ -679,6 +679,7 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
   int		texture;
   int		direction;
   int		stairlock;
+  unsigned int	diff;
   line_t*	sline;
   sector_t*	tsec;
   fixed_t	speed;
@@ -783,6 +784,14 @@ static boolean make_stairs (sector_t * sec, stair_e buildtype, boolean doit)
 	}
 
 	sec = tsec;
+
+	if (height > floor->floordestheight)
+	  diff = height - floor->floordestheight;
+	else
+	  diff = floor->floordestheight - height;
+
+	if (diff > (24*FRACUNIT))
+	  height = floor->floordestheight + stairsize;
 
 	// new floor thinker
 	floor = P_NewFloorAction (sec);
