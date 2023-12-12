@@ -19,7 +19,6 @@ typedef struct
 {
     int                 width;
     int                 height;
-    unsigned            widthmask;
 
     // this is the single malloc'ed/free'd array
     // for this patch

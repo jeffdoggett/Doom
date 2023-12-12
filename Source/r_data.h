@@ -106,8 +106,6 @@ typedef struct
     // Next in hash table chain
     int                 next;
 
-    unsigned int        widthmask;
-
     // All the patches[patchcount]
     //  are drawn back to front into the cached texture.
     short               patchcount;

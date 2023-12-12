@@ -110,7 +110,6 @@ static void createTextureCompositePatch(int id)
 
     composite_patch->width = texture->width;
     composite_patch->height = texture->height;
-    composite_patch->widthmask = texture->widthmask;
 
     // work out how much memory we need to allocate for this patch's data
     pixelDataSize = (composite_patch->width * composite_patch->height + 4) & ~3;

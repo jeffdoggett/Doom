@@ -61,9 +61,15 @@ int		prevcollump = 0;
 //
 byte *R_GetTextureColumn(rpatch_t *texpatch, int col)
 {
+    unsigned int width = texpatch->width;
+
     while (col < 0)
-	col += texpatch->width;
-    col &= texpatch->widthmask;
+	col += width;
+
+    if (width & (width - 1))		// If width is not a power of 2
+      col %= width;			// then use mod instead.
+    else
+      col &= (width - 1);
 
     return texpatch->columns[col].pixels;
 }
@@ -218,8 +224,6 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 #endif
 	}
 
-	for (j = 1; j * 2 <= texture->width; j <<= 1);
-	texture->widthmask = j - 1;
 	textures[texbase+i].height = texture->height << FRACBITS;
 	textures[texbase+i].pnames_lump = names_lump;
 	i++;	// Done here so that 'continue' misses it out...
