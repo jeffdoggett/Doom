@@ -821,7 +821,10 @@ void R_StoreWallRange(int start, int stop)
 	    || frontsector->heightsec != -1
 
 	    // killough 4/17/98: draw floors if different light levels
-	    || backsector->floorlightsec != frontsector->floorlightsec);
+	    || backsector->floorlightsec != frontsector->floorlightsec
+
+            // draw floors if different specials
+	    || backsector->special != frontsector->special);
 
 	markceiling = (boolean)(worldhigh != worldtop
 	    || backsector->ceilingpic != frontsector->ceilingpic
