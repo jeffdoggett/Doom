@@ -308,9 +308,14 @@ R_FindPlane
 
     if ((picnum == skyflatnum) || (picnum & PL_SKYFLAT))
     {
-	height = 0;			// all skies map together
+	// killough 7/19/98: most skies map together
 	lightlevel = 0;
-    }
+
+	// haleyjd 05/06/08: but not all. If height > viewpoint.z, set height to 1
+	// instead of 0, to keep ceilings mapping with ceilings, and floors mapping
+	// with floors.
+	height = (height > viewz);
+     }
 
     for (check=visplanes; check<lastvisplane; check++)
     {

@@ -224,6 +224,10 @@ static void R_ReadTextures (int names_lump, int maptex_lump_1, int maptex_lump_2
 #endif
 	}
 
+	if ((texture->width & (texture->width - 1))
+	 && (M_CheckParm ("-showunknown")))
+	  printf ("Texture %0.8s has non power of 2 width %u\n", texture->name, texture->width);
+
 	textures[texbase+i].height = texture->height << FRACBITS;
 	textures[texbase+i].pnames_lump = names_lump;
 	i++;	// Done here so that 'continue' misses it out...

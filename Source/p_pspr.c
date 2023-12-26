@@ -31,9 +31,6 @@ static const char rcsid[] = "$Id: p_pspr.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 #define LOWERSPEED		(FRACUNIT*6)
 #define RAISESPEED		(FRACUNIT*6)
 
-// plasma cells for a bfg attack
-unsigned int bfg_cells = 40;
-
 extern int setblocks;
 int	weaponrecoil;
 
@@ -210,20 +207,7 @@ static void P_BringUpWeapon (player_t* player)
 
 static int P_AmmoPerShot (player_t* player)
 {
-    ammotype_t		ammo;
-    int			count;
-
-    ammo = weaponinfo[player->readyweapon].ammo;
-
-    // Minimal amount for one shot varies.
-    if (player->readyweapon == wp_bfg)
-	count = bfg_cells;
-    else if (player->readyweapon == wp_supershotgun)
-	count = 2;	// Double barrel.
-    else
-	count = 1;	// Regular.
-
-    return count;
+    return weaponinfo[player->readyweapon].ammopershot;
 }
 
 //-----------------------------------------------------------------------------
@@ -285,7 +269,7 @@ static boolean P_CheckAmmo (player_t* player)
 	    player->pendingweapon = wp_missile;
 	}
 	else if (player->weaponowned[wp_bfg]
-		 && player->ammo[am_cell]>=bfg_cells
+		 && player->ammo[am_cell]>=weaponinfo[wp_bfg].ammopershot
 		 && (gamemode != shareware) )
 	{
 	    player->pendingweapon = wp_bfg;
@@ -690,7 +674,7 @@ void A_FireBFG (mobj_t* mo, pspdef_t* psp)
   player_t*	player;
 
   if ((player = mo->player) != NULL)
-    A_DecrementAmmo (player, bfg_cells);
+    A_DecrementAmmo (player, weaponinfo[wp_bfg].ammopershot);
 
   P_SpawnPlayerMissile (mo, MT_BFG);
 }

@@ -189,241 +189,244 @@ static void R_InitSpriteDefs (void)
   i = 0;
   do
   {
-    // printf ("i = %d of %d\n", i, NUMSPRITES);
-
-    sprptr = &sprtemp[0];
-    maxframe = ARRAY_SIZE(sprtemp);
-    do
+    if (sprnames[i] != NULL)
     {
-      for (rotation=0 ; rotation < ARRAY_SIZE(sprptr->lump) ; rotation++)
-      {
-	sprptr->lump [rotation] = -1;
-      }
-      sprptr -> flip = 0;
-      sprptr++;
-    } while (--maxframe);
+      // printf ("Looking for sprite %u of %u (%s)\n", i, NUMSPRITES, sprnames[i]);
 
-    maxframe = -1;
-
-    // scan the lumps,
-    //  filling in the frames for whatever is found
-    lump = numlumps;
-    index = numspritelumps;
-    do
-    {
-      /* Search for 'end' */
-      lump--;
-      if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
-      {
-	do
-	{
-	  lump--;
-	  if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
-	   || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
-	  {
-	    break;
-	  }
-
-	  if (lumpinfo[lump].name[0])
-	  {
-	    if (--index < 0)
-	      I_Error ("R_InitSpriteDefs: index < 0\n");
-
-	    if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
-	    {
-	      frame = lumpinfo[lump].name[4] - 'A';
-	      rotation = lumpinfo[lump].name[5] - '0';
-
-	      if (frame >= 0)
-	      {
-		if (frame > maxframe)
-		  maxframe = frame;
-		R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
-	      }
-
-	      if (lumpinfo[lump].name[6])
-	      {
-		frame = lumpinfo[lump].name[6] - 'A';
-		rotation = lumpinfo[lump].name[7] - '0';
-		if (frame > maxframe)
-		  maxframe = frame;
-		R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
-	      }
-	    }
-	  }
-	} while (1);
-      }
-    } while (lump);
-
-    maxframe++;
-    sprites[i].numframes = maxframe;
-
-    // check the frames that were found for completeness
-    if (maxframe)
-    {
       sprptr = &sprtemp[0];
-      frame = 0;
+      maxframe = ARRAY_SIZE(sprtemp);
       do
       {
-	// must have all 16 rotations
-	rotation = 0;
+	for (rotation=0 ; rotation < ARRAY_SIZE(sprptr->lump) ; rotation++)
+	{
+	  sprptr->lump [rotation] = -1;
+	}
+	sprptr -> flip = 0;
+	sprptr++;
+      } while (--maxframe);
+
+      maxframe = -1;
+
+      // scan the lumps,
+      //  filling in the frames for whatever is found
+      lump = numlumps;
+      index = numspritelumps;
+      do
+      {
+	/* Search for 'end' */
+	lump--;
+	if (strncasecmp (lumpinfo[lump].name, "S_END", 8) == 0)
+	{
+	  do
+	  {
+	    lump--;
+	    if ((strncasecmp (lumpinfo[lump].name, "S_START", 8) == 0)
+	     || (lumpinfo[lump].handle != lumpinfo[lump+1].handle))
+	    {
+	      break;
+	    }
+
+	    if (lumpinfo[lump].name[0])
+	    {
+	      if (--index < 0)
+		I_Error ("R_InitSpriteDefs: index < 0\n");
+
+	      if (strncasecmp (lumpinfo[lump].name, sprnames[i], 4) == 0)
+	      {
+		frame = lumpinfo[lump].name[4] - 'A';
+		rotation = lumpinfo[lump].name[5] - '0';
+
+		if (frame >= 0)
+		{
+		  if (frame > maxframe)
+		    maxframe = frame;
+		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, false);
+		}
+
+		if (lumpinfo[lump].name[6])
+		{
+		  frame = lumpinfo[lump].name[6] - 'A';
+		  rotation = lumpinfo[lump].name[7] - '0';
+		  if (frame > maxframe)
+		    maxframe = frame;
+		  R_InstallSpriteLump (sprnames[i], index, lump, frame, rotation, true);
+		}
+	      }
+	    }
+	  } while (1);
+	}
+      } while (lump);
+
+      maxframe++;
+      sprites[i].numframes = maxframe;
+
+      // check the frames that were found for completeness
+      if (maxframe)
+      {
+	sprptr = &sprtemp[0];
+	frame = 0;
 	do
 	{
-	  if (sprptr->lump[rotation] == -1)
+	  // must have all 16 rotations
+	  rotation = 0;
+	  do
 	  {
-	    if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
+	    if (sprptr->lump[rotation] == -1)
 	    {
-	      sprptr->lump[rotation] = sprptr->lump[rotation-1];
-	      sprptr->index[rotation] = sprptr->index[rotation-1];
+	      if (rotation & 1)			// We expect rotations 8-15 to be missing in most cases.
+	      {
+		sprptr->lump[rotation] = sprptr->lump[rotation-1];
+		sprptr->index[rotation] = sprptr->index[rotation-1];
 
-	      if (sprptr->flip & (1<<(rotation-1)))
-		sprptr->flip |= (1<<rotation);
+		if (sprptr->flip & (1<<(rotation-1)))
+		  sprptr->flip |= (1<<rotation);
+		else
+		  sprptr->flip &= ~(1<<rotation);
+	      }
 	      else
-		sprptr->flip &= ~(1<<rotation);
-	    }
-	    else
-	    {
-	      if (M_CheckParm ("-showunknown"))
-		printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
+	      {
+		if (M_CheckParm ("-showunknown"))
+		  printf ("R_InitSprites: Sprite %s frame %c is missing rotation %u\n",
 			sprnames[i], frame+'A', rotation);
 
-	      switch (rotation)
-	      {
-		case 0*2:
-		  if (sprptr->lump[4*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[4*2];
-		    sprptr->index[rotation] = sprptr->index[4*2];
-		    if (sprptr->flip & (1<<(4*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 4*2:
-		  if (sprptr->lump[0*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[0*2];
-		    sprptr->index[rotation] = sprptr->index[0*2];
-		    if (sprptr->flip & (1<<(0*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 2*2:
-		  if (sprptr->lump[6*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[6*2];
-		    sprptr->index[rotation] = sprptr->index[6*2];
-		    if (sprptr->flip & (1<<(6*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 6*2:
-		  if (sprptr->lump[2*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[2*2];
-		    sprptr->index[rotation] = sprptr->index[2*2];
-		    if (sprptr->flip & (1<<(2*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 3*2:
-		  if (sprptr->lump[5*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[5*2];
-		    sprptr->index[rotation] = sprptr->index[5*2];
-		    if (sprptr->flip & (1<<(5*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 5*2:
-		  if (sprptr->lump[3*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[3*2];
-		    sprptr->index[rotation] = sprptr->index[3*2];
-		    if (sprptr->flip & (1<<(3*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 1*2:
-		  if (sprptr->lump[7*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[7*2];
-		    sprptr->index[rotation] = sprptr->index[7*2];
-		    if (sprptr->flip & (1<<(7*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-
-		case 7*2:
-		  if (sprptr->lump[1*2] != -1)
-		  {
-		    sprptr->lump[rotation] = sprptr->lump[1*2];
-		    sprptr->index[rotation] = sprptr->index[1*2];
-		    if (sprptr->flip & (1<<(1*2)))
-		      sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
-		    else
-		      sprptr->flip |= (1<<rotation);
-		  }
-		  break;
-	      }
-
-	      if (sprptr->lump[rotation] == -1)
-	      {
-		if (rotation)
+		switch (rotation)
 		{
-		  sprptr->lump[rotation] = sprptr->lump[rotation-1];
-		  sprptr->index[rotation] = sprptr->index[rotation-1];
-		  if (sprptr->flip & (1<<(rotation-1)))
-		    sprptr->flip |= (1<<rotation);
-		  else
-		    sprptr->flip &= ~(1<<rotation);
-		}
-		else
-		{
-		  rot = rotation;
-		  do
-		  {
-		    if (sprptr->lump[rot] != -1)
+		  case 0*2:
+		    if (sprptr->lump[4*2] != -1)
 		    {
-		      sprptr->lump[rotation] = sprptr->lump[rot];
-		      sprptr->index[rotation] = sprptr->index[rot];
-		      if (sprptr->flip & (1<<rot))
-			sprptr->flip |= (1<<rotation);
+		      sprptr->lump[rotation] = sprptr->lump[4*2];
+		      sprptr->index[rotation] = sprptr->index[4*2];
+		      if (sprptr->flip & (1<<(4*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
 		      else
-			sprptr->flip &= ~(1<<rotation);
-		      break;
+			sprptr->flip |= (1<<rotation);
 		    }
-		  } while (++rot < ARRAY_SIZE(sprptr->lump));
+		    break;
+
+		  case 4*2:
+		    if (sprptr->lump[0*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[0*2];
+		      sprptr->index[rotation] = sprptr->index[0*2];
+		      if (sprptr->flip & (1<<(0*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 2*2:
+		    if (sprptr->lump[6*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[6*2];
+		      sprptr->index[rotation] = sprptr->index[6*2];
+		      if (sprptr->flip & (1<<(6*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 6*2:
+		    if (sprptr->lump[2*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[2*2];
+		      sprptr->index[rotation] = sprptr->index[2*2];
+		      if (sprptr->flip & (1<<(2*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 3*2:
+		    if (sprptr->lump[5*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[5*2];
+		      sprptr->index[rotation] = sprptr->index[5*2];
+		      if (sprptr->flip & (1<<(5*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 5*2:
+		    if (sprptr->lump[3*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[3*2];
+		      sprptr->index[rotation] = sprptr->index[3*2];
+		      if (sprptr->flip & (1<<(3*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 1*2:
+		    if (sprptr->lump[7*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[7*2];
+		      sprptr->index[rotation] = sprptr->index[7*2];
+		      if (sprptr->flip & (1<<(7*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+
+		  case 7*2:
+		    if (sprptr->lump[1*2] != -1)
+		    {
+		      sprptr->lump[rotation] = sprptr->lump[1*2];
+		      sprptr->index[rotation] = sprptr->index[1*2];
+		      if (sprptr->flip & (1<<(1*2)))
+			sprptr->flip &= ~(1<<rotation);	// Invert the flip bit.
+		      else
+			sprptr->flip |= (1<<rotation);
+		    }
+		    break;
+		}
+
+		if (sprptr->lump[rotation] == -1)
+		{
+		  if (rotation)
+		  {
+		    sprptr->lump[rotation] = sprptr->lump[rotation-1];
+		    sprptr->index[rotation] = sprptr->index[rotation-1];
+		    if (sprptr->flip & (1<<(rotation-1)))
+		      sprptr->flip |= (1<<rotation);
+		    else
+		      sprptr->flip &= ~(1<<rotation);
+		  }
+		  else
+		  {
+		    rot = rotation;
+		    do
+		    {
+		      if (sprptr->lump[rot] != -1)
+		      {
+			sprptr->lump[rotation] = sprptr->lump[rot];
+			sprptr->index[rotation] = sprptr->index[rot];
+			if (sprptr->flip & (1<<rot))
+			  sprptr->flip |= (1<<rotation);
+			else
+			  sprptr->flip &= ~(1<<rotation);
+			break;
+		      }
+		    } while (++rot < ARRAY_SIZE(sprptr->lump));
+		  }
 		}
 	      }
 	    }
-	  }
-	} while (++rotation < ARRAY_SIZE(sprptr->lump));
-	sprptr++;
-      } while (++frame < maxframe);
+	  } while (++rotation < ARRAY_SIZE(sprptr->lump));
+	  sprptr++;
+	} while (++frame < maxframe);
 
-      // allocate space for the frames present and copy sprtemp to it
-      sprites[i].spriteframes = Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
-      memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
+	// allocate space for the frames present and copy sprtemp to it
+	sprites[i].spriteframes = Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
+	memcpy (sprites[i].spriteframes, sprtemp, maxframe * sizeof(spriteframe_t));
+      }
     }
   } while (++i < NUMSPRITES);
 

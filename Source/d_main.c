@@ -128,8 +128,8 @@ extern char*	cast_names_copy[];
 extern mobjtype_t castorder[];
 
 /* Strings from info.c */
-extern char * sprnames [];
 extern char * sprnames_orig[];
+extern actionf_t states_ptr_copy [];
 
 /* Strings from p_inter.c */
 extern char * got_messages [];
@@ -177,9 +177,6 @@ extern char * special_effects_messages_orig [];
 /* Strings from sounds.c */
 extern char * music_names_copy [];
 extern char * sound_names_copy [];
-
-/* Pointers from dh_stuff.c */
-extern actionf_t states_ptr_copy [NUMSTATES];
 
 /* ----------------------------------------------------------- */
 

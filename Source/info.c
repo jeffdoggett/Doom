@@ -63,11 +63,15 @@ char *sprnames_orig[] =
   NULL
 };
 
-char *sprnames [ARRAY_SIZE(sprnames_orig)];
+//-----------------------------------------------------------------------------
+
+char *sprnames_table [ARRAY_SIZE(sprnames_orig)];
+char **sprnames = sprnames_table;
+uint32_t NUMSPRITES = ARRAY_SIZE(sprnames_orig) - 1;
 
 //-----------------------------------------------------------------------------
 
-state_t states [] =
+state_t states_table [] =
 {
   //  sprite	frame		  tics	action		nextstate	 misc1	misc2	    state
   { SPR_TROO,	0,		    -1, NULL,		S_NULL, 	 0,	0 }, // S_NULL
@@ -1457,2924 +1461,18 @@ state_t states [] =
   { SPR_PLAY,  20,		    5,	NULL,		S_PLAY_GDIE8,	 0,	0 }, // S_PLAY_GDIE7
   { SPR_PLAY,  21,		    5,	NULL,		S_PLAY_GDIE9,	 0,	0 }, // S_PLAY_GDIE8
   { SPR_PLAY,  22,		    -1, NULL,		S_NULL, 	 0,	0 }, // S_PLAY_GDIE9
-
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+0), 0,	0 }, // EXTRASTATE 0
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1), 0,	0 }, // EXTRASTATE 1
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2), 0,	0 }, // EXTRASTATE 2
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+3), 0,	0 }, // EXTRASTATE 3
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+4), 0,	0 }, // EXTRASTATE 4
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+5), 0,	0 }, // EXTRASTATE 5
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+6), 0,	0 }, // EXTRASTATE 6
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+7), 0,	0 }, // EXTRASTATE 7
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+8), 0,	0 }, // EXTRASTATE 8
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+9), 0,	0 }, // EXTRASTATE 9
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+10), 0,	0 }, // EXTRASTATE 10
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+11), 0,	0 }, // EXTRASTATE 11
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+12), 0,	0 }, // EXTRASTATE 12
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+13), 0,	0 }, // EXTRASTATE 13
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+14), 0,	0 }, // EXTRASTATE 14
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+15), 0,	0 }, // EXTRASTATE 15
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+16), 0,	0 }, // EXTRASTATE 16
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+17), 0,	0 }, // EXTRASTATE 17
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+18), 0,	0 }, // EXTRASTATE 18
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+19), 0,	0 }, // EXTRASTATE 19
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+20), 0,	0 }, // EXTRASTATE 20
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+21), 0,	0 }, // EXTRASTATE 21
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+22), 0,	0 }, // EXTRASTATE 22
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+23), 0,	0 }, // EXTRASTATE 23
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+24), 0,	0 }, // EXTRASTATE 24
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+25), 0,	0 }, // EXTRASTATE 25
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+26), 0,	0 }, // EXTRASTATE 26
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+27), 0,	0 }, // EXTRASTATE 27
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+28), 0,	0 }, // EXTRASTATE 28
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+29), 0,	0 }, // EXTRASTATE 29
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+30), 0,	0 }, // EXTRASTATE 30
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+31), 0,	0 }, // EXTRASTATE 31
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+32), 0,	0 }, // EXTRASTATE 32
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+33), 0,	0 }, // EXTRASTATE 33
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+34), 0,	0 }, // EXTRASTATE 34
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+35), 0,	0 }, // EXTRASTATE 35
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+36), 0,	0 }, // EXTRASTATE 36
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+37), 0,	0 }, // EXTRASTATE 37
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+38), 0,	0 }, // EXTRASTATE 38
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+39), 0,	0 }, // EXTRASTATE 39
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+40), 0,	0 }, // EXTRASTATE 40
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+41), 0,	0 }, // EXTRASTATE 41
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+42), 0,	0 }, // EXTRASTATE 42
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+43), 0,	0 }, // EXTRASTATE 43
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+44), 0,	0 }, // EXTRASTATE 44
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+45), 0,	0 }, // EXTRASTATE 45
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+46), 0,	0 }, // EXTRASTATE 46
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+47), 0,	0 }, // EXTRASTATE 47
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+48), 0,	0 }, // EXTRASTATE 48
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+49), 0,	0 }, // EXTRASTATE 49
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+50), 0,	0 }, // EXTRASTATE 50
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+51), 0,	0 }, // EXTRASTATE 51
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+52), 0,	0 }, // EXTRASTATE 52
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+53), 0,	0 }, // EXTRASTATE 53
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+54), 0,	0 }, // EXTRASTATE 54
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+55), 0,	0 }, // EXTRASTATE 55
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+56), 0,	0 }, // EXTRASTATE 56
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+57), 0,	0 }, // EXTRASTATE 57
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+58), 0,	0 }, // EXTRASTATE 58
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+59), 0,	0 }, // EXTRASTATE 59
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+60), 0,	0 }, // EXTRASTATE 60
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+61), 0,	0 }, // EXTRASTATE 61
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+62), 0,	0 }, // EXTRASTATE 62
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+63), 0,	0 }, // EXTRASTATE 63
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+64), 0,	0 }, // EXTRASTATE 64
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+65), 0,	0 }, // EXTRASTATE 65
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+66), 0,	0 }, // EXTRASTATE 66
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+67), 0,	0 }, // EXTRASTATE 67
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+68), 0,	0 }, // EXTRASTATE 68
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+69), 0,	0 }, // EXTRASTATE 69
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+70), 0,	0 }, // EXTRASTATE 70
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+71), 0,	0 }, // EXTRASTATE 71
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+72), 0,	0 }, // EXTRASTATE 72
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+73), 0,	0 }, // EXTRASTATE 73
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+74), 0,	0 }, // EXTRASTATE 74
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+75), 0,	0 }, // EXTRASTATE 75
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+76), 0,	0 }, // EXTRASTATE 76
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+77), 0,	0 }, // EXTRASTATE 77
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+78), 0,	0 }, // EXTRASTATE 78
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+79), 0,	0 }, // EXTRASTATE 79
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+80), 0,	0 }, // EXTRASTATE 80
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+81), 0,	0 }, // EXTRASTATE 81
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+82), 0,	0 }, // EXTRASTATE 82
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+83), 0,	0 }, // EXTRASTATE 83
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+84), 0,	0 }, // EXTRASTATE 84
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+85), 0,	0 }, // EXTRASTATE 85
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+86), 0,	0 }, // EXTRASTATE 86
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+87), 0,	0 }, // EXTRASTATE 87
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+88), 0,	0 }, // EXTRASTATE 88
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+89), 0,	0 }, // EXTRASTATE 89
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+90), 0,	0 }, // EXTRASTATE 90
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+91), 0,	0 }, // EXTRASTATE 91
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+92), 0,	0 }, // EXTRASTATE 92
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+93), 0,	0 }, // EXTRASTATE 93
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+94), 0,	0 }, // EXTRASTATE 94
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+95), 0,	0 }, // EXTRASTATE 95
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+96), 0,	0 }, // EXTRASTATE 96
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+97), 0,	0 }, // EXTRASTATE 97
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+98), 0,	0 }, // EXTRASTATE 98
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+99), 0,	0 }, // EXTRASTATE 99
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+100), 0,	0 }, // EXTRASTATE 100
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+101), 0,	0 }, // EXTRASTATE 101
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+102), 0,	0 }, // EXTRASTATE 102
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+103), 0,	0 }, // EXTRASTATE 103
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+104), 0,	0 }, // EXTRASTATE 104
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+105), 0,	0 }, // EXTRASTATE 105
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+106), 0,	0 }, // EXTRASTATE 106
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+107), 0,	0 }, // EXTRASTATE 107
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+108), 0,	0 }, // EXTRASTATE 108
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+109), 0,	0 }, // EXTRASTATE 109
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+110), 0,	0 }, // EXTRASTATE 110
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+111), 0,	0 }, // EXTRASTATE 111
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+112), 0,	0 }, // EXTRASTATE 112
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+113), 0,	0 }, // EXTRASTATE 113
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+114), 0,	0 }, // EXTRASTATE 114
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+115), 0,	0 }, // EXTRASTATE 115
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+116), 0,	0 }, // EXTRASTATE 116
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+117), 0,	0 }, // EXTRASTATE 117
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+118), 0,	0 }, // EXTRASTATE 118
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+119), 0,	0 }, // EXTRASTATE 119
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+120), 0,	0 }, // EXTRASTATE 120
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+121), 0,	0 }, // EXTRASTATE 121
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+122), 0,	0 }, // EXTRASTATE 122
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+123), 0,	0 }, // EXTRASTATE 123
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+124), 0,	0 }, // EXTRASTATE 124
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+125), 0,	0 }, // EXTRASTATE 125
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+126), 0,	0 }, // EXTRASTATE 126
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+127), 0,	0 }, // EXTRASTATE 127
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+128), 0,	0 }, // EXTRASTATE 128
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+129), 0,	0 }, // EXTRASTATE 129
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+130), 0,	0 }, // EXTRASTATE 130
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+131), 0,	0 }, // EXTRASTATE 131
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+132), 0,	0 }, // EXTRASTATE 132
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+133), 0,	0 }, // EXTRASTATE 133
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+134), 0,	0 }, // EXTRASTATE 134
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+135), 0,	0 }, // EXTRASTATE 135
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+136), 0,	0 }, // EXTRASTATE 136
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+137), 0,	0 }, // EXTRASTATE 137
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+138), 0,	0 }, // EXTRASTATE 138
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+139), 0,	0 }, // EXTRASTATE 139
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+140), 0,	0 }, // EXTRASTATE 140
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+141), 0,	0 }, // EXTRASTATE 141
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+142), 0,	0 }, // EXTRASTATE 142
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+143), 0,	0 }, // EXTRASTATE 143
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+144), 0,	0 }, // EXTRASTATE 144
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+145), 0,	0 }, // EXTRASTATE 145
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+146), 0,	0 }, // EXTRASTATE 146
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+147), 0,	0 }, // EXTRASTATE 147
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+148), 0,	0 }, // EXTRASTATE 148
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+149), 0,	0 }, // EXTRASTATE 149
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+150), 0,	0 }, // EXTRASTATE 150
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+151), 0,	0 }, // EXTRASTATE 151
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+152), 0,	0 }, // EXTRASTATE 152
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+153), 0,	0 }, // EXTRASTATE 153
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+154), 0,	0 }, // EXTRASTATE 154
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+155), 0,	0 }, // EXTRASTATE 155
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+156), 0,	0 }, // EXTRASTATE 156
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+157), 0,	0 }, // EXTRASTATE 157
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+158), 0,	0 }, // EXTRASTATE 158
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+159), 0,	0 }, // EXTRASTATE 159
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+160), 0,	0 }, // EXTRASTATE 160
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+161), 0,	0 }, // EXTRASTATE 161
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+162), 0,	0 }, // EXTRASTATE 162
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+163), 0,	0 }, // EXTRASTATE 163
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+164), 0,	0 }, // EXTRASTATE 164
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+165), 0,	0 }, // EXTRASTATE 165
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+166), 0,	0 }, // EXTRASTATE 166
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+167), 0,	0 }, // EXTRASTATE 167
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+168), 0,	0 }, // EXTRASTATE 168
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+169), 0,	0 }, // EXTRASTATE 169
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+170), 0,	0 }, // EXTRASTATE 170
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+171), 0,	0 }, // EXTRASTATE 171
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+172), 0,	0 }, // EXTRASTATE 172
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+173), 0,	0 }, // EXTRASTATE 173
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+174), 0,	0 }, // EXTRASTATE 174
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+175), 0,	0 }, // EXTRASTATE 175
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+176), 0,	0 }, // EXTRASTATE 176
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+177), 0,	0 }, // EXTRASTATE 177
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+178), 0,	0 }, // EXTRASTATE 178
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+179), 0,	0 }, // EXTRASTATE 179
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+180), 0,	0 }, // EXTRASTATE 180
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+181), 0,	0 }, // EXTRASTATE 181
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+182), 0,	0 }, // EXTRASTATE 182
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+183), 0,	0 }, // EXTRASTATE 183
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+184), 0,	0 }, // EXTRASTATE 184
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+185), 0,	0 }, // EXTRASTATE 185
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+186), 0,	0 }, // EXTRASTATE 186
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+187), 0,	0 }, // EXTRASTATE 187
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+188), 0,	0 }, // EXTRASTATE 188
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+189), 0,	0 }, // EXTRASTATE 189
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+190), 0,	0 }, // EXTRASTATE 190
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+191), 0,	0 }, // EXTRASTATE 191
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+192), 0,	0 }, // EXTRASTATE 192
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+193), 0,	0 }, // EXTRASTATE 193
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+194), 0,	0 }, // EXTRASTATE 194
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+195), 0,	0 }, // EXTRASTATE 195
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+196), 0,	0 }, // EXTRASTATE 196
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+197), 0,	0 }, // EXTRASTATE 197
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+198), 0,	0 }, // EXTRASTATE 198
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+199), 0,	0 }, // EXTRASTATE 199
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+200), 0,	0 }, // EXTRASTATE 200
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+201), 0,	0 }, // EXTRASTATE 201
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+202), 0,	0 }, // EXTRASTATE 202
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+203), 0,	0 }, // EXTRASTATE 203
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+204), 0,	0 }, // EXTRASTATE 204
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+205), 0,	0 }, // EXTRASTATE 205
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+206), 0,	0 }, // EXTRASTATE 206
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+207), 0,	0 }, // EXTRASTATE 207
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+208), 0,	0 }, // EXTRASTATE 208
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+209), 0,	0 }, // EXTRASTATE 209
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+210), 0,	0 }, // EXTRASTATE 210
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+211), 0,	0 }, // EXTRASTATE 211
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+212), 0,	0 }, // EXTRASTATE 212
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+213), 0,	0 }, // EXTRASTATE 213
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+214), 0,	0 }, // EXTRASTATE 214
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+215), 0,	0 }, // EXTRASTATE 215
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+216), 0,	0 }, // EXTRASTATE 216
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+217), 0,	0 }, // EXTRASTATE 217
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+218), 0,	0 }, // EXTRASTATE 218
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+219), 0,	0 }, // EXTRASTATE 219
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+220), 0,	0 }, // EXTRASTATE 220
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+221), 0,	0 }, // EXTRASTATE 221
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+222), 0,	0 }, // EXTRASTATE 222
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+223), 0,	0 }, // EXTRASTATE 223
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+224), 0,	0 }, // EXTRASTATE 224
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+225), 0,	0 }, // EXTRASTATE 225
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+226), 0,	0 }, // EXTRASTATE 226
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+227), 0,	0 }, // EXTRASTATE 227
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+228), 0,	0 }, // EXTRASTATE 228
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+229), 0,	0 }, // EXTRASTATE 229
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+230), 0,	0 }, // EXTRASTATE 230
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+231), 0,	0 }, // EXTRASTATE 231
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+232), 0,	0 }, // EXTRASTATE 232
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+233), 0,	0 }, // EXTRASTATE 233
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+234), 0,	0 }, // EXTRASTATE 234
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+235), 0,	0 }, // EXTRASTATE 235
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+236), 0,	0 }, // EXTRASTATE 236
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+237), 0,	0 }, // EXTRASTATE 237
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+238), 0,	0 }, // EXTRASTATE 238
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+239), 0,	0 }, // EXTRASTATE 239
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+240), 0,	0 }, // EXTRASTATE 240
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+241), 0,	0 }, // EXTRASTATE 241
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+242), 0,	0 }, // EXTRASTATE 242
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+243), 0,	0 }, // EXTRASTATE 243
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+244), 0,	0 }, // EXTRASTATE 244
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+245), 0,	0 }, // EXTRASTATE 245
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+246), 0,	0 }, // EXTRASTATE 246
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+247), 0,	0 }, // EXTRASTATE 247
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+248), 0,	0 }, // EXTRASTATE 248
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+249), 0,	0 }, // EXTRASTATE 249
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+250), 0,	0 }, // EXTRASTATE 250
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+251), 0,	0 }, // EXTRASTATE 251
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+252), 0,	0 }, // EXTRASTATE 252
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+253), 0,	0 }, // EXTRASTATE 253
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+254), 0,	0 }, // EXTRASTATE 254
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+255), 0,	0 }, // EXTRASTATE 255
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+256), 0,	0 }, // EXTRASTATE 256
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+257), 0,	0 }, // EXTRASTATE 257
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+258), 0,	0 }, // EXTRASTATE 258
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+259), 0,	0 }, // EXTRASTATE 259
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+260), 0,	0 }, // EXTRASTATE 260
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+261), 0,	0 }, // EXTRASTATE 261
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+262), 0,	0 }, // EXTRASTATE 262
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+263), 0,	0 }, // EXTRASTATE 263
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+264), 0,	0 }, // EXTRASTATE 264
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+265), 0,	0 }, // EXTRASTATE 265
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+266), 0,	0 }, // EXTRASTATE 266
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+267), 0,	0 }, // EXTRASTATE 267
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+268), 0,	0 }, // EXTRASTATE 268
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+269), 0,	0 }, // EXTRASTATE 269
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+270), 0,	0 }, // EXTRASTATE 270
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+271), 0,	0 }, // EXTRASTATE 271
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+272), 0,	0 }, // EXTRASTATE 272
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+273), 0,	0 }, // EXTRASTATE 273
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+274), 0,	0 }, // EXTRASTATE 274
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+275), 0,	0 }, // EXTRASTATE 275
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+276), 0,	0 }, // EXTRASTATE 276
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+277), 0,	0 }, // EXTRASTATE 277
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+278), 0,	0 }, // EXTRASTATE 278
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+279), 0,	0 }, // EXTRASTATE 279
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+280), 0,	0 }, // EXTRASTATE 280
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+281), 0,	0 }, // EXTRASTATE 281
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+282), 0,	0 }, // EXTRASTATE 282
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+283), 0,	0 }, // EXTRASTATE 283
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+284), 0,	0 }, // EXTRASTATE 284
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+285), 0,	0 }, // EXTRASTATE 285
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+286), 0,	0 }, // EXTRASTATE 286
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+287), 0,	0 }, // EXTRASTATE 287
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+288), 0,	0 }, // EXTRASTATE 288
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+289), 0,	0 }, // EXTRASTATE 289
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+290), 0,	0 }, // EXTRASTATE 290
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+291), 0,	0 }, // EXTRASTATE 291
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+292), 0,	0 }, // EXTRASTATE 292
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+293), 0,	0 }, // EXTRASTATE 293
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+294), 0,	0 }, // EXTRASTATE 294
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+295), 0,	0 }, // EXTRASTATE 295
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+296), 0,	0 }, // EXTRASTATE 296
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+297), 0,	0 }, // EXTRASTATE 297
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+298), 0,	0 }, // EXTRASTATE 298
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+299), 0,	0 }, // EXTRASTATE 299
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+300), 0,	0 }, // EXTRASTATE 300
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+301), 0,	0 }, // EXTRASTATE 301
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+302), 0,	0 }, // EXTRASTATE 302
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+303), 0,	0 }, // EXTRASTATE 303
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+304), 0,	0 }, // EXTRASTATE 304
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+305), 0,	0 }, // EXTRASTATE 305
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+306), 0,	0 }, // EXTRASTATE 306
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+307), 0,	0 }, // EXTRASTATE 307
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+308), 0,	0 }, // EXTRASTATE 308
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+309), 0,	0 }, // EXTRASTATE 309
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+310), 0,	0 }, // EXTRASTATE 310
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+311), 0,	0 }, // EXTRASTATE 311
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+312), 0,	0 }, // EXTRASTATE 312
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+313), 0,	0 }, // EXTRASTATE 313
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+314), 0,	0 }, // EXTRASTATE 314
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+315), 0,	0 }, // EXTRASTATE 315
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+316), 0,	0 }, // EXTRASTATE 316
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+317), 0,	0 }, // EXTRASTATE 317
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+318), 0,	0 }, // EXTRASTATE 318
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+319), 0,	0 }, // EXTRASTATE 319
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+320), 0,	0 }, // EXTRASTATE 320
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+321), 0,	0 }, // EXTRASTATE 321
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+322), 0,	0 }, // EXTRASTATE 322
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+323), 0,	0 }, // EXTRASTATE 323
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+324), 0,	0 }, // EXTRASTATE 324
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+325), 0,	0 }, // EXTRASTATE 325
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+326), 0,	0 }, // EXTRASTATE 326
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+327), 0,	0 }, // EXTRASTATE 327
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+328), 0,	0 }, // EXTRASTATE 328
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+329), 0,	0 }, // EXTRASTATE 329
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+330), 0,	0 }, // EXTRASTATE 330
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+331), 0,	0 }, // EXTRASTATE 331
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+332), 0,	0 }, // EXTRASTATE 332
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+333), 0,	0 }, // EXTRASTATE 333
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+334), 0,	0 }, // EXTRASTATE 334
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+335), 0,	0 }, // EXTRASTATE 335
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+336), 0,	0 }, // EXTRASTATE 336
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+337), 0,	0 }, // EXTRASTATE 337
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+338), 0,	0 }, // EXTRASTATE 338
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+339), 0,	0 }, // EXTRASTATE 339
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+340), 0,	0 }, // EXTRASTATE 340
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+341), 0,	0 }, // EXTRASTATE 341
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+342), 0,	0 }, // EXTRASTATE 342
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+343), 0,	0 }, // EXTRASTATE 343
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+344), 0,	0 }, // EXTRASTATE 344
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+345), 0,	0 }, // EXTRASTATE 345
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+346), 0,	0 }, // EXTRASTATE 346
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+347), 0,	0 }, // EXTRASTATE 347
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+348), 0,	0 }, // EXTRASTATE 348
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+349), 0,	0 }, // EXTRASTATE 349
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+350), 0,	0 }, // EXTRASTATE 350
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+351), 0,	0 }, // EXTRASTATE 351
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+352), 0,	0 }, // EXTRASTATE 352
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+353), 0,	0 }, // EXTRASTATE 353
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+354), 0,	0 }, // EXTRASTATE 354
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+355), 0,	0 }, // EXTRASTATE 355
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+356), 0,	0 }, // EXTRASTATE 356
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+357), 0,	0 }, // EXTRASTATE 357
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+358), 0,	0 }, // EXTRASTATE 358
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+359), 0,	0 }, // EXTRASTATE 359
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+360), 0,	0 }, // EXTRASTATE 360
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+361), 0,	0 }, // EXTRASTATE 361
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+362), 0,	0 }, // EXTRASTATE 362
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+363), 0,	0 }, // EXTRASTATE 363
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+364), 0,	0 }, // EXTRASTATE 364
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+365), 0,	0 }, // EXTRASTATE 365
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+366), 0,	0 }, // EXTRASTATE 366
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+367), 0,	0 }, // EXTRASTATE 367
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+368), 0,	0 }, // EXTRASTATE 368
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+369), 0,	0 }, // EXTRASTATE 369
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+370), 0,	0 }, // EXTRASTATE 370
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+371), 0,	0 }, // EXTRASTATE 371
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+372), 0,	0 }, // EXTRASTATE 372
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+373), 0,	0 }, // EXTRASTATE 373
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+374), 0,	0 }, // EXTRASTATE 374
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+375), 0,	0 }, // EXTRASTATE 375
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+376), 0,	0 }, // EXTRASTATE 376
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+377), 0,	0 }, // EXTRASTATE 377
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+378), 0,	0 }, // EXTRASTATE 378
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+379), 0,	0 }, // EXTRASTATE 379
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+380), 0,	0 }, // EXTRASTATE 380
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+381), 0,	0 }, // EXTRASTATE 381
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+382), 0,	0 }, // EXTRASTATE 382
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+383), 0,	0 }, // EXTRASTATE 383
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+384), 0,	0 }, // EXTRASTATE 384
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+385), 0,	0 }, // EXTRASTATE 385
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+386), 0,	0 }, // EXTRASTATE 386
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+387), 0,	0 }, // EXTRASTATE 387
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+388), 0,	0 }, // EXTRASTATE 388
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+389), 0,	0 }, // EXTRASTATE 389
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+390), 0,	0 }, // EXTRASTATE 390
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+391), 0,	0 }, // EXTRASTATE 391
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+392), 0,	0 }, // EXTRASTATE 392
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+393), 0,	0 }, // EXTRASTATE 393
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+394), 0,	0 }, // EXTRASTATE 394
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+395), 0,	0 }, // EXTRASTATE 395
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+396), 0,	0 }, // EXTRASTATE 396
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+397), 0,	0 }, // EXTRASTATE 397
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+398), 0,	0 }, // EXTRASTATE 398
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+399), 0,	0 }, // EXTRASTATE 399
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+400), 0,	0 }, // EXTRASTATE 400
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+401), 0,	0 }, // EXTRASTATE 401
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+402), 0,	0 }, // EXTRASTATE 402
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+403), 0,	0 }, // EXTRASTATE 403
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+404), 0,	0 }, // EXTRASTATE 404
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+405), 0,	0 }, // EXTRASTATE 405
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+406), 0,	0 }, // EXTRASTATE 406
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+407), 0,	0 }, // EXTRASTATE 407
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+408), 0,	0 }, // EXTRASTATE 408
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+409), 0,	0 }, // EXTRASTATE 409
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+410), 0,	0 }, // EXTRASTATE 410
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+411), 0,	0 }, // EXTRASTATE 411
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+412), 0,	0 }, // EXTRASTATE 412
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+413), 0,	0 }, // EXTRASTATE 413
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+414), 0,	0 }, // EXTRASTATE 414
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+415), 0,	0 }, // EXTRASTATE 415
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+416), 0,	0 }, // EXTRASTATE 416
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+417), 0,	0 }, // EXTRASTATE 417
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+418), 0,	0 }, // EXTRASTATE 418
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+419), 0,	0 }, // EXTRASTATE 419
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+420), 0,	0 }, // EXTRASTATE 420
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+421), 0,	0 }, // EXTRASTATE 421
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+422), 0,	0 }, // EXTRASTATE 422
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+423), 0,	0 }, // EXTRASTATE 423
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+424), 0,	0 }, // EXTRASTATE 424
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+425), 0,	0 }, // EXTRASTATE 425
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+426), 0,	0 }, // EXTRASTATE 426
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+427), 0,	0 }, // EXTRASTATE 427
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+428), 0,	0 }, // EXTRASTATE 428
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+429), 0,	0 }, // EXTRASTATE 429
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+430), 0,	0 }, // EXTRASTATE 430
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+431), 0,	0 }, // EXTRASTATE 431
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+432), 0,	0 }, // EXTRASTATE 432
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+433), 0,	0 }, // EXTRASTATE 433
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+434), 0,	0 }, // EXTRASTATE 434
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+435), 0,	0 }, // EXTRASTATE 435
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+436), 0,	0 }, // EXTRASTATE 436
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+437), 0,	0 }, // EXTRASTATE 437
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+438), 0,	0 }, // EXTRASTATE 438
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+439), 0,	0 }, // EXTRASTATE 439
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+440), 0,	0 }, // EXTRASTATE 440
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+441), 0,	0 }, // EXTRASTATE 441
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+442), 0,	0 }, // EXTRASTATE 442
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+443), 0,	0 }, // EXTRASTATE 443
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+444), 0,	0 }, // EXTRASTATE 444
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+445), 0,	0 }, // EXTRASTATE 445
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+446), 0,	0 }, // EXTRASTATE 446
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+447), 0,	0 }, // EXTRASTATE 447
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+448), 0,	0 }, // EXTRASTATE 448
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+449), 0,	0 }, // EXTRASTATE 449
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+450), 0,	0 }, // EXTRASTATE 450
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+451), 0,	0 }, // EXTRASTATE 451
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+452), 0,	0 }, // EXTRASTATE 452
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+453), 0,	0 }, // EXTRASTATE 453
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+454), 0,	0 }, // EXTRASTATE 454
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+455), 0,	0 }, // EXTRASTATE 455
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+456), 0,	0 }, // EXTRASTATE 456
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+457), 0,	0 }, // EXTRASTATE 457
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+458), 0,	0 }, // EXTRASTATE 458
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+459), 0,	0 }, // EXTRASTATE 459
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+460), 0,	0 }, // EXTRASTATE 460
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+461), 0,	0 }, // EXTRASTATE 461
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+462), 0,	0 }, // EXTRASTATE 462
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+463), 0,	0 }, // EXTRASTATE 463
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+464), 0,	0 }, // EXTRASTATE 464
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+465), 0,	0 }, // EXTRASTATE 465
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+466), 0,	0 }, // EXTRASTATE 466
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+467), 0,	0 }, // EXTRASTATE 467
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+468), 0,	0 }, // EXTRASTATE 468
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+469), 0,	0 }, // EXTRASTATE 469
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+470), 0,	0 }, // EXTRASTATE 470
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+471), 0,	0 }, // EXTRASTATE 471
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+472), 0,	0 }, // EXTRASTATE 472
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+473), 0,	0 }, // EXTRASTATE 473
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+474), 0,	0 }, // EXTRASTATE 474
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+475), 0,	0 }, // EXTRASTATE 475
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+476), 0,	0 }, // EXTRASTATE 476
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+477), 0,	0 }, // EXTRASTATE 477
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+478), 0,	0 }, // EXTRASTATE 478
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+479), 0,	0 }, // EXTRASTATE 479
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+480), 0,	0 }, // EXTRASTATE 480
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+481), 0,	0 }, // EXTRASTATE 481
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+482), 0,	0 }, // EXTRASTATE 482
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+483), 0,	0 }, // EXTRASTATE 483
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+484), 0,	0 }, // EXTRASTATE 484
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+485), 0,	0 }, // EXTRASTATE 485
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+486), 0,	0 }, // EXTRASTATE 486
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+487), 0,	0 }, // EXTRASTATE 487
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+488), 0,	0 }, // EXTRASTATE 488
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+489), 0,	0 }, // EXTRASTATE 489
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+490), 0,	0 }, // EXTRASTATE 490
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+491), 0,	0 }, // EXTRASTATE 491
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+492), 0,	0 }, // EXTRASTATE 492
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+493), 0,	0 }, // EXTRASTATE 493
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+494), 0,	0 }, // EXTRASTATE 494
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+495), 0,	0 }, // EXTRASTATE 495
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+496), 0,	0 }, // EXTRASTATE 496
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+497), 0,	0 }, // EXTRASTATE 497
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+498), 0,	0 }, // EXTRASTATE 498
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+499), 0,	0 }, // EXTRASTATE 499
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+500), 0,	0 }, // EXTRASTATE 500
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+501), 0,	0 }, // EXTRASTATE 501
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+502), 0,	0 }, // EXTRASTATE 502
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+503), 0,	0 }, // EXTRASTATE 503
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+504), 0,	0 }, // EXTRASTATE 504
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+505), 0,	0 }, // EXTRASTATE 505
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+506), 0,	0 }, // EXTRASTATE 506
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+507), 0,	0 }, // EXTRASTATE 507
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+508), 0,	0 }, // EXTRASTATE 508
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+509), 0,	0 }, // EXTRASTATE 509
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+510), 0,	0 }, // EXTRASTATE 510
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+511), 0,	0 }, // EXTRASTATE 511
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+512), 0,	0 }, // EXTRASTATE 512
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+513), 0,	0 }, // EXTRASTATE 513
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+514), 0,	0 }, // EXTRASTATE 514
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+515), 0,	0 }, // EXTRASTATE 515
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+516), 0,	0 }, // EXTRASTATE 516
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+517), 0,	0 }, // EXTRASTATE 517
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+518), 0,	0 }, // EXTRASTATE 518
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+519), 0,	0 }, // EXTRASTATE 519
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+520), 0,	0 }, // EXTRASTATE 520
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+521), 0,	0 }, // EXTRASTATE 521
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+522), 0,	0 }, // EXTRASTATE 522
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+523), 0,	0 }, // EXTRASTATE 523
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+524), 0,	0 }, // EXTRASTATE 524
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+525), 0,	0 }, // EXTRASTATE 525
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+526), 0,	0 }, // EXTRASTATE 526
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+527), 0,	0 }, // EXTRASTATE 527
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+528), 0,	0 }, // EXTRASTATE 528
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+529), 0,	0 }, // EXTRASTATE 529
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+530), 0,	0 }, // EXTRASTATE 530
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+531), 0,	0 }, // EXTRASTATE 531
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+532), 0,	0 }, // EXTRASTATE 532
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+533), 0,	0 }, // EXTRASTATE 533
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+534), 0,	0 }, // EXTRASTATE 534
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+535), 0,	0 }, // EXTRASTATE 535
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+536), 0,	0 }, // EXTRASTATE 536
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+537), 0,	0 }, // EXTRASTATE 537
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+538), 0,	0 }, // EXTRASTATE 538
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+539), 0,	0 }, // EXTRASTATE 539
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+540), 0,	0 }, // EXTRASTATE 540
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+541), 0,	0 }, // EXTRASTATE 541
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+542), 0,	0 }, // EXTRASTATE 542
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+543), 0,	0 }, // EXTRASTATE 543
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+544), 0,	0 }, // EXTRASTATE 544
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+545), 0,	0 }, // EXTRASTATE 545
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+546), 0,	0 }, // EXTRASTATE 546
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+547), 0,	0 }, // EXTRASTATE 547
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+548), 0,	0 }, // EXTRASTATE 548
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+549), 0,	0 }, // EXTRASTATE 549
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+550), 0,	0 }, // EXTRASTATE 550
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+551), 0,	0 }, // EXTRASTATE 551
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+552), 0,	0 }, // EXTRASTATE 552
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+553), 0,	0 }, // EXTRASTATE 553
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+554), 0,	0 }, // EXTRASTATE 554
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+555), 0,	0 }, // EXTRASTATE 555
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+556), 0,	0 }, // EXTRASTATE 556
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+557), 0,	0 }, // EXTRASTATE 557
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+558), 0,	0 }, // EXTRASTATE 558
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+559), 0,	0 }, // EXTRASTATE 559
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+560), 0,	0 }, // EXTRASTATE 560
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+561), 0,	0 }, // EXTRASTATE 561
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+562), 0,	0 }, // EXTRASTATE 562
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+563), 0,	0 }, // EXTRASTATE 563
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+564), 0,	0 }, // EXTRASTATE 564
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+565), 0,	0 }, // EXTRASTATE 565
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+566), 0,	0 }, // EXTRASTATE 566
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+567), 0,	0 }, // EXTRASTATE 567
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+568), 0,	0 }, // EXTRASTATE 568
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+569), 0,	0 }, // EXTRASTATE 569
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+570), 0,	0 }, // EXTRASTATE 570
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+571), 0,	0 }, // EXTRASTATE 571
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+572), 0,	0 }, // EXTRASTATE 572
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+573), 0,	0 }, // EXTRASTATE 573
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+574), 0,	0 }, // EXTRASTATE 574
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+575), 0,	0 }, // EXTRASTATE 575
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+576), 0,	0 }, // EXTRASTATE 576
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+577), 0,	0 }, // EXTRASTATE 577
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+578), 0,	0 }, // EXTRASTATE 578
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+579), 0,	0 }, // EXTRASTATE 579
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+580), 0,	0 }, // EXTRASTATE 580
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+581), 0,	0 }, // EXTRASTATE 581
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+582), 0,	0 }, // EXTRASTATE 582
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+583), 0,	0 }, // EXTRASTATE 583
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+584), 0,	0 }, // EXTRASTATE 584
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+585), 0,	0 }, // EXTRASTATE 585
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+586), 0,	0 }, // EXTRASTATE 586
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+587), 0,	0 }, // EXTRASTATE 587
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+588), 0,	0 }, // EXTRASTATE 588
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+589), 0,	0 }, // EXTRASTATE 589
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+590), 0,	0 }, // EXTRASTATE 590
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+591), 0,	0 }, // EXTRASTATE 591
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+592), 0,	0 }, // EXTRASTATE 592
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+593), 0,	0 }, // EXTRASTATE 593
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+594), 0,	0 }, // EXTRASTATE 594
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+595), 0,	0 }, // EXTRASTATE 595
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+596), 0,	0 }, // EXTRASTATE 596
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+597), 0,	0 }, // EXTRASTATE 597
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+598), 0,	0 }, // EXTRASTATE 598
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+599), 0,	0 }, // EXTRASTATE 599
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+600), 0,	0 }, // EXTRASTATE 600
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+601), 0,	0 }, // EXTRASTATE 601
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+602), 0,	0 }, // EXTRASTATE 602
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+603), 0,	0 }, // EXTRASTATE 603
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+604), 0,	0 }, // EXTRASTATE 604
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+605), 0,	0 }, // EXTRASTATE 605
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+606), 0,	0 }, // EXTRASTATE 606
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+607), 0,	0 }, // EXTRASTATE 607
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+608), 0,	0 }, // EXTRASTATE 608
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+609), 0,	0 }, // EXTRASTATE 609
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+610), 0,	0 }, // EXTRASTATE 610
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+611), 0,	0 }, // EXTRASTATE 611
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+612), 0,	0 }, // EXTRASTATE 612
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+613), 0,	0 }, // EXTRASTATE 613
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+614), 0,	0 }, // EXTRASTATE 614
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+615), 0,	0 }, // EXTRASTATE 615
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+616), 0,	0 }, // EXTRASTATE 616
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+617), 0,	0 }, // EXTRASTATE 617
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+618), 0,	0 }, // EXTRASTATE 618
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+619), 0,	0 }, // EXTRASTATE 619
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+620), 0,	0 }, // EXTRASTATE 620
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+621), 0,	0 }, // EXTRASTATE 621
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+622), 0,	0 }, // EXTRASTATE 622
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+623), 0,	0 }, // EXTRASTATE 623
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+624), 0,	0 }, // EXTRASTATE 624
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+625), 0,	0 }, // EXTRASTATE 625
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+626), 0,	0 }, // EXTRASTATE 626
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+627), 0,	0 }, // EXTRASTATE 627
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+628), 0,	0 }, // EXTRASTATE 628
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+629), 0,	0 }, // EXTRASTATE 629
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+630), 0,	0 }, // EXTRASTATE 630
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+631), 0,	0 }, // EXTRASTATE 631
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+632), 0,	0 }, // EXTRASTATE 632
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+633), 0,	0 }, // EXTRASTATE 633
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+634), 0,	0 }, // EXTRASTATE 634
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+635), 0,	0 }, // EXTRASTATE 635
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+636), 0,	0 }, // EXTRASTATE 636
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+637), 0,	0 }, // EXTRASTATE 637
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+638), 0,	0 }, // EXTRASTATE 638
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+639), 0,	0 }, // EXTRASTATE 639
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+640), 0,	0 }, // EXTRASTATE 640
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+641), 0,	0 }, // EXTRASTATE 641
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+642), 0,	0 }, // EXTRASTATE 642
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+643), 0,	0 }, // EXTRASTATE 643
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+644), 0,	0 }, // EXTRASTATE 644
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+645), 0,	0 }, // EXTRASTATE 645
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+646), 0,	0 }, // EXTRASTATE 646
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+647), 0,	0 }, // EXTRASTATE 647
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+648), 0,	0 }, // EXTRASTATE 648
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+649), 0,	0 }, // EXTRASTATE 649
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+650), 0,	0 }, // EXTRASTATE 650
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+651), 0,	0 }, // EXTRASTATE 651
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+652), 0,	0 }, // EXTRASTATE 652
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+653), 0,	0 }, // EXTRASTATE 653
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+654), 0,	0 }, // EXTRASTATE 654
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+655), 0,	0 }, // EXTRASTATE 655
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+656), 0,	0 }, // EXTRASTATE 656
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+657), 0,	0 }, // EXTRASTATE 657
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+658), 0,	0 }, // EXTRASTATE 658
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+659), 0,	0 }, // EXTRASTATE 659
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+660), 0,	0 }, // EXTRASTATE 660
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+661), 0,	0 }, // EXTRASTATE 661
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+662), 0,	0 }, // EXTRASTATE 662
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+663), 0,	0 }, // EXTRASTATE 663
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+664), 0,	0 }, // EXTRASTATE 664
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+665), 0,	0 }, // EXTRASTATE 665
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+666), 0,	0 }, // EXTRASTATE 666
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+667), 0,	0 }, // EXTRASTATE 667
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+668), 0,	0 }, // EXTRASTATE 668
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+669), 0,	0 }, // EXTRASTATE 669
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+670), 0,	0 }, // EXTRASTATE 670
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+671), 0,	0 }, // EXTRASTATE 671
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+672), 0,	0 }, // EXTRASTATE 672
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+673), 0,	0 }, // EXTRASTATE 673
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+674), 0,	0 }, // EXTRASTATE 674
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+675), 0,	0 }, // EXTRASTATE 675
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+676), 0,	0 }, // EXTRASTATE 676
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+677), 0,	0 }, // EXTRASTATE 677
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+678), 0,	0 }, // EXTRASTATE 678
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+679), 0,	0 }, // EXTRASTATE 679
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+680), 0,	0 }, // EXTRASTATE 680
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+681), 0,	0 }, // EXTRASTATE 681
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+682), 0,	0 }, // EXTRASTATE 682
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+683), 0,	0 }, // EXTRASTATE 683
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+684), 0,	0 }, // EXTRASTATE 684
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+685), 0,	0 }, // EXTRASTATE 685
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+686), 0,	0 }, // EXTRASTATE 686
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+687), 0,	0 }, // EXTRASTATE 687
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+688), 0,	0 }, // EXTRASTATE 688
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+689), 0,	0 }, // EXTRASTATE 689
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+690), 0,	0 }, // EXTRASTATE 690
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+691), 0,	0 }, // EXTRASTATE 691
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+692), 0,	0 }, // EXTRASTATE 692
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+693), 0,	0 }, // EXTRASTATE 693
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+694), 0,	0 }, // EXTRASTATE 694
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+695), 0,	0 }, // EXTRASTATE 695
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+696), 0,	0 }, // EXTRASTATE 696
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+697), 0,	0 }, // EXTRASTATE 697
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+698), 0,	0 }, // EXTRASTATE 698
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+699), 0,	0 }, // EXTRASTATE 699
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+700), 0,	0 }, // EXTRASTATE 700
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+701), 0,	0 }, // EXTRASTATE 701
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+702), 0,	0 }, // EXTRASTATE 702
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+703), 0,	0 }, // EXTRASTATE 703
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+704), 0,	0 }, // EXTRASTATE 704
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+705), 0,	0 }, // EXTRASTATE 705
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+706), 0,	0 }, // EXTRASTATE 706
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+707), 0,	0 }, // EXTRASTATE 707
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+708), 0,	0 }, // EXTRASTATE 708
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+709), 0,	0 }, // EXTRASTATE 709
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+710), 0,	0 }, // EXTRASTATE 710
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+711), 0,	0 }, // EXTRASTATE 711
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+712), 0,	0 }, // EXTRASTATE 712
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+713), 0,	0 }, // EXTRASTATE 713
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+714), 0,	0 }, // EXTRASTATE 714
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+715), 0,	0 }, // EXTRASTATE 715
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+716), 0,	0 }, // EXTRASTATE 716
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+717), 0,	0 }, // EXTRASTATE 717
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+718), 0,	0 }, // EXTRASTATE 718
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+719), 0,	0 }, // EXTRASTATE 719
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+720), 0,	0 }, // EXTRASTATE 720
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+721), 0,	0 }, // EXTRASTATE 721
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+722), 0,	0 }, // EXTRASTATE 722
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+723), 0,	0 }, // EXTRASTATE 723
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+724), 0,	0 }, // EXTRASTATE 724
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+725), 0,	0 }, // EXTRASTATE 725
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+726), 0,	0 }, // EXTRASTATE 726
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+727), 0,	0 }, // EXTRASTATE 727
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+728), 0,	0 }, // EXTRASTATE 728
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+729), 0,	0 }, // EXTRASTATE 729
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+730), 0,	0 }, // EXTRASTATE 730
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+731), 0,	0 }, // EXTRASTATE 731
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+732), 0,	0 }, // EXTRASTATE 732
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+733), 0,	0 }, // EXTRASTATE 733
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+734), 0,	0 }, // EXTRASTATE 734
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+735), 0,	0 }, // EXTRASTATE 735
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+736), 0,	0 }, // EXTRASTATE 736
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+737), 0,	0 }, // EXTRASTATE 737
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+738), 0,	0 }, // EXTRASTATE 738
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+739), 0,	0 }, // EXTRASTATE 739
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+740), 0,	0 }, // EXTRASTATE 740
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+741), 0,	0 }, // EXTRASTATE 741
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+742), 0,	0 }, // EXTRASTATE 742
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+743), 0,	0 }, // EXTRASTATE 743
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+744), 0,	0 }, // EXTRASTATE 744
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+745), 0,	0 }, // EXTRASTATE 745
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+746), 0,	0 }, // EXTRASTATE 746
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+747), 0,	0 }, // EXTRASTATE 747
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+748), 0,	0 }, // EXTRASTATE 748
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+749), 0,	0 }, // EXTRASTATE 749
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+750), 0,	0 }, // EXTRASTATE 750
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+751), 0,	0 }, // EXTRASTATE 751
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+752), 0,	0 }, // EXTRASTATE 752
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+753), 0,	0 }, // EXTRASTATE 753
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+754), 0,	0 }, // EXTRASTATE 754
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+755), 0,	0 }, // EXTRASTATE 755
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+756), 0,	0 }, // EXTRASTATE 756
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+757), 0,	0 }, // EXTRASTATE 757
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+758), 0,	0 }, // EXTRASTATE 758
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+759), 0,	0 }, // EXTRASTATE 759
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+760), 0,	0 }, // EXTRASTATE 760
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+761), 0,	0 }, // EXTRASTATE 761
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+762), 0,	0 }, // EXTRASTATE 762
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+763), 0,	0 }, // EXTRASTATE 763
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+764), 0,	0 }, // EXTRASTATE 764
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+765), 0,	0 }, // EXTRASTATE 765
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+766), 0,	0 }, // EXTRASTATE 766
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+767), 0,	0 }, // EXTRASTATE 767
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+768), 0,	0 }, // EXTRASTATE 768
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+769), 0,	0 }, // EXTRASTATE 769
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+770), 0,	0 }, // EXTRASTATE 770
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+771), 0,	0 }, // EXTRASTATE 771
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+772), 0,	0 }, // EXTRASTATE 772
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+773), 0,	0 }, // EXTRASTATE 773
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+774), 0,	0 }, // EXTRASTATE 774
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+775), 0,	0 }, // EXTRASTATE 775
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+776), 0,	0 }, // EXTRASTATE 776
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+777), 0,	0 }, // EXTRASTATE 777
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+778), 0,	0 }, // EXTRASTATE 778
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+779), 0,	0 }, // EXTRASTATE 779
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+780), 0,	0 }, // EXTRASTATE 780
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+781), 0,	0 }, // EXTRASTATE 781
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+782), 0,	0 }, // EXTRASTATE 782
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+783), 0,	0 }, // EXTRASTATE 783
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+784), 0,	0 }, // EXTRASTATE 784
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+785), 0,	0 }, // EXTRASTATE 785
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+786), 0,	0 }, // EXTRASTATE 786
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+787), 0,	0 }, // EXTRASTATE 787
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+788), 0,	0 }, // EXTRASTATE 788
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+789), 0,	0 }, // EXTRASTATE 789
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+790), 0,	0 }, // EXTRASTATE 790
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+791), 0,	0 }, // EXTRASTATE 791
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+792), 0,	0 }, // EXTRASTATE 792
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+793), 0,	0 }, // EXTRASTATE 793
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+794), 0,	0 }, // EXTRASTATE 794
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+795), 0,	0 }, // EXTRASTATE 795
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+796), 0,	0 }, // EXTRASTATE 796
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+797), 0,	0 }, // EXTRASTATE 797
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+798), 0,	0 }, // EXTRASTATE 798
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+799), 0,	0 }, // EXTRASTATE 799
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+800), 0,	0 }, // EXTRASTATE 800
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+801), 0,	0 }, // EXTRASTATE 801
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+802), 0,	0 }, // EXTRASTATE 802
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+803), 0,	0 }, // EXTRASTATE 803
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+804), 0,	0 }, // EXTRASTATE 804
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+805), 0,	0 }, // EXTRASTATE 805
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+806), 0,	0 }, // EXTRASTATE 806
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+807), 0,	0 }, // EXTRASTATE 807
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+808), 0,	0 }, // EXTRASTATE 808
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+809), 0,	0 }, // EXTRASTATE 809
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+810), 0,	0 }, // EXTRASTATE 810
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+811), 0,	0 }, // EXTRASTATE 811
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+812), 0,	0 }, // EXTRASTATE 812
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+813), 0,	0 }, // EXTRASTATE 813
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+814), 0,	0 }, // EXTRASTATE 814
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+815), 0,	0 }, // EXTRASTATE 815
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+816), 0,	0 }, // EXTRASTATE 816
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+817), 0,	0 }, // EXTRASTATE 817
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+818), 0,	0 }, // EXTRASTATE 818
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+819), 0,	0 }, // EXTRASTATE 819
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+820), 0,	0 }, // EXTRASTATE 820
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+821), 0,	0 }, // EXTRASTATE 821
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+822), 0,	0 }, // EXTRASTATE 822
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+823), 0,	0 }, // EXTRASTATE 823
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+824), 0,	0 }, // EXTRASTATE 824
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+825), 0,	0 }, // EXTRASTATE 825
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+826), 0,	0 }, // EXTRASTATE 826
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+827), 0,	0 }, // EXTRASTATE 827
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+828), 0,	0 }, // EXTRASTATE 828
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+829), 0,	0 }, // EXTRASTATE 829
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+830), 0,	0 }, // EXTRASTATE 830
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+831), 0,	0 }, // EXTRASTATE 831
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+832), 0,	0 }, // EXTRASTATE 832
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+833), 0,	0 }, // EXTRASTATE 833
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+834), 0,	0 }, // EXTRASTATE 834
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+835), 0,	0 }, // EXTRASTATE 835
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+836), 0,	0 }, // EXTRASTATE 836
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+837), 0,	0 }, // EXTRASTATE 837
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+838), 0,	0 }, // EXTRASTATE 838
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+839), 0,	0 }, // EXTRASTATE 839
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+840), 0,	0 }, // EXTRASTATE 840
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+841), 0,	0 }, // EXTRASTATE 841
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+842), 0,	0 }, // EXTRASTATE 842
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+843), 0,	0 }, // EXTRASTATE 843
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+844), 0,	0 }, // EXTRASTATE 844
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+845), 0,	0 }, // EXTRASTATE 845
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+846), 0,	0 }, // EXTRASTATE 846
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+847), 0,	0 }, // EXTRASTATE 847
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+848), 0,	0 }, // EXTRASTATE 848
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+849), 0,	0 }, // EXTRASTATE 849
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+850), 0,	0 }, // EXTRASTATE 850
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+851), 0,	0 }, // EXTRASTATE 851
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+852), 0,	0 }, // EXTRASTATE 852
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+853), 0,	0 }, // EXTRASTATE 853
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+854), 0,	0 }, // EXTRASTATE 854
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+855), 0,	0 }, // EXTRASTATE 855
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+856), 0,	0 }, // EXTRASTATE 856
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+857), 0,	0 }, // EXTRASTATE 857
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+858), 0,	0 }, // EXTRASTATE 858
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+859), 0,	0 }, // EXTRASTATE 859
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+860), 0,	0 }, // EXTRASTATE 860
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+861), 0,	0 }, // EXTRASTATE 861
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+862), 0,	0 }, // EXTRASTATE 862
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+863), 0,	0 }, // EXTRASTATE 863
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+864), 0,	0 }, // EXTRASTATE 864
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+865), 0,	0 }, // EXTRASTATE 865
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+866), 0,	0 }, // EXTRASTATE 866
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+867), 0,	0 }, // EXTRASTATE 867
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+868), 0,	0 }, // EXTRASTATE 868
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+869), 0,	0 }, // EXTRASTATE 869
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+870), 0,	0 }, // EXTRASTATE 870
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+871), 0,	0 }, // EXTRASTATE 871
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+872), 0,	0 }, // EXTRASTATE 872
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+873), 0,	0 }, // EXTRASTATE 873
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+874), 0,	0 }, // EXTRASTATE 874
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+875), 0,	0 }, // EXTRASTATE 875
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+876), 0,	0 }, // EXTRASTATE 876
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+877), 0,	0 }, // EXTRASTATE 877
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+878), 0,	0 }, // EXTRASTATE 878
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+879), 0,	0 }, // EXTRASTATE 879
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+880), 0,	0 }, // EXTRASTATE 880
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+881), 0,	0 }, // EXTRASTATE 881
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+882), 0,	0 }, // EXTRASTATE 882
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+883), 0,	0 }, // EXTRASTATE 883
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+884), 0,	0 }, // EXTRASTATE 884
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+885), 0,	0 }, // EXTRASTATE 885
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+886), 0,	0 }, // EXTRASTATE 886
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+887), 0,	0 }, // EXTRASTATE 887
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+888), 0,	0 }, // EXTRASTATE 888
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+889), 0,	0 }, // EXTRASTATE 889
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+890), 0,	0 }, // EXTRASTATE 890
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+891), 0,	0 }, // EXTRASTATE 891
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+892), 0,	0 }, // EXTRASTATE 892
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+893), 0,	0 }, // EXTRASTATE 893
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+894), 0,	0 }, // EXTRASTATE 894
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+895), 0,	0 }, // EXTRASTATE 895
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+896), 0,	0 }, // EXTRASTATE 896
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+897), 0,	0 }, // EXTRASTATE 897
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+898), 0,	0 }, // EXTRASTATE 898
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+899), 0,	0 }, // EXTRASTATE 899
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+900), 0,	0 }, // EXTRASTATE 900
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+901), 0,	0 }, // EXTRASTATE 901
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+902), 0,	0 }, // EXTRASTATE 902
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+903), 0,	0 }, // EXTRASTATE 903
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+904), 0,	0 }, // EXTRASTATE 904
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+905), 0,	0 }, // EXTRASTATE 905
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+906), 0,	0 }, // EXTRASTATE 906
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+907), 0,	0 }, // EXTRASTATE 907
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+908), 0,	0 }, // EXTRASTATE 908
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+909), 0,	0 }, // EXTRASTATE 909
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+910), 0,	0 }, // EXTRASTATE 910
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+911), 0,	0 }, // EXTRASTATE 911
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+912), 0,	0 }, // EXTRASTATE 912
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+913), 0,	0 }, // EXTRASTATE 913
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+914), 0,	0 }, // EXTRASTATE 914
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+915), 0,	0 }, // EXTRASTATE 915
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+916), 0,	0 }, // EXTRASTATE 916
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+917), 0,	0 }, // EXTRASTATE 917
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+918), 0,	0 }, // EXTRASTATE 918
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+919), 0,	0 }, // EXTRASTATE 919
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+920), 0,	0 }, // EXTRASTATE 920
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+921), 0,	0 }, // EXTRASTATE 921
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+922), 0,	0 }, // EXTRASTATE 922
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+923), 0,	0 }, // EXTRASTATE 923
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+924), 0,	0 }, // EXTRASTATE 924
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+925), 0,	0 }, // EXTRASTATE 925
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+926), 0,	0 }, // EXTRASTATE 926
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+927), 0,	0 }, // EXTRASTATE 927
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+928), 0,	0 }, // EXTRASTATE 928
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+929), 0,	0 }, // EXTRASTATE 929
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+930), 0,	0 }, // EXTRASTATE 930
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+931), 0,	0 }, // EXTRASTATE 931
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+932), 0,	0 }, // EXTRASTATE 932
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+933), 0,	0 }, // EXTRASTATE 933
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+934), 0,	0 }, // EXTRASTATE 934
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+935), 0,	0 }, // EXTRASTATE 935
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+936), 0,	0 }, // EXTRASTATE 936
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+937), 0,	0 }, // EXTRASTATE 937
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+938), 0,	0 }, // EXTRASTATE 938
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+939), 0,	0 }, // EXTRASTATE 939
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+940), 0,	0 }, // EXTRASTATE 940
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+941), 0,	0 }, // EXTRASTATE 941
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+942), 0,	0 }, // EXTRASTATE 942
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+943), 0,	0 }, // EXTRASTATE 943
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+944), 0,	0 }, // EXTRASTATE 944
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+945), 0,	0 }, // EXTRASTATE 945
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+946), 0,	0 }, // EXTRASTATE 946
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+947), 0,	0 }, // EXTRASTATE 947
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+948), 0,	0 }, // EXTRASTATE 948
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+949), 0,	0 }, // EXTRASTATE 949
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+950), 0,	0 }, // EXTRASTATE 950
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+951), 0,	0 }, // EXTRASTATE 951
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+952), 0,	0 }, // EXTRASTATE 952
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+953), 0,	0 }, // EXTRASTATE 953
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+954), 0,	0 }, // EXTRASTATE 954
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+955), 0,	0 }, // EXTRASTATE 955
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+956), 0,	0 }, // EXTRASTATE 956
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+957), 0,	0 }, // EXTRASTATE 957
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+958), 0,	0 }, // EXTRASTATE 958
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+959), 0,	0 }, // EXTRASTATE 959
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+960), 0,	0 }, // EXTRASTATE 960
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+961), 0,	0 }, // EXTRASTATE 961
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+962), 0,	0 }, // EXTRASTATE 962
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+963), 0,	0 }, // EXTRASTATE 963
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+964), 0,	0 }, // EXTRASTATE 964
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+965), 0,	0 }, // EXTRASTATE 965
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+966), 0,	0 }, // EXTRASTATE 966
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+967), 0,	0 }, // EXTRASTATE 967
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+968), 0,	0 }, // EXTRASTATE 968
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+969), 0,	0 }, // EXTRASTATE 969
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+970), 0,	0 }, // EXTRASTATE 970
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+971), 0,	0 }, // EXTRASTATE 971
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+972), 0,	0 }, // EXTRASTATE 972
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+973), 0,	0 }, // EXTRASTATE 973
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+974), 0,	0 }, // EXTRASTATE 974
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+975), 0,	0 }, // EXTRASTATE 975
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+976), 0,	0 }, // EXTRASTATE 976
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+977), 0,	0 }, // EXTRASTATE 977
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+978), 0,	0 }, // EXTRASTATE 978
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+979), 0,	0 }, // EXTRASTATE 979
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+980), 0,	0 }, // EXTRASTATE 980
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+981), 0,	0 }, // EXTRASTATE 981
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+982), 0,	0 }, // EXTRASTATE 982
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+983), 0,	0 }, // EXTRASTATE 983
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+984), 0,	0 }, // EXTRASTATE 984
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+985), 0,	0 }, // EXTRASTATE 985
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+986), 0,	0 }, // EXTRASTATE 986
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+987), 0,	0 }, // EXTRASTATE 987
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+988), 0,	0 }, // EXTRASTATE 988
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+989), 0,	0 }, // EXTRASTATE 989
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+990), 0,	0 }, // EXTRASTATE 990
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+991), 0,	0 }, // EXTRASTATE 991
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+992), 0,	0 }, // EXTRASTATE 992
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+993), 0,	0 }, // EXTRASTATE 993
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+994), 0,	0 }, // EXTRASTATE 994
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+995), 0,	0 }, // EXTRASTATE 995
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+996), 0,	0 }, // EXTRASTATE 996
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+997), 0,	0 }, // EXTRASTATE 997
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+998), 0,	0 }, // EXTRASTATE 998
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+999), 0,	0 }, // EXTRASTATE 999
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1000), 0,	0 }, // EXTRASTATE 1000
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1001), 0,	0 }, // EXTRASTATE 1001
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1002), 0,	0 }, // EXTRASTATE 1002
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1003), 0,	0 }, // EXTRASTATE 1003
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1004), 0,	0 }, // EXTRASTATE 1004
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1005), 0,	0 }, // EXTRASTATE 1005
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1006), 0,	0 }, // EXTRASTATE 1006
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1007), 0,	0 }, // EXTRASTATE 1007
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1008), 0,	0 }, // EXTRASTATE 1008
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1009), 0,	0 }, // EXTRASTATE 1009
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1010), 0,	0 }, // EXTRASTATE 1010
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1011), 0,	0 }, // EXTRASTATE 1011
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1012), 0,	0 }, // EXTRASTATE 1012
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1013), 0,	0 }, // EXTRASTATE 1013
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1014), 0,	0 }, // EXTRASTATE 1014
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1015), 0,	0 }, // EXTRASTATE 1015
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1016), 0,	0 }, // EXTRASTATE 1016
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1017), 0,	0 }, // EXTRASTATE 1017
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1018), 0,	0 }, // EXTRASTATE 1018
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1019), 0,	0 }, // EXTRASTATE 1019
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1020), 0,	0 }, // EXTRASTATE 1020
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1021), 0,	0 }, // EXTRASTATE 1021
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1022), 0,	0 }, // EXTRASTATE 1022
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1023), 0,	0 }, // EXTRASTATE 1023
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1024), 0,	0 }, // EXTRASTATE 1024
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1025), 0,	0 }, // EXTRASTATE 1025
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1026), 0,	0 }, // EXTRASTATE 1026
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1027), 0,	0 }, // EXTRASTATE 1027
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1028), 0,	0 }, // EXTRASTATE 1028
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1029), 0,	0 }, // EXTRASTATE 1029
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1030), 0,	0 }, // EXTRASTATE 1030
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1031), 0,	0 }, // EXTRASTATE 1031
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1032), 0,	0 }, // EXTRASTATE 1032
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1033), 0,	0 }, // EXTRASTATE 1033
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1034), 0,	0 }, // EXTRASTATE 1034
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1035), 0,	0 }, // EXTRASTATE 1035
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1036), 0,	0 }, // EXTRASTATE 1036
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1037), 0,	0 }, // EXTRASTATE 1037
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1038), 0,	0 }, // EXTRASTATE 1038
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1039), 0,	0 }, // EXTRASTATE 1039
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1040), 0,	0 }, // EXTRASTATE 1040
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1041), 0,	0 }, // EXTRASTATE 1041
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1042), 0,	0 }, // EXTRASTATE 1042
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1043), 0,	0 }, // EXTRASTATE 1043
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1044), 0,	0 }, // EXTRASTATE 1044
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1045), 0,	0 }, // EXTRASTATE 1045
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1046), 0,	0 }, // EXTRASTATE 1046
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1047), 0,	0 }, // EXTRASTATE 1047
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1048), 0,	0 }, // EXTRASTATE 1048
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1049), 0,	0 }, // EXTRASTATE 1049
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1050), 0,	0 }, // EXTRASTATE 1050
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1051), 0,	0 }, // EXTRASTATE 1051
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1052), 0,	0 }, // EXTRASTATE 1052
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1053), 0,	0 }, // EXTRASTATE 1053
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1054), 0,	0 }, // EXTRASTATE 1054
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1055), 0,	0 }, // EXTRASTATE 1055
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1056), 0,	0 }, // EXTRASTATE 1056
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1057), 0,	0 }, // EXTRASTATE 1057
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1058), 0,	0 }, // EXTRASTATE 1058
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1059), 0,	0 }, // EXTRASTATE 1059
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1060), 0,	0 }, // EXTRASTATE 1060
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1061), 0,	0 }, // EXTRASTATE 1061
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1062), 0,	0 }, // EXTRASTATE 1062
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1063), 0,	0 }, // EXTRASTATE 1063
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1064), 0,	0 }, // EXTRASTATE 1064
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1065), 0,	0 }, // EXTRASTATE 1065
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1066), 0,	0 }, // EXTRASTATE 1066
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1067), 0,	0 }, // EXTRASTATE 1067
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1068), 0,	0 }, // EXTRASTATE 1068
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1069), 0,	0 }, // EXTRASTATE 1069
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1070), 0,	0 }, // EXTRASTATE 1070
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1071), 0,	0 }, // EXTRASTATE 1071
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1072), 0,	0 }, // EXTRASTATE 1072
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1073), 0,	0 }, // EXTRASTATE 1073
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1074), 0,	0 }, // EXTRASTATE 1074
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1075), 0,	0 }, // EXTRASTATE 1075
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1076), 0,	0 }, // EXTRASTATE 1076
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1077), 0,	0 }, // EXTRASTATE 1077
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1078), 0,	0 }, // EXTRASTATE 1078
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1079), 0,	0 }, // EXTRASTATE 1079
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1080), 0,	0 }, // EXTRASTATE 1080
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1081), 0,	0 }, // EXTRASTATE 1081
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1082), 0,	0 }, // EXTRASTATE 1082
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1083), 0,	0 }, // EXTRASTATE 1083
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1084), 0,	0 }, // EXTRASTATE 1084
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1085), 0,	0 }, // EXTRASTATE 1085
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1086), 0,	0 }, // EXTRASTATE 1086
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1087), 0,	0 }, // EXTRASTATE 1087
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1088), 0,	0 }, // EXTRASTATE 1088
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1089), 0,	0 }, // EXTRASTATE 1089
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1090), 0,	0 }, // EXTRASTATE 1090
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1091), 0,	0 }, // EXTRASTATE 1091
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1092), 0,	0 }, // EXTRASTATE 1092
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1093), 0,	0 }, // EXTRASTATE 1093
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1094), 0,	0 }, // EXTRASTATE 1094
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1095), 0,	0 }, // EXTRASTATE 1095
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1096), 0,	0 }, // EXTRASTATE 1096
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1097), 0,	0 }, // EXTRASTATE 1097
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1098), 0,	0 }, // EXTRASTATE 1098
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1099), 0,	0 }, // EXTRASTATE 1099
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1100), 0,	0 }, // EXTRASTATE 1100
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1101), 0,	0 }, // EXTRASTATE 1101
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1102), 0,	0 }, // EXTRASTATE 1102
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1103), 0,	0 }, // EXTRASTATE 1103
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1104), 0,	0 }, // EXTRASTATE 1104
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1105), 0,	0 }, // EXTRASTATE 1105
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1106), 0,	0 }, // EXTRASTATE 1106
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1107), 0,	0 }, // EXTRASTATE 1107
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1108), 0,	0 }, // EXTRASTATE 1108
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1109), 0,	0 }, // EXTRASTATE 1109
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1110), 0,	0 }, // EXTRASTATE 1110
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1111), 0,	0 }, // EXTRASTATE 1111
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1112), 0,	0 }, // EXTRASTATE 1112
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1113), 0,	0 }, // EXTRASTATE 1113
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1114), 0,	0 }, // EXTRASTATE 1114
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1115), 0,	0 }, // EXTRASTATE 1115
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1116), 0,	0 }, // EXTRASTATE 1116
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1117), 0,	0 }, // EXTRASTATE 1117
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1118), 0,	0 }, // EXTRASTATE 1118
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1119), 0,	0 }, // EXTRASTATE 1119
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1120), 0,	0 }, // EXTRASTATE 1120
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1121), 0,	0 }, // EXTRASTATE 1121
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1122), 0,	0 }, // EXTRASTATE 1122
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1123), 0,	0 }, // EXTRASTATE 1123
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1124), 0,	0 }, // EXTRASTATE 1124
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1125), 0,	0 }, // EXTRASTATE 1125
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1126), 0,	0 }, // EXTRASTATE 1126
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1127), 0,	0 }, // EXTRASTATE 1127
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1128), 0,	0 }, // EXTRASTATE 1128
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1129), 0,	0 }, // EXTRASTATE 1129
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1130), 0,	0 }, // EXTRASTATE 1130
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1131), 0,	0 }, // EXTRASTATE 1131
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1132), 0,	0 }, // EXTRASTATE 1132
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1133), 0,	0 }, // EXTRASTATE 1133
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1134), 0,	0 }, // EXTRASTATE 1134
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1135), 0,	0 }, // EXTRASTATE 1135
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1136), 0,	0 }, // EXTRASTATE 1136
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1137), 0,	0 }, // EXTRASTATE 1137
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1138), 0,	0 }, // EXTRASTATE 1138
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1139), 0,	0 }, // EXTRASTATE 1139
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1140), 0,	0 }, // EXTRASTATE 1140
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1141), 0,	0 }, // EXTRASTATE 1141
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1142), 0,	0 }, // EXTRASTATE 1142
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1143), 0,	0 }, // EXTRASTATE 1143
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1144), 0,	0 }, // EXTRASTATE 1144
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1145), 0,	0 }, // EXTRASTATE 1145
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1146), 0,	0 }, // EXTRASTATE 1146
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1147), 0,	0 }, // EXTRASTATE 1147
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1148), 0,	0 }, // EXTRASTATE 1148
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1149), 0,	0 }, // EXTRASTATE 1149
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1150), 0,	0 }, // EXTRASTATE 1150
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1151), 0,	0 }, // EXTRASTATE 1151
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1152), 0,	0 }, // EXTRASTATE 1152
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1153), 0,	0 }, // EXTRASTATE 1153
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1154), 0,	0 }, // EXTRASTATE 1154
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1155), 0,	0 }, // EXTRASTATE 1155
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1156), 0,	0 }, // EXTRASTATE 1156
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1157), 0,	0 }, // EXTRASTATE 1157
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1158), 0,	0 }, // EXTRASTATE 1158
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1159), 0,	0 }, // EXTRASTATE 1159
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1160), 0,	0 }, // EXTRASTATE 1160
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1161), 0,	0 }, // EXTRASTATE 1161
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1162), 0,	0 }, // EXTRASTATE 1162
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1163), 0,	0 }, // EXTRASTATE 1163
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1164), 0,	0 }, // EXTRASTATE 1164
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1165), 0,	0 }, // EXTRASTATE 1165
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1166), 0,	0 }, // EXTRASTATE 1166
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1167), 0,	0 }, // EXTRASTATE 1167
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1168), 0,	0 }, // EXTRASTATE 1168
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1169), 0,	0 }, // EXTRASTATE 1169
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1170), 0,	0 }, // EXTRASTATE 1170
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1171), 0,	0 }, // EXTRASTATE 1171
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1172), 0,	0 }, // EXTRASTATE 1172
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1173), 0,	0 }, // EXTRASTATE 1173
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1174), 0,	0 }, // EXTRASTATE 1174
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1175), 0,	0 }, // EXTRASTATE 1175
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1176), 0,	0 }, // EXTRASTATE 1176
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1177), 0,	0 }, // EXTRASTATE 1177
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1178), 0,	0 }, // EXTRASTATE 1178
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1179), 0,	0 }, // EXTRASTATE 1179
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1180), 0,	0 }, // EXTRASTATE 1180
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1181), 0,	0 }, // EXTRASTATE 1181
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1182), 0,	0 }, // EXTRASTATE 1182
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1183), 0,	0 }, // EXTRASTATE 1183
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1184), 0,	0 }, // EXTRASTATE 1184
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1185), 0,	0 }, // EXTRASTATE 1185
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1186), 0,	0 }, // EXTRASTATE 1186
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1187), 0,	0 }, // EXTRASTATE 1187
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1188), 0,	0 }, // EXTRASTATE 1188
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1189), 0,	0 }, // EXTRASTATE 1189
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1190), 0,	0 }, // EXTRASTATE 1190
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1191), 0,	0 }, // EXTRASTATE 1191
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1192), 0,	0 }, // EXTRASTATE 1192
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1193), 0,	0 }, // EXTRASTATE 1193
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1194), 0,	0 }, // EXTRASTATE 1194
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1195), 0,	0 }, // EXTRASTATE 1195
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1196), 0,	0 }, // EXTRASTATE 1196
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1197), 0,	0 }, // EXTRASTATE 1197
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1198), 0,	0 }, // EXTRASTATE 1198
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1199), 0,	0 }, // EXTRASTATE 1199
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1200), 0,	0 }, // EXTRASTATE 1200
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1201), 0,	0 }, // EXTRASTATE 1201
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1202), 0,	0 }, // EXTRASTATE 1202
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1203), 0,	0 }, // EXTRASTATE 1203
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1204), 0,	0 }, // EXTRASTATE 1204
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1205), 0,	0 }, // EXTRASTATE 1205
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1206), 0,	0 }, // EXTRASTATE 1206
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1207), 0,	0 }, // EXTRASTATE 1207
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1208), 0,	0 }, // EXTRASTATE 1208
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1209), 0,	0 }, // EXTRASTATE 1209
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1210), 0,	0 }, // EXTRASTATE 1210
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1211), 0,	0 }, // EXTRASTATE 1211
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1212), 0,	0 }, // EXTRASTATE 1212
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1213), 0,	0 }, // EXTRASTATE 1213
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1214), 0,	0 }, // EXTRASTATE 1214
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1215), 0,	0 }, // EXTRASTATE 1215
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1216), 0,	0 }, // EXTRASTATE 1216
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1217), 0,	0 }, // EXTRASTATE 1217
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1218), 0,	0 }, // EXTRASTATE 1218
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1219), 0,	0 }, // EXTRASTATE 1219
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1220), 0,	0 }, // EXTRASTATE 1220
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1221), 0,	0 }, // EXTRASTATE 1221
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1222), 0,	0 }, // EXTRASTATE 1222
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1223), 0,	0 }, // EXTRASTATE 1223
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1224), 0,	0 }, // EXTRASTATE 1224
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1225), 0,	0 }, // EXTRASTATE 1225
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1226), 0,	0 }, // EXTRASTATE 1226
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1227), 0,	0 }, // EXTRASTATE 1227
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1228), 0,	0 }, // EXTRASTATE 1228
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1229), 0,	0 }, // EXTRASTATE 1229
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1230), 0,	0 }, // EXTRASTATE 1230
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1231), 0,	0 }, // EXTRASTATE 1231
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1232), 0,	0 }, // EXTRASTATE 1232
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1233), 0,	0 }, // EXTRASTATE 1233
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1234), 0,	0 }, // EXTRASTATE 1234
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1235), 0,	0 }, // EXTRASTATE 1235
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1236), 0,	0 }, // EXTRASTATE 1236
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1237), 0,	0 }, // EXTRASTATE 1237
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1238), 0,	0 }, // EXTRASTATE 1238
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1239), 0,	0 }, // EXTRASTATE 1239
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1240), 0,	0 }, // EXTRASTATE 1240
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1241), 0,	0 }, // EXTRASTATE 1241
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1242), 0,	0 }, // EXTRASTATE 1242
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1243), 0,	0 }, // EXTRASTATE 1243
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1244), 0,	0 }, // EXTRASTATE 1244
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1245), 0,	0 }, // EXTRASTATE 1245
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1246), 0,	0 }, // EXTRASTATE 1246
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1247), 0,	0 }, // EXTRASTATE 1247
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1248), 0,	0 }, // EXTRASTATE 1248
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1249), 0,	0 }, // EXTRASTATE 1249
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1250), 0,	0 }, // EXTRASTATE 1250
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1251), 0,	0 }, // EXTRASTATE 1251
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1252), 0,	0 }, // EXTRASTATE 1252
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1253), 0,	0 }, // EXTRASTATE 1253
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1254), 0,	0 }, // EXTRASTATE 1254
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1255), 0,	0 }, // EXTRASTATE 1255
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1256), 0,	0 }, // EXTRASTATE 1256
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1257), 0,	0 }, // EXTRASTATE 1257
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1258), 0,	0 }, // EXTRASTATE 1258
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1259), 0,	0 }, // EXTRASTATE 1259
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1260), 0,	0 }, // EXTRASTATE 1260
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1261), 0,	0 }, // EXTRASTATE 1261
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1262), 0,	0 }, // EXTRASTATE 1262
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1263), 0,	0 }, // EXTRASTATE 1263
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1264), 0,	0 }, // EXTRASTATE 1264
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1265), 0,	0 }, // EXTRASTATE 1265
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1266), 0,	0 }, // EXTRASTATE 1266
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1267), 0,	0 }, // EXTRASTATE 1267
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1268), 0,	0 }, // EXTRASTATE 1268
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1269), 0,	0 }, // EXTRASTATE 1269
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1270), 0,	0 }, // EXTRASTATE 1270
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1271), 0,	0 }, // EXTRASTATE 1271
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1272), 0,	0 }, // EXTRASTATE 1272
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1273), 0,	0 }, // EXTRASTATE 1273
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1274), 0,	0 }, // EXTRASTATE 1274
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1275), 0,	0 }, // EXTRASTATE 1275
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1276), 0,	0 }, // EXTRASTATE 1276
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1277), 0,	0 }, // EXTRASTATE 1277
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1278), 0,	0 }, // EXTRASTATE 1278
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1279), 0,	0 }, // EXTRASTATE 1279
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1280), 0,	0 }, // EXTRASTATE 1280
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1281), 0,	0 }, // EXTRASTATE 1281
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1282), 0,	0 }, // EXTRASTATE 1282
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1283), 0,	0 }, // EXTRASTATE 1283
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1284), 0,	0 }, // EXTRASTATE 1284
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1285), 0,	0 }, // EXTRASTATE 1285
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1286), 0,	0 }, // EXTRASTATE 1286
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1287), 0,	0 }, // EXTRASTATE 1287
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1288), 0,	0 }, // EXTRASTATE 1288
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1289), 0,	0 }, // EXTRASTATE 1289
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1290), 0,	0 }, // EXTRASTATE 1290
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1291), 0,	0 }, // EXTRASTATE 1291
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1292), 0,	0 }, // EXTRASTATE 1292
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1293), 0,	0 }, // EXTRASTATE 1293
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1294), 0,	0 }, // EXTRASTATE 1294
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1295), 0,	0 }, // EXTRASTATE 1295
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1296), 0,	0 }, // EXTRASTATE 1296
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1297), 0,	0 }, // EXTRASTATE 1297
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1298), 0,	0 }, // EXTRASTATE 1298
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1299), 0,	0 }, // EXTRASTATE 1299
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1300), 0,	0 }, // EXTRASTATE 1300
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1301), 0,	0 }, // EXTRASTATE 1301
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1302), 0,	0 }, // EXTRASTATE 1302
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1303), 0,	0 }, // EXTRASTATE 1303
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1304), 0,	0 }, // EXTRASTATE 1304
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1305), 0,	0 }, // EXTRASTATE 1305
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1306), 0,	0 }, // EXTRASTATE 1306
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1307), 0,	0 }, // EXTRASTATE 1307
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1308), 0,	0 }, // EXTRASTATE 1308
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1309), 0,	0 }, // EXTRASTATE 1309
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1310), 0,	0 }, // EXTRASTATE 1310
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1311), 0,	0 }, // EXTRASTATE 1311
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1312), 0,	0 }, // EXTRASTATE 1312
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1313), 0,	0 }, // EXTRASTATE 1313
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1314), 0,	0 }, // EXTRASTATE 1314
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1315), 0,	0 }, // EXTRASTATE 1315
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1316), 0,	0 }, // EXTRASTATE 1316
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1317), 0,	0 }, // EXTRASTATE 1317
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1318), 0,	0 }, // EXTRASTATE 1318
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1319), 0,	0 }, // EXTRASTATE 1319
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1320), 0,	0 }, // EXTRASTATE 1320
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1321), 0,	0 }, // EXTRASTATE 1321
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1322), 0,	0 }, // EXTRASTATE 1322
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1323), 0,	0 }, // EXTRASTATE 1323
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1324), 0,	0 }, // EXTRASTATE 1324
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1325), 0,	0 }, // EXTRASTATE 1325
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1326), 0,	0 }, // EXTRASTATE 1326
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1327), 0,	0 }, // EXTRASTATE 1327
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1328), 0,	0 }, // EXTRASTATE 1328
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1329), 0,	0 }, // EXTRASTATE 1329
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1330), 0,	0 }, // EXTRASTATE 1330
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1331), 0,	0 }, // EXTRASTATE 1331
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1332), 0,	0 }, // EXTRASTATE 1332
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1333), 0,	0 }, // EXTRASTATE 1333
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1334), 0,	0 }, // EXTRASTATE 1334
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1335), 0,	0 }, // EXTRASTATE 1335
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1336), 0,	0 }, // EXTRASTATE 1336
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1337), 0,	0 }, // EXTRASTATE 1337
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1338), 0,	0 }, // EXTRASTATE 1338
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1339), 0,	0 }, // EXTRASTATE 1339
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1340), 0,	0 }, // EXTRASTATE 1340
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1341), 0,	0 }, // EXTRASTATE 1341
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1342), 0,	0 }, // EXTRASTATE 1342
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1343), 0,	0 }, // EXTRASTATE 1343
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1344), 0,	0 }, // EXTRASTATE 1344
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1345), 0,	0 }, // EXTRASTATE 1345
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1346), 0,	0 }, // EXTRASTATE 1346
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1347), 0,	0 }, // EXTRASTATE 1347
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1348), 0,	0 }, // EXTRASTATE 1348
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1349), 0,	0 }, // EXTRASTATE 1349
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1350), 0,	0 }, // EXTRASTATE 1350
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1351), 0,	0 }, // EXTRASTATE 1351
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1352), 0,	0 }, // EXTRASTATE 1352
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1353), 0,	0 }, // EXTRASTATE 1353
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1354), 0,	0 }, // EXTRASTATE 1354
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1355), 0,	0 }, // EXTRASTATE 1355
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1356), 0,	0 }, // EXTRASTATE 1356
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1357), 0,	0 }, // EXTRASTATE 1357
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1358), 0,	0 }, // EXTRASTATE 1358
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1359), 0,	0 }, // EXTRASTATE 1359
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1360), 0,	0 }, // EXTRASTATE 1360
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1361), 0,	0 }, // EXTRASTATE 1361
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1362), 0,	0 }, // EXTRASTATE 1362
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1363), 0,	0 }, // EXTRASTATE 1363
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1364), 0,	0 }, // EXTRASTATE 1364
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1365), 0,	0 }, // EXTRASTATE 1365
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1366), 0,	0 }, // EXTRASTATE 1366
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1367), 0,	0 }, // EXTRASTATE 1367
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1368), 0,	0 }, // EXTRASTATE 1368
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1369), 0,	0 }, // EXTRASTATE 1369
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1370), 0,	0 }, // EXTRASTATE 1370
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1371), 0,	0 }, // EXTRASTATE 1371
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1372), 0,	0 }, // EXTRASTATE 1372
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1373), 0,	0 }, // EXTRASTATE 1373
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1374), 0,	0 }, // EXTRASTATE 1374
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1375), 0,	0 }, // EXTRASTATE 1375
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1376), 0,	0 }, // EXTRASTATE 1376
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1377), 0,	0 }, // EXTRASTATE 1377
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1378), 0,	0 }, // EXTRASTATE 1378
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1379), 0,	0 }, // EXTRASTATE 1379
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1380), 0,	0 }, // EXTRASTATE 1380
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1381), 0,	0 }, // EXTRASTATE 1381
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1382), 0,	0 }, // EXTRASTATE 1382
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1383), 0,	0 }, // EXTRASTATE 1383
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1384), 0,	0 }, // EXTRASTATE 1384
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1385), 0,	0 }, // EXTRASTATE 1385
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1386), 0,	0 }, // EXTRASTATE 1386
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1387), 0,	0 }, // EXTRASTATE 1387
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1388), 0,	0 }, // EXTRASTATE 1388
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1389), 0,	0 }, // EXTRASTATE 1389
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1390), 0,	0 }, // EXTRASTATE 1390
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1391), 0,	0 }, // EXTRASTATE 1391
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1392), 0,	0 }, // EXTRASTATE 1392
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1393), 0,	0 }, // EXTRASTATE 1393
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1394), 0,	0 }, // EXTRASTATE 1394
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1395), 0,	0 }, // EXTRASTATE 1395
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1396), 0,	0 }, // EXTRASTATE 1396
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1397), 0,	0 }, // EXTRASTATE 1397
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1398), 0,	0 }, // EXTRASTATE 1398
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1399), 0,	0 }, // EXTRASTATE 1399
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1400), 0,	0 }, // EXTRASTATE 1400
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1401), 0,	0 }, // EXTRASTATE 1401
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1402), 0,	0 }, // EXTRASTATE 1402
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1403), 0,	0 }, // EXTRASTATE 1403
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1404), 0,	0 }, // EXTRASTATE 1404
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1405), 0,	0 }, // EXTRASTATE 1405
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1406), 0,	0 }, // EXTRASTATE 1406
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1407), 0,	0 }, // EXTRASTATE 1407
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1408), 0,	0 }, // EXTRASTATE 1408
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1409), 0,	0 }, // EXTRASTATE 1409
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1410), 0,	0 }, // EXTRASTATE 1410
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1411), 0,	0 }, // EXTRASTATE 1411
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1412), 0,	0 }, // EXTRASTATE 1412
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1413), 0,	0 }, // EXTRASTATE 1413
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1414), 0,	0 }, // EXTRASTATE 1414
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1415), 0,	0 }, // EXTRASTATE 1415
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1416), 0,	0 }, // EXTRASTATE 1416
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1417), 0,	0 }, // EXTRASTATE 1417
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1418), 0,	0 }, // EXTRASTATE 1418
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1419), 0,	0 }, // EXTRASTATE 1419
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1420), 0,	0 }, // EXTRASTATE 1420
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1421), 0,	0 }, // EXTRASTATE 1421
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1422), 0,	0 }, // EXTRASTATE 1422
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1423), 0,	0 }, // EXTRASTATE 1423
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1424), 0,	0 }, // EXTRASTATE 1424
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1425), 0,	0 }, // EXTRASTATE 1425
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1426), 0,	0 }, // EXTRASTATE 1426
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1427), 0,	0 }, // EXTRASTATE 1427
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1428), 0,	0 }, // EXTRASTATE 1428
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1429), 0,	0 }, // EXTRASTATE 1429
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1430), 0,	0 }, // EXTRASTATE 1430
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1431), 0,	0 }, // EXTRASTATE 1431
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1432), 0,	0 }, // EXTRASTATE 1432
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1433), 0,	0 }, // EXTRASTATE 1433
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1434), 0,	0 }, // EXTRASTATE 1434
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1435), 0,	0 }, // EXTRASTATE 1435
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1436), 0,	0 }, // EXTRASTATE 1436
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1437), 0,	0 }, // EXTRASTATE 1437
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1438), 0,	0 }, // EXTRASTATE 1438
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1439), 0,	0 }, // EXTRASTATE 1439
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1440), 0,	0 }, // EXTRASTATE 1440
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1441), 0,	0 }, // EXTRASTATE 1441
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1442), 0,	0 }, // EXTRASTATE 1442
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1443), 0,	0 }, // EXTRASTATE 1443
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1444), 0,	0 }, // EXTRASTATE 1444
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1445), 0,	0 }, // EXTRASTATE 1445
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1446), 0,	0 }, // EXTRASTATE 1446
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1447), 0,	0 }, // EXTRASTATE 1447
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1448), 0,	0 }, // EXTRASTATE 1448
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1449), 0,	0 }, // EXTRASTATE 1449
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1450), 0,	0 }, // EXTRASTATE 1450
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1451), 0,	0 }, // EXTRASTATE 1451
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1452), 0,	0 }, // EXTRASTATE 1452
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1453), 0,	0 }, // EXTRASTATE 1453
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1454), 0,	0 }, // EXTRASTATE 1454
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1455), 0,	0 }, // EXTRASTATE 1455
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1456), 0,	0 }, // EXTRASTATE 1456
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1457), 0,	0 }, // EXTRASTATE 1457
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1458), 0,	0 }, // EXTRASTATE 1458
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1459), 0,	0 }, // EXTRASTATE 1459
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1460), 0,	0 }, // EXTRASTATE 1460
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1461), 0,	0 }, // EXTRASTATE 1461
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1462), 0,	0 }, // EXTRASTATE 1462
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1463), 0,	0 }, // EXTRASTATE 1463
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1464), 0,	0 }, // EXTRASTATE 1464
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1465), 0,	0 }, // EXTRASTATE 1465
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1466), 0,	0 }, // EXTRASTATE 1466
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1467), 0,	0 }, // EXTRASTATE 1467
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1468), 0,	0 }, // EXTRASTATE 1468
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1469), 0,	0 }, // EXTRASTATE 1469
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1470), 0,	0 }, // EXTRASTATE 1470
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1471), 0,	0 }, // EXTRASTATE 1471
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1472), 0,	0 }, // EXTRASTATE 1472
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1473), 0,	0 }, // EXTRASTATE 1473
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1474), 0,	0 }, // EXTRASTATE 1474
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1475), 0,	0 }, // EXTRASTATE 1475
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1476), 0,	0 }, // EXTRASTATE 1476
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1477), 0,	0 }, // EXTRASTATE 1477
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1478), 0,	0 }, // EXTRASTATE 1478
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1479), 0,	0 }, // EXTRASTATE 1479
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1480), 0,	0 }, // EXTRASTATE 1480
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1481), 0,	0 }, // EXTRASTATE 1481
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1482), 0,	0 }, // EXTRASTATE 1482
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1483), 0,	0 }, // EXTRASTATE 1483
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1484), 0,	0 }, // EXTRASTATE 1484
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1485), 0,	0 }, // EXTRASTATE 1485
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1486), 0,	0 }, // EXTRASTATE 1486
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1487), 0,	0 }, // EXTRASTATE 1487
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1488), 0,	0 }, // EXTRASTATE 1488
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1489), 0,	0 }, // EXTRASTATE 1489
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1490), 0,	0 }, // EXTRASTATE 1490
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1491), 0,	0 }, // EXTRASTATE 1491
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1492), 0,	0 }, // EXTRASTATE 1492
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1493), 0,	0 }, // EXTRASTATE 1493
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1494), 0,	0 }, // EXTRASTATE 1494
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1495), 0,	0 }, // EXTRASTATE 1495
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1496), 0,	0 }, // EXTRASTATE 1496
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1497), 0,	0 }, // EXTRASTATE 1497
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1498), 0,	0 }, // EXTRASTATE 1498
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1499), 0,	0 }, // EXTRASTATE 1499
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1500), 0,	0 }, // EXTRASTATE 1500
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1501), 0,	0 }, // EXTRASTATE 1501
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1502), 0,	0 }, // EXTRASTATE 1502
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1503), 0,	0 }, // EXTRASTATE 1503
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1504), 0,	0 }, // EXTRASTATE 1504
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1505), 0,	0 }, // EXTRASTATE 1505
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1506), 0,	0 }, // EXTRASTATE 1506
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1507), 0,	0 }, // EXTRASTATE 1507
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1508), 0,	0 }, // EXTRASTATE 1508
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1509), 0,	0 }, // EXTRASTATE 1509
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1510), 0,	0 }, // EXTRASTATE 1510
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1511), 0,	0 }, // EXTRASTATE 1511
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1512), 0,	0 }, // EXTRASTATE 1512
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1513), 0,	0 }, // EXTRASTATE 1513
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1514), 0,	0 }, // EXTRASTATE 1514
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1515), 0,	0 }, // EXTRASTATE 1515
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1516), 0,	0 }, // EXTRASTATE 1516
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1517), 0,	0 }, // EXTRASTATE 1517
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1518), 0,	0 }, // EXTRASTATE 1518
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1519), 0,	0 }, // EXTRASTATE 1519
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1520), 0,	0 }, // EXTRASTATE 1520
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1521), 0,	0 }, // EXTRASTATE 1521
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1522), 0,	0 }, // EXTRASTATE 1522
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1523), 0,	0 }, // EXTRASTATE 1523
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1524), 0,	0 }, // EXTRASTATE 1524
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1525), 0,	0 }, // EXTRASTATE 1525
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1526), 0,	0 }, // EXTRASTATE 1526
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1527), 0,	0 }, // EXTRASTATE 1527
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1528), 0,	0 }, // EXTRASTATE 1528
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1529), 0,	0 }, // EXTRASTATE 1529
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1530), 0,	0 }, // EXTRASTATE 1530
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1531), 0,	0 }, // EXTRASTATE 1531
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1532), 0,	0 }, // EXTRASTATE 1532
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1533), 0,	0 }, // EXTRASTATE 1533
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1534), 0,	0 }, // EXTRASTATE 1534
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1535), 0,	0 }, // EXTRASTATE 1535
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1536), 0,	0 }, // EXTRASTATE 1536
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1537), 0,	0 }, // EXTRASTATE 1537
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1538), 0,	0 }, // EXTRASTATE 1538
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1539), 0,	0 }, // EXTRASTATE 1539
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1540), 0,	0 }, // EXTRASTATE 1540
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1541), 0,	0 }, // EXTRASTATE 1541
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1542), 0,	0 }, // EXTRASTATE 1542
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1543), 0,	0 }, // EXTRASTATE 1543
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1544), 0,	0 }, // EXTRASTATE 1544
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1545), 0,	0 }, // EXTRASTATE 1545
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1546), 0,	0 }, // EXTRASTATE 1546
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1547), 0,	0 }, // EXTRASTATE 1547
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1548), 0,	0 }, // EXTRASTATE 1548
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1549), 0,	0 }, // EXTRASTATE 1549
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1550), 0,	0 }, // EXTRASTATE 1550
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1551), 0,	0 }, // EXTRASTATE 1551
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1552), 0,	0 }, // EXTRASTATE 1552
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1553), 0,	0 }, // EXTRASTATE 1553
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1554), 0,	0 }, // EXTRASTATE 1554
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1555), 0,	0 }, // EXTRASTATE 1555
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1556), 0,	0 }, // EXTRASTATE 1556
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1557), 0,	0 }, // EXTRASTATE 1557
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1558), 0,	0 }, // EXTRASTATE 1558
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1559), 0,	0 }, // EXTRASTATE 1559
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1560), 0,	0 }, // EXTRASTATE 1560
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1561), 0,	0 }, // EXTRASTATE 1561
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1562), 0,	0 }, // EXTRASTATE 1562
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1563), 0,	0 }, // EXTRASTATE 1563
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1564), 0,	0 }, // EXTRASTATE 1564
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1565), 0,	0 }, // EXTRASTATE 1565
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1566), 0,	0 }, // EXTRASTATE 1566
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1567), 0,	0 }, // EXTRASTATE 1567
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1568), 0,	0 }, // EXTRASTATE 1568
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1569), 0,	0 }, // EXTRASTATE 1569
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1570), 0,	0 }, // EXTRASTATE 1570
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1571), 0,	0 }, // EXTRASTATE 1571
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1572), 0,	0 }, // EXTRASTATE 1572
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1573), 0,	0 }, // EXTRASTATE 1573
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1574), 0,	0 }, // EXTRASTATE 1574
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1575), 0,	0 }, // EXTRASTATE 1575
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1576), 0,	0 }, // EXTRASTATE 1576
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1577), 0,	0 }, // EXTRASTATE 1577
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1578), 0,	0 }, // EXTRASTATE 1578
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1579), 0,	0 }, // EXTRASTATE 1579
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1580), 0,	0 }, // EXTRASTATE 1580
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1581), 0,	0 }, // EXTRASTATE 1581
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1582), 0,	0 }, // EXTRASTATE 1582
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1583), 0,	0 }, // EXTRASTATE 1583
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1584), 0,	0 }, // EXTRASTATE 1584
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1585), 0,	0 }, // EXTRASTATE 1585
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1586), 0,	0 }, // EXTRASTATE 1586
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1587), 0,	0 }, // EXTRASTATE 1587
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1588), 0,	0 }, // EXTRASTATE 1588
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1589), 0,	0 }, // EXTRASTATE 1589
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1590), 0,	0 }, // EXTRASTATE 1590
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1591), 0,	0 }, // EXTRASTATE 1591
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1592), 0,	0 }, // EXTRASTATE 1592
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1593), 0,	0 }, // EXTRASTATE 1593
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1594), 0,	0 }, // EXTRASTATE 1594
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1595), 0,	0 }, // EXTRASTATE 1595
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1596), 0,	0 }, // EXTRASTATE 1596
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1597), 0,	0 }, // EXTRASTATE 1597
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1598), 0,	0 }, // EXTRASTATE 1598
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1599), 0,	0 }, // EXTRASTATE 1599
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1600), 0,	0 }, // EXTRASTATE 1600
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1601), 0,	0 }, // EXTRASTATE 1601
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1602), 0,	0 }, // EXTRASTATE 1602
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1603), 0,	0 }, // EXTRASTATE 1603
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1604), 0,	0 }, // EXTRASTATE 1604
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1605), 0,	0 }, // EXTRASTATE 1605
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1606), 0,	0 }, // EXTRASTATE 1606
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1607), 0,	0 }, // EXTRASTATE 1607
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1608), 0,	0 }, // EXTRASTATE 1608
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1609), 0,	0 }, // EXTRASTATE 1609
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1610), 0,	0 }, // EXTRASTATE 1610
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1611), 0,	0 }, // EXTRASTATE 1611
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1612), 0,	0 }, // EXTRASTATE 1612
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1613), 0,	0 }, // EXTRASTATE 1613
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1614), 0,	0 }, // EXTRASTATE 1614
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1615), 0,	0 }, // EXTRASTATE 1615
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1616), 0,	0 }, // EXTRASTATE 1616
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1617), 0,	0 }, // EXTRASTATE 1617
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1618), 0,	0 }, // EXTRASTATE 1618
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1619), 0,	0 }, // EXTRASTATE 1619
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1620), 0,	0 }, // EXTRASTATE 1620
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1621), 0,	0 }, // EXTRASTATE 1621
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1622), 0,	0 }, // EXTRASTATE 1622
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1623), 0,	0 }, // EXTRASTATE 1623
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1624), 0,	0 }, // EXTRASTATE 1624
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1625), 0,	0 }, // EXTRASTATE 1625
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1626), 0,	0 }, // EXTRASTATE 1626
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1627), 0,	0 }, // EXTRASTATE 1627
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1628), 0,	0 }, // EXTRASTATE 1628
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1629), 0,	0 }, // EXTRASTATE 1629
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1630), 0,	0 }, // EXTRASTATE 1630
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1631), 0,	0 }, // EXTRASTATE 1631
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1632), 0,	0 }, // EXTRASTATE 1632
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1633), 0,	0 }, // EXTRASTATE 1633
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1634), 0,	0 }, // EXTRASTATE 1634
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1635), 0,	0 }, // EXTRASTATE 1635
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1636), 0,	0 }, // EXTRASTATE 1636
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1637), 0,	0 }, // EXTRASTATE 1637
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1638), 0,	0 }, // EXTRASTATE 1638
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1639), 0,	0 }, // EXTRASTATE 1639
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1640), 0,	0 }, // EXTRASTATE 1640
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1641), 0,	0 }, // EXTRASTATE 1641
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1642), 0,	0 }, // EXTRASTATE 1642
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1643), 0,	0 }, // EXTRASTATE 1643
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1644), 0,	0 }, // EXTRASTATE 1644
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1645), 0,	0 }, // EXTRASTATE 1645
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1646), 0,	0 }, // EXTRASTATE 1646
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1647), 0,	0 }, // EXTRASTATE 1647
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1648), 0,	0 }, // EXTRASTATE 1648
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1649), 0,	0 }, // EXTRASTATE 1649
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1650), 0,	0 }, // EXTRASTATE 1650
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1651), 0,	0 }, // EXTRASTATE 1651
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1652), 0,	0 }, // EXTRASTATE 1652
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1653), 0,	0 }, // EXTRASTATE 1653
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1654), 0,	0 }, // EXTRASTATE 1654
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1655), 0,	0 }, // EXTRASTATE 1655
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1656), 0,	0 }, // EXTRASTATE 1656
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1657), 0,	0 }, // EXTRASTATE 1657
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1658), 0,	0 }, // EXTRASTATE 1658
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1659), 0,	0 }, // EXTRASTATE 1659
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1660), 0,	0 }, // EXTRASTATE 1660
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1661), 0,	0 }, // EXTRASTATE 1661
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1662), 0,	0 }, // EXTRASTATE 1662
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1663), 0,	0 }, // EXTRASTATE 1663
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1664), 0,	0 }, // EXTRASTATE 1664
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1665), 0,	0 }, // EXTRASTATE 1665
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1666), 0,	0 }, // EXTRASTATE 1666
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1667), 0,	0 }, // EXTRASTATE 1667
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1668), 0,	0 }, // EXTRASTATE 1668
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1669), 0,	0 }, // EXTRASTATE 1669
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1670), 0,	0 }, // EXTRASTATE 1670
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1671), 0,	0 }, // EXTRASTATE 1671
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1672), 0,	0 }, // EXTRASTATE 1672
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1673), 0,	0 }, // EXTRASTATE 1673
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1674), 0,	0 }, // EXTRASTATE 1674
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1675), 0,	0 }, // EXTRASTATE 1675
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1676), 0,	0 }, // EXTRASTATE 1676
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1677), 0,	0 }, // EXTRASTATE 1677
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1678), 0,	0 }, // EXTRASTATE 1678
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1679), 0,	0 }, // EXTRASTATE 1679
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1680), 0,	0 }, // EXTRASTATE 1680
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1681), 0,	0 }, // EXTRASTATE 1681
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1682), 0,	0 }, // EXTRASTATE 1682
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1683), 0,	0 }, // EXTRASTATE 1683
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1684), 0,	0 }, // EXTRASTATE 1684
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1685), 0,	0 }, // EXTRASTATE 1685
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1686), 0,	0 }, // EXTRASTATE 1686
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1687), 0,	0 }, // EXTRASTATE 1687
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1688), 0,	0 }, // EXTRASTATE 1688
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1689), 0,	0 }, // EXTRASTATE 1689
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1690), 0,	0 }, // EXTRASTATE 1690
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1691), 0,	0 }, // EXTRASTATE 1691
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1692), 0,	0 }, // EXTRASTATE 1692
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1693), 0,	0 }, // EXTRASTATE 1693
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1694), 0,	0 }, // EXTRASTATE 1694
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1695), 0,	0 }, // EXTRASTATE 1695
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1696), 0,	0 }, // EXTRASTATE 1696
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1697), 0,	0 }, // EXTRASTATE 1697
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1698), 0,	0 }, // EXTRASTATE 1698
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1699), 0,	0 }, // EXTRASTATE 1699
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1700), 0,	0 }, // EXTRASTATE 1700
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1701), 0,	0 }, // EXTRASTATE 1701
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1702), 0,	0 }, // EXTRASTATE 1702
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1703), 0,	0 }, // EXTRASTATE 1703
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1704), 0,	0 }, // EXTRASTATE 1704
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1705), 0,	0 }, // EXTRASTATE 1705
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1706), 0,	0 }, // EXTRASTATE 1706
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1707), 0,	0 }, // EXTRASTATE 1707
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1708), 0,	0 }, // EXTRASTATE 1708
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1709), 0,	0 }, // EXTRASTATE 1709
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1710), 0,	0 }, // EXTRASTATE 1710
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1711), 0,	0 }, // EXTRASTATE 1711
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1712), 0,	0 }, // EXTRASTATE 1712
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1713), 0,	0 }, // EXTRASTATE 1713
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1714), 0,	0 }, // EXTRASTATE 1714
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1715), 0,	0 }, // EXTRASTATE 1715
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1716), 0,	0 }, // EXTRASTATE 1716
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1717), 0,	0 }, // EXTRASTATE 1717
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1718), 0,	0 }, // EXTRASTATE 1718
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1719), 0,	0 }, // EXTRASTATE 1719
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1720), 0,	0 }, // EXTRASTATE 1720
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1721), 0,	0 }, // EXTRASTATE 1721
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1722), 0,	0 }, // EXTRASTATE 1722
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1723), 0,	0 }, // EXTRASTATE 1723
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1724), 0,	0 }, // EXTRASTATE 1724
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1725), 0,	0 }, // EXTRASTATE 1725
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1726), 0,	0 }, // EXTRASTATE 1726
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1727), 0,	0 }, // EXTRASTATE 1727
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1728), 0,	0 }, // EXTRASTATE 1728
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1729), 0,	0 }, // EXTRASTATE 1729
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1730), 0,	0 }, // EXTRASTATE 1730
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1731), 0,	0 }, // EXTRASTATE 1731
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1732), 0,	0 }, // EXTRASTATE 1732
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1733), 0,	0 }, // EXTRASTATE 1733
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1734), 0,	0 }, // EXTRASTATE 1734
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1735), 0,	0 }, // EXTRASTATE 1735
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1736), 0,	0 }, // EXTRASTATE 1736
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1737), 0,	0 }, // EXTRASTATE 1737
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1738), 0,	0 }, // EXTRASTATE 1738
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1739), 0,	0 }, // EXTRASTATE 1739
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1740), 0,	0 }, // EXTRASTATE 1740
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1741), 0,	0 }, // EXTRASTATE 1741
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1742), 0,	0 }, // EXTRASTATE 1742
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1743), 0,	0 }, // EXTRASTATE 1743
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1744), 0,	0 }, // EXTRASTATE 1744
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1745), 0,	0 }, // EXTRASTATE 1745
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1746), 0,	0 }, // EXTRASTATE 1746
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1747), 0,	0 }, // EXTRASTATE 1747
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1748), 0,	0 }, // EXTRASTATE 1748
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1749), 0,	0 }, // EXTRASTATE 1749
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1750), 0,	0 }, // EXTRASTATE 1750
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1751), 0,	0 }, // EXTRASTATE 1751
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1752), 0,	0 }, // EXTRASTATE 1752
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1753), 0,	0 }, // EXTRASTATE 1753
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1754), 0,	0 }, // EXTRASTATE 1754
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1755), 0,	0 }, // EXTRASTATE 1755
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1756), 0,	0 }, // EXTRASTATE 1756
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1757), 0,	0 }, // EXTRASTATE 1757
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1758), 0,	0 }, // EXTRASTATE 1758
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1759), 0,	0 }, // EXTRASTATE 1759
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1760), 0,	0 }, // EXTRASTATE 1760
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1761), 0,	0 }, // EXTRASTATE 1761
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1762), 0,	0 }, // EXTRASTATE 1762
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1763), 0,	0 }, // EXTRASTATE 1763
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1764), 0,	0 }, // EXTRASTATE 1764
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1765), 0,	0 }, // EXTRASTATE 1765
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1766), 0,	0 }, // EXTRASTATE 1766
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1767), 0,	0 }, // EXTRASTATE 1767
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1768), 0,	0 }, // EXTRASTATE 1768
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1769), 0,	0 }, // EXTRASTATE 1769
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1770), 0,	0 }, // EXTRASTATE 1770
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1771), 0,	0 }, // EXTRASTATE 1771
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1772), 0,	0 }, // EXTRASTATE 1772
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1773), 0,	0 }, // EXTRASTATE 1773
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1774), 0,	0 }, // EXTRASTATE 1774
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1775), 0,	0 }, // EXTRASTATE 1775
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1776), 0,	0 }, // EXTRASTATE 1776
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1777), 0,	0 }, // EXTRASTATE 1777
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1778), 0,	0 }, // EXTRASTATE 1778
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1779), 0,	0 }, // EXTRASTATE 1779
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1780), 0,	0 }, // EXTRASTATE 1780
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1781), 0,	0 }, // EXTRASTATE 1781
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1782), 0,	0 }, // EXTRASTATE 1782
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1783), 0,	0 }, // EXTRASTATE 1783
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1784), 0,	0 }, // EXTRASTATE 1784
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1785), 0,	0 }, // EXTRASTATE 1785
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1786), 0,	0 }, // EXTRASTATE 1786
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1787), 0,	0 }, // EXTRASTATE 1787
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1788), 0,	0 }, // EXTRASTATE 1788
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1789), 0,	0 }, // EXTRASTATE 1789
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1790), 0,	0 }, // EXTRASTATE 1790
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1791), 0,	0 }, // EXTRASTATE 1791
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1792), 0,	0 }, // EXTRASTATE 1792
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1793), 0,	0 }, // EXTRASTATE 1793
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1794), 0,	0 }, // EXTRASTATE 1794
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1795), 0,	0 }, // EXTRASTATE 1795
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1796), 0,	0 }, // EXTRASTATE 1796
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1797), 0,	0 }, // EXTRASTATE 1797
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1798), 0,	0 }, // EXTRASTATE 1798
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1799), 0,	0 }, // EXTRASTATE 1799
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1800), 0,	0 }, // EXTRASTATE 1800
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1801), 0,	0 }, // EXTRASTATE 1801
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1802), 0,	0 }, // EXTRASTATE 1802
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1803), 0,	0 }, // EXTRASTATE 1803
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1804), 0,	0 }, // EXTRASTATE 1804
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1805), 0,	0 }, // EXTRASTATE 1805
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1806), 0,	0 }, // EXTRASTATE 1806
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1807), 0,	0 }, // EXTRASTATE 1807
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1808), 0,	0 }, // EXTRASTATE 1808
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1809), 0,	0 }, // EXTRASTATE 1809
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1810), 0,	0 }, // EXTRASTATE 1810
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1811), 0,	0 }, // EXTRASTATE 1811
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1812), 0,	0 }, // EXTRASTATE 1812
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1813), 0,	0 }, // EXTRASTATE 1813
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1814), 0,	0 }, // EXTRASTATE 1814
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1815), 0,	0 }, // EXTRASTATE 1815
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1816), 0,	0 }, // EXTRASTATE 1816
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1817), 0,	0 }, // EXTRASTATE 1817
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1818), 0,	0 }, // EXTRASTATE 1818
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1819), 0,	0 }, // EXTRASTATE 1819
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1820), 0,	0 }, // EXTRASTATE 1820
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1821), 0,	0 }, // EXTRASTATE 1821
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1822), 0,	0 }, // EXTRASTATE 1822
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1823), 0,	0 }, // EXTRASTATE 1823
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1824), 0,	0 }, // EXTRASTATE 1824
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1825), 0,	0 }, // EXTRASTATE 1825
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1826), 0,	0 }, // EXTRASTATE 1826
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1827), 0,	0 }, // EXTRASTATE 1827
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1828), 0,	0 }, // EXTRASTATE 1828
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1829), 0,	0 }, // EXTRASTATE 1829
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1830), 0,	0 }, // EXTRASTATE 1830
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1831), 0,	0 }, // EXTRASTATE 1831
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1832), 0,	0 }, // EXTRASTATE 1832
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1833), 0,	0 }, // EXTRASTATE 1833
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1834), 0,	0 }, // EXTRASTATE 1834
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1835), 0,	0 }, // EXTRASTATE 1835
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1836), 0,	0 }, // EXTRASTATE 1836
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1837), 0,	0 }, // EXTRASTATE 1837
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1838), 0,	0 }, // EXTRASTATE 1838
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1839), 0,	0 }, // EXTRASTATE 1839
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1840), 0,	0 }, // EXTRASTATE 1840
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1841), 0,	0 }, // EXTRASTATE 1841
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1842), 0,	0 }, // EXTRASTATE 1842
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1843), 0,	0 }, // EXTRASTATE 1843
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1844), 0,	0 }, // EXTRASTATE 1844
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1845), 0,	0 }, // EXTRASTATE 1845
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1846), 0,	0 }, // EXTRASTATE 1846
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1847), 0,	0 }, // EXTRASTATE 1847
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1848), 0,	0 }, // EXTRASTATE 1848
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1849), 0,	0 }, // EXTRASTATE 1849
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1850), 0,	0 }, // EXTRASTATE 1850
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1851), 0,	0 }, // EXTRASTATE 1851
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1852), 0,	0 }, // EXTRASTATE 1852
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1853), 0,	0 }, // EXTRASTATE 1853
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1854), 0,	0 }, // EXTRASTATE 1854
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1855), 0,	0 }, // EXTRASTATE 1855
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1856), 0,	0 }, // EXTRASTATE 1856
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1857), 0,	0 }, // EXTRASTATE 1857
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1858), 0,	0 }, // EXTRASTATE 1858
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1859), 0,	0 }, // EXTRASTATE 1859
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1860), 0,	0 }, // EXTRASTATE 1860
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1861), 0,	0 }, // EXTRASTATE 1861
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1862), 0,	0 }, // EXTRASTATE 1862
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1863), 0,	0 }, // EXTRASTATE 1863
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1864), 0,	0 }, // EXTRASTATE 1864
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1865), 0,	0 }, // EXTRASTATE 1865
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1866), 0,	0 }, // EXTRASTATE 1866
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1867), 0,	0 }, // EXTRASTATE 1867
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1868), 0,	0 }, // EXTRASTATE 1868
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1869), 0,	0 }, // EXTRASTATE 1869
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1870), 0,	0 }, // EXTRASTATE 1870
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1871), 0,	0 }, // EXTRASTATE 1871
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1872), 0,	0 }, // EXTRASTATE 1872
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1873), 0,	0 }, // EXTRASTATE 1873
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1874), 0,	0 }, // EXTRASTATE 1874
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1875), 0,	0 }, // EXTRASTATE 1875
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1876), 0,	0 }, // EXTRASTATE 1876
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1877), 0,	0 }, // EXTRASTATE 1877
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1878), 0,	0 }, // EXTRASTATE 1878
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1879), 0,	0 }, // EXTRASTATE 1879
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1880), 0,	0 }, // EXTRASTATE 1880
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1881), 0,	0 }, // EXTRASTATE 1881
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1882), 0,	0 }, // EXTRASTATE 1882
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1883), 0,	0 }, // EXTRASTATE 1883
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1884), 0,	0 }, // EXTRASTATE 1884
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1885), 0,	0 }, // EXTRASTATE 1885
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1886), 0,	0 }, // EXTRASTATE 1886
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1887), 0,	0 }, // EXTRASTATE 1887
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1888), 0,	0 }, // EXTRASTATE 1888
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1889), 0,	0 }, // EXTRASTATE 1889
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1890), 0,	0 }, // EXTRASTATE 1890
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1891), 0,	0 }, // EXTRASTATE 1891
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1892), 0,	0 }, // EXTRASTATE 1892
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1893), 0,	0 }, // EXTRASTATE 1893
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1894), 0,	0 }, // EXTRASTATE 1894
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1895), 0,	0 }, // EXTRASTATE 1895
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1896), 0,	0 }, // EXTRASTATE 1896
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1897), 0,	0 }, // EXTRASTATE 1897
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1898), 0,	0 }, // EXTRASTATE 1898
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1899), 0,	0 }, // EXTRASTATE 1899
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1900), 0,	0 }, // EXTRASTATE 1900
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1901), 0,	0 }, // EXTRASTATE 1901
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1902), 0,	0 }, // EXTRASTATE 1902
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1903), 0,	0 }, // EXTRASTATE 1903
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1904), 0,	0 }, // EXTRASTATE 1904
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1905), 0,	0 }, // EXTRASTATE 1905
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1906), 0,	0 }, // EXTRASTATE 1906
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1907), 0,	0 }, // EXTRASTATE 1907
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1908), 0,	0 }, // EXTRASTATE 1908
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1909), 0,	0 }, // EXTRASTATE 1909
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1910), 0,	0 }, // EXTRASTATE 1910
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1911), 0,	0 }, // EXTRASTATE 1911
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1912), 0,	0 }, // EXTRASTATE 1912
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1913), 0,	0 }, // EXTRASTATE 1913
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1914), 0,	0 }, // EXTRASTATE 1914
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1915), 0,	0 }, // EXTRASTATE 1915
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1916), 0,	0 }, // EXTRASTATE 1916
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1917), 0,	0 }, // EXTRASTATE 1917
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1918), 0,	0 }, // EXTRASTATE 1918
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1919), 0,	0 }, // EXTRASTATE 1919
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1920), 0,	0 }, // EXTRASTATE 1920
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1921), 0,	0 }, // EXTRASTATE 1921
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1922), 0,	0 }, // EXTRASTATE 1922
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1923), 0,	0 }, // EXTRASTATE 1923
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1924), 0,	0 }, // EXTRASTATE 1924
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1925), 0,	0 }, // EXTRASTATE 1925
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1926), 0,	0 }, // EXTRASTATE 1926
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1927), 0,	0 }, // EXTRASTATE 1927
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1928), 0,	0 }, // EXTRASTATE 1928
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1929), 0,	0 }, // EXTRASTATE 1929
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1930), 0,	0 }, // EXTRASTATE 1930
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1931), 0,	0 }, // EXTRASTATE 1931
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1932), 0,	0 }, // EXTRASTATE 1932
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1933), 0,	0 }, // EXTRASTATE 1933
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1934), 0,	0 }, // EXTRASTATE 1934
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1935), 0,	0 }, // EXTRASTATE 1935
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1936), 0,	0 }, // EXTRASTATE 1936
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1937), 0,	0 }, // EXTRASTATE 1937
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1938), 0,	0 }, // EXTRASTATE 1938
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1939), 0,	0 }, // EXTRASTATE 1939
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1940), 0,	0 }, // EXTRASTATE 1940
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1941), 0,	0 }, // EXTRASTATE 1941
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1942), 0,	0 }, // EXTRASTATE 1942
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1943), 0,	0 }, // EXTRASTATE 1943
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1944), 0,	0 }, // EXTRASTATE 1944
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1945), 0,	0 }, // EXTRASTATE 1945
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1946), 0,	0 }, // EXTRASTATE 1946
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1947), 0,	0 }, // EXTRASTATE 1947
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1948), 0,	0 }, // EXTRASTATE 1948
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1949), 0,	0 }, // EXTRASTATE 1949
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1950), 0,	0 }, // EXTRASTATE 1950
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1951), 0,	0 }, // EXTRASTATE 1951
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1952), 0,	0 }, // EXTRASTATE 1952
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1953), 0,	0 }, // EXTRASTATE 1953
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1954), 0,	0 }, // EXTRASTATE 1954
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1955), 0,	0 }, // EXTRASTATE 1955
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1956), 0,	0 }, // EXTRASTATE 1956
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1957), 0,	0 }, // EXTRASTATE 1957
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1958), 0,	0 }, // EXTRASTATE 1958
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1959), 0,	0 }, // EXTRASTATE 1959
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1960), 0,	0 }, // EXTRASTATE 1960
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1961), 0,	0 }, // EXTRASTATE 1961
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1962), 0,	0 }, // EXTRASTATE 1962
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1963), 0,	0 }, // EXTRASTATE 1963
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1964), 0,	0 }, // EXTRASTATE 1964
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1965), 0,	0 }, // EXTRASTATE 1965
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1966), 0,	0 }, // EXTRASTATE 1966
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1967), 0,	0 }, // EXTRASTATE 1967
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1968), 0,	0 }, // EXTRASTATE 1968
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1969), 0,	0 }, // EXTRASTATE 1969
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1970), 0,	0 }, // EXTRASTATE 1970
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1971), 0,	0 }, // EXTRASTATE 1971
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1972), 0,	0 }, // EXTRASTATE 1972
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1973), 0,	0 }, // EXTRASTATE 1973
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1974), 0,	0 }, // EXTRASTATE 1974
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1975), 0,	0 }, // EXTRASTATE 1975
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1976), 0,	0 }, // EXTRASTATE 1976
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1977), 0,	0 }, // EXTRASTATE 1977
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1978), 0,	0 }, // EXTRASTATE 1978
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1979), 0,	0 }, // EXTRASTATE 1979
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1980), 0,	0 }, // EXTRASTATE 1980
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1981), 0,	0 }, // EXTRASTATE 1981
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1982), 0,	0 }, // EXTRASTATE 1982
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1983), 0,	0 }, // EXTRASTATE 1983
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1984), 0,	0 }, // EXTRASTATE 1984
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1985), 0,	0 }, // EXTRASTATE 1985
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1986), 0,	0 }, // EXTRASTATE 1986
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1987), 0,	0 }, // EXTRASTATE 1987
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1988), 0,	0 }, // EXTRASTATE 1988
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1989), 0,	0 }, // EXTRASTATE 1989
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1990), 0,	0 }, // EXTRASTATE 1990
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1991), 0,	0 }, // EXTRASTATE 1991
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1992), 0,	0 }, // EXTRASTATE 1992
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1993), 0,	0 }, // EXTRASTATE 1993
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1994), 0,	0 }, // EXTRASTATE 1994
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1995), 0,	0 }, // EXTRASTATE 1995
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1996), 0,	0 }, // EXTRASTATE 1996
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1997), 0,	0 }, // EXTRASTATE 1997
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1998), 0,	0 }, // EXTRASTATE 1998
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+1999), 0,	0 }, // EXTRASTATE 1999
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2000), 0,	0 }, // EXTRASTATE 2000
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2001), 0,	0 }, // EXTRASTATE 2001
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2002), 0,	0 }, // EXTRASTATE 2002
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2003), 0,	0 }, // EXTRASTATE 2003
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2004), 0,	0 }, // EXTRASTATE 2004
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2005), 0,	0 }, // EXTRASTATE 2005
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2006), 0,	0 }, // EXTRASTATE 2006
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2007), 0,	0 }, // EXTRASTATE 2007
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2008), 0,	0 }, // EXTRASTATE 2008
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2009), 0,	0 }, // EXTRASTATE 2009
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2010), 0,	0 }, // EXTRASTATE 2010
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2011), 0,	0 }, // EXTRASTATE 2011
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2012), 0,	0 }, // EXTRASTATE 2012
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2013), 0,	0 }, // EXTRASTATE 2013
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2014), 0,	0 }, // EXTRASTATE 2014
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2015), 0,	0 }, // EXTRASTATE 2015
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2016), 0,	0 }, // EXTRASTATE 2016
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2017), 0,	0 }, // EXTRASTATE 2017
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2018), 0,	0 }, // EXTRASTATE 2018
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2019), 0,	0 }, // EXTRASTATE 2019
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2020), 0,	0 }, // EXTRASTATE 2020
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2021), 0,	0 }, // EXTRASTATE 2021
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2022), 0,	0 }, // EXTRASTATE 2022
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2023), 0,	0 }, // EXTRASTATE 2023
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2024), 0,	0 }, // EXTRASTATE 2024
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2025), 0,	0 }, // EXTRASTATE 2025
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2026), 0,	0 }, // EXTRASTATE 2026
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2027), 0,	0 }, // EXTRASTATE 2027
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2028), 0,	0 }, // EXTRASTATE 2028
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2029), 0,	0 }, // EXTRASTATE 2029
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2030), 0,	0 }, // EXTRASTATE 2030
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2031), 0,	0 }, // EXTRASTATE 2031
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2032), 0,	0 }, // EXTRASTATE 2032
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2033), 0,	0 }, // EXTRASTATE 2033
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2034), 0,	0 }, // EXTRASTATE 2034
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2035), 0,	0 }, // EXTRASTATE 2035
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2036), 0,	0 }, // EXTRASTATE 2036
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2037), 0,	0 }, // EXTRASTATE 2037
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2038), 0,	0 }, // EXTRASTATE 2038
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2039), 0,	0 }, // EXTRASTATE 2039
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2040), 0,	0 }, // EXTRASTATE 2040
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2041), 0,	0 }, // EXTRASTATE 2041
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2042), 0,	0 }, // EXTRASTATE 2042
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2043), 0,	0 }, // EXTRASTATE 2043
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2044), 0,	0 }, // EXTRASTATE 2044
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2045), 0,	0 }, // EXTRASTATE 2045
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2046), 0,	0 }, // EXTRASTATE 2046
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2047), 0,	0 }, // EXTRASTATE 2047
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2048), 0,	0 }, // EXTRASTATE 2048
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2049), 0,	0 }, // EXTRASTATE 2049
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2050), 0,	0 }, // EXTRASTATE 2050
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2051), 0,	0 }, // EXTRASTATE 2051
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2052), 0,	0 }, // EXTRASTATE 2052
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2053), 0,	0 }, // EXTRASTATE 2053
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2054), 0,	0 }, // EXTRASTATE 2054
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2055), 0,	0 }, // EXTRASTATE 2055
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2056), 0,	0 }, // EXTRASTATE 2056
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2057), 0,	0 }, // EXTRASTATE 2057
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2058), 0,	0 }, // EXTRASTATE 2058
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2059), 0,	0 }, // EXTRASTATE 2059
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2060), 0,	0 }, // EXTRASTATE 2060
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2061), 0,	0 }, // EXTRASTATE 2061
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2062), 0,	0 }, // EXTRASTATE 2062
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2063), 0,	0 }, // EXTRASTATE 2063
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2064), 0,	0 }, // EXTRASTATE 2064
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2065), 0,	0 }, // EXTRASTATE 2065
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2066), 0,	0 }, // EXTRASTATE 2066
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2067), 0,	0 }, // EXTRASTATE 2067
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2068), 0,	0 }, // EXTRASTATE 2068
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2069), 0,	0 }, // EXTRASTATE 2069
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2070), 0,	0 }, // EXTRASTATE 2070
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2071), 0,	0 }, // EXTRASTATE 2071
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2072), 0,	0 }, // EXTRASTATE 2072
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2073), 0,	0 }, // EXTRASTATE 2073
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2074), 0,	0 }, // EXTRASTATE 2074
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2075), 0,	0 }, // EXTRASTATE 2075
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2076), 0,	0 }, // EXTRASTATE 2076
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2077), 0,	0 }, // EXTRASTATE 2077
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2078), 0,	0 }, // EXTRASTATE 2078
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2079), 0,	0 }, // EXTRASTATE 2079
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2080), 0,	0 }, // EXTRASTATE 2080
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2081), 0,	0 }, // EXTRASTATE 2081
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2082), 0,	0 }, // EXTRASTATE 2082
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2083), 0,	0 }, // EXTRASTATE 2083
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2084), 0,	0 }, // EXTRASTATE 2084
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2085), 0,	0 }, // EXTRASTATE 2085
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2086), 0,	0 }, // EXTRASTATE 2086
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2087), 0,	0 }, // EXTRASTATE 2087
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2088), 0,	0 }, // EXTRASTATE 2088
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2089), 0,	0 }, // EXTRASTATE 2089
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2090), 0,	0 }, // EXTRASTATE 2090
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2091), 0,	0 }, // EXTRASTATE 2091
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2092), 0,	0 }, // EXTRASTATE 2092
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2093), 0,	0 }, // EXTRASTATE 2093
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2094), 0,	0 }, // EXTRASTATE 2094
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2095), 0,	0 }, // EXTRASTATE 2095
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2096), 0,	0 }, // EXTRASTATE 2096
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2097), 0,	0 }, // EXTRASTATE 2097
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2098), 0,	0 }, // EXTRASTATE 2098
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2099), 0,	0 }, // EXTRASTATE 2099
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2100), 0,	0 }, // EXTRASTATE 2100
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2101), 0,	0 }, // EXTRASTATE 2101
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2102), 0,	0 }, // EXTRASTATE 2102
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2103), 0,	0 }, // EXTRASTATE 2103
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2104), 0,	0 }, // EXTRASTATE 2104
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2105), 0,	0 }, // EXTRASTATE 2105
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2106), 0,	0 }, // EXTRASTATE 2106
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2107), 0,	0 }, // EXTRASTATE 2107
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2108), 0,	0 }, // EXTRASTATE 2108
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2109), 0,	0 }, // EXTRASTATE 2109
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2110), 0,	0 }, // EXTRASTATE 2110
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2111), 0,	0 }, // EXTRASTATE 2111
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2112), 0,	0 }, // EXTRASTATE 2112
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2113), 0,	0 }, // EXTRASTATE 2113
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2114), 0,	0 }, // EXTRASTATE 2114
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2115), 0,	0 }, // EXTRASTATE 2115
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2116), 0,	0 }, // EXTRASTATE 2116
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2117), 0,	0 }, // EXTRASTATE 2117
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2118), 0,	0 }, // EXTRASTATE 2118
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2119), 0,	0 }, // EXTRASTATE 2119
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2120), 0,	0 }, // EXTRASTATE 2120
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2121), 0,	0 }, // EXTRASTATE 2121
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2122), 0,	0 }, // EXTRASTATE 2122
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2123), 0,	0 }, // EXTRASTATE 2123
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2124), 0,	0 }, // EXTRASTATE 2124
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2125), 0,	0 }, // EXTRASTATE 2125
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2126), 0,	0 }, // EXTRASTATE 2126
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2127), 0,	0 }, // EXTRASTATE 2127
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2128), 0,	0 }, // EXTRASTATE 2128
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2129), 0,	0 }, // EXTRASTATE 2129
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2130), 0,	0 }, // EXTRASTATE 2130
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2131), 0,	0 }, // EXTRASTATE 2131
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2132), 0,	0 }, // EXTRASTATE 2132
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2133), 0,	0 }, // EXTRASTATE 2133
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2134), 0,	0 }, // EXTRASTATE 2134
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2135), 0,	0 }, // EXTRASTATE 2135
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2136), 0,	0 }, // EXTRASTATE 2136
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2137), 0,	0 }, // EXTRASTATE 2137
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2138), 0,	0 }, // EXTRASTATE 2138
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2139), 0,	0 }, // EXTRASTATE 2139
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2140), 0,	0 }, // EXTRASTATE 2140
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2141), 0,	0 }, // EXTRASTATE 2141
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2142), 0,	0 }, // EXTRASTATE 2142
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2143), 0,	0 }, // EXTRASTATE 2143
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2144), 0,	0 }, // EXTRASTATE 2144
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2145), 0,	0 }, // EXTRASTATE 2145
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2146), 0,	0 }, // EXTRASTATE 2146
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2147), 0,	0 }, // EXTRASTATE 2147
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2148), 0,	0 }, // EXTRASTATE 2148
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2149), 0,	0 }, // EXTRASTATE 2149
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2150), 0,	0 }, // EXTRASTATE 2150
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2151), 0,	0 }, // EXTRASTATE 2151
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2152), 0,	0 }, // EXTRASTATE 2152
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2153), 0,	0 }, // EXTRASTATE 2153
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2154), 0,	0 }, // EXTRASTATE 2154
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2155), 0,	0 }, // EXTRASTATE 2155
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2156), 0,	0 }, // EXTRASTATE 2156
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2157), 0,	0 }, // EXTRASTATE 2157
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2158), 0,	0 }, // EXTRASTATE 2158
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2159), 0,	0 }, // EXTRASTATE 2159
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2160), 0,	0 }, // EXTRASTATE 2160
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2161), 0,	0 }, // EXTRASTATE 2161
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2162), 0,	0 }, // EXTRASTATE 2162
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2163), 0,	0 }, // EXTRASTATE 2163
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2164), 0,	0 }, // EXTRASTATE 2164
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2165), 0,	0 }, // EXTRASTATE 2165
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2166), 0,	0 }, // EXTRASTATE 2166
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2167), 0,	0 }, // EXTRASTATE 2167
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2168), 0,	0 }, // EXTRASTATE 2168
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2169), 0,	0 }, // EXTRASTATE 2169
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2170), 0,	0 }, // EXTRASTATE 2170
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2171), 0,	0 }, // EXTRASTATE 2171
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2172), 0,	0 }, // EXTRASTATE 2172
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2173), 0,	0 }, // EXTRASTATE 2173
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2174), 0,	0 }, // EXTRASTATE 2174
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2175), 0,	0 }, // EXTRASTATE 2175
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2176), 0,	0 }, // EXTRASTATE 2176
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2177), 0,	0 }, // EXTRASTATE 2177
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2178), 0,	0 }, // EXTRASTATE 2178
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2179), 0,	0 }, // EXTRASTATE 2179
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2180), 0,	0 }, // EXTRASTATE 2180
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2181), 0,	0 }, // EXTRASTATE 2181
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2182), 0,	0 }, // EXTRASTATE 2182
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2183), 0,	0 }, // EXTRASTATE 2183
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2184), 0,	0 }, // EXTRASTATE 2184
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2185), 0,	0 }, // EXTRASTATE 2185
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2186), 0,	0 }, // EXTRASTATE 2186
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2187), 0,	0 }, // EXTRASTATE 2187
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2188), 0,	0 }, // EXTRASTATE 2188
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2189), 0,	0 }, // EXTRASTATE 2189
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2190), 0,	0 }, // EXTRASTATE 2190
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2191), 0,	0 }, // EXTRASTATE 2191
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2192), 0,	0 }, // EXTRASTATE 2192
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2193), 0,	0 }, // EXTRASTATE 2193
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2194), 0,	0 }, // EXTRASTATE 2194
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2195), 0,	0 }, // EXTRASTATE 2195
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2196), 0,	0 }, // EXTRASTATE 2196
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2197), 0,	0 }, // EXTRASTATE 2197
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2198), 0,	0 }, // EXTRASTATE 2198
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2199), 0,	0 }, // EXTRASTATE 2199
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2200), 0,	0 }, // EXTRASTATE 2200
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2201), 0,	0 }, // EXTRASTATE 2201
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2202), 0,	0 }, // EXTRASTATE 2202
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2203), 0,	0 }, // EXTRASTATE 2203
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2204), 0,	0 }, // EXTRASTATE 2204
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2205), 0,	0 }, // EXTRASTATE 2205
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2206), 0,	0 }, // EXTRASTATE 2206
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2207), 0,	0 }, // EXTRASTATE 2207
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2208), 0,	0 }, // EXTRASTATE 2208
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2209), 0,	0 }, // EXTRASTATE 2209
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2210), 0,	0 }, // EXTRASTATE 2210
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2211), 0,	0 }, // EXTRASTATE 2211
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2212), 0,	0 }, // EXTRASTATE 2212
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2213), 0,	0 }, // EXTRASTATE 2213
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2214), 0,	0 }, // EXTRASTATE 2214
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2215), 0,	0 }, // EXTRASTATE 2215
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2216), 0,	0 }, // EXTRASTATE 2216
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2217), 0,	0 }, // EXTRASTATE 2217
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2218), 0,	0 }, // EXTRASTATE 2218
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2219), 0,	0 }, // EXTRASTATE 2219
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2220), 0,	0 }, // EXTRASTATE 2220
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2221), 0,	0 }, // EXTRASTATE 2221
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2222), 0,	0 }, // EXTRASTATE 2222
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2223), 0,	0 }, // EXTRASTATE 2223
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2224), 0,	0 }, // EXTRASTATE 2224
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2225), 0,	0 }, // EXTRASTATE 2225
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2226), 0,	0 }, // EXTRASTATE 2226
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2227), 0,	0 }, // EXTRASTATE 2227
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2228), 0,	0 }, // EXTRASTATE 2228
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2229), 0,	0 }, // EXTRASTATE 2229
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2230), 0,	0 }, // EXTRASTATE 2230
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2231), 0,	0 }, // EXTRASTATE 2231
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2232), 0,	0 }, // EXTRASTATE 2232
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2233), 0,	0 }, // EXTRASTATE 2233
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2234), 0,	0 }, // EXTRASTATE 2234
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2235), 0,	0 }, // EXTRASTATE 2235
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2236), 0,	0 }, // EXTRASTATE 2236
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2237), 0,	0 }, // EXTRASTATE 2237
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2238), 0,	0 }, // EXTRASTATE 2238
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2239), 0,	0 }, // EXTRASTATE 2239
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2240), 0,	0 }, // EXTRASTATE 2240
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2241), 0,	0 }, // EXTRASTATE 2241
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2242), 0,	0 }, // EXTRASTATE 2242
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2243), 0,	0 }, // EXTRASTATE 2243
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2244), 0,	0 }, // EXTRASTATE 2244
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2245), 0,	0 }, // EXTRASTATE 2245
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2246), 0,	0 }, // EXTRASTATE 2246
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2247), 0,	0 }, // EXTRASTATE 2247
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2248), 0,	0 }, // EXTRASTATE 2248
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2249), 0,	0 }, // EXTRASTATE 2249
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2250), 0,	0 }, // EXTRASTATE 2250
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2251), 0,	0 }, // EXTRASTATE 2251
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2252), 0,	0 }, // EXTRASTATE 2252
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2253), 0,	0 }, // EXTRASTATE 2253
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2254), 0,	0 }, // EXTRASTATE 2254
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2255), 0,	0 }, // EXTRASTATE 2255
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2256), 0,	0 }, // EXTRASTATE 2256
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2257), 0,	0 }, // EXTRASTATE 2257
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2258), 0,	0 }, // EXTRASTATE 2258
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2259), 0,	0 }, // EXTRASTATE 2259
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2260), 0,	0 }, // EXTRASTATE 2260
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2261), 0,	0 }, // EXTRASTATE 2261
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2262), 0,	0 }, // EXTRASTATE 2262
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2263), 0,	0 }, // EXTRASTATE 2263
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2264), 0,	0 }, // EXTRASTATE 2264
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2265), 0,	0 }, // EXTRASTATE 2265
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2266), 0,	0 }, // EXTRASTATE 2266
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2267), 0,	0 }, // EXTRASTATE 2267
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2268), 0,	0 }, // EXTRASTATE 2268
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2269), 0,	0 }, // EXTRASTATE 2269
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2270), 0,	0 }, // EXTRASTATE 2270
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2271), 0,	0 }, // EXTRASTATE 2271
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2272), 0,	0 }, // EXTRASTATE 2272
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2273), 0,	0 }, // EXTRASTATE 2273
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2274), 0,	0 }, // EXTRASTATE 2274
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2275), 0,	0 }, // EXTRASTATE 2275
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2276), 0,	0 }, // EXTRASTATE 2276
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2277), 0,	0 }, // EXTRASTATE 2277
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2278), 0,	0 }, // EXTRASTATE 2278
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2279), 0,	0 }, // EXTRASTATE 2279
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2280), 0,	0 }, // EXTRASTATE 2280
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2281), 0,	0 }, // EXTRASTATE 2281
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2282), 0,	0 }, // EXTRASTATE 2282
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2283), 0,	0 }, // EXTRASTATE 2283
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2284), 0,	0 }, // EXTRASTATE 2284
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2285), 0,	0 }, // EXTRASTATE 2285
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2286), 0,	0 }, // EXTRASTATE 2286
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2287), 0,	0 }, // EXTRASTATE 2287
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2288), 0,	0 }, // EXTRASTATE 2288
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2289), 0,	0 }, // EXTRASTATE 2289
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2290), 0,	0 }, // EXTRASTATE 2290
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2291), 0,	0 }, // EXTRASTATE 2291
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2292), 0,	0 }, // EXTRASTATE 2292
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2293), 0,	0 }, // EXTRASTATE 2293
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2294), 0,	0 }, // EXTRASTATE 2294
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2295), 0,	0 }, // EXTRASTATE 2295
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2296), 0,	0 }, // EXTRASTATE 2296
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2297), 0,	0 }, // EXTRASTATE 2297
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2298), 0,	0 }, // EXTRASTATE 2298
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2299), 0,	0 }, // EXTRASTATE 2299
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2300), 0,	0 }, // EXTRASTATE 2300
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2301), 0,	0 }, // EXTRASTATE 2301
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2302), 0,	0 }, // EXTRASTATE 2302
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2303), 0,	0 }, // EXTRASTATE 2303
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2304), 0,	0 }, // EXTRASTATE 2304
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2305), 0,	0 }, // EXTRASTATE 2305
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2306), 0,	0 }, // EXTRASTATE 2306
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2307), 0,	0 }, // EXTRASTATE 2307
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2308), 0,	0 }, // EXTRASTATE 2308
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2309), 0,	0 }, // EXTRASTATE 2309
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2310), 0,	0 }, // EXTRASTATE 2310
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2311), 0,	0 }, // EXTRASTATE 2311
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2312), 0,	0 }, // EXTRASTATE 2312
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2313), 0,	0 }, // EXTRASTATE 2313
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2314), 0,	0 }, // EXTRASTATE 2314
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2315), 0,	0 }, // EXTRASTATE 2315
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2316), 0,	0 }, // EXTRASTATE 2316
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2317), 0,	0 }, // EXTRASTATE 2317
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2318), 0,	0 }, // EXTRASTATE 2318
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2319), 0,	0 }, // EXTRASTATE 2319
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2320), 0,	0 }, // EXTRASTATE 2320
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2321), 0,	0 }, // EXTRASTATE 2321
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2322), 0,	0 }, // EXTRASTATE 2322
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2323), 0,	0 }, // EXTRASTATE 2323
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2324), 0,	0 }, // EXTRASTATE 2324
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2325), 0,	0 }, // EXTRASTATE 2325
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2326), 0,	0 }, // EXTRASTATE 2326
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2327), 0,	0 }, // EXTRASTATE 2327
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2328), 0,	0 }, // EXTRASTATE 2328
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2329), 0,	0 }, // EXTRASTATE 2329
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2330), 0,	0 }, // EXTRASTATE 2330
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2331), 0,	0 }, // EXTRASTATE 2331
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2332), 0,	0 }, // EXTRASTATE 2332
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2333), 0,	0 }, // EXTRASTATE 2333
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2334), 0,	0 }, // EXTRASTATE 2334
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2335), 0,	0 }, // EXTRASTATE 2335
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2336), 0,	0 }, // EXTRASTATE 2336
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2337), 0,	0 }, // EXTRASTATE 2337
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2338), 0,	0 }, // EXTRASTATE 2338
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2339), 0,	0 }, // EXTRASTATE 2339
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2340), 0,	0 }, // EXTRASTATE 2340
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2341), 0,	0 }, // EXTRASTATE 2341
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2342), 0,	0 }, // EXTRASTATE 2342
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2343), 0,	0 }, // EXTRASTATE 2343
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2344), 0,	0 }, // EXTRASTATE 2344
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2345), 0,	0 }, // EXTRASTATE 2345
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2346), 0,	0 }, // EXTRASTATE 2346
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2347), 0,	0 }, // EXTRASTATE 2347
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2348), 0,	0 }, // EXTRASTATE 2348
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2349), 0,	0 }, // EXTRASTATE 2349
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2350), 0,	0 }, // EXTRASTATE 2350
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2351), 0,	0 }, // EXTRASTATE 2351
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2352), 0,	0 }, // EXTRASTATE 2352
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2353), 0,	0 }, // EXTRASTATE 2353
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2354), 0,	0 }, // EXTRASTATE 2354
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2355), 0,	0 }, // EXTRASTATE 2355
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2356), 0,	0 }, // EXTRASTATE 2356
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2357), 0,	0 }, // EXTRASTATE 2357
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2358), 0,	0 }, // EXTRASTATE 2358
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2359), 0,	0 }, // EXTRASTATE 2359
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2360), 0,	0 }, // EXTRASTATE 2360
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2361), 0,	0 }, // EXTRASTATE 2361
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2362), 0,	0 }, // EXTRASTATE 2362
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2363), 0,	0 }, // EXTRASTATE 2363
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2364), 0,	0 }, // EXTRASTATE 2364
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2365), 0,	0 }, // EXTRASTATE 2365
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2366), 0,	0 }, // EXTRASTATE 2366
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2367), 0,	0 }, // EXTRASTATE 2367
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2368), 0,	0 }, // EXTRASTATE 2368
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2369), 0,	0 }, // EXTRASTATE 2369
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2370), 0,	0 }, // EXTRASTATE 2370
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2371), 0,	0 }, // EXTRASTATE 2371
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2372), 0,	0 }, // EXTRASTATE 2372
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2373), 0,	0 }, // EXTRASTATE 2373
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2374), 0,	0 }, // EXTRASTATE 2374
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2375), 0,	0 }, // EXTRASTATE 2375
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2376), 0,	0 }, // EXTRASTATE 2376
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2377), 0,	0 }, // EXTRASTATE 2377
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2378), 0,	0 }, // EXTRASTATE 2378
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2379), 0,	0 }, // EXTRASTATE 2379
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2380), 0,	0 }, // EXTRASTATE 2380
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2381), 0,	0 }, // EXTRASTATE 2381
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2382), 0,	0 }, // EXTRASTATE 2382
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2383), 0,	0 }, // EXTRASTATE 2383
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2384), 0,	0 }, // EXTRASTATE 2384
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2385), 0,	0 }, // EXTRASTATE 2385
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2386), 0,	0 }, // EXTRASTATE 2386
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2387), 0,	0 }, // EXTRASTATE 2387
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2388), 0,	0 }, // EXTRASTATE 2388
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2389), 0,	0 }, // EXTRASTATE 2389
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2390), 0,	0 }, // EXTRASTATE 2390
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2391), 0,	0 }, // EXTRASTATE 2391
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2392), 0,	0 }, // EXTRASTATE 2392
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2393), 0,	0 }, // EXTRASTATE 2393
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2394), 0,	0 }, // EXTRASTATE 2394
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2395), 0,	0 }, // EXTRASTATE 2395
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2396), 0,	0 }, // EXTRASTATE 2396
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2397), 0,	0 }, // EXTRASTATE 2397
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2398), 0,	0 }, // EXTRASTATE 2398
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2399), 0,	0 }, // EXTRASTATE 2399
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2400), 0,	0 }, // EXTRASTATE 2400
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2401), 0,	0 }, // EXTRASTATE 2401
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2402), 0,	0 }, // EXTRASTATE 2402
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2403), 0,	0 }, // EXTRASTATE 2403
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2404), 0,	0 }, // EXTRASTATE 2404
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2405), 0,	0 }, // EXTRASTATE 2405
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2406), 0,	0 }, // EXTRASTATE 2406
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2407), 0,	0 }, // EXTRASTATE 2407
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2408), 0,	0 }, // EXTRASTATE 2408
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2409), 0,	0 }, // EXTRASTATE 2409
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2410), 0,	0 }, // EXTRASTATE 2410
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2411), 0,	0 }, // EXTRASTATE 2411
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2412), 0,	0 }, // EXTRASTATE 2412
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2413), 0,	0 }, // EXTRASTATE 2413
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2414), 0,	0 }, // EXTRASTATE 2414
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2415), 0,	0 }, // EXTRASTATE 2415
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2416), 0,	0 }, // EXTRASTATE 2416
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2417), 0,	0 }, // EXTRASTATE 2417
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2418), 0,	0 }, // EXTRASTATE 2418
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2419), 0,	0 }, // EXTRASTATE 2419
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2420), 0,	0 }, // EXTRASTATE 2420
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2421), 0,	0 }, // EXTRASTATE 2421
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2422), 0,	0 }, // EXTRASTATE 2422
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2423), 0,	0 }, // EXTRASTATE 2423
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2424), 0,	0 }, // EXTRASTATE 2424
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2425), 0,	0 }, // EXTRASTATE 2425
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2426), 0,	0 }, // EXTRASTATE 2426
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2427), 0,	0 }, // EXTRASTATE 2427
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2428), 0,	0 }, // EXTRASTATE 2428
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2429), 0,	0 }, // EXTRASTATE 2429
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2430), 0,	0 }, // EXTRASTATE 2430
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2431), 0,	0 }, // EXTRASTATE 2431
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2432), 0,	0 }, // EXTRASTATE 2432
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2433), 0,	0 }, // EXTRASTATE 2433
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2434), 0,	0 }, // EXTRASTATE 2434
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2435), 0,	0 }, // EXTRASTATE 2435
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2436), 0,	0 }, // EXTRASTATE 2436
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2437), 0,	0 }, // EXTRASTATE 2437
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2438), 0,	0 }, // EXTRASTATE 2438
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2439), 0,	0 }, // EXTRASTATE 2439
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2440), 0,	0 }, // EXTRASTATE 2440
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2441), 0,	0 }, // EXTRASTATE 2441
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2442), 0,	0 }, // EXTRASTATE 2442
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2443), 0,	0 }, // EXTRASTATE 2443
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2444), 0,	0 }, // EXTRASTATE 2444
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2445), 0,	0 }, // EXTRASTATE 2445
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2446), 0,	0 }, // EXTRASTATE 2446
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2447), 0,	0 }, // EXTRASTATE 2447
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2448), 0,	0 }, // EXTRASTATE 2448
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2449), 0,	0 }, // EXTRASTATE 2449
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2450), 0,	0 }, // EXTRASTATE 2450
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2451), 0,	0 }, // EXTRASTATE 2451
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2452), 0,	0 }, // EXTRASTATE 2452
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2453), 0,	0 }, // EXTRASTATE 2453
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2454), 0,	0 }, // EXTRASTATE 2454
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2455), 0,	0 }, // EXTRASTATE 2455
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2456), 0,	0 }, // EXTRASTATE 2456
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2457), 0,	0 }, // EXTRASTATE 2457
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2458), 0,	0 }, // EXTRASTATE 2458
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2459), 0,	0 }, // EXTRASTATE 2459
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2460), 0,	0 }, // EXTRASTATE 2460
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2461), 0,	0 }, // EXTRASTATE 2461
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2462), 0,	0 }, // EXTRASTATE 2462
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2463), 0,	0 }, // EXTRASTATE 2463
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2464), 0,	0 }, // EXTRASTATE 2464
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2465), 0,	0 }, // EXTRASTATE 2465
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2466), 0,	0 }, // EXTRASTATE 2466
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2467), 0,	0 }, // EXTRASTATE 2467
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2468), 0,	0 }, // EXTRASTATE 2468
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2469), 0,	0 }, // EXTRASTATE 2469
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2470), 0,	0 }, // EXTRASTATE 2470
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2471), 0,	0 }, // EXTRASTATE 2471
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2472), 0,	0 }, // EXTRASTATE 2472
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2473), 0,	0 }, // EXTRASTATE 2473
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2474), 0,	0 }, // EXTRASTATE 2474
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2475), 0,	0 }, // EXTRASTATE 2475
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2476), 0,	0 }, // EXTRASTATE 2476
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2477), 0,	0 }, // EXTRASTATE 2477
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2478), 0,	0 }, // EXTRASTATE 2478
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2479), 0,	0 }, // EXTRASTATE 2479
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2480), 0,	0 }, // EXTRASTATE 2480
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2481), 0,	0 }, // EXTRASTATE 2481
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2482), 0,	0 }, // EXTRASTATE 2482
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2483), 0,	0 }, // EXTRASTATE 2483
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2484), 0,	0 }, // EXTRASTATE 2484
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2485), 0,	0 }, // EXTRASTATE 2485
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2486), 0,	0 }, // EXTRASTATE 2486
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2487), 0,	0 }, // EXTRASTATE 2487
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2488), 0,	0 }, // EXTRASTATE 2488
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2489), 0,	0 }, // EXTRASTATE 2489
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2490), 0,	0 }, // EXTRASTATE 2490
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2491), 0,	0 }, // EXTRASTATE 2491
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2492), 0,	0 }, // EXTRASTATE 2492
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2493), 0,	0 }, // EXTRASTATE 2493
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2494), 0,	0 }, // EXTRASTATE 2494
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2495), 0,	0 }, // EXTRASTATE 2495
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2496), 0,	0 }, // EXTRASTATE 2496
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2497), 0,	0 }, // EXTRASTATE 2497
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2498), 0,	0 }, // EXTRASTATE 2498
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2499), 0,	0 }, // EXTRASTATE 2499
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2500), 0,	0 }, // EXTRASTATE 2500
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2501), 0,	0 }, // EXTRASTATE 2501
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2502), 0,	0 }, // EXTRASTATE 2502
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2503), 0,	0 }, // EXTRASTATE 2503
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2504), 0,	0 }, // EXTRASTATE 2504
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2505), 0,	0 }, // EXTRASTATE 2505
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2506), 0,	0 }, // EXTRASTATE 2506
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2507), 0,	0 }, // EXTRASTATE 2507
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2508), 0,	0 }, // EXTRASTATE 2508
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2509), 0,	0 }, // EXTRASTATE 2509
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2510), 0,	0 }, // EXTRASTATE 2510
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2511), 0,	0 }, // EXTRASTATE 2511
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2512), 0,	0 }, // EXTRASTATE 2512
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2513), 0,	0 }, // EXTRASTATE 2513
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2514), 0,	0 }, // EXTRASTATE 2514
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2515), 0,	0 }, // EXTRASTATE 2515
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2516), 0,	0 }, // EXTRASTATE 2516
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2517), 0,	0 }, // EXTRASTATE 2517
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2518), 0,	0 }, // EXTRASTATE 2518
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2519), 0,	0 }, // EXTRASTATE 2519
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2520), 0,	0 }, // EXTRASTATE 2520
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2521), 0,	0 }, // EXTRASTATE 2521
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2522), 0,	0 }, // EXTRASTATE 2522
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2523), 0,	0 }, // EXTRASTATE 2523
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2524), 0,	0 }, // EXTRASTATE 2524
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2525), 0,	0 }, // EXTRASTATE 2525
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2526), 0,	0 }, // EXTRASTATE 2526
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2527), 0,	0 }, // EXTRASTATE 2527
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2528), 0,	0 }, // EXTRASTATE 2528
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2529), 0,	0 }, // EXTRASTATE 2529
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2530), 0,	0 }, // EXTRASTATE 2530
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2531), 0,	0 }, // EXTRASTATE 2531
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2532), 0,	0 }, // EXTRASTATE 2532
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2533), 0,	0 }, // EXTRASTATE 2533
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2534), 0,	0 }, // EXTRASTATE 2534
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2535), 0,	0 }, // EXTRASTATE 2535
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2536), 0,	0 }, // EXTRASTATE 2536
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2537), 0,	0 }, // EXTRASTATE 2537
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2538), 0,	0 }, // EXTRASTATE 2538
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2539), 0,	0 }, // EXTRASTATE 2539
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2540), 0,	0 }, // EXTRASTATE 2540
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2541), 0,	0 }, // EXTRASTATE 2541
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2542), 0,	0 }, // EXTRASTATE 2542
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2543), 0,	0 }, // EXTRASTATE 2543
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2544), 0,	0 }, // EXTRASTATE 2544
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2545), 0,	0 }, // EXTRASTATE 2545
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2546), 0,	0 }, // EXTRASTATE 2546
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2547), 0,	0 }, // EXTRASTATE 2547
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2548), 0,	0 }, // EXTRASTATE 2548
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2549), 0,	0 }, // EXTRASTATE 2549
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2550), 0,	0 }, // EXTRASTATE 2550
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2551), 0,	0 }, // EXTRASTATE 2551
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2552), 0,	0 }, // EXTRASTATE 2552
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2553), 0,	0 }, // EXTRASTATE 2553
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2554), 0,	0 }, // EXTRASTATE 2554
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2555), 0,	0 }, // EXTRASTATE 2555
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2556), 0,	0 }, // EXTRASTATE 2556
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2557), 0,	0 }, // EXTRASTATE 2557
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2558), 0,	0 }, // EXTRASTATE 2558
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2559), 0,	0 }, // EXTRASTATE 2559
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2560), 0,	0 }, // EXTRASTATE 2560
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2561), 0,	0 }, // EXTRASTATE 2561
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2562), 0,	0 }, // EXTRASTATE 2562
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2563), 0,	0 }, // EXTRASTATE 2563
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2564), 0,	0 }, // EXTRASTATE 2564
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2565), 0,	0 }, // EXTRASTATE 2565
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2566), 0,	0 }, // EXTRASTATE 2566
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2567), 0,	0 }, // EXTRASTATE 2567
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2568), 0,	0 }, // EXTRASTATE 2568
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2569), 0,	0 }, // EXTRASTATE 2569
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2570), 0,	0 }, // EXTRASTATE 2570
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2571), 0,	0 }, // EXTRASTATE 2571
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2572), 0,	0 }, // EXTRASTATE 2572
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2573), 0,	0 }, // EXTRASTATE 2573
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2574), 0,	0 }, // EXTRASTATE 2574
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2575), 0,	0 }, // EXTRASTATE 2575
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2576), 0,	0 }, // EXTRASTATE 2576
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2577), 0,	0 }, // EXTRASTATE 2577
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2578), 0,	0 }, // EXTRASTATE 2578
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2579), 0,	0 }, // EXTRASTATE 2579
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2580), 0,	0 }, // EXTRASTATE 2580
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2581), 0,	0 }, // EXTRASTATE 2581
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2582), 0,	0 }, // EXTRASTATE 2582
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2583), 0,	0 }, // EXTRASTATE 2583
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2584), 0,	0 }, // EXTRASTATE 2584
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2585), 0,	0 }, // EXTRASTATE 2585
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2586), 0,	0 }, // EXTRASTATE 2586
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2587), 0,	0 }, // EXTRASTATE 2587
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2588), 0,	0 }, // EXTRASTATE 2588
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2589), 0,	0 }, // EXTRASTATE 2589
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2590), 0,	0 }, // EXTRASTATE 2590
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2591), 0,	0 }, // EXTRASTATE 2591
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2592), 0,	0 }, // EXTRASTATE 2592
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2593), 0,	0 }, // EXTRASTATE 2593
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2594), 0,	0 }, // EXTRASTATE 2594
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2595), 0,	0 }, // EXTRASTATE 2595
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2596), 0,	0 }, // EXTRASTATE 2596
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2597), 0,	0 }, // EXTRASTATE 2597
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2598), 0,	0 }, // EXTRASTATE 2598
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2599), 0,	0 }, // EXTRASTATE 2599
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2600), 0,	0 }, // EXTRASTATE 2600
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2601), 0,	0 }, // EXTRASTATE 2601
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2602), 0,	0 }, // EXTRASTATE 2602
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2603), 0,	0 }, // EXTRASTATE 2603
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2604), 0,	0 }, // EXTRASTATE 2604
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2605), 0,	0 }, // EXTRASTATE 2605
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2606), 0,	0 }, // EXTRASTATE 2606
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2607), 0,	0 }, // EXTRASTATE 2607
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2608), 0,	0 }, // EXTRASTATE 2608
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2609), 0,	0 }, // EXTRASTATE 2609
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2610), 0,	0 }, // EXTRASTATE 2610
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2611), 0,	0 }, // EXTRASTATE 2611
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2612), 0,	0 }, // EXTRASTATE 2612
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2613), 0,	0 }, // EXTRASTATE 2613
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2614), 0,	0 }, // EXTRASTATE 2614
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2615), 0,	0 }, // EXTRASTATE 2615
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2616), 0,	0 }, // EXTRASTATE 2616
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2617), 0,	0 }, // EXTRASTATE 2617
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2618), 0,	0 }, // EXTRASTATE 2618
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2619), 0,	0 }, // EXTRASTATE 2619
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2620), 0,	0 }, // EXTRASTATE 2620
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2621), 0,	0 }, // EXTRASTATE 2621
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2622), 0,	0 }, // EXTRASTATE 2622
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2623), 0,	0 }, // EXTRASTATE 2623
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2624), 0,	0 }, // EXTRASTATE 2624
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2625), 0,	0 }, // EXTRASTATE 2625
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2626), 0,	0 }, // EXTRASTATE 2626
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2627), 0,	0 }, // EXTRASTATE 2627
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2628), 0,	0 }, // EXTRASTATE 2628
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2629), 0,	0 }, // EXTRASTATE 2629
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2630), 0,	0 }, // EXTRASTATE 2630
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2631), 0,	0 }, // EXTRASTATE 2631
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2632), 0,	0 }, // EXTRASTATE 2632
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2633), 0,	0 }, // EXTRASTATE 2633
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2634), 0,	0 }, // EXTRASTATE 2634
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2635), 0,	0 }, // EXTRASTATE 2635
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2636), 0,	0 }, // EXTRASTATE 2636
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2637), 0,	0 }, // EXTRASTATE 2637
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2638), 0,	0 }, // EXTRASTATE 2638
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2639), 0,	0 }, // EXTRASTATE 2639
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2640), 0,	0 }, // EXTRASTATE 2640
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2641), 0,	0 }, // EXTRASTATE 2641
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2642), 0,	0 }, // EXTRASTATE 2642
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2643), 0,	0 }, // EXTRASTATE 2643
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2644), 0,	0 }, // EXTRASTATE 2644
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2645), 0,	0 }, // EXTRASTATE 2645
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2646), 0,	0 }, // EXTRASTATE 2646
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2647), 0,	0 }, // EXTRASTATE 2647
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2648), 0,	0 }, // EXTRASTATE 2648
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2649), 0,	0 }, // EXTRASTATE 2649
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2650), 0,	0 }, // EXTRASTATE 2650
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2651), 0,	0 }, // EXTRASTATE 2651
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2652), 0,	0 }, // EXTRASTATE 2652
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2653), 0,	0 }, // EXTRASTATE 2653
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2654), 0,	0 }, // EXTRASTATE 2654
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2655), 0,	0 }, // EXTRASTATE 2655
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2656), 0,	0 }, // EXTRASTATE 2656
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2657), 0,	0 }, // EXTRASTATE 2657
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2658), 0,	0 }, // EXTRASTATE 2658
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2659), 0,	0 }, // EXTRASTATE 2659
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2660), 0,	0 }, // EXTRASTATE 2660
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2661), 0,	0 }, // EXTRASTATE 2661
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2662), 0,	0 }, // EXTRASTATE 2662
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2663), 0,	0 }, // EXTRASTATE 2663
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2664), 0,	0 }, // EXTRASTATE 2664
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2665), 0,	0 }, // EXTRASTATE 2665
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2666), 0,	0 }, // EXTRASTATE 2666
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2667), 0,	0 }, // EXTRASTATE 2667
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2668), 0,	0 }, // EXTRASTATE 2668
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2669), 0,	0 }, // EXTRASTATE 2669
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2670), 0,	0 }, // EXTRASTATE 2670
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2671), 0,	0 }, // EXTRASTATE 2671
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2672), 0,	0 }, // EXTRASTATE 2672
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2673), 0,	0 }, // EXTRASTATE 2673
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2674), 0,	0 }, // EXTRASTATE 2674
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2675), 0,	0 }, // EXTRASTATE 2675
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2676), 0,	0 }, // EXTRASTATE 2676
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2677), 0,	0 }, // EXTRASTATE 2677
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2678), 0,	0 }, // EXTRASTATE 2678
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2679), 0,	0 }, // EXTRASTATE 2679
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2680), 0,	0 }, // EXTRASTATE 2680
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2681), 0,	0 }, // EXTRASTATE 2681
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2682), 0,	0 }, // EXTRASTATE 2682
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2683), 0,	0 }, // EXTRASTATE 2683
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2684), 0,	0 }, // EXTRASTATE 2684
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2685), 0,	0 }, // EXTRASTATE 2685
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2686), 0,	0 }, // EXTRASTATE 2686
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2687), 0,	0 }, // EXTRASTATE 2687
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2688), 0,	0 }, // EXTRASTATE 2688
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2689), 0,	0 }, // EXTRASTATE 2689
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2690), 0,	0 }, // EXTRASTATE 2690
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2691), 0,	0 }, // EXTRASTATE 2691
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2692), 0,	0 }, // EXTRASTATE 2692
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2693), 0,	0 }, // EXTRASTATE 2693
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2694), 0,	0 }, // EXTRASTATE 2694
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2695), 0,	0 }, // EXTRASTATE 2695
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2696), 0,	0 }, // EXTRASTATE 2696
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2697), 0,	0 }, // EXTRASTATE 2697
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2698), 0,	0 }, // EXTRASTATE 2698
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2699), 0,	0 }, // EXTRASTATE 2699
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2700), 0,	0 }, // EXTRASTATE 2700
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2701), 0,	0 }, // EXTRASTATE 2701
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2702), 0,	0 }, // EXTRASTATE 2702
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2703), 0,	0 }, // EXTRASTATE 2703
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2704), 0,	0 }, // EXTRASTATE 2704
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2705), 0,	0 }, // EXTRASTATE 2705
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2706), 0,	0 }, // EXTRASTATE 2706
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2707), 0,	0 }, // EXTRASTATE 2707
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2708), 0,	0 }, // EXTRASTATE 2708
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2709), 0,	0 }, // EXTRASTATE 2709
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2710), 0,	0 }, // EXTRASTATE 2710
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2711), 0,	0 }, // EXTRASTATE 2711
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2712), 0,	0 }, // EXTRASTATE 2712
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2713), 0,	0 }, // EXTRASTATE 2713
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2714), 0,	0 }, // EXTRASTATE 2714
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2715), 0,	0 }, // EXTRASTATE 2715
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2716), 0,	0 }, // EXTRASTATE 2716
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2717), 0,	0 }, // EXTRASTATE 2717
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2718), 0,	0 }, // EXTRASTATE 2718
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2719), 0,	0 }, // EXTRASTATE 2719
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2720), 0,	0 }, // EXTRASTATE 2720
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2721), 0,	0 }, // EXTRASTATE 2721
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2722), 0,	0 }, // EXTRASTATE 2722
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2723), 0,	0 }, // EXTRASTATE 2723
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2724), 0,	0 }, // EXTRASTATE 2724
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2725), 0,	0 }, // EXTRASTATE 2725
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2726), 0,	0 }, // EXTRASTATE 2726
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2727), 0,	0 }, // EXTRASTATE 2727
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2728), 0,	0 }, // EXTRASTATE 2728
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2729), 0,	0 }, // EXTRASTATE 2729
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2730), 0,	0 }, // EXTRASTATE 2730
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2731), 0,	0 }, // EXTRASTATE 2731
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2732), 0,	0 }, // EXTRASTATE 2732
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2733), 0,	0 }, // EXTRASTATE 2733
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2734), 0,	0 }, // EXTRASTATE 2734
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2735), 0,	0 }, // EXTRASTATE 2735
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2736), 0,	0 }, // EXTRASTATE 2736
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2737), 0,	0 }, // EXTRASTATE 2737
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2738), 0,	0 }, // EXTRASTATE 2738
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2739), 0,	0 }, // EXTRASTATE 2739
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2740), 0,	0 }, // EXTRASTATE 2740
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2741), 0,	0 }, // EXTRASTATE 2741
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2742), 0,	0 }, // EXTRASTATE 2742
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2743), 0,	0 }, // EXTRASTATE 2743
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2744), 0,	0 }, // EXTRASTATE 2744
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2745), 0,	0 }, // EXTRASTATE 2745
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2746), 0,	0 }, // EXTRASTATE 2746
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2747), 0,	0 }, // EXTRASTATE 2747
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2748), 0,	0 }, // EXTRASTATE 2748
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2749), 0,	0 }, // EXTRASTATE 2749
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2750), 0,	0 }, // EXTRASTATE 2750
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2751), 0,	0 }, // EXTRASTATE 2751
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2752), 0,	0 }, // EXTRASTATE 2752
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2753), 0,	0 }, // EXTRASTATE 2753
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2754), 0,	0 }, // EXTRASTATE 2754
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2755), 0,	0 }, // EXTRASTATE 2755
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2756), 0,	0 }, // EXTRASTATE 2756
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2757), 0,	0 }, // EXTRASTATE 2757
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2758), 0,	0 }, // EXTRASTATE 2758
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2759), 0,	0 }, // EXTRASTATE 2759
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2760), 0,	0 }, // EXTRASTATE 2760
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2761), 0,	0 }, // EXTRASTATE 2761
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2762), 0,	0 }, // EXTRASTATE 2762
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2763), 0,	0 }, // EXTRASTATE 2763
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2764), 0,	0 }, // EXTRASTATE 2764
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2765), 0,	0 }, // EXTRASTATE 2765
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2766), 0,	0 }, // EXTRASTATE 2766
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2767), 0,	0 }, // EXTRASTATE 2767
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2768), 0,	0 }, // EXTRASTATE 2768
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2769), 0,	0 }, // EXTRASTATE 2769
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2770), 0,	0 }, // EXTRASTATE 2770
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2771), 0,	0 }, // EXTRASTATE 2771
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2772), 0,	0 }, // EXTRASTATE 2772
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2773), 0,	0 }, // EXTRASTATE 2773
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2774), 0,	0 }, // EXTRASTATE 2774
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2775), 0,	0 }, // EXTRASTATE 2775
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2776), 0,	0 }, // EXTRASTATE 2776
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2777), 0,	0 }, // EXTRASTATE 2777
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2778), 0,	0 }, // EXTRASTATE 2778
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2779), 0,	0 }, // EXTRASTATE 2779
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2780), 0,	0 }, // EXTRASTATE 2780
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2781), 0,	0 }, // EXTRASTATE 2781
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2782), 0,	0 }, // EXTRASTATE 2782
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2783), 0,	0 }, // EXTRASTATE 2783
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2784), 0,	0 }, // EXTRASTATE 2784
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2785), 0,	0 }, // EXTRASTATE 2785
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2786), 0,	0 }, // EXTRASTATE 2786
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2787), 0,	0 }, // EXTRASTATE 2787
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2788), 0,	0 }, // EXTRASTATE 2788
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2789), 0,	0 }, // EXTRASTATE 2789
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2790), 0,	0 }, // EXTRASTATE 2790
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2791), 0,	0 }, // EXTRASTATE 2791
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2792), 0,	0 }, // EXTRASTATE 2792
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2793), 0,	0 }, // EXTRASTATE 2793
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2794), 0,	0 }, // EXTRASTATE 2794
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2795), 0,	0 }, // EXTRASTATE 2795
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2796), 0,	0 }, // EXTRASTATE 2796
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2797), 0,	0 }, // EXTRASTATE 2797
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2798), 0,	0 }, // EXTRASTATE 2798
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2799), 0,	0 }, // EXTRASTATE 2799
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2800), 0,	0 }, // EXTRASTATE 2800
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2801), 0,	0 }, // EXTRASTATE 2801
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2802), 0,	0 }, // EXTRASTATE 2802
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2803), 0,	0 }, // EXTRASTATE 2803
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2804), 0,	0 }, // EXTRASTATE 2804
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2805), 0,	0 }, // EXTRASTATE 2805
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2806), 0,	0 }, // EXTRASTATE 2806
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2807), 0,	0 }, // EXTRASTATE 2807
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2808), 0,	0 }, // EXTRASTATE 2808
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2809), 0,	0 }, // EXTRASTATE 2809
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2810), 0,	0 }, // EXTRASTATE 2810
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2811), 0,	0 }, // EXTRASTATE 2811
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2812), 0,	0 }, // EXTRASTATE 2812
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2813), 0,	0 }, // EXTRASTATE 2813
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2814), 0,	0 }, // EXTRASTATE 2814
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2815), 0,	0 }, // EXTRASTATE 2815
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2816), 0,	0 }, // EXTRASTATE 2816
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2817), 0,	0 }, // EXTRASTATE 2817
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2818), 0,	0 }, // EXTRASTATE 2818
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2819), 0,	0 }, // EXTRASTATE 2819
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2820), 0,	0 }, // EXTRASTATE 2820
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2821), 0,	0 }, // EXTRASTATE 2821
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2822), 0,	0 }, // EXTRASTATE 2822
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2823), 0,	0 }, // EXTRASTATE 2823
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2824), 0,	0 }, // EXTRASTATE 2824
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2825), 0,	0 }, // EXTRASTATE 2825
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2826), 0,	0 }, // EXTRASTATE 2826
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2827), 0,	0 }, // EXTRASTATE 2827
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2828), 0,	0 }, // EXTRASTATE 2828
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2829), 0,	0 }, // EXTRASTATE 2829
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2830), 0,	0 }, // EXTRASTATE 2830
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2831), 0,	0 }, // EXTRASTATE 2831
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2832), 0,	0 }, // EXTRASTATE 2832
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2833), 0,	0 }, // EXTRASTATE 2833
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2834), 0,	0 }, // EXTRASTATE 2834
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2835), 0,	0 }, // EXTRASTATE 2835
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2836), 0,	0 }, // EXTRASTATE 2836
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2837), 0,	0 }, // EXTRASTATE 2837
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2838), 0,	0 }, // EXTRASTATE 2838
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2839), 0,	0 }, // EXTRASTATE 2839
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2840), 0,	0 }, // EXTRASTATE 2840
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2841), 0,	0 }, // EXTRASTATE 2841
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2842), 0,	0 }, // EXTRASTATE 2842
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2843), 0,	0 }, // EXTRASTATE 2843
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2844), 0,	0 }, // EXTRASTATE 2844
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2845), 0,	0 }, // EXTRASTATE 2845
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2846), 0,	0 }, // EXTRASTATE 2846
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2847), 0,	0 }, // EXTRASTATE 2847
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2848), 0,	0 }, // EXTRASTATE 2848
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2849), 0,	0 }, // EXTRASTATE 2849
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2850), 0,	0 }, // EXTRASTATE 2850
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2851), 0,	0 }, // EXTRASTATE 2851
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2852), 0,	0 }, // EXTRASTATE 2852
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2853), 0,	0 }, // EXTRASTATE 2853
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2854), 0,	0 }, // EXTRASTATE 2854
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2855), 0,	0 }, // EXTRASTATE 2855
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2856), 0,	0 }, // EXTRASTATE 2856
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2857), 0,	0 }, // EXTRASTATE 2857
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2858), 0,	0 }, // EXTRASTATE 2858
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2859), 0,	0 }, // EXTRASTATE 2859
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2860), 0,	0 }, // EXTRASTATE 2860
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2861), 0,	0 }, // EXTRASTATE 2861
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2862), 0,	0 }, // EXTRASTATE 2862
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2863), 0,	0 }, // EXTRASTATE 2863
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2864), 0,	0 }, // EXTRASTATE 2864
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2865), 0,	0 }, // EXTRASTATE 2865
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2866), 0,	0 }, // EXTRASTATE 2866
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2867), 0,	0 }, // EXTRASTATE 2867
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2868), 0,	0 }, // EXTRASTATE 2868
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2869), 0,	0 }, // EXTRASTATE 2869
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2870), 0,	0 }, // EXTRASTATE 2870
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2871), 0,	0 }, // EXTRASTATE 2871
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2872), 0,	0 }, // EXTRASTATE 2872
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2873), 0,	0 }, // EXTRASTATE 2873
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2874), 0,	0 }, // EXTRASTATE 2874
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2875), 0,	0 }, // EXTRASTATE 2875
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2876), 0,	0 }, // EXTRASTATE 2876
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2877), 0,	0 }, // EXTRASTATE 2877
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2878), 0,	0 }, // EXTRASTATE 2878
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2879), 0,	0 }, // EXTRASTATE 2879
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2880), 0,	0 }, // EXTRASTATE 2880
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2881), 0,	0 }, // EXTRASTATE 2881
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2882), 0,	0 }, // EXTRASTATE 2882
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2883), 0,	0 }, // EXTRASTATE 2883
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2884), 0,	0 }, // EXTRASTATE 2884
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2885), 0,	0 }, // EXTRASTATE 2885
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2886), 0,	0 }, // EXTRASTATE 2886
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2887), 0,	0 }, // EXTRASTATE 2887
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2888), 0,	0 }, // EXTRASTATE 2888
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2889), 0,	0 }, // EXTRASTATE 2889
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2890), 0,	0 }, // EXTRASTATE 2890
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2891), 0,	0 }, // EXTRASTATE 2891
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2892), 0,	0 }, // EXTRASTATE 2892
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2893), 0,	0 }, // EXTRASTATE 2893
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2894), 0,	0 }, // EXTRASTATE 2894
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2895), 0,	0 }, // EXTRASTATE 2895
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2896), 0,	0 }, // EXTRASTATE 2896
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2897), 0,	0 }, // EXTRASTATE 2897
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2898), 0,	0 }, // EXTRASTATE 2898
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2899), 0,	0 }, // EXTRASTATE 2899
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2900), 0,	0 }, // EXTRASTATE 2900
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2901), 0,	0 }, // EXTRASTATE 2901
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2902), 0,	0 }, // EXTRASTATE 2902
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2903), 0,	0 }, // EXTRASTATE 2903
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2904), 0,	0 }, // EXTRASTATE 2904
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2905), 0,	0 }, // EXTRASTATE 2905
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2906), 0,	0 }, // EXTRASTATE 2906
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2907), 0,	0 }, // EXTRASTATE 2907
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2908), 0,	0 }, // EXTRASTATE 2908
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2909), 0,	0 }, // EXTRASTATE 2909
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2910), 0,	0 }, // EXTRASTATE 2910
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2911), 0,	0 }, // EXTRASTATE 2911
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2912), 0,	0 }, // EXTRASTATE 2912
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2913), 0,	0 }, // EXTRASTATE 2913
-  { SPR_TNT1,	0,		    -1,	NULL,(statenum_t)((int)EXTRASTATES+2914), 0,	0 }  // EXTRASTATE 2914
-
 };
+
+//-----------------------------------------------------------------------------
+
+state_t extra_state =
+  { SPR_TNT1,	0,		    -1,	NULL,		S_NULL,		 0,	0 };
+
+//-----------------------------------------------------------------------------
+
+state_t * states = states_table;
+actionf_t states_ptr_copy [ARRAY_SIZE(states_table)];
+uint32_t NUMSTATES = ARRAY_SIZE(states_table);
 
 //-----------------------------------------------------------------------------
 
@@ -4409,6 +1507,7 @@ state_t states [] =
   .activesound = sfx_None,		\
   .flags = 0,			 	\
   .flags2 = 0,			 	\
+  .mbf21bits = 0,			\
   .raisestate = S_NULL,		 	\
   .scale = FRACUNIT,		 	\
   .names[0] = n,			\
@@ -4419,7 +1518,7 @@ state_t states [] =
 
 //-----------------------------------------------------------------------------
 
-mobjinfo_t mobjinfo[] =
+mobjinfo_t mobjinfo_table [] =
 {
   {					// MT_PLAYER
     .doomednum = -1,
@@ -4451,6 +1550,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP|MF_NOTDMATCH,
     .flags2 = MF2_PASSMOBJ,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Player",
@@ -4488,6 +1588,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_posact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_POSS_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Trooper",
@@ -4524,6 +1625,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_posact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_SPOS_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Sargeant",
@@ -4560,6 +1662,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_vilact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Archvile",
@@ -4596,6 +1699,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Archvile Attack",
@@ -4632,6 +1736,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_skeact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_SKEL_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Revenant",
@@ -4668,6 +1773,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Revenant Fireball",
@@ -4704,6 +1810,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Fireball Trail",
@@ -4740,6 +1847,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_posact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_FATT_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Mancubus",
@@ -4776,6 +1884,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Mancubus Fireball",
@@ -4812,6 +1921,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_posact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_CPOS_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Chaingun Sargeant",
@@ -4848,6 +1958,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_bgact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_TROO_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Imp",
@@ -4884,6 +1995,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_SARG_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Demon",
@@ -4920,6 +2032,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_SHADOW|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_SARG_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Spectre",
@@ -4956,6 +2069,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,
     .flags2 = MF2_PASSMOBJ,
+    .mbf21bits = 0,
     .raisestate = S_HEAD_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Cacodemon",
@@ -4992,6 +2106,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_BOSS_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Baron of Hell",
@@ -5028,6 +2143,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Baron Fireball",
@@ -5064,6 +2180,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_BOS2_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Hell Knight",
@@ -5100,6 +2217,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY,
     .flags2 = MF2_PASSMOBJ,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Lost Soul",
@@ -5136,6 +2254,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Spiderdemon",
@@ -5172,6 +2291,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_bspact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_BSPI_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Arachnotron",
@@ -5208,6 +2328,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Cyberdemon",
@@ -5244,6 +2365,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dmact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,
     .flags2 = MF2_PASSMOBJ,
+    .mbf21bits = 0,
     .raisestate = S_PAIN_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Pain Elemental",
@@ -5280,6 +2402,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_posact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_SSWV_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "SS Nazi",
@@ -5316,6 +2439,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Commander Keen",
@@ -5352,6 +2476,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SHOOTABLE,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Big Brain",
@@ -5388,6 +2513,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOSECTOR,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Demon Spawner",
@@ -5424,6 +2550,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOSECTOR,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Demon Spawn Spot",
@@ -5460,6 +2587,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_NOCLIP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Demon Spawn Cube",
@@ -5496,6 +2624,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Demon Spawn Fire",
@@ -5532,6 +2661,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_NOBLOOD,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Barrel",
@@ -5569,6 +2699,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Imp Fireball",
@@ -5605,6 +2736,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Caco Fireball",
@@ -5641,6 +2773,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Rocket (in air)",
@@ -5677,6 +2810,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Plasma Bullet",
@@ -5713,6 +2847,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "BFG Shot",
@@ -5749,6 +2884,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Arach. Fireball",
@@ -5785,6 +2921,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Bullet Puff",
@@ -5821,6 +2958,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Blood Splat",
@@ -5857,6 +2995,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Teleport Flash",
@@ -5893,6 +3032,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Item Respawn Fog",
@@ -5929,6 +3069,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOSECTOR,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Teleport Exit",
@@ -5965,6 +3106,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "BFG Hit",
@@ -6001,6 +3143,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Green Armour",
@@ -6037,6 +3180,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Blue Armour",
@@ -6073,6 +3217,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Health Potion",
@@ -6109,6 +3254,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Armour Helmet",
@@ -6145,6 +3291,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Blue Keycard",
@@ -6181,6 +3328,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Red Keycard",
@@ -6217,6 +3365,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Yellow Keycard",
@@ -6253,6 +3402,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Yellow Skull Key",
@@ -6289,6 +3439,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Red Skull Key",
@@ -6325,6 +3476,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_NOTDMATCH,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Blue Skull Key",
@@ -6361,6 +3513,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Stim Pack",
@@ -6397,6 +3550,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Medical Kit",
@@ -6433,6 +3587,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Soul Sphere",
@@ -6469,6 +3624,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Invulnerability",
@@ -6505,6 +3661,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Berserk Sphere",
@@ -6541,6 +3698,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Blur Sphere",
@@ -6577,6 +3735,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Radiation Suit",
@@ -6613,6 +3772,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Computer Map",
@@ -6649,6 +3809,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Lite Amp. Visor",
@@ -6685,6 +3846,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Mega Sphere",
@@ -6721,6 +3883,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Ammo Clip",
@@ -6757,6 +3920,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Box of Ammo",
@@ -6793,6 +3957,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Rocket",
@@ -6829,6 +3994,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Box of Rockets",
@@ -6865,6 +4031,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Energy Cell",
@@ -6901,6 +4068,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Energy Pack",
@@ -6937,6 +4105,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Shells",
@@ -6973,6 +4142,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Box of Shells",
@@ -7009,6 +4179,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Backpack",
@@ -7045,6 +4216,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "BFG 9000",
@@ -7081,6 +4253,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Chaingun",
@@ -7117,6 +4290,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Chainsaw",
@@ -7153,6 +4327,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Rocket Launcher",
@@ -7189,6 +4364,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Plasma Gun",
@@ -7225,6 +4401,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Shotgun",
@@ -7261,6 +4438,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Super Shotgun",
@@ -7297,6 +4475,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Lamp",
@@ -7333,6 +4512,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Lamp 2",
@@ -7369,6 +4549,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Short Lamp",
@@ -7405,6 +4586,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Gr. Pillar",
@@ -7441,6 +4623,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Short Gr. Pillar",
@@ -7477,6 +4660,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Red Pillar",
@@ -7513,6 +4697,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Short Red Pillar",
@@ -7549,6 +4734,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pillar w/Skull",
@@ -7585,6 +4771,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pillar w/Heart",
@@ -7621,6 +4808,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Eye in Symbol",
@@ -7657,6 +4845,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Flaming Skulls",
@@ -7693,6 +4882,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Grey Tree",
@@ -7729,6 +4919,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Blue Torch",
@@ -7765,6 +4956,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Green Torch",
@@ -7801,6 +4993,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Tall Red Torch",
@@ -7837,6 +5030,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Small Blue Torch",
@@ -7873,6 +5067,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Small Gr. Torch",
@@ -7909,6 +5104,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Small Red Torch",
@@ -7945,6 +5141,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Brown Stub",
@@ -7981,6 +5178,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Technical Column",
@@ -8017,6 +5215,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Candle",
@@ -8053,6 +5252,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Candelabra",
@@ -8089,6 +5289,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Swaying Body",
@@ -8125,6 +5326,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Arms Out",
@@ -8161,6 +5363,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "One-legged Body",
@@ -8197,6 +5400,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Torso",
@@ -8233,6 +5437,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Leg",
@@ -8269,6 +5474,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Arms Out2",
@@ -8305,6 +5511,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Torso 2",
@@ -8341,6 +5548,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "One-legged Body 2",
@@ -8377,6 +5585,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Leg 2",
@@ -8413,6 +5622,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Swaying Body 2",
@@ -8449,6 +5659,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Cacodemon",
@@ -8485,6 +5696,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Marine",
@@ -8521,6 +5733,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Trooper",
@@ -8557,6 +5770,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Demon",
@@ -8593,6 +5807,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Lost Soul",
@@ -8629,6 +5844,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Imp",
@@ -8665,6 +5881,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Dead Sargeant",
@@ -8701,6 +5918,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Guts and Bones",
@@ -8737,6 +5955,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Guts and Bones 2",
@@ -8773,6 +5992,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Skewered Heads",
@@ -8809,6 +6029,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = 0,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pool of Blood",
@@ -8845,6 +6066,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pole with Skull",
@@ -8881,6 +6103,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pile of Skulls",
@@ -8917,6 +6140,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Impaled Body",
@@ -8953,6 +6177,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Twitching Body",
@@ -8989,6 +6214,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Large Tree",
@@ -9025,6 +6251,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Flaming Barrel",
@@ -9061,6 +6288,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 1",
@@ -9097,6 +6325,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 2",
@@ -9133,6 +6362,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 3",
@@ -9169,6 +6399,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 4",
@@ -9205,6 +6436,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 5",
@@ -9241,6 +6473,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Hanging Body 6",
@@ -9277,6 +6510,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pool Of Blood 1",
@@ -9313,6 +6547,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Pool Of Blood 2",
@@ -9349,6 +6584,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Brains",
@@ -9386,6 +6622,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Wind Push",
@@ -9423,6 +6660,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Wind Pull",
@@ -9460,6 +6698,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_dgact,
     .flags = MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_DOGS_RAISE1,
     .scale = FRACUNIT,
     .names[0] = "Dog",
@@ -9497,6 +6736,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Plasma 1",
@@ -9534,6 +6774,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_BOUNCES,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Plasma 2",
@@ -9571,6 +6812,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Sceptre",
@@ -9608,6 +6850,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_SPECIAL|MF_COUNTITEM,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Bible",
@@ -9644,6 +6887,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Musicsource"
@@ -9680,6 +6924,7 @@ mobjinfo_t mobjinfo[] =
     .activesound = sfx_None,
     .flags = MF_NOBLOCKMAP | MF_DROPOFF,
     .flags2 = 0,
+    .mbf21bits = 0,
     .raisestate = S_NULL,
     .scale = FRACUNIT,
     .names[0] = "Gibdeath"
@@ -9688,30 +6933,17 @@ mobjinfo_t mobjinfo[] =
   EXTRA_MOBJINFO("Blue Blood"),			// Blue Blood (MT_BLUEBLOOD)
   EXTRA_MOBJINFO("Green Blood"),		// Green Blood (MT_GREENBLOOD)
   EXTRA_MOBJINFO("Fuzzy Blood"),		// Fuzzy Blood (MT_FUZZYBLOOD)
-  EXTRA_MOBJINFO("Trail"),			// Smoke Trail (MT_TRAIL)
-
-  /* Extra mobjs from MT_EXTRA00 to MT_EXTRA99 */
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL),
-  EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL), EXTRA_MOBJINFO(NULL)
+  EXTRA_MOBJINFO("Trail")			// Smoke Trail (MT_TRAIL)
 };
+
+//-----------------------------------------------------------------------------
+
+mobjinfo_t extra_mobjinfo = EXTRA_MOBJINFO(NULL);
+
+//-----------------------------------------------------------------------------
+
+mobjinfo_t * mobjinfo = mobjinfo_table;
+uint32_t NUMMOBJTYPES = ARRAY_SIZE(mobjinfo_table);
 
 //-----------------------------------------------------------------------------
 //#define CHECK_INFO_ARRAY_SIZES
@@ -9719,14 +6951,14 @@ mobjinfo_t mobjinfo[] =
 
 void check_array_sizes (void)
 {
-  if (ARRAY_SIZE(sprnames) != (NUMSPRITES+1))
+  if (ARRAY_SIZE(sprnames_orig) != (NUMSPRITES+1))
     printf ("sprnames %u/%u\n", ARRAY_SIZE(sprnames_orig), (NUMSPRITES+1));
 
-  if (ARRAY_SIZE(states) != (NUMSTATES))
-    printf ("states %u/%u\n", ARRAY_SIZE(states), (NUMSTATES));
+  if (ARRAY_SIZE(states_table) != (NUMSTATES))
+    printf ("states %u/%u\n", ARRAY_SIZE(states_table), (NUMSTATES));
 
-  if (ARRAY_SIZE(mobjinfo) != (NUMMOBJTYPES))
-    printf ("mobjinfo %u/%u\n", ARRAY_SIZE(mobjinfo), (NUMMOBJTYPES));
+  if (ARRAY_SIZE(mobjinfo_table) != (NUMMOBJTYPES))
+    printf ("mobjinfo %u/%u\n", ARRAY_SIZE(mobjinfo_table), (NUMMOBJTYPES));
 }
 
 #endif

@@ -7,8 +7,13 @@
 #include <stddef.h>				// For the offsetof() macro
 
 /* Strings from info.c */
-extern char * sprnames [];
 extern char * sprnames_orig[];
+extern char * sprnames_table [];
+extern state_t states_table[];
+extern state_t extra_state;
+extern mobjinfo_t mobjinfo_table [];
+extern mobjinfo_t extra_mobjinfo;
+extern actionf_t states_ptr_copy [];
 
 /* Strings from f_finale.c */
 extern char*	finale_messages[];
@@ -125,9 +130,6 @@ extern armour_class_t Blue_Armour_Class;
 extern int	maxammo[];
 extern int	clipammo[];
 
-/* Variables from p_pspr.c */
-extern unsigned int bfg_cells;
-
 /* Variables from p_map.c */
 extern boolean Monsters_Infight1;
 
@@ -181,6 +183,7 @@ typedef enum
   JOB_PARS,
   JOB_CODEPTR,
   JOB_STRINGS,
+  JOB_SPRITES,
   JOB_END,
   QTY_JOBS
 } dhjobs_t;
@@ -203,6 +206,7 @@ static const char * const dehack_patches [] =
   "[PARS]",
   "[CODEPTR]",
   "[STRINGS]",
+  "[SPRITES]",
   "[END]",
   NULL
 };
@@ -253,6 +257,7 @@ static const char * const dehack_things [] =
   "Dropped item",
   "Blood color",
   "Retro Bits",
+  "MBF21 Bits",
   "Name",
   "Name1",
   "Name2",
@@ -299,6 +304,7 @@ typedef enum
   THING_Dropped_item,
   THING_Blood_Colour,
   THING_Retro_Bits,
+  THING_MBF21_Bits,
   THING_Name,
   THING_Name1,
   THING_Name2,
@@ -364,6 +370,8 @@ static const char * const dehack_weapons [] =
   "Bobbing frame",
   "Shooting frame",
   "Firing frame",
+  "Ammo Per Shot",
+  "MBF21 Bits",
   NULL
 };
 
@@ -930,17 +938,17 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "FRIEND",		M_FRIEND},		// a friend of the player(s) (MBF)
   { "TRANSLUCENT",	M_TRANSLUCENT},		// apply translucency to sprite (BOOM)
 
-  { "BOSS",		M2_MASSACRE+32+1}	// Unused bit
+  { "BOSS",		M2_MASSACRE+32+1},	// Unused bit
+  { "",			0}
+};
+
+static const bit_names_t dehack_thing_mbf21_bit_names [] =
+{
+  { "",			0}
 };
 
 /* ---------------------------------------------------------------------------- */
 
-/* Need a private copy of this table (from info.c) to prevent */
-/* problems with circular modifications */
-
-actionf_t states_ptr_copy [NUMSTATES];
-
-/* ---------------------------------------------------------------------------- */
 #define CREATE_DEHACK_FILE
 #ifdef CREATE_DEHACK_FILE
 
@@ -1225,6 +1233,117 @@ unsigned int dh_qty_match (const char * s1, const char * s2)
 }
 
 /* ---------------------------------------------------------------------------- */
+/* Reserve more memory if required. */
+
+static void check_things_qty (uint32_t num)
+{
+  uint32_t new_size;
+  mobjinfo_t * ptr;
+
+  if (num < NUMMOBJTYPES)
+    return;
+
+  // Need more memory.
+  new_size = num + 10;
+
+  // printf ("Extending Thing array from %u to %u\n", NUMMOBJTYPES, new_size);
+
+  if (mobjinfo == mobjinfo_table)
+  {
+    mobjinfo = malloc (sizeof (mobjinfo_t) * new_size);
+    memcpy (mobjinfo, mobjinfo_table, sizeof (mobjinfo_t) * NUMMOBJTYPES);
+  }
+  else
+  {
+    mobjinfo = realloc (mobjinfo, sizeof (mobjinfo_t) * new_size);
+  }
+
+  if (mobjinfo == NULL)
+    I_Error ("Out of memory");
+
+  ptr = &mobjinfo [NUMMOBJTYPES];
+  do
+  {
+    memcpy (ptr, &extra_mobjinfo, sizeof (mobjinfo_t));
+    ++ptr;
+  } while (++NUMMOBJTYPES < new_size);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void check_states_qty (uint32_t num)
+{
+  uint32_t new_size;
+  state_t * ptr;
+
+  if (num < NUMSTATES)
+    return;
+
+  // Need more memory.
+  new_size = num + 10;
+
+  // printf ("Extending States array from %u to %u\n", NUMSTATES, new_size);
+
+  if (states == states_table)
+  {
+    states = malloc (sizeof (state_t) * new_size);
+    memcpy (states, states_table, sizeof (state_t) * NUMSTATES);
+  }
+  else
+  {
+    states = realloc (states, sizeof (state_t) * new_size);
+  }
+
+  if (states == NULL)
+    I_Error ("Out of memory");
+
+  ptr = &states [NUMSTATES];
+  do
+  {
+    memcpy (ptr, &extra_state, sizeof (state_t));
+    ptr -> nextstate = (statenum_t) (NUMSTATES);
+    ++ptr;
+  } while (++NUMSTATES < new_size);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void check_sprites_qty (uint32_t num)
+{
+  uint32_t pos;
+  uint32_t new_size;
+
+  if (num < NUMSPRITES)
+    return;
+
+  // Need more memory.
+  new_size = num + 10;
+
+  // printf ("Extending Sprites array from %u to %u\n", NUMSPRITES, new_size);
+
+  if (sprnames == sprnames_table)
+  {
+    sprnames = malloc (sizeof (char *) * new_size);
+    memcpy (sprnames, sprnames_table, sizeof (char *) * NUMSPRITES);
+  }
+  else
+  {
+    sprnames = realloc (sprnames, sizeof (char *) * new_size);
+  }
+
+  if (sprnames == NULL)
+    I_Error ("Out of memory");
+
+  pos = NUMSPRITES;
+  do
+  {
+    sprnames [pos] = NULL;
+  } while (++pos < new_size);
+
+  NUMSPRITES = new_size - 1;	// NUMSPRITES does not include the trailing NULL
+}
+
+/* ---------------------------------------------------------------------------- */
 
 /* Attempts to open a file that is in the same directory as the executable */
 
@@ -1395,7 +1514,6 @@ static void write_all_things (FILE * fout)
   int thing_no;
   const char * name;
   mobjinfo_t * ptr;
-  char namestr [20];
 
   ptr = &mobjinfo[0];
   thing_no = 0;
@@ -1404,15 +1522,7 @@ static void write_all_things (FILE * fout)
     name = ptr -> names[0];
     if (name == NULL)
     {
-      if ((thing_no >= MT_EXTRA00) && (thing_no <= MT_EXTRA99))
-      {
-	sprintf (namestr, "Extra %u", thing_no - MT_EXTRA00);
-	name = namestr;
-      }
-      else
-      {
-	name = "Unknown";
-      }
+      name = "Unknown";
     }
 
     fprintf (fout, "%s %d (%s)\n", dehack_patches[1], thing_no+1, name);
@@ -1453,15 +1563,13 @@ static void write_all_things (FILE * fout)
 
 /* ---------------------------------------------------------------------------- */
 
-static const char * find_thing_bitname (int * thing_ptr, char operator, const char * str)
+static const char * find_thing_bitname (int * thing_ptr, char operator, const char * str, const bit_names_t * ptr)
 {
   char cc;
   unsigned int rc;
   unsigned int len;
-  unsigned int count;
   unsigned int pos;
   unsigned int bit;
-  const bit_names_t * ptr;
   char buf [40];
 
   /* Note: Trisen.wad has -2147416560 here! */
@@ -1494,9 +1602,14 @@ static const char * find_thing_bitname (int * thing_ptr, char operator, const ch
   else
   {
     ptr = dehack_thing_bit_names;
-    count = ARRAY_SIZE (dehack_thing_bit_names);
     do
     {
+      if (ptr->name[0] == 0)
+      {
+	if (M_CheckParm ("-showunknown"))
+	  fprintf (stderr, "DeHackEd:Failed to match bitname (%s)\n", buf);
+	return (str);
+      }
       if (strcasecmp (ptr->name, buf) == 0)
       {
 	pos = ptr->value / 32;
@@ -1504,12 +1617,6 @@ static const char * find_thing_bitname (int * thing_ptr, char operator, const ch
 	break;
       }
       ptr++;
-      if (--count == 0)
-      {
-	if (M_CheckParm ("-showunknown"))
-	  fprintf (stderr, "DeHackEd:Failed to match bitname (%s)\n", buf);
-	return (str);
-      }
     } while (1);
   }
 
@@ -1531,9 +1638,9 @@ static void decode_things_bits (unsigned int number, thing_element_t record, con
   int * ptr;
 
   if ((number == 0)
-   || (number >= NUMMOBJTYPES))
+   || (number > NUMMOBJTYPES))
   {
-    fprintf (stderr, "Invalid thing number %u\n", number);
+    fprintf (stderr, "Invalid thing number %u/%u\n", number, NUMMOBJTYPES);
     return;
   }
 
@@ -1546,7 +1653,8 @@ static void decode_things_bits (unsigned int number, thing_element_t record, con
 
   do
   {
-    string1 = find_thing_bitname (ptr, operator, string1);
+    string1 = find_thing_bitname (ptr, operator, string1, dehack_thing_bit_names);
+
     while (*string1 == ' ')
       string1++;
     if (*string1 == 0)
@@ -1569,6 +1677,42 @@ static void decode_things_bits (unsigned int number, thing_element_t record, con
 
 /* ---------------------------------------------------------------------------- */
 
+static void decode_things_mbf21_bits (unsigned int number, thing_element_t record, const char * string1)
+{
+  char operator;
+  int * ptr;
+
+  if ((number == 0)
+   || (number > NUMMOBJTYPES))
+  {
+    fprintf (stderr, "Invalid thing number %u/%u\n", number, NUMMOBJTYPES);
+    return;
+  }
+
+  // printf ("Thing %u bits (%s) = ", number, string1);
+
+  ptr = &mobjinfo[number-1].mbf21bits;
+  ptr[0] = 0;
+  ptr[1] = 0;
+  operator = '|';
+
+  do
+  {
+    string1 = find_thing_bitname (ptr, operator, string1, dehack_thing_mbf21_bit_names);
+    while (*string1 == ' ')
+      string1++;
+    if (*string1 == 0)
+      break;
+    operator = *string1++;
+    while (*string1 == ' ')
+      string1++;
+  } while (*string1);
+
+  // printf ("%08X %08X\n", ptr[0], ptr[1]);
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void decode_things_name (unsigned int number, thing_element_t record, char * value)
 {
   char * newtext;
@@ -1576,9 +1720,9 @@ static void decode_things_name (unsigned int number, thing_element_t record, cha
   mobjinfo_t * ptr;
 
   if ((number == 0)
-   || (number >= NUMMOBJTYPES))
+   || (number > NUMMOBJTYPES))
   {
-    fprintf (stderr, "Invalid thing number %u\n", number);
+    fprintf (stderr, "Invalid thing number %u/%u\n", number, NUMMOBJTYPES);
     return;
   }
 
@@ -1635,8 +1779,8 @@ static void dh_thing_drop (mobjtype_t number, mobjtype_t value)
     drop_info_p = drop_info_p -> next;
   }
 
-  if (((unsigned int)(number) >= NUMMOBJTYPES)
-   || ((unsigned int)(value) >= NUMMOBJTYPES))
+  if (((unsigned int)(number) > NUMMOBJTYPES)
+   || ((unsigned int)(value) > NUMMOBJTYPES))
     return;
 
   drop_info_p = malloc (sizeof (item_to_drop_t));
@@ -1656,9 +1800,9 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
   mobjinfo_t * ptr;
 
   if ((number == 0)
-   || (number >= NUMMOBJTYPES))
+   || (number > NUMMOBJTYPES))
   {
-    fprintf (stderr, "Invalid thing number %u\n", number);
+    fprintf (stderr, "Invalid thing number %u/%u\n", number, NUMMOBJTYPES);
     return;
   }
 
@@ -1794,7 +1938,8 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
     case THING_Blood_Colour:	// Not implemented
     case THING_Retro_Bits:
 
-    case THING_Name:		// We already did these.
+    case THING_MBF21_Bits:	// We already did these.
+    case THING_Name:
     case THING_Name1:
     case THING_Name2:
     case THING_Plural1:
@@ -2089,6 +2234,8 @@ static void dh_write_to_weapon (unsigned int number, unsigned int record, unsign
     case 3:ptr -> readystate	= value; break;
     case 4:ptr -> atkstate	= value; break;
     case 5:ptr -> flashstate	= value; break;
+    case 6:ptr -> ammopershot	= value; break;
+    case 7:ptr -> mbf21bits	= value; break;
     default:fprintf (stderr, "Invalid Weapon record\n");
   }
   // printf ("Patched element %d of WEAPONS %d to %d\n", record, number, value);
@@ -2379,7 +2526,7 @@ static void write_all_miscs (FILE * fout)
   fprintf (fout, "%s = %d\n", dehack_miscs [15], IDFA_Armour_Class);
   fprintf (fout, "%s = %d\n", dehack_miscs [17], IDKFA_Armour);
   fprintf (fout, "%s = %d\n", dehack_miscs [19], IDKFA_Armour_Class);
-  fprintf (fout, "%s = %d\n", dehack_miscs [21], bfg_cells);
+  fprintf (fout, "%s = %d\n", dehack_miscs [21], weaponinfo[wp_bfg].ammopershot);
   if (Monsters_Infight1 == false)
     c = 202;
   else
@@ -2463,7 +2610,7 @@ static void dh_write_to_misc (unsigned int number, unsigned int record, unsigned
       break;
 
     case 21:	//	"BFG Cells/Shot",
-      bfg_cells = value;
+      weaponinfo[wp_bfg].ammopershot = value;
       break;
 
     case 22:	//	"Monsters Infight"
@@ -3006,8 +3153,8 @@ static unsigned int replace_maptable_text (char * orig, char * newt)
       pq = skies[s];
       if (strcasecmp (orig, pq) == 0)
       {
-        pp = pq;
-        break;
+	pp = pq;
+	break;
       }
       if (s == 0)
 	return (1);
@@ -3696,21 +3843,21 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	  case JOB_SPRITE:
 	  case JOB_CHEAT:
 	  case JOB_MISC:
+	  case JOB_SPRITES:
 	    current_job = (dhjobs_t) counter1;
 	    break;
 
 	  case JOB_THING:
-	    if ((params[0] >=1) && (params[0] <= NUMMOBJTYPES))
-	    {
-	      current_job = JOB_THING;
-	      job_params[0] = params[0];
-	    }
-	    else
+	    if (params[0] == 0)
 	    {
 	      current_job = JOB_NULL;
-	      fprintf (stderr, "DeHackEd: Invalid Thing number (%d) at line %d\n",
-				     params[0],dh_line_number);
+	      fprintf (stderr, "Invalid thing number %u/%u at line %u\n", params[0], NUMMOBJTYPES, dh_line_number);
+	      break;
 	    }
+
+	    check_things_qty (params[0] - 1);
+	    current_job = JOB_THING;
+	    job_params[0] = params[0];
 	    break;
 
 	  case JOB_SOUND:
@@ -3728,17 +3875,9 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    break;
 
 	  case JOB_FRAME:
-	    if (params[0] < NUMSTATES)
-	    {
-	      current_job = JOB_FRAME;
-	      job_params[0] = params[0];
-	    }
-	    else
-	    {
-	      current_job = JOB_NULL;
-	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
-				     params[0],NUMSTATES,dh_line_number);
-	    }
+	    check_states_qty (params[0]);
+	    current_job = JOB_FRAME;
+	    job_params[0] = params[0];
 	    break;
 
 	  case JOB_AMMO:
@@ -3890,6 +4029,15 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		  }
 		  break;
 
+		case THING_MBF21_Bits:
+		  counter2 = dh_inchar (a_line, '=');
+		  if (counter2)
+		  {
+		    string1 = next_arg (a_line+counter2);
+		    decode_things_mbf21_bits (job_params[0], (thing_element_t) counter1, string1);
+		  }
+		  break;
+
 		case THING_Scale:			// Writing to "scale"
 		  counter2 = dh_inchar (a_line, '=');
 		  if (counter2)
@@ -4024,13 +4172,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      break;
 
 	    counter2 = atoi (a_line + counter2);
-	    if (counter2 >= NUMSTATES)
-	    {
-	      fprintf (stderr, "DeHackEd: Invalid Frame number (%d/%d) at line %d\n",
-				     counter2,NUMSTATES,dh_line_number);
-	      counter1 = -1;
-	      break;
-	    }
+	    check_states_qty (counter2);
 
 	    counter1 = dh_search_str_tab (dehack_codeptrs, a_line);
 	    if (counter1 != -1)
@@ -4065,6 +4207,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	    }
 	    break;
 
+
 	  case JOB_STRINGS:
 	    /* Freedoom has a trailing backslash at the end of the line */
 	    /* to signify that the next line continues. */
@@ -4090,6 +4233,36 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	      }
 	    } while (1);
 	    counter1 = DH_Parse_language_string (a_line);
+	    break;
+
+
+    	  case JOB_SPRITES:
+	    string1 = a_line;
+
+	    while (*string1 == ' ')
+	      string1++;
+
+	    counter1 = atoi (string1);
+
+	    counter2 = dh_inchar (string1, '=');
+	    if (counter2 == 0)
+	      break;
+
+	    string1 = string1 + counter2;
+	    while (*string1 == ' ')
+	      string1++;
+
+	    check_sprites_qty (counter1 + 1);
+	    {
+	      char * newt = malloc (8);
+	      if (newt)
+	      {
+		strncpy (newt, string1, 8);
+		newt [4] = 0;
+		sprnames [counter1] = newt;
+//		printf ("Setting sprite name %u to %s\n", counter1, newt);
+	      }
+	    }
 	    break;
 	}
 	if ((counter1 == -1) && (*a_line > ' ')
@@ -4747,8 +4920,8 @@ static void show_thing_drops (void)
     m1 = drop_info_p -> just_died;
     m2 = drop_info_p -> mt_spawn;
 
-    if (((unsigned int) m1 < NUMMOBJTYPES)
-     && ((unsigned int) m2 < NUMMOBJTYPES))
+    if (((unsigned int) m1 <= NUMMOBJTYPES)
+     && ((unsigned int) m2 <= NUMMOBJTYPES))
     {
       name1 = mobjinfo [m1].names[0];
       if (name1 == NULL)

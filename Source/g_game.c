@@ -2542,7 +2542,7 @@ boolean G_CheckDemoStatus (void)
 
 /* -------------------------------------------------------------------------------------------- */
 
-static const char * const cast_mtconv [NUMMOBJTYPES+1] =
+static const char * const cast_mtconv [] =
 {
   "PLAYER", "POSSESSED", "SHOTGUY", "VILE", "FIRE",
   "UNDEAD", "TRACER", "SMOKE", "FATSO", "FATSHOT",
@@ -2606,14 +2606,14 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
     counter = 0;
     do
     {
-      if (strcasecmp (src, cmp [counter]) == 0)
+      if ((cmp [counter] != NULL)
+       && (strcasecmp (src, cmp [counter]) == 0))
       {
 	num = G_SprNum ((spritenum_t) counter);
 	if (num != MT_NULL)
 	  return (num);
       }
-      counter++;
-    } while (cmp[counter]);
+    } while (++counter < NUMSPRITES);
   }
   else
   {
@@ -2628,11 +2628,6 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
 	  return ((mobjtype_t)counter);
         counter++;
       } while (cmp[counter]);
-      if (strncasecmp (src, "EXTRA", 5) == 0)
-      {
-        counter = atoi (src+5);
-        return ((mobjtype_t) (MT_EXTRA00 + counter));
-      }
     }
     else
     {
