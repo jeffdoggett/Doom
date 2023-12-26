@@ -1601,7 +1601,6 @@ static const char * find_thing_bitname (int * thing_ptr, char operator, const ch
   }
   else
   {
-    ptr = dehack_thing_bit_names;
     do
     {
       if (ptr->name[0] == 0)
@@ -1693,7 +1692,6 @@ static void decode_things_mbf21_bits (unsigned int number, thing_element_t recor
 
   ptr = &mobjinfo[number-1].mbf21bits;
   ptr[0] = 0;
-  ptr[1] = 0;
   operator = '|';
 
   do
