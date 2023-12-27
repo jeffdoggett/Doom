@@ -1325,6 +1325,31 @@ P_KillMobj
 }
 
 //-----------------------------------------------------------------------------
+/*
+  Things with the same value of N will not target each other after taking damage.
+*/
+
+static inline int P_MonstersInfight (mobj_t* target, mobj_t* source)
+{
+  int group;
+
+  if ((source == NULL) || (source == target))
+    return false;
+
+  group = target->info->infightinggroup;
+  if (group > 0)
+  {
+    if (group == source->info->infightinggroup)
+      return (Monsters_Infight1 || Monsters_Infight2);
+  }
+
+  return (source->type != MT_VILE &&
+      (!target->threshold || target->type == MT_VILE) &&
+      ((source->flags ^ target->flags) & MF_FRIEND ||
+       Monsters_Infight1 || Monsters_Infight2));
+}
+
+//-----------------------------------------------------------------------------
 //
 // P_DamageMobj
 // Damages both enemies and players
@@ -1497,10 +1522,7 @@ P_DamageMobj
 
   // killough 9/9/98: cleaned up, made more consistent:
 
-  if (source && source != target && source->type != MT_VILE &&
-      (!target->threshold || target->type == MT_VILE) &&
-      ((source->flags ^ target->flags) & MF_FRIEND ||
-       Monsters_Infight1 || Monsters_Infight2))
+    if (P_MonstersInfight (target, source))
     {
       state_t *state = target->state;
       state_t *spawnstate = &states[info->spawnstate];

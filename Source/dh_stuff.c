@@ -130,6 +130,17 @@ extern armour_class_t Blue_Armour_Class;
 extern int	maxammo[];
 extern int	clipammo[];
 
+
+/* Variables from p_enemy.c */
+extern bossdeath_t bd_action_1;
+extern bossdeath_t bd_action_2;
+extern bossdeath_t bd_action_3;
+extern bossdeath_t bd_action_4;
+extern bossdeath_t bd_action_5;
+extern bossdeath_t bd_action_6;
+extern bossdeath_t bd_action_7;
+
+
 /* Variables from p_map.c */
 extern boolean Monsters_Infight1;
 
@@ -164,6 +175,7 @@ static const int * AmmoTableOffset = &maxammo [0];
 /* ---------------------------------------------------------------------------- */
 
 static char * read_map_num (unsigned int * episode, unsigned int * map, char * ptr);
+static void set_new_boss_action (mobjtype_t monster, bossdeath_t * bd_ptr);
 
 /* ---------------------------------------------------------------------------- */
 
@@ -258,6 +270,9 @@ static const char * const dehack_things [] =
   "Blood color",
   "Retro Bits",
   "MBF21 Bits",
+  "Infighting Group",
+  "Projectile Group",
+  "Splash Group",
   "Name",
   "Name1",
   "Name2",
@@ -305,6 +320,9 @@ typedef enum
   THING_Blood_Colour,
   THING_Retro_Bits,
   THING_MBF21_Bits,
+  THING_Infighting_Group,
+  THING_Projectile_Group,
+  THING_Splash_Group,
   THING_Name,
   THING_Name1,
   THING_Name2,
@@ -947,25 +965,25 @@ static const bit_names_t dehack_thing_bit_names [] =
 
 static const bit_names_t dehack_thing_mbf21_bit_names [] =
 {
-  { "LOGRAV",		0},	// 	Lower gravity (1/8)
-  { "SHORTMRANGE",	1},	// 	Short missile range (archvile)
-  { "DMGIGNORED",	2},	// 	Other things ignore its attacks (archvile)
-  { "NORADIUSDMG",	3},	// 	Doesn't take splash damage (cyberdemon, mastermind)
-  { "FORCERADIUSDMG",	4},	// 	Thing causes splash damage even if the target shouldn't
-  { "HIGHERMPROB",	5},	// 	Higher missile attack probability (cyberdemon)
-  { "RANGEHALF",	6},	// 	Use half distance for missile attack probability (cyberdemon, mastermind, revenant, lost soul)
-  { "NOTHRESHOLD",	7},	// 	Has no targeting threshold (archvile)
-  { "LONGMELEE",	8},	// 	Has long melee range (revenant)
-  { "BOSS",		9},	// 	Full volume see / death sound & splash immunity (from heretic)
-  { "MAP07BOSS1",	10},	// 	Tag 666 "boss" on doom 2 map 7 (mancubus)
-  { "MAP07BOSS2",	11},	// 	Tag 667 "boss" on doom 2 map 7 (arachnotron)
-  { "E1M8BOSS",		12},	// 	E1M8 boss (baron)
-  { "E2M8BOSS",		13},	// 	E2M8 boss (cyberdemon)
-  { "E3M8BOSS",		14},	// 	E3M8 boss (mastermind)
-  { "E4M6BOSS",		15},	// 	E4M6 boss (cyberdemon)
-  { "E4M8BOSS",		16},	// 	E4M8 boss (mastermind)
-  { "RIP",		17},	// 	Ripper projectile (does not disappear on impact)
-  { "FULLVOLSOUNDS",	18},	// 	Full volume see / death sounds (cyberdemon, mastermind)
+  { "LOGRAV",		MB_LOGRAV},
+  { "SHORTMRANGE",	MB_SHORTMRANGE},
+  { "DMGIGNORED",	MB_DMGIGNORED},
+  { "NORADIUSDMG",	MB_NORADIUSDMG},
+  { "FORCERADIUSDMG",	MB_FORCERADIUSDMG},
+  { "HIGHERMPROB",	MB_HIGHERMPROB},
+  { "RANGEHALF",	MB_RANGEHALF},
+  { "NOTHRESHOLD",	MB_NOTHRESHOLD},
+  { "LONGMELEE",	MB_LONGMELEE},
+  { "BOSS",		MB_BOSS},
+  { "MAP07BOSS1",	MB_MAP07BOSS1},
+  { "MAP07BOSS2",	MB_MAP07BOSS2},
+  { "E1M8BOSS",		MB_E1M8BOSS},
+  { "E2M8BOSS",		MB_E2M8BOSS},
+  { "E3M8BOSS",		MB_E3M8BOSS},
+  { "E4M6BOSS",		MB_E4M6BOSS},
+  { "E4M8BOSS",		MB_E4M8BOSS},
+  { "RIP",		MB_RIP},
+  { "FULLVOLSOUNDS",	MB_FULLVOLSOUNDS},
   { "",			0}
 };
 
@@ -1958,12 +1976,42 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
     case THING_Blood_Colour:	// Not implemented
     case THING_Retro_Bits:
 
-    case THING_MBF21_Bits:	// We already did these.
-    case THING_Name:
+    case THING_MBF21_Bits:	// We already did this, but see if we need to do anything.
+      value = ptr -> mbf21bits;
+      // printf ("MBF21 bits %u = %X\n", number, value);
+      if (value & MBF_MAP07BOSS1)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_1);
+       if (value & MBF_MAP07BOSS2)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_2);
+      if (value & MBF_E1M8BOSS)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_3);
+      if (value & MBF_E2M8BOSS)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_4);
+      if (value & MBF_E3M8BOSS)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_5);
+      if (value & MBF_E4M6BOSS)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_6);
+      if (value & MBF_E4M8BOSS)
+	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_7);
+      break;
+
+    case THING_Name:		// We already did these.
     case THING_Name1:
     case THING_Name2:
     case THING_Plural1:
     case THING_Plural2:
+      break;
+
+    case THING_Infighting_Group:
+      ptr -> infightinggroup = value;
+      break;
+
+    case THING_Projectile_Group:
+      ptr -> projectilegroup = value;
+      break;
+
+    case THING_Splash_Group:
+      ptr -> splashgroup = value;
       break;
 
     default:fprintf (stderr, "Invalid record %u for thing %u\n", record, number);
@@ -4649,6 +4697,26 @@ static bossdeath_t * set_boss_action (bossdeath_t * bd_ptr, actionf2 func, unsig
 
 /* ---------------------------------------------------------------------------- */
 
+static void set_new_boss_action (mobjtype_t monster, bossdeath_t * bd_ptr)
+{
+  bossdeath_t * bd_ptr_2;
+
+  // printf ("Set_new_boss_action (%u)\n", monster);
+
+  bd_ptr_2 = new_bossdeath_action ();
+  if (bd_ptr_2 == NULL)
+    return;
+
+  bd_ptr_2 -> episode = bd_ptr->episode;
+  bd_ptr_2 -> map = bd_ptr->map;
+  bd_ptr_2 -> monster = monster;
+  bd_ptr_2 -> tag = bd_ptr->tag;
+  bd_ptr_2 -> func = bd_ptr->func;
+  bd_ptr_2 -> action = bd_ptr->action;
+}
+
+/* ---------------------------------------------------------------------------- */
+
 typedef struct
 {
   char name [8];
@@ -4806,7 +4874,7 @@ static bossdeath_t * find_special_action (const char * name, unsigned int episod
 
 /* ---------------------------------------------------------------------------- */
 
-static const char * find_boss_action_name (mobjtype_t boss)
+static const char * find_boss_action_name (char * buffer, mobjtype_t boss)
 {
   char * ptr;
 
@@ -4814,7 +4882,8 @@ static const char * find_boss_action_name (mobjtype_t boss)
   if (ptr)
     return (ptr);
 
-  return ("Unknown");
+  sprintf (buffer, "Thing type %u", boss);
+  return (buffer);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -4847,6 +4916,7 @@ static void show_boss_action (void)
 {
   const char * monster;
   bossdeath_t * bd_ptr;
+  char buffer [40];
 
   bd_ptr = boss_death_actions_head;
   do
@@ -4857,7 +4927,7 @@ static void show_boss_action (void)
     }
     else
     {
-      monster = find_boss_action_name(bd_ptr -> monster);
+      monster = find_boss_action_name (buffer, bd_ptr -> monster);
     }
 
     printf ("Boss action: %u,%u %s %u %p %u (%s)\n",

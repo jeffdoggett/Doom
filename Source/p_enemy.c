@@ -1960,43 +1960,43 @@ void A_Explode (mobj_t* thingy, pspdef_t* psp)
 */
 // Episode, Map, trigger,    tag,	function,		type, next
 
-static bossdeath_t bd_action_7 =
+bossdeath_t bd_action_7 =
 {
   4, 8, MT_SPIDER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, NULL
 };
 
-static bossdeath_t bd_action_6 =
+bossdeath_t bd_action_6 =
 {
   4, 6, MT_CYBORG,	666, (actionf2) EV_DoDoor,   blazeOpen, &bd_action_7
 };
 
-static bossdeath_t bd_action_5 =
+bossdeath_t bd_action_5 =
 {
   3, 8, MT_SPIDER,	0,   (actionf2) G_ExitLevel, 0, &bd_action_6
 };
 
-static bossdeath_t bd_action_4 =
+bossdeath_t bd_action_4 =
 {
   2, 8, MT_CYBORG,	0,   (actionf2) G_ExitLevel, 0, &bd_action_5
 };
 
-static bossdeath_t bd_action_3 =
+bossdeath_t bd_action_3 =
 {
   1, 8, MT_BRUISER,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_4
 };
 
-static bossdeath_t bd_action_2 =
+bossdeath_t bd_action_2 =
 {
   255, 7, MT_BABY,	667, (actionf2) EV_DoFloor,  raiseToTexture, &bd_action_3
 };
 
-static bossdeath_t bd_action_1 =
+bossdeath_t bd_action_1 =
 {
   255, 7, MT_FATSO,	666, (actionf2) EV_DoFloor,  lowerFloorToLowest, &bd_action_2
 };
 
 #if 0
-static bossdeath_t bd_action_0 =
+bossdeath_t bd_action_0 =
 {
   0, 0, MT_KEEN,	666, (actionf2) EV_DoDoor,   normalOpen, &bd_action_1
 };

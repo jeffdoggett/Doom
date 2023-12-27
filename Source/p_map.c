@@ -272,7 +272,32 @@ boolean P_TeleportMove (mobj_t* thing, fixed_t x, fixed_t y, fixed_t z, boolean 
     return true;
 }
 
+//-----------------------------------------------------------------------------
+/*
+  Things with the same value of M will not deal projectile damage to each other.
+  A negative value of M means that species has no projectile immunity, even to other things in the same species.
+*/
 
+static inline int P_SameSpecies (mobj_t* target, mobj_t* source)
+{
+  int group;
+
+  if ((target == NULL) || (source == NULL))
+    return false;
+
+  group = target->info->projectilegroup;
+  if (group < 0)
+    return false;
+
+  if (group > 0)
+    return (group == source->info->projectilegroup);
+
+  return (target->type == source->type ||
+	(target->type == MT_KNIGHT && source->type == MT_BRUISER)||
+	(target->type == MT_BRUISER && source->type == MT_KNIGHT) );
+}
+
+//-----------------------------------------------------------------------------
 //
 // MOVEMENT ITERATOR FUNCTIONS
 //
@@ -450,10 +475,7 @@ boolean PIT_CheckThing (mobj_t* thing)
 	if (tmthing->z+tmthing->height < thing->z)
 	    return true;		// underneath
 
-	if (tmthing->target && (
-	    tmthing->target->type == thing->type ||
-	    (tmthing->target->type == MT_KNIGHT && thing->type == MT_BRUISER)||
-	    (tmthing->target->type == MT_BRUISER && thing->type == MT_KNIGHT) ) )
+        if (P_SameSpecies (tmthing->target, thing))
 	{
 	    // Don't hit same species as originator.
 	    if (thing == tmthing->target)

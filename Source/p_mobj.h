@@ -262,6 +262,54 @@ typedef enum
   MF2_MASSACRE		= (1U << M2_MASSACRE)
 } mobjflag2_t;
 
+
+
+typedef enum
+{
+  MB_LOGRAV,		// 	Lower gravity (1/8)
+  MB_SHORTMRANGE,	// 	Short missile range (archvile)
+  MB_DMGIGNORED,	// 	Other things ignore its attacks (archvile)
+  MB_NORADIUSDMG,	// 	Doesn't take splash damage (cyberdemon, mastermind)
+  MB_FORCERADIUSDMG,	// 	Thing causes splash damage even if the target shouldn't
+  MB_HIGHERMPROB,	// 	Higher missile attack probability (cyberdemon)
+  MB_RANGEHALF,		// 	Use half distance for missile attack probability (cyberdemon, mastermind, revenant, lost soul)
+  MB_NOTHRESHOLD,	// 	Has no targeting threshold (archvile)
+  MB_LONGMELEE,		// 	Has long melee range (revenant)
+  MB_BOSS,		// 	Full volume see / death sound & splash immunity (from heretic)
+  MB_MAP07BOSS1,	// 	Tag 666 "boss" on doom 2 map 7 (mancubus)
+  MB_MAP07BOSS2,	// 	Tag 667 "boss" on doom 2 map 7 (arachnotron)
+  MB_E1M8BOSS,		// 	E1M8 boss (baron)
+  MB_E2M8BOSS,		// 	E2M8 boss (cyberdemon)
+  MB_E3M8BOSS,		// 	E3M8 boss (mastermind)
+  MB_E4M6BOSS,		// 	E4M6 boss (cyberdemon)
+  MB_E4M8BOSS,		// 	E4M8 boss (mastermind)
+  MB_RIP,		// 	Ripper projectile (does not disappear on impact)
+  MB_FULLVOLSOUNDS	// 	Full volume see / death sounds (cyberdemon, mastermind)
+} mobjflagmbf21num_t;
+
+typedef enum
+{
+  MBF_LOGRAV		= (1 <<	MB_LOGRAV),
+  MBF_SHORTMRANGE	= (1 <<	MB_SHORTMRANGE),
+  MBF_DMGIGNORED	= (1 <<	MB_DMGIGNORED),
+  MBF_NORADIUSDMG	= (1 <<	MB_NORADIUSDMG),
+  MBF_FORCERADIUSDMG	= (1 <<	MB_FORCERADIUSDMG),
+  MBF_HIGHERMPROB	= (1 <<	MB_HIGHERMPROB),
+  MBF_RANGEHALF		= (1 <<	MB_RANGEHALF),
+  MBF_NOTHRESHOLD	= (1 <<	MB_NOTHRESHOLD),
+  MBF_LONGMELEE		= (1 <<	MB_LONGMELEE),
+  MBF_BOSS		= (1 <<	MB_BOSS),
+  MBF_MAP07BOSS1	= (1 <<	MB_MAP07BOSS1),
+  MBF_MAP07BOSS2	= (1 <<	MB_MAP07BOSS2),
+  MBF_E1M8BOSS		= (1 <<	MB_E1M8BOSS),
+  MBF_E2M8BOSS		= (1 <<	MB_E2M8BOSS),
+  MBF_E3M8BOSS		= (1 <<	MB_E3M8BOSS),
+  MBF_E4M6BOSS		= (1 <<	MB_E4M6BOSS),
+  MBF_E4M8BOSS		= (1 <<	MB_E4M8BOSS),
+  MBF_RIP		= (1 <<	MB_RIP),
+  MBF_FULLVOLSOUNDS	= (1 <<	MB_FULLVOLSOUNDS),
+} mobjflagmbf21_t;
+
 // Map Object definition.
 typedef struct mobj_s
 {

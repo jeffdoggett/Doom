@@ -289,6 +289,9 @@ typedef struct
   int	flags2;
   int	mbf21bits;
   int	raisestate;
+  int	infightinggroup;
+  int	projectilegroup;
+  int	splashgroup;
   int	scale;
   char* names[2];
   char* obits[2];
