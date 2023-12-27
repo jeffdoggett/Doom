@@ -28,12 +28,6 @@ static const char rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
 #include "includes.h"
 
-#if defined(LINUX) || defined(HAVE_ALLOCA)
-#include  <alloca.h>
-#else
-extern void * alloca (unsigned int);
-#endif
-
 /* ---------------------------------------------------------------------------- */
 //
 // GLOBALS
@@ -229,10 +223,11 @@ void W_AddFile (const char *filename)
     int 		length;
     int 		startlump;
     filelump_t* 	fileinfo;
-    filelump_t		singleinfo;
+    filelump_t* 	fileinfop;
     FILE* 		storehandle;
     int 		its_a_wad;
     int			maps_found;
+    size_t		file_size;
 
     // open the file and add to directory
 
@@ -251,6 +246,14 @@ void W_AddFile (const char *filename)
 	return;
     }
 
+    file_size = filesize (filename);
+    if (file_size <= sizeof (header))
+    {
+      fclose (handle);
+      printf (" %s invalid\n",filename);
+      return;
+    }
+
     printf (" adding %s\n",filename);
     startlump = numlumps;
 
@@ -261,7 +264,7 @@ void W_AddFile (const char *filename)
     }
     else
     {
-      if ((filesize (filename)) >= (sizeof (header)))
+      if (file_size >= (sizeof (header)))
       {
 	fread (&header, 1, sizeof(header), handle);
 	if (strncmp (header.identification,"IWAD",4) == 0)
@@ -271,16 +274,19 @@ void W_AddFile (const char *filename)
       }
     }
 
+    fileinfo = NULL;
+
     switch (its_a_wad)
     {
       case 0:
 	// single lump file
 	fseek (handle, (long int) 0, SEEK_SET);
-	fileinfo = &singleinfo;
-	singleinfo.filepos = 0;
-	singleinfo.size = filesize(filename);
-	singleinfo.size = LONG(singleinfo.size);
-	strncpy (singleinfo.name, leafname (filename), sizeof (singleinfo.name));
+	fileinfo = malloc (sizeof (fileinfo));
+	if (fileinfo == NULL)
+	  I_Error ("No memory");
+	fileinfo->filepos = 0;
+	fileinfo->size = filesize(filename);
+	strncpy (fileinfo->name, leafname (filename), sizeof (fileinfo->name));
 	numlumps++;
 	break;
 
@@ -308,7 +314,9 @@ void W_AddFile (const char *filename)
 	header.numlumps = LONG(header.numlumps);
 	header.infotableofs = LONG(header.infotableofs);
 	length = header.numlumps*sizeof(filelump_t);
-	fileinfo = alloca (length);
+	fileinfo = malloc (length);
+	if (fileinfo == NULL)
+	  I_Error ("No memory");
 	fseek (handle, header.infotableofs, SEEK_SET);
 	fread (fileinfo, 1, length, handle);
 	numlumps += header.numlumps;
@@ -327,13 +335,14 @@ void W_AddFile (const char *filename)
     length = 0;
     i = startlump;
     maps_found = 0;
+    fileinfop = fileinfo;
     do
     {
 	lump_p->handle = storehandle;
-	lump_p->position = LONG(fileinfo->filepos);
-	lump_p->size = LONG(fileinfo->size);
+	lump_p->position = LONG(fileinfop->filepos);
+	lump_p->size = LONG(fileinfop->size);
 	lump_p->cache = NULL;
-	strncpy (lump_p->name, fileinfo->name, 8);
+	strncpy (lump_p->name, fileinfop->name, 8);
 #if 0
 	if (its_a_wad == 3)
 	{
@@ -372,7 +381,7 @@ void W_AddFile (const char *filename)
 	}
 #endif
       lump_p++;
-      fileinfo++;
+      fileinfop++;
     } while (++i < numlumps);
 
 
@@ -413,7 +422,6 @@ void W_AddFile (const char *filename)
     }
 #endif
 
-
     if (length)
       putchar ('\n');
 
@@ -432,6 +440,9 @@ void W_AddFile (const char *filename)
 	  I_Error ("This wadfile requires doom2.wad\n");
 	break;
     }
+
+    if (fileinfo)
+      free (fileinfo);
 }
 
 /* ---------------------------------------------------------------------------- */
@@ -461,7 +472,8 @@ void W_Reload (void)
     lumpcount = LONG(header.numlumps);
     header.infotableofs = LONG(header.infotableofs);
     length = lumpcount*sizeof(filelump_t);
-    fileinfo = alloca (length);
+    uint8_t buffer [length];
+    fileinfo = (filelump_t *) buffer;
     fseek (handle, header.infotableofs, SEEK_SET);
     fread (fileinfo, 1, length, handle);
 

@@ -25,7 +25,7 @@ HDRS=		acorn.h am_map.h dh_stuff.h doomdata.h doomdef.h doomstat.h doomtype.h ds
  		st_lib.h st_stuff.h s_sound.h tables.h v_text.h v_video.h wi_stuff.h w_wad.h z_zone.h
 
 
-OBJS=		acorn.o alloca.o am_map.o a_sound.o a_keyboard.o a_video.o dh_stuff.o doomdef.o doomstat.o \
+OBJS=		acorn.o am_map.o a_sound.o a_keyboard.o a_video.o dh_stuff.o doomdef.o doomstat.o \
 		d_items.o d_main.o d_net.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o info.o i_main.o \
 		i_net.o i_system.o m_argv.o m_bbox.o m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o \
 		m_swap.o p_ceilng.o p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o \

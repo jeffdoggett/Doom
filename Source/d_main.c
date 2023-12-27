@@ -815,21 +815,25 @@ static boolean IsEntryPresent (FILE * fin, char * name,
   char catname [16];
   unsigned int p;
 
-  fseek (fin, (long int) cat_pos, SEEK_SET);
-  do
+  if (cat_size)
   {
-    p = 0;
+    fseek (fin, (long int) cat_pos, SEEK_SET);
     do
     {
-      catname [p] = fgetc (fin);
-      p++;
-    } while (p < 16);
+      p = 0;
+      do
+      {
+	catname [p] = fgetc (fin);
+	p++;
+      } while (p < 16);
 
-    if (strncasecmp(name, &catname[8], 8) == 0)
-      return (true);
+      if (strncasecmp(name, &catname[8], 8) == 0)
+	return (true);
 
-    cat_size--;
-  } while (cat_size);
+      cat_size--;
+    } while (cat_size);
+  }
+
   return (false);
 }
 #endif
@@ -867,49 +871,52 @@ static unsigned int IdentifyWad (const char * filename, unsigned int magic)
       cat_size = Read_32 (fin);
       cat_pos  = Read_32 (fin);
 
-      /* Now try to identify the WAD from it's contents */
-
-      fseek (fin, (long int) cat_pos, SEEK_SET);
-      do
+      if (cat_size)
       {
-	fread (catname, 1, 16, fin);
-	catname [16] = 0;
+	/* Now try to identify the WAD from it's contents */
 
-	if ((catname [0+8] == 'E')
-	 && (catname [2+8] == 'M')
-	 && (catname [4+8] == 0)
-	 && (catname [3+8] >= '0')
-	 && (catname [3+8] <= '9')
-	 && (catname [1+8] >= '0'))
+	fseek (fin, (long int) cat_pos, SEEK_SET);
+	do
 	{
-	  if (pack == (none << 8))
-	    pack = (doom << 8);
-	  if (rc == 0) rc = 1;
-	  if (catname [1+8] > '1')
+	  fread (catname, 1, 16, fin);
+	  catname [16] = 0;
+
+	  if ((catname [0+8] == 'E')
+	   && (catname [2+8] == 'M')
+	   && (catname [4+8] == 0)
+	   && (catname [3+8] >= '0')
+	   && (catname [3+8] <= '9')
+	   && (catname [1+8] >= '0'))
 	  {
-	    if (rc < 2) rc = 2;
-	    if (catname [1+8] > '3')
-	      if (rc < 3) rc = 3;
+	    if (pack == (none << 8))
+	      pack = (doom << 8);
+	    if (rc == 0) rc = 1;
+	    if (catname [1+8] > '1')
+	    {
+	      if (rc < 2) rc = 2;
+	      if (catname [1+8] > '3')
+		if (rc < 3) rc = 3;
+	    }
 	  }
-	}
-	else
-	if ((strncmp (catname+8, "MAP", 3) == 0)
-	 && (catname [5+8] == 0)
-	 && (catname [3+8] >= '0')
-	 && (catname [3+8] <= '9')
-	 && (catname [4+8] >= '0')
-	 && (catname [4+8] <= '9'))
-	{
-	  rc = 4;
-	  if (pack == (none << 8))
-	    pack = (doom2 << 8);
-	}
-	else if (strcmp (catname+8, "REDTNT2") == 0)
-	  pack = (pack_tnt << 8);
-	else if (strcmp (catname+8, "CAMO1") == 0)
-	  pack = (pack_plut << 8);
-	cat_size--;
-      } while (cat_size);
+	  else
+	  if ((strncmp (catname+8, "MAP", 3) == 0)
+	   && (catname [5+8] == 0)
+	   && (catname [3+8] >= '0')
+	   && (catname [3+8] <= '9')
+	   && (catname [4+8] >= '0')
+	   && (catname [4+8] <= '9'))
+	  {
+	    rc = 4;
+	    if (pack == (none << 8))
+	      pack = (doom2 << 8);
+	  }
+	  else if (strcmp (catname+8, "REDTNT2") == 0)
+	    pack = (pack_tnt << 8);
+	  else if (strcmp (catname+8, "CAMO1") == 0)
+	    pack = (pack_plut << 8);
+	  cat_size--;
+	} while (cat_size);
+      }
     }
     fclose (fin);
   }
@@ -1722,26 +1729,29 @@ static void find_language_in_wad (const char * wadname)
     {
       cat_size = Read_32 (fin);
       cat_pos  = Read_32 (fin);
-      fseek (fin, (long int) cat_pos, SEEK_SET);
-      catname [8] = 0;
-      do
+      if (cat_size)
       {
-	file_pos  = Read_32 (fin);
-	file_size = Read_32 (fin);
-	p = 0;
+	fseek (fin, (long int) cat_pos, SEEK_SET);
+	catname [8] = 0;
 	do
 	{
-	  catname [p] = fgetc (fin);
-	} while (++p < 8);
+	  file_pos  = Read_32 (fin);
+	  file_size = Read_32 (fin);
+	  p = 0;
+	  do
+	  {
+	    catname [p] = fgetc (fin);
+	  } while (++p < 8);
 
-	if ((strcasecmp(catname, "LANGUAGE") == 0)
-	 || (strcasecmp(catname, "GAMEINFO") == 0))
-	{
-	  fseek (fin, (long int) file_pos, SEEK_SET);
-	  DH_parse_language_file_f (fin, file_size);
-	  break;
-	}
-      } while (--cat_size);
+	  if ((strcasecmp(catname, "LANGUAGE") == 0)
+	   || (strcasecmp(catname, "GAMEINFO") == 0))
+	  {
+	    fseek (fin, (long int) file_pos, SEEK_SET);
+	    DH_parse_language_file_f (fin, file_size);
+	    break;
+	  }
+	} while (--cat_size);
+      }
     }
     fclose (fin);
   }
@@ -1768,25 +1778,28 @@ static void find_dehacked_in_wad (const char * wadname)
     {
       cat_size = Read_32 (fin);
       cat_pos  = Read_32 (fin);
-      fseek (fin, (long int) cat_pos, SEEK_SET);
-      catname [8] = 0;
-      do
+      if (cat_size)
       {
-	file_pos  = Read_32 (fin);
-	file_size = Read_32 (fin);
-	p = 0;
+	fseek (fin, (long int) cat_pos, SEEK_SET);
+	catname [8] = 0;
 	do
 	{
-	  catname [p] = fgetc (fin);
-	} while (++p < 8);
+	  file_pos  = Read_32 (fin);
+	  file_size = Read_32 (fin);
+	  p = 0;
+	  do
+	  {
+	    catname [p] = fgetc (fin);
+	  } while (++p < 8);
 
-	if (strcasecmp(catname, "DEHACKED") == 0)
-	{
-	  fseek (fin, (long int) file_pos, SEEK_SET);
-	  DH_parse_hacker_file_f (wadname, fin, file_pos+file_size);
-	  break;
-	}
-      } while (--cat_size);
+	  if (strcasecmp(catname, "DEHACKED") == 0)
+	  {
+	    fseek (fin, (long int) file_pos, SEEK_SET);
+	    DH_parse_hacker_file_f (wadname, fin, file_pos+file_size);
+	    break;
+	  }
+	} while (--cat_size);
+      }
     }
     fclose (fin);
   }

@@ -942,8 +942,30 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "",			0}
 };
 
+/* ---------------------------------------------------------------------------- */
+//https://github.com/kraflab/mbf21/blob/master/docs/spec.md
+
 static const bit_names_t dehack_thing_mbf21_bit_names [] =
 {
+  { "LOGRAV",		0},	// 	Lower gravity (1/8)
+  { "SHORTMRANGE",	1},	// 	Short missile range (archvile)
+  { "DMGIGNORED",	2},	// 	Other things ignore its attacks (archvile)
+  { "NORADIUSDMG",	3},	// 	Doesn't take splash damage (cyberdemon, mastermind)
+  { "FORCERADIUSDMG",	4},	// 	Thing causes splash damage even if the target shouldn't
+  { "HIGHERMPROB",	5},	// 	Higher missile attack probability (cyberdemon)
+  { "RANGEHALF",	6},	// 	Use half distance for missile attack probability (cyberdemon, mastermind, revenant, lost soul)
+  { "NOTHRESHOLD",	7},	// 	Has no targeting threshold (archvile)
+  { "LONGMELEE",	8},	// 	Has long melee range (revenant)
+  { "BOSS",		9},	// 	Full volume see / death sound & splash immunity (from heretic)
+  { "MAP07BOSS1",	10},	// 	Tag 666 "boss" on doom 2 map 7 (mancubus)
+  { "MAP07BOSS2",	11},	// 	Tag 667 "boss" on doom 2 map 7 (arachnotron)
+  { "E1M8BOSS",		12},	// 	E1M8 boss (baron)
+  { "E2M8BOSS",		13},	// 	E2M8 boss (cyberdemon)
+  { "E3M8BOSS",		14},	// 	E3M8 boss (mastermind)
+  { "E4M6BOSS",		15},	// 	E4M6 boss (cyberdemon)
+  { "E4M8BOSS",		16},	// 	E4M8 boss (mastermind)
+  { "RIP",		17},	// 	Ripper projectile (does not disappear on impact)
+  { "FULLVOLSOUNDS",	18},	// 	Full volume see / death sounds (cyberdemon, mastermind)
   { "",			0}
 };
 
