@@ -1327,6 +1327,7 @@ P_KillMobj
 //-----------------------------------------------------------------------------
 /*
   Things with the same value of N will not target each other after taking damage.
+  N is non negative.
 */
 
 static inline int P_MonstersInfight (mobj_t* target, mobj_t* source)
@@ -1337,7 +1338,7 @@ static inline int P_MonstersInfight (mobj_t* target, mobj_t* source)
     return false;
 
   group = target->info->infightinggroup;
-  if (group > 0)
+  if (group >= 0)
   {
     if (group == source->info->infightinggroup)
       return (Monsters_Infight1 || Monsters_Infight2);

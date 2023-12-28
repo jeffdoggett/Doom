@@ -1607,6 +1607,10 @@ mobj_t*		bombsource;
 mobj_t*		bombspot;
 int		bombdamage;
 
+/*
+  Things with the same value of S will not deal splash damage.
+  S is non negative.
+*/
 
 static inline boolean P_TakesSplashDamage (mobj_t* victim, mobj_t* source)
 {
@@ -1618,7 +1622,7 @@ static inline boolean P_TakesSplashDamage (mobj_t* victim, mobj_t* source)
       return true;
 
     group = victim->info->splashgroup;
-    if ((group > 0)
+    if ((group >= 0)
      && (group == source->info->splashgroup))
       return false;
   }
