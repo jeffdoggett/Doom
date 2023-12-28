@@ -295,7 +295,11 @@ boolean P_CheckMissileRange (mobj_t* actor)
     if (dist > p)
       dist = p;
 
-    if (P_Random () < dist)
+    p = P_Random ();
+    if (info->mbf21bits & MBF_HIGHERMPROB)
+      p *= 2;
+
+    if (p < dist)
 	return false;
 
     if (actor->flags & MF_FRIEND && P_HitFriend(actor))
@@ -871,8 +875,7 @@ void A_Look (mobj_t* actor, pspdef_t* psp)
 	    break;
 	}
 
-	if (actor->type==MT_SPIDER
-	    || actor->type == MT_CYBORG)
+	if (actor->info->mbf21bits & MBF_FULLVOLSOUNDS)
 	{
 	    // full volume
 	    S_StartSound (NULL, sound);
@@ -1878,8 +1881,7 @@ void A_Scream (mobj_t* actor, pspdef_t* psp)
     }
 
     // Check for bosses.
-    if (actor->type==MT_SPIDER
-	|| actor->type == MT_CYBORG)
+    if (actor->info->mbf21bits & MBF_FULLVOLSOUNDS)
     {
 	// full volume
 	S_StartSound (NULL, sound);

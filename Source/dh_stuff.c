@@ -1979,6 +1979,10 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
     case THING_MBF21_Bits:	// We already did this, but see if we need to do anything.
       value = ptr -> mbf21bits;
       // printf ("MBF21 bits %u = %X\n", number, value);
+      if (value & MBF_RANGEHALF)
+        ptr -> missilechancemult = FRACUNIT / 2;
+      if (value & MBF_LONGMELEE)
+        ptr -> meleerange = MELEERANGE * 2;
       if (value & MBF_MAP07BOSS1)
 	set_new_boss_action ((mobjtype_t)(number-1), &bd_action_1);
        if (value & MBF_MAP07BOSS2)

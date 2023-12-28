@@ -1608,6 +1608,29 @@ mobj_t*		bombspot;
 int		bombdamage;
 
 
+static inline boolean P_TakesSplashDamage (mobj_t* victim, mobj_t* source)
+{
+  int group;
+
+  if (source != NULL)
+  {
+    if (source->info->mbf21bits & MBF_FORCERADIUSDMG)
+      return true;
+
+    group = victim->info->splashgroup;
+    if ((group > 0)
+     && (group == source->info->splashgroup))
+      return false;
+  }
+
+  // Boss spider and cyborg
+  // take no damage from concussion.
+  if (victim->info->mbf21bits & MBF_NORADIUSDMG)
+    return false;
+
+  return true;
+}
+
 //
 // PIT_RadiusAttack
 // "bombsource" is the creature
@@ -1627,10 +1650,7 @@ boolean PIT_RadiusAttack (mobj_t* thing)
      && !(thing->flags & MF_CORPSE))
         return true;
 
-    // Boss spider and cyborg
-    // take no damage from concussion.
-    if (thing->type == MT_CYBORG
-     || thing->type == MT_SPIDER)
+    if (!P_TakesSplashDamage (thing, bombsource))
 	return (true);
 
     dx = ABS(thing->x - bombspot->x);
