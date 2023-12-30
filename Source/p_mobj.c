@@ -33,35 +33,22 @@ extern void P_DelSeclist (msecnode_t *node);
 unsigned int mtf_mask = 0;
 
 /* -------------------------------------------------------------------------------------------- */
-/*
-   Experimental code to read the speed from the mobjinfo table
-   and apply the nightmare adjustments so that the mobjinfo
-   table doesn't have to be written to in G_InitNew().
-*/
-#if 0
+
 int P_GetMobjSpeed (mobj_t* mobj)
 {
   int speed;
+  mobjinfo_t * info;
 
-  speed = mobj->info->speed;
+  info = mobj->info;
 
   if (gameskill == sk_nightmare)
-  {
-    switch (mobj->type)
-    {
-      case MT_BRUISERSHOT:
-	speed = (speed * 3) / 4;	// 20 -> 15
-	break;
-
-      case MT_HEADSHOT:
-      case MT_TROOPSHOT:
-	speed >>= 1;
-    }
-  }
+    speed = info->fastspeed;
+  else
+    speed = info->normalspeed;
 
   return (speed);
 }
-#endif
+
 /* -------------------------------------------------------------------------------------------- */
 //
 // P_SetMobjState
@@ -73,7 +60,7 @@ P_SetMobjState
 ( mobj_t*	mobj,
   statenum_t	state )
 {
-  int tics;
+  uint32_t tics;
   unsigned int guard;
   unsigned int r;
   static unsigned int recurse = 0;
@@ -92,12 +79,17 @@ P_SetMobjState
 
     st = &states[state];
     mobj->state = st;
-    tics = (int) st->tics;
+    tics = st->tics;
 #if 0
     if ((tics > 1)
      && (gameskill == sk_nightmare)
      && (state >= S_SARG_RUN1)
      && (state <= S_SARG_PAIN2))
+      tics >>= 1;
+#else
+    if ((tics > 1)
+     && (gameskill == sk_nightmare)
+     && (st->mbf21bits & MBF_SKILL5FAST))
       tics >>= 1;
 #endif
     mobj->tics = tics;
@@ -1171,6 +1163,7 @@ P_SpawnMissile
     mobj_t*	th;
     angle_t	an;
     int		dist;
+    int		speed;
 
     th = P_SpawnMobj (source->x,
 		      source->y,
@@ -1191,11 +1184,12 @@ P_SpawnMissile
 
     th->angle = an;
     an >>= ANGLETOFINESHIFT;
-    th->momx = FixedMul (th->info->speed, finecosine[an]);
-    th->momy = FixedMul (th->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(th);
+    th->momx = FixedMul (speed, finecosine[an]);
+    th->momy = FixedMul (speed, finesine[an]);
 
     dist = P_ApproxDistance (dest->x - source->x, dest->y - source->y);
-    dist = dist / th->info->speed;
+    if (speed) dist = dist / speed;
 
     if (dist < 1)
 	dist = 1;
@@ -1218,6 +1212,7 @@ P_SpawnPlayerMissile
 {
   mobj_t *th;
   fixed_t x, y, z, slope = 0;
+  int speed;
 
   // see which target is to be aimed at
 
@@ -1250,11 +1245,12 @@ P_SpawnPlayerMissile
 
   th->target = source;
   th->angle = an;
-  th->momx = FixedMul( th->info->speed,
+  speed = P_GetMobjSpeed(th);
+  th->momx = FixedMul( speed,
 		       finecosine[an>>ANGLETOFINESHIFT]);
-  th->momy = FixedMul( th->info->speed,
+  th->momy = FixedMul( speed,
 		       finesine[an>>ANGLETOFINESHIFT]);
-  th->momz = FixedMul( th->info->speed, slope);
+  th->momz = FixedMul( speed, slope);
 
   P_CheckMissileSpawn (th);
   return (th);
@@ -1300,6 +1296,7 @@ static boolean P_FaceMobj(mobj_t *source, mobj_t *target, angle_t *delta)
 boolean P_SeekerMissile(mobj_t *actor, mobj_t **seekTarget, angle_t thresh, angle_t turnmax, boolean seekcentre)
 {
     int     dir;
+    int     speed;
     angle_t delta;
     angle_t angle;
     mobj_t  *target = *seekTarget;
@@ -1332,13 +1329,14 @@ boolean P_SeekerMissile(mobj_t *actor, mobj_t **seekTarget, angle_t thresh, angl
         actor->angle -= delta;
 
     angle = actor->angle >> ANGLETOFINESHIFT;
-    actor->momx = FixedMul(actor->info->speed, finecosine[angle]);
-    actor->momy = FixedMul(actor->info->speed, finesine[angle]);
+    speed = P_GetMobjSpeed(actor);
+    actor->momx = FixedMul(speed, finecosine[angle]);
+    actor->momy = FixedMul(speed, finesine[angle]);
 
     // Need to seek vertically
     if (actor->z + actor->height < target->z || target->z + target->height < actor->z || seekcentre)
     {
-      fixed_t approx = P_ApproxDistance(target->x - actor->x, target->y - actor->y) / actor->info->speed;
+      fixed_t approx = P_ApproxDistance(target->x - actor->x, target->y - actor->y) / speed;
       if (approx < 1)
         approx = 1;
       actor->momz = (target->z + (seekcentre ? target->height / 2 : 0) - actor->z) / approx;

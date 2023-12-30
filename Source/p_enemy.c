@@ -335,7 +335,7 @@ boolean P_Move (mobj_t*	actor)
     // killough 10/98: make monsters get affected by ice and sludge too:
     movefactor = P_GetMoveFactor(actor, &friction);
 
-    speed = actor->info->speed;
+    speed = P_GetMobjSpeed(actor);
 
     if (friction < ORIG_FRICTION)	// sludge
     {
@@ -1268,6 +1268,7 @@ void A_SkelMissile (mobj_t* actor, pspdef_t* psp)
 
 void A_Tracer (mobj_t* actor, pspdef_t* psp)
 {
+    int		speed;
     angle_t	exact;
     fixed_t	dist;
     fixed_t	slope;
@@ -1319,14 +1320,15 @@ void A_Tracer (mobj_t* actor, pspdef_t* psp)
     }
 
     exact = actor->angle>>ANGLETOFINESHIFT;
-    actor->momx = FixedMul (actor->info->speed, finecosine[exact]);
-    actor->momy = FixedMul (actor->info->speed, finesine[exact]);
+    speed = P_GetMobjSpeed(actor);
+    actor->momx = FixedMul (speed, finecosine[exact]);
+    actor->momy = FixedMul (speed, finesine[exact]);
 
     // change slope
     dist = P_ApproxDistance (dest->x - actor->x,
 			    dest->y - actor->y);
 
-    dist = dist / actor->info->speed;
+    if (speed) dist = dist / speed;
 
     if (dist < 1)
 	dist = 1;
@@ -1449,14 +1451,16 @@ void A_VileChase (mobj_t* actor, pspdef_t* psp)
 
     mobjinfo_t*		info;
     mobj_t*		temp;
+    int			speed;
 
     if (actor->movedir != DI_NODIR)
     {
 	// check for corpses to raise
+	speed = P_GetMobjSpeed(actor);
 	viletryx =
-	    actor->x + actor->info->speed*xspeed[actor->movedir];
+	    actor->x + speed*xspeed[actor->movedir];
 	viletryy =
-	    actor->y + actor->info->speed*yspeed[actor->movedir];
+	    actor->y + speed*yspeed[actor->movedir];
 
 	xl = P_GetSafeBlockX(viletryx - bmaporgx - MAXRADIUS * 2);
 	xh = P_GetSafeBlockX(viletryx - bmaporgx + MAXRADIUS * 2);
@@ -1653,6 +1657,7 @@ void A_FatAttack1 (mobj_t* actor, pspdef_t* psp)
 {
     mobj_t*	mo;
     int		an;
+    int		speed;
 
     A_FaceTarget (actor,psp);
     // Change direction  to ...
@@ -1662,14 +1667,16 @@ void A_FatAttack1 (mobj_t* actor, pspdef_t* psp)
     mo = P_SpawnMissile (actor, actor->target, MT_FATSHOT);
     mo->angle += FATSPREAD;
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul (mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul (mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul (speed, finecosine[an]);
+    mo->momy = FixedMul (speed, finesine[an]);
 }
 
 void A_FatAttack2 (mobj_t* actor, pspdef_t* psp)
 {
     mobj_t*	mo;
     int		an;
+    int		speed;
 
     A_FaceTarget (actor,psp);
     // Now here choose opposite deviation.
@@ -1679,28 +1686,32 @@ void A_FatAttack2 (mobj_t* actor, pspdef_t* psp)
     mo = P_SpawnMissile (actor, actor->target, MT_FATSHOT);
     mo->angle -= FATSPREAD*2;
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul (mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul (mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul (speed, finecosine[an]);
+    mo->momy = FixedMul (speed, finesine[an]);
 }
 
 void A_FatAttack3 (mobj_t* actor, pspdef_t* psp)
 {
     mobj_t*	mo;
     int		an;
+    int		speed;
 
     A_FaceTarget (actor,psp);
 
     mo = P_SpawnMissile (actor, actor->target, MT_FATSHOT);
     mo->angle -= FATSPREAD/2;
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul (mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul (mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul (speed, finecosine[an]);
+    mo->momy = FixedMul (speed, finesine[an]);
 
     mo = P_SpawnMissile (actor, actor->target, MT_FATSHOT);
     mo->angle += FATSPREAD/2;
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul (mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul (mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul (speed, finecosine[an]);
+    mo->momy = FixedMul (speed, finesine[an]);
 }
 
 
@@ -2814,7 +2825,7 @@ static boolean P_HealCorpse(mobj_t *actor, int radius, statenum_t healstate, sfx
         int         xh;
         int         yl;
         int         yh;
-        const int   speed = actor->info->speed;
+        const int   speed = P_GetMobjSpeed(actor);
 
         // check for corpses to raise
         viletryx = actor->x + speed * xspeed[movedir];
@@ -2953,6 +2964,7 @@ void A_SpawnObject(mobj_t *actor, pspdef_t *psp)
 void A_MonsterProjectile(mobj_t *actor, pspdef_t *psp)
 {
     int     an;
+    int	    speed;
     mobj_t  *mo;
     mobj_t  *target = actor->target;
 
@@ -2968,12 +2980,13 @@ void A_MonsterProjectile(mobj_t *actor, pspdef_t *psp)
     // adjust angle
     mo->angle += (angle_t)(((int64_t)actor->state->args[1] << 16) / 360);
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul(mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul(mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul(speed, finecosine[an]);
+    mo->momy = FixedMul(speed, finesine[an]);
 
     // adjust pitch (approximated, using DOOM's ye olde
     // finetangent table; same method as monster aim)
-    mo->momz += FixedMul(mo->info->speed, DegToSlope(actor->state->args[2]));
+    mo->momz += FixedMul(speed, DegToSlope(actor->state->args[2]));
 
     // adjust position
     an = (actor->angle - ANG90) >> ANGLETOFINESHIFT;

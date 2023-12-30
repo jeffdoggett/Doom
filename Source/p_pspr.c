@@ -90,6 +90,7 @@ static fixed_t weapon_bottom (void)
 void P_SetPspritePtr(pspdef_t *psp, statenum_t stnum)
 {
     fixed_t	y;
+    uint32_t	tics;
 
     do
     {
@@ -104,7 +105,13 @@ void P_SetPspritePtr(pspdef_t *psp, statenum_t stnum)
             state_t *state = &states[stnum];
 
             psp->state = state;
-            psp->tics = state->tics;    // could be 0
+
+            tics = state->tics;    // could be 0
+	    if ((tics > 1)
+	     && (gameskill == sk_nightmare)
+	     && (state->mbf21bits & MBF_SKILL5FAST))
+	      tics >>= 1;
+            psp->tics = tics;
 
             if (state->misc1)
             {
@@ -1090,6 +1097,7 @@ void A_WeaponProjectile(mobj_t *actor, pspdef_t *psp)
 {
     mobj_t  *mo;
     int     an;
+    int     speed;
     state_t *state = psp->state;
     player_t *player;
 
@@ -1106,11 +1114,12 @@ void A_WeaponProjectile(mobj_t *actor, pspdef_t *psp)
     // adjust angle
     mo->angle += (angle_t)(((int64_t)state->args[1] << 16) / 360);
     an = mo->angle >> ANGLETOFINESHIFT;
-    mo->momx = FixedMul(mo->info->speed, finecosine[an]);
-    mo->momy = FixedMul(mo->info->speed, finesine[an]);
+    speed = P_GetMobjSpeed(mo);
+    mo->momx = FixedMul(speed, finecosine[an]);
+    mo->momy = FixedMul(speed, finesine[an]);
 
     // adjust pitch (approximated, using DOOM's ye olde finetangent table; same method as autoaim)
-    mo->momz += FixedMul(mo->info->speed, DegToSlope(state->args[2]));
+    mo->momz += FixedMul(speed, DegToSlope(state->args[2]));
 
     // adjust position
     an = (player->mo->angle - ANG90) >> ANGLETOFINESHIFT;

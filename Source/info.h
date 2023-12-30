@@ -203,6 +203,16 @@ typedef enum
 
 #define MAXSTATEARGS	8
 
+typedef enum
+{
+  MB_SKILL5FAST
+} stateflagmbfnum21_t;
+
+typedef enum
+{
+  MBF_SKILL5FAST = (1U << MB_SKILL5FAST)
+} stateflagmbf21_t;
+
 typedef struct
 {
   spritenum_t	sprite;
@@ -211,6 +221,7 @@ typedef struct
   // void	(*action) ();
   actionf_t	action;
   statenum_t	nextstate;
+  uint32_t	mbf21bits;
   uint32_t	misc1, misc2;
   uint32_t	args[MAXSTATEARGS]; // MBF21
 } state_t;
@@ -278,7 +289,8 @@ typedef struct
   int	maxattackrange;
   int	minmissilechance;
   int	missilechancemult;
-  int	speed;
+  int	normalspeed;
+  int	fastspeed;
   int	radius;
   int	pickupradius;
   int	height;

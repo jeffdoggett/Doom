@@ -2214,7 +2214,7 @@ G_InitNew
   else
       respawnmonsters = false;
 
-#if 1
+#if 0
   /* Would be nice to be able to remove this as it causes problems... */
 
   if (fastparm || (skill == sk_nightmare && gameskill != sk_nightmare) )

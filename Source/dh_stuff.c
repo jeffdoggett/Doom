@@ -256,6 +256,7 @@ static const char * const dehack_things [] =
   "Min missile chance",
   "Missile chance multiplier",
   "Speed",
+  "Fast Speed",
   "Width",
   "Radius",
   "Height",
@@ -306,6 +307,7 @@ typedef enum
   THING_Min_missile_chance,
   THING_Missile_chance_multiplier,
   THING_Speed,
+  THING_Fast_speed,
   THING_Width,
   THING_Radius,
   THING_Height,
@@ -357,6 +359,7 @@ static const char * const dehack_frames [] =
   "Duration",
   "Action pointer",
   "Next frame",
+  "MBF21 bits",
   "Unknown 1",
   "Unknown 2",
   "Translucent",
@@ -368,7 +371,6 @@ static const char * const dehack_frames [] =
   "Args6",
   "Args7",
   "Args8",
-//"MBF21 bits",
   NULL
 };
 
@@ -989,6 +991,15 @@ static const bit_names_t dehack_thing_mbf21_bit_names [] =
 
 /* ---------------------------------------------------------------------------- */
 
+static const bit_names_t dehack_frame_mbf21_bit_names [] =
+{
+  { "SKILL5FAST",	MB_SKILL5FAST},
+  { "",			0}
+};
+
+/* ---------------------------------------------------------------------------- */
+
+
 #define CREATE_DEHACK_FILE
 #ifdef CREATE_DEHACK_FILE
 
@@ -1583,7 +1594,7 @@ static void write_all_things (FILE * fout)
     fprintf (fout, "%s = %d\n", dehack_things [THING_Death_frame], ptr -> deathstate);
     fprintf (fout, "%s = %d\n", dehack_things [THING_Exploding_frame], ptr -> xdeathstate);
     fprintf (fout, "%s = %d\n", dehack_things [THING_Death_sound], ptr -> deathsound);
-    fprintf (fout, "%s = %d\n", dehack_things [THING_Speed], ptr -> speed);
+    fprintf (fout, "%s = %d\n", dehack_things [THING_Speed], ptr -> normalspeed);
     fprintf (fout, "%s = %d\n", dehack_things [THING_Width], ptr -> radius);
     fprintf (fout, "%s = %d\n", dehack_things [THING_Height], ptr -> height);
     fprintf (fout, "%s = %d\n", dehack_things [THING_Mass], ptr -> mass);
@@ -1737,6 +1748,40 @@ static void decode_things_mbf21_bits (unsigned int number, thing_element_t recor
   do
   {
     string1 = find_thing_bitname (ptr, operator, string1, dehack_thing_mbf21_bit_names);
+    while (*string1 == ' ')
+      string1++;
+    if (*string1 == 0)
+      break;
+    operator = *string1++;
+    while (*string1 == ' ')
+      string1++;
+  } while (*string1);
+
+  // printf ("%08X %08X\n", ptr[0], ptr[1]);
+}
+
+/* ---------------------------------------------------------------------------- */
+
+static void decode_frame_bits (unsigned int number, thing_element_t record, const char * string1)
+{
+  char operator;
+  int * ptr;
+
+  if (number > NUMSTATES)
+  {
+    fprintf (stderr, "Invalid state number %u/%u\n", number, NUMSTATES);
+    return;
+  }
+
+  // printf ("Frame %u bits (%s) = ", number, string1);
+
+  ptr = (int*)&states[number].mbf21bits;
+  ptr[0] = 0;
+  operator = '|';
+
+  do
+  {
+    string1 = find_thing_bitname (ptr, operator, string1, dehack_frame_mbf21_bit_names);
     while (*string1 == ' ')
       string1++;
     if (*string1 == 0)
@@ -1932,7 +1977,11 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       break;
 
     case THING_Speed:
-      ptr -> speed = value;
+      ptr -> normalspeed = value;
+      break;
+
+    case THING_Fast_speed:
+      ptr -> fastspeed = value;
       break;
 
     case THING_Width:
@@ -2170,50 +2219,53 @@ static void dh_write_to_frame (unsigned int number, unsigned int record, unsigne
       ptr -> nextstate = (statenum_t) value;
       break;
 
-    case  5:
-      ptr -> misc1 = value;
+    case  5:		// Already done.
       break;
 
     case  6:
+      ptr -> misc1 = value;
+      break;
+
+    case  7:
       ptr -> misc2 = value;
       break;
 
-    case 7:
+    case 8:
       if (value)
 	ptr -> frame |= FF_TRANSLUCENT;
       else
 	ptr -> frame &= ~FF_TRANSLUCENT;
       break;
 
-    case  8:
+    case  9:
       ptr -> args[0] = value;
       break;
 
-    case  9:
+    case  10:
       ptr -> args[1] = value;
       break;
 
-    case  10:
+    case  11:
       ptr -> args[2] = value;
       break;
 
-    case  11:
+    case  12:
       ptr -> args[3] = value;
       break;
 
-    case  12:
+    case  13:
       ptr -> args[4] = value;
       break;
 
-    case  13:
+    case  14:
       ptr -> args[5] = value;
       break;
 
-    case  14:
+    case  15:
       ptr -> args[6] = value;
       break;
 
-    case  15:
+    case  16:
       ptr -> args[7] = value;
       break;
 
@@ -4147,7 +4199,20 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	  case JOB_FRAME:
 	    counter1 = dh_search_str_tab (dehack_frames, a_line);
 	    if (counter1 != -1)
+	    {
+	      switch (counter1)
+	      {
+		case 5:			// Writing to "bits"
+		  counter2 = dh_inchar (a_line, '=');
+		  if (counter2)
+		  {
+		    string1 = next_arg (a_line+counter2);
+		    decode_frame_bits (job_params[0], (thing_element_t) counter1, string1);
+		  }
+		  break;
+              }
 	      dh_write_to_frame (job_params[0], counter1, params[0]);
+	    }
 	    break;
 
 	  case JOB_SPRITE:

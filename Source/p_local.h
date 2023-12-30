@@ -116,6 +116,7 @@ P_SpawnMobj
   fixed_t	z,
   mobjtype_t	type );
 
+int	P_GetMobjSpeed (mobj_t* mobj);
 void 	P_RemoveMobj (mobj_t* th);
 boolean	P_SetMobjState (mobj_t* mobj, statenum_t state);
 void 	P_MobjThinker (mobj_t* mobj);
