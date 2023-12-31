@@ -1767,7 +1767,7 @@ static void decode_frame_bits (unsigned int number, thing_element_t record, cons
   char operator;
   int * ptr;
 
-  if (number > NUMSTATES)
+  if (number >= NUMSTATES)
   {
     fprintf (stderr, "Invalid state number %u/%u\n", number, NUMSTATES);
     return;
@@ -1977,6 +1977,16 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
       break;
 
     case THING_Speed:
+      {
+        float ratio;
+        if (ptr -> normalspeed == 0)
+          ratio = 1;
+        else
+          ratio = ((float)ptr -> fastspeed) / ((float)ptr -> normalspeed);
+        float newvalue = (float) ((int32_t)value);
+        float newfast = ratio * newvalue;
+        ptr -> fastspeed = (int) newfast;
+      }
       ptr -> normalspeed = value;
       break;
 
