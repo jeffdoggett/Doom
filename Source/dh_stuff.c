@@ -4870,6 +4870,11 @@ static mobjtype_t find_boss_mobytype (const char * name)
     ptr++;
   } while (--count);
 
+  if (strncasecmp (name, "Deh_Actor_", 10) == 0)
+  {
+    return ((mobjtype_t) atoi (name + 10));
+  }
+
   fprintf (stderr, "DeHackEd:Failed to match text (%0.8s)\n", name);
   return (MT_NULL);
 }
