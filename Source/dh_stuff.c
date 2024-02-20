@@ -196,6 +196,7 @@ typedef enum
   JOB_CODEPTR,
   JOB_STRINGS,
   JOB_SPRITES,
+  JOB_SOUNDS,
   JOB_END,
   QTY_JOBS
 } dhjobs_t;
@@ -219,6 +220,7 @@ static const char * const dehack_patches [] =
   "[CODEPTR]",
   "[STRINGS]",
   "[SPRITES]",
+  "[SOUNDS]",
   "[END]",
   NULL
 };
@@ -259,6 +261,7 @@ static const char * const dehack_things [] =
   "Fast Speed",
   "Width",
   "Radius",
+  "Pickup Width",
   "Height",
   "Mass",
   "Damage",
@@ -310,6 +313,7 @@ typedef enum
   THING_Fast_speed,
   THING_Width,
   THING_Radius,
+  THING_Pickup_Width,
   THING_Height,
   THING_Mass,
   THING_Damage,
@@ -956,9 +960,11 @@ static const bit_names_t dehack_thing_bit_names [] =
   { "TOUCHY",		M_TOUCHY},		// dies on contact with solid objects (MBF)
   { "BOUNCES",		M_BOUNCES},		// bounces off floors, ceilings and maybe walls
   { "FRIEND",		M_FRIEND},		// a friend of the player(s) (MBF)
+  { "FRIENDLY",		M_FRIEND},		// a friend of the player(s) (MBF)
   { "TRANSLUCENT",	M_TRANSLUCENT},		// apply translucency to sprite (BOOM)
 
   { "BOSS",		M2_MASSACRE+32+1},	// Unused bit
+  { "DONTDRAW",		M2_MASSACRE+32+2},	// Unused bit
   { "",			0}
 };
 
@@ -1997,6 +2003,10 @@ static void dh_write_to_thing (unsigned int number, thing_element_t record, unsi
     case THING_Width:
     case THING_Radius:
       ptr -> radius = value;
+      ptr -> pickupradius = value;
+      break;
+
+    case THING_Pickup_Width:
       ptr -> pickupradius = value;
       break;
 
@@ -3792,6 +3802,12 @@ static char ** DH_Find_language_text (char * ttext, boolean Changing)
     return (&obituary_messages[counter1]);
   }
 
+  if (strncasecmp (ttext, "Obituary_Deh_Actor_", 19) == 0)
+  {
+    counter1 = atoi (ttext + 19);
+    return (&mobjinfo[counter1].obits[0]);
+  }
+
   if (strncasecmp (ttext, "QUITMSG", 7) == 0)
   {
     counter1 = atoi (ttext+7);
@@ -3978,6 +3994,7 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 	  case JOB_CHEAT:
 	  case JOB_MISC:
 	  case JOB_SPRITES:
+	  case JOB_SOUNDS:
 	    current_job = (dhjobs_t) counter1;
 	    break;
 
@@ -4408,6 +4425,39 @@ void DH_parse_hacker_file_f (const char * filename, FILE * fin, unsigned int fil
 		newt [4] = 0;
 		sprnames [counter1] = newt;
 //		printf ("Setting sprite name %u to %s\n", counter1, newt);
+	      }
+	    }
+	    break;
+
+	  case JOB_SOUNDS:
+	    string1 = a_line;
+
+	    while (*string1 == ' ')
+	      string1++;
+
+	    counter1 = atoi (string1);
+
+	    counter2 = dh_inchar (string1, '=');
+	    if (counter2 == 0)
+	      break;
+
+	    string1 = string1 + counter2;
+	    while (*string1 == ' ')
+	      string1++;
+
+	    if (counter1 >= NUMSFX)
+	    {
+	      printf ("Sound %u = '%s' is too large\n", counter1, string1);
+	    }
+	    else
+	    {
+	      char * newt = malloc (8);
+	      if (newt)
+	      {
+		strncpy (newt, string1, 8);
+		newt [6] = 0;
+		// printf ("Replacing sound %u '%s' with '%s'\n", counter1, S_sfx [counter1].name, newt);
+		S_sfx [counter1].name = newt;
 	      }
 	    }
 	    break;
