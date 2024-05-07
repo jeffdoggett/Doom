@@ -31,6 +31,7 @@ static const char rcsid[] = "$Id: r_things.c,v 1.5 1997/02/03 16:47:56 b1 Exp $"
 
 
 #define MINZ				(FRACUNIT*4)
+#define MAXZ				(FRACUNIT*8192)
 #define BASEYCENTER			100
 
 //void R_DrawColumn (void);
@@ -822,7 +823,7 @@ static void R_ProjectSprite (mobj_t* thing)
   tz = gxt-gyt;
 
   // thing is behind view plane?
-  if (tz < MINZ)
+  if ((tz < MINZ) || (tx > MAXZ))
     return;
 
   distance = FixedDiv(projection, tz);
@@ -832,7 +833,7 @@ static void R_ProjectSprite (mobj_t* thing)
   tx = -(gyt+gxt);
 
   // too far off the side?
-  if (abs(tx)>(tz<<2))
+  if (abs(tx/4) > tz)
     return;
 
   // decide which patch to use for sprite relative to player
