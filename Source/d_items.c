@@ -48,7 +48,7 @@ weaponinfo_t	weaponinfo[NUMWEAPONS] =
 	S_PUNCH,
 	S_PUNCH1,
 	S_NULL,
-	0,		// Ammo per shot
+	1,		// Ammo per shot
 	0		// MBF21 bits
     },
     {
@@ -119,7 +119,7 @@ weaponinfo_t	weaponinfo[NUMWEAPONS] =
 	S_SAW,
 	S_SAW1,
 	S_NULL,
-	0,0
+	1,0
     },
     {
 	// super shotgun
