@@ -37,9 +37,13 @@ OBJS=		am_map.o i_sound.o i_video.o dh_stuff.o doomdef.o doomstat.o \
 		p_tick.o p_user.o r_bsp.o r_data.o r_draw.o r_main.o r_patch.o r_plane.o r_segs.o r_sky.o r_things.o \
 		sounds.o st_lib.o st_stuff.o s_sound.o tables.o v_text.o v_video.o wi_stuff.o w_wad.o z_zone.o
 
-all:		/usr/local/lib/Doom/xdoom
+all:		xdoom
 
-/usr/local/lib/Doom/xdoom:    $(OBJS)
+install:	xdoom
+		mkdir -p /usr/local/lib/Doom
+		cp -p xdoom* /usr/local/lib/Doom/
+
+xdoom:		$(OBJS)
 		$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 		#upx $@
 		@echo Finished OK
