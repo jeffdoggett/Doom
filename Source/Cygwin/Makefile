@@ -12,6 +12,10 @@ CC=gcc
 ASM=
 VPATH=..
 
+ifndef DESTDIR
+DESTDIR = /usr/local/bin
+endif
+
 CFLAGS=-g -DMORELIGHTLEVELS -DPADDED_STRUCTS -DNORMALUNIX -DHAVE_ALLOCA
 #-Wpointer-to-int-cast -Wint-to-pointer-cast
 
@@ -40,12 +44,12 @@ OBJS=		am_map.o i_sound.o i_video.o dh_stuff.o doomdef.o doomstat.o \
 all:		xdoom
 
 install:	xdoom
-		mkdir -p /usr/local/lib/Doom
-		cp -p xdoom* /usr/local/lib/Doom/
+		mkdir -p $(DESTDIR)
+		cp -p xdoom* $(DESTDIR)
 
 xdoom:		$(OBJS)
 		$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
-		#upx $@
+		upx --best --lzma $@
 		@echo Finished OK
 
 #.SUFFIXES: .o .c
