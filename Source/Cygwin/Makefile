@@ -49,7 +49,7 @@ install:	xdoom
 
 xdoom:		$(OBJS)
 		$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
-		upx --best --lzma $@
+		upx --best --lzma $(@)*
 		@echo Finished OK
 
 #.SUFFIXES: .o .c
