@@ -823,7 +823,7 @@ static void R_ProjectSprite (mobj_t* thing)
   tz = gxt-gyt;
 
   // thing is behind view plane?
-  if ((tz < MINZ) || (tx > MAXZ))
+  if ((tz < MINZ) || (tz > MAXZ))
     return;
 
   distance = FixedDiv(projection, tz);
