@@ -1002,14 +1002,16 @@ castlist_t *		castlist = NULL;
 
 static char * F_CastName (mobjtype_t rtype)
 {
+  char * name;
   mobjinfo_t * mobj_ptr;
 
   if (castlist)
     return (castlist -> cast_name);
 
   mobj_ptr = &mobjinfo [rtype];
-  if ((mobj_ptr->names[0]) && (mobj_ptr->names[0][0]))
-    return (mobj_ptr -> names[0]);
+  name = mobj_ptr -> names[0];
+  if ((name != NULL) && (name[0] != 0))
+    return (name);
 
   return ("Unknown");
 }
@@ -1018,12 +1020,14 @@ static char * F_CastName (mobjtype_t rtype)
 
 static boolean F_FindCastByName (const char * castName)
 {
+  char * name;
   mobjtype_t   cast_num = (mobjtype_t) 0;
   mobjinfo_t * mobj_ptr = &mobjinfo[0];
 
   do
   {
-    if (strcasecmp (mobj_ptr->names[0], castName) == 0)
+    name = mobj_ptr->names[0];
+    if ((name != NULL) && (strcasecmp (name, castName) == 0))
     {
       casttype = cast_num;
       return (true);
@@ -1037,7 +1041,8 @@ static boolean F_FindCastByName (const char * castName)
   mobj_ptr = &mobjinfo[0];
   do
   {
-    if (dh_qty_match (mobj_ptr->names[0], castName) > 8)
+    name = mobj_ptr->names[0];
+    if ((name != NULL) && (dh_qty_match (name, castName) > 8))
     {
       casttype = cast_num;
       return (true);
@@ -1050,7 +1055,8 @@ static boolean F_FindCastByName (const char * castName)
   mobj_ptr = &mobjinfo[0];
   do
   {
-    if (dh_instr (mobj_ptr->names[0], castName))
+    name = mobj_ptr->names[0];
+    if ((name != NULL) && (dh_instr (name, castName)))
     {
       casttype = cast_num;
       return (true);
@@ -1068,6 +1074,7 @@ static void F_NextCast (boolean restart)
 {
   int attempts;
   static int castnum = 0;
+  char * name;
   mobjtype_t * cast_ptr;
   mobjinfo_t * mobj_ptr;
 
@@ -1117,7 +1124,8 @@ static void F_NextCast (boolean restart)
       cast_ptr = &castorder[0];
     }
     mobj_ptr = &mobjinfo [casttype = *cast_ptr];
-    if ((mobj_ptr -> names[0]) && (mobj_ptr -> names[0][0]))
+    name = mobj_ptr -> names[0];
+    if ((name != NULL) && (name[0] != 0))
       break;
   } while (--attempts);
 }

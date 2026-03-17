@@ -1486,16 +1486,19 @@ static boolean secret_sector (sector_t * sector)
 {
   unsigned int ss;
 
-  ss = sector -> special;
-  if ((ss & 0x1F) == 9)
-    return (true);
-  if (ss & SECRET_MASK)
-    return (true);
-  ss = sector -> oldspecial;
-  if ((ss & 0x1F) == 9)
-    return (true);
-  if (ss & SECRET_MASK)
-    return (true);
+  if (sector)
+  {
+    ss = sector -> special;
+    if ((ss & 0x1F) == 9)
+      return (true);
+    if (ss & SECRET_MASK)
+      return (true);
+    ss = sector -> oldspecial;
+    if ((ss & 0x1F) == 9)
+      return (true);
+    if (ss & SECRET_MASK)
+      return (true);
+  }
   return (false);
 }
 
@@ -1503,8 +1506,9 @@ static boolean secret_sector (sector_t * sector)
 
 static boolean moving_sector (sector_t * sector)
 {
-  if (((amclock & 8) == 0)
-   || ((sector->floordata == 0) && (sector->ceilingdata == 0)))
+  if ((sector == NULL)
+   || ((amclock & 8) == 0)
+   || ((sector->floordata == NULL) && (sector->ceilingdata == NULL)))
     return (false);
   return (true);
 }

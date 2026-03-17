@@ -2634,14 +2634,16 @@ static mobjtype_t get_mobj_num (char * mobj_name, char * filename, unsigned int 
       counter = 0;
       do
       {
-        if (strcasecmp (src, mobjinfo [counter].names[0]) == 0)
+	char * name = mobjinfo [counter].names[0];
+        if ((name != NULL) && (strcasecmp (src, name) == 0))
 	  return ((mobjtype_t)counter);
         counter++;
       } while (counter < NUMMOBJTYPES);
       counter = 0;
       do
       {
-        if (strcasecmp (src, mobjinfo [counter].names[1]) == 0)
+	char * name = mobjinfo [counter].names[1];
+        if ((name != NULL) && (strcasecmp (src, name) == 0))
 	  return ((mobjtype_t)counter);
         counter++;
       } while (counter < NUMMOBJTYPES);

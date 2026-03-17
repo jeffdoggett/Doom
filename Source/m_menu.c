@@ -148,7 +148,6 @@ char * menu_lump_names_orig [] =
   NULL
 };
 
-
 char * menu_lump_names [ARRAY_SIZE(menu_lump_names_orig)];
 
 
@@ -209,6 +208,8 @@ typedef enum
   ML_STDISC,
   ML_STCDROM
 } menu_lumps_t;
+
+static char empty_menu_lump_name [] = { 0xFF, 0 };
 
 /* ----------------------------------------------------------------------- */
 
@@ -784,7 +785,7 @@ void M_SetEpiName (unsigned int episode, char * name, unsigned int len)
     // name = M_EPI5"  (ie has a trailing quote)
     if (name == NULL)
     {
-      menu_lump_names[lumpnum][0] = 0xFF;
+      menu_lump_names[lumpnum] = empty_menu_lump_name;
     }
     else
     {
@@ -2694,7 +2695,7 @@ void M_Init (void)
 	   && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	  {
 //	    printf ("Destroyed menu lump %u for map %u\n", episode, G_Access_MapStartTab (episode_num [episode]) -> start_map);
-	    menu_lump_names[m_ptr -> namenum][0] = 0xFF;
+	    menu_lump_names[m_ptr -> namenum] = empty_menu_lump_name;
 	  }
 	  m_ptr++;
 	} while (++episode < EpiDef.numitems);
@@ -2737,7 +2738,7 @@ void M_Init (void)
 	     && (lumpinfo[lump2].handle != lumpinfo[0].handle))
 	    {
 	      // printf ("Destroyed menu lump %u\n", pos);
-	      menu_lump_names[m_ptr -> namenum][0] = 0xFF;
+	      menu_lump_names[m_ptr -> namenum] = empty_menu_lump_name;
 	    }
 	    m_ptr++;
 	  }

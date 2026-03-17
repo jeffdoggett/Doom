@@ -356,6 +356,7 @@ void A_WeaponReady (mobj_t* mo, pspdef_t* psp)
     statenum_t	newstate;
     int		angle;
     player_t*	player;
+    weapontype_t  readyweapon;
 
     // get out of attack state
     if (mo->state == &states[S_PLAY_ATK1]
@@ -367,7 +368,9 @@ void A_WeaponReady (mobj_t* mo, pspdef_t* psp)
     if ((player = mo->player) == NULL)
       return;
 
-    if (player->readyweapon == wp_chainsaw
+   readyweapon = player->readyweapon;
+
+    if (readyweapon == wp_chainsaw
 	&& psp
 	&& psp->state == &states[S_SAW])
     {
@@ -380,7 +383,7 @@ void A_WeaponReady (mobj_t* mo, pspdef_t* psp)
     {
 	// change weapon
 	//  (pending weapon should allready be validated)
-	newstate = (statenum_t) weaponinfo[player->readyweapon].downstate;
+	newstate = (statenum_t) weaponinfo[readyweapon].downstate;
 	P_SetPsprite (player, &player->psprites[ps_weapon], newstate);
 	return;
     }
@@ -389,9 +392,7 @@ void A_WeaponReady (mobj_t* mo, pspdef_t* psp)
     //  the missile launcher and bfg do not auto fire
     if (player->cmd.buttons & BT_ATTACK)
     {
-	if ( !player->attackdown
-	     || (player->readyweapon != wp_missile
-		 && player->readyweapon != wp_bfg) )
+	if (!player->attackdown || !(weaponinfo[readyweapon].mbf21bits & WPF_NOAUTOFIRE))
 	{
 	    player->attackdown = true;
 	    P_FireWeapon (player);

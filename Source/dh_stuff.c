@@ -4892,11 +4892,15 @@ static mobjtype_t find_boss_mobytype (const char * name)
     pos = 0;
     do
     {
-      len = dh_qty_match (buffer, mobjptr->names[pos]);
-      if (len > best_len)
+      char * name = mobjptr->names[pos];
+      if (name)
       {
-	best_len = len;
-	best = (mobjtype_t) count;
+	len = dh_qty_match (buffer, name);
+	if (len > best_len)
+	{
+	  best_len = len;
+	  best = (mobjtype_t) count;
+	}
       }
     } while (++pos < ARRAY_SIZE(mobjptr->names));
     ++mobjptr;
