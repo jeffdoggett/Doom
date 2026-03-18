@@ -7050,6 +7050,22 @@ static unsigned int FindExitPicSlot (map_dests_t * mdest_ptr, const char * newna
 
 /* ---------------------------------------------------------------------------- */
 
+static void set_map_text_entry (char ** destp, char ** ptr, boolean multiLine)
+{
+  char * dest;
+  char * newtext;
+
+  newtext = ReadQuotedArg (ptr, multiLine);
+  if ((newtext) && (((dest = *destp) == NULL) || (strcmp (newtext, dest))))
+  {
+    char * t = strdup (newtext);
+    if (t)
+      *destp = t;
+  }
+}
+
+/* ---------------------------------------------------------------------------- */
+
 static void Parse_UMapinfo (char * ptr, char * top)
 {
   unsigned int i,j;
@@ -7181,43 +7197,19 @@ static void Parse_UMapinfo (char * ptr, char * top)
     }
     else if (strncasecmp (ptr, "SkyTexture", 9) == 0)
     {
-      newtext = ReadQuotedArg (&ptr, false);
-      if ((newtext) && (strcmp (newtext, mdest_ptr -> sky)))
-      {
-	char * t = strdup (newtext);
-	if (t)
-	  mdest_ptr -> sky = t;
-      }
+      set_map_text_entry (&mdest_ptr -> sky, &ptr, false);
     }
     else if (strncasecmp (ptr, "Music", 5) == 0)
     {
-      newtext = ReadQuotedArg (&ptr, false);
-      if ((newtext) && (strcmp (newtext, mdest_ptr -> music)))
-      {
-	char * t = strdup (newtext);
-	if (t)
-	  mdest_ptr -> music = t;
-      }
+      set_map_text_entry (&mdest_ptr -> music, &ptr, false);
     }
     else if (strncasecmp (ptr, "EnterPic", 8) == 0)
     {
-      newtext = ReadQuotedArg (&ptr, false);
-      if ((newtext) && (strcmp (newtext, mdest_ptr -> enterpic)))
-      {
-	char * t = strdup (newtext);
-	if (t)
-	  mdest_ptr -> enterpic = t;
-      }
+      set_map_text_entry (&mdest_ptr -> enterpic, &ptr, false);
     }
     else if (strncasecmp (ptr, "ExitPic", 7) == 0)
     {
-      newtext = ReadQuotedArg (&ptr, false);
-      if ((newtext) && (strcmp (newtext, mdest_ptr -> exitpic)))
-      {
-	char * t = strdup (newtext);
-	if (t)
-	  mdest_ptr -> exitpic = t;
-      }
+      set_map_text_entry (&mdest_ptr -> exitpic, &ptr, false);
     }
     else if (strncasecmp (ptr, "EndPic", 6) == 0)
     {
